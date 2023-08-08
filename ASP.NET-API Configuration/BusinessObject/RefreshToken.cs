@@ -15,6 +15,7 @@ namespace BusinessObject
 		public long Id { get; set; }
 		public long UserId { get; set; }
 		public string? TokenRefresh { get; set; }
+		public DateTime ExpiredDate { get; set; }
 		public string? JwtId { get; set; }
 
 		[ForeignKey(nameof(UserId))]

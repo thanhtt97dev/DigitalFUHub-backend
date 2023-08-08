@@ -49,7 +49,7 @@ namespace ServerAPI.Services
 			var tokenDescription = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(claims),
-				Expires = DateTime.UtcNow.AddMinutes(30),
+				Expires = DateTime.UtcNow.AddMinutes(int.Parse(configuration["JWT:TokenAge"] ?? string.Empty)),
 				SigningCredentials = signingCredentials
 			};
 
@@ -63,6 +63,7 @@ namespace ServerAPI.Services
 				UserId = user.UserId,
 				TokenRefresh = refreshToken,
 				JwtId = token.Id, 
+				ExpiredDate = DateTime.UtcNow.AddMinutes(int.Parse(configuration["JWT:RefreshTokenAge"] ?? string.Empty)),
 			};
 
 			await refreshTokenRepository.AddRefreshTokenAsync(refreshTokenModel);
@@ -95,17 +96,18 @@ namespace ServerAPI.Services
 
 			var tokenValidationParameters = new TokenValidationParameters
 			{
-				ValidateIssuerSigningKey = true,
-				IssuerSigningKey = new SymmetricSecurityKey(secretKey),
 				ValidateIssuer = false,
 				ValidateAudience = false,
+
+				ValidateIssuerSigningKey = true,
+				IssuerSigningKey = new SymmetricSecurityKey(secretKey),
 				/*
 				ValidateIssuer = true,
 				ValidIssuer = configuration["JWT:Issuer"],
 				ValidateAudience = true,
 				ValidAudience = configuration["JWT:Audience"],
 				*/
-				ClockSkew = TimeSpan.FromMinutes(1),
+				ClockSkew = TimeSpan.FromMinutes(3),
 				ValidateLifetime = false
 			};
 
@@ -130,6 +132,12 @@ namespace ServerAPI.Services
 			// check refreshToken exist DB
 			var refreshToken = await refreshTokenRepository.GetRefreshToken(refreshTokenKey);
 			if(refreshToken == null) return false;
+
+			// check refreshToken is expired
+			if (refreshToken.ExpiredDate < DateTime.UtcNow)
+			{
+				return false;
+			}
 
 			// check accessToken id equal jwtId of refreshToken yet
 			var jti = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Jti).Value;

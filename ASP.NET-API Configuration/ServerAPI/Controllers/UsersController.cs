@@ -2,6 +2,7 @@
 using BusinessObject;
 using DataAccess.IRepositories;
 using DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServerAPI.Services;
@@ -80,5 +81,13 @@ namespace ServerAPI.Controllers
 				return _apiResponseHelper.StatusCode(500);
 			}
 		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpPost("test")]
+		public async Task<IActionResult> Test()
+		{
+			return Ok();	
+		}
+
 	}
 }

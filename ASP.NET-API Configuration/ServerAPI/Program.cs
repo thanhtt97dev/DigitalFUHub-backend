@@ -55,8 +55,13 @@ namespace ServerAPI
 
 						ValidateIssuerSigningKey = true,
 						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"] ?? string.Empty)),
-
-						ClockSkew = TimeSpan.FromMinutes(1)
+						/*
+						ValidateIssuer = true,
+						ValidIssuer = configuration["JWT:Issuer"],
+						ValidateAudience = true,
+						ValidAudience = configuration["JWT:Audience"],
+						*/
+						ValidateLifetime = true,
 					};
 				});
 

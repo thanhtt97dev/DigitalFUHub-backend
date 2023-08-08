@@ -31,7 +31,7 @@ namespace BusinessObject
 			//	.Build();
 			//if (!optionsBuilder.IsConfigured)
 			//{
-			optionsBuilder.UseSqlServer("Server=localhost;Initial Catalog=ApiConfiguration;Persist Security Info=False;User ID=sa;Password=sa;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+			optionsBuilder.UseSqlServer("Server=localhost;Initial Catalog=ApiConfigurationTest;Persist Security Info=False;User ID=sa;Password=sa;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
 			//optionsBuilder.UseSqlServer(conf.GetConnectionString("DB"));
 			//}
 		}
