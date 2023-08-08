@@ -1,4 +1,4 @@
-﻿namespace ServerAPI.Controllers
+﻿namespace DTOs
 {
 	public class RefreshTokenRequestDTO
 	{

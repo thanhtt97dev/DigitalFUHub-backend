@@ -42,7 +42,7 @@ namespace ServerAPI
 					.AddRouteComponents("odata", GetEdmModel());
 				});
 
-			
+
 
 			//Add JWT
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -64,6 +64,13 @@ namespace ServerAPI
 						ValidateLifetime = true,
 					};
 				});
+
+			//Add for more Policy Authorization
+			builder.Services.AddAuthorization(options =>
+			{
+				options.AddPolicy("AdminOnly", policy =>
+					policy.RequireRole("Admin"));
+			});
 
 			//Add Cors
 			builder.Services.AddCors(options =>
@@ -93,8 +100,7 @@ namespace ServerAPI
 			var mapper = configAutoMapper.CreateMapper();
 			builder.Services.AddSingleton(mapper);
 
-			//Add DI
-			builder.Services.AddSingleton<ApiResponseHelper>();
+			//Add DI 
 			builder.Services.AddSingleton<IUserRepository, UserRepository>();
 			builder.Services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
 
@@ -123,10 +129,10 @@ namespace ServerAPI
 		private static IEdmModel GetEdmModel()
 		{
 			ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-			
+
 			return builder.GetEdmModel();
 		}
 
-		
+
 	}
 }

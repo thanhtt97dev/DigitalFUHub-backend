@@ -2,13 +2,13 @@
 
 namespace ServerAPI.Services
 {
-	public class UtilityService
+	public class Util
 	{
 
-		private static UtilityService? instance;
+		private static Util? instance;
 		private static readonly object instanceLock = new object();
 
-		public static UtilityService Instance
+		public static Util Instance
 		{
 			get
 			{
@@ -16,7 +16,7 @@ namespace ServerAPI.Services
 				{
 					if (instance == null)
 					{
-						instance = new UtilityService();
+						instance = new Util();
 					}
 				}
 				return instance;

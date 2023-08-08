@@ -13,15 +13,13 @@ namespace ServerAPI.Controllers
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
-		private readonly ApiResponseHelper _apiResponseHelper;
 		private readonly IConfiguration _configuration;
 		private readonly IUserRepository _userRepository;
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 		private readonly IMapper _mapper;
 
-		public UsersController(ApiResponseHelper apiResponseHelper, IConfiguration configuration, IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IMapper mapper)
+		public UsersController(IConfiguration configuration, IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IMapper mapper)
 		{
-			_apiResponseHelper = apiResponseHelper;
 			_configuration = configuration;
 			_userRepository = userRepository;
 			_mapper = mapper;
@@ -46,7 +44,7 @@ namespace ServerAPI.Controllers
 			}
 			catch (Exception) 
 			{
-				return _apiResponseHelper.StatusCode(500);
+				return StatusCode(500);
 			}
 		}
 
@@ -60,14 +58,14 @@ namespace ServerAPI.Controllers
 
 				if (!isValidRefreshToken)
 				{
-					return _apiResponseHelper.StatusCode(409,"Refresh token is invalid!");
+					return Conflict("Refresh token is invalid!");
 				}
 
 				var user = await _userRepository.GetUserFromRefreshTokenAsync(refreshTokenRequestDTO.RefreshToken);
 
 				if(user == null)
 				{
-					return _apiResponseHelper.StatusCode(409);
+					return Conflict();
 				}
 
 				var token = await JwtTokenService.Instance.GenerateTokenAsync(user, _refreshTokenRepository, _configuration);
@@ -78,15 +76,15 @@ namespace ServerAPI.Controllers
 			}
 			catch (Exception) 
 			{
-				return _apiResponseHelper.StatusCode(500);
+				return StatusCode(500);
 			}
 		}
 
 		[Authorize(Roles = "Admin")]
 		[HttpPost("test")]
-		public async Task<IActionResult> Test()
+		public IActionResult Test()
 		{
-			return Ok();	
+			return Ok();
 		}
 
 	}
