@@ -53,6 +53,7 @@ namespace ServerAPI.Controllers
 			}
 		}
 
+		[Authorize]
 		[HttpPost("RefreshToken")]
 		public async Task<IActionResult> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
 		{
@@ -93,8 +94,14 @@ namespace ServerAPI.Controllers
 		public IActionResult testConflict()
 		{
 			string? accessToken = HttpContext.GetTokenAsync("access_token").Result;
-			_accessTokenRepository.RemoveAllAccessTokenByUserIdAsync(accessToken);
 			return Conflict("Remove token");
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("hehe")]
+		public IActionResult daw()
+		{
+			return Ok("hieuld6");
 		}
 
 	}

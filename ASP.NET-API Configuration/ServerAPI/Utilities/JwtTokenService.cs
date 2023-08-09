@@ -33,9 +33,10 @@ namespace ServerAPI.Services
 			}
 		}
 
-		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user, IAccessTokenRepository accessTokenRepository, 
+		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user, IAccessTokenRepository accessTokenRepository,
 			IRefreshTokenRepository refreshTokenRepository, IConfiguration configuration)
 		{
+			//Create access token
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var secretKeyBytes = Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? string.Empty);
 			var signingCredentials =
@@ -46,7 +47,7 @@ namespace ServerAPI.Services
 				new Claim(ClaimTypes.Name, user.Email ?? string.Empty),
 				new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new Claim("Id", user.UserId.ToString()),
+				new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
 				new Claim(ClaimTypes.Role, (user.Role == null ? string.Empty : user.Role.RoleName) ?? string.Empty),
 			};
 
@@ -62,6 +63,7 @@ namespace ServerAPI.Services
 			var token = tokenHandler.CreateToken(tokenDescription);
 			var accessToken = tokenHandler.WriteToken(token);
 
+			//Add access token to DB
 			var accessTokenModel = new AccessToken
 			{
 				UserId = user.UserId,
@@ -70,8 +72,9 @@ namespace ServerAPI.Services
 				ExpiredDate = accessTokenExpiredDate
 			};
 
-			await accessTokenRepository.AddAccessTokenAsync(accessTokenModel);
+			 await accessTokenRepository.AddAccessTokenAsync(accessTokenModel);
 
+			//Create Refresh token
 			var refreshToken = GenerateRefreshToken();
 			var refreshTokenModel = new RefreshToken
 			{
@@ -80,15 +83,18 @@ namespace ServerAPI.Services
 				JwtId = token.Id,
 				ExpiredDate = DateTime.UtcNow.AddMinutes(int.Parse(configuration["JWT:RefreshTokenAge"] ?? string.Empty)),
 			};
-
+			
+			//Add refresh token to DB
 			await refreshTokenRepository.AddRefreshTokenAsync(refreshTokenModel);
+
 			var response = new UserSignInResponseDTO
 			{
 				UserId = user.UserId,
 				Email = user.Email,
 				RoleName = user.Role == null ? string.Empty : user.Role.RoleName,
 				AccessToken = accessToken,
-				RefreshToken = refreshToken
+				RefreshToken = refreshToken,
+				JwtId = token.Id
 			};
 			return response;
 		}

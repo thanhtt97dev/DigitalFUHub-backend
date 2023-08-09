@@ -13,6 +13,8 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using ServerAPI.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ServerAPI
 {
@@ -43,7 +45,8 @@ namespace ServerAPI
 					.AddRouteComponents("odata", GetEdmModel());
 				});
 
-
+			// Add HttpContextAccessor 
+			builder.Services.AddHttpContextAccessor();
 
 			//Add JWT
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -71,24 +74,41 @@ namespace ServerAPI
 						OnTokenValidated = async context =>
 						{
 							var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApiContext>();
-							// Retrieve token from headers
-							var jwtId = context.SecurityToken.Id;
+
+							//JwtRegisteredClaimNames.Sub
 							// Retrieve user's ID from token claims
-							var userIdClaim = context.Principal.FindFirstValue("Id");
-
-							if (!string.IsNullOrEmpty(userIdClaim))
+							string? userId = string.Empty;
+							if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
 							{
-								var accessToken = await dbContext.AccessToken
-								.FirstOrDefaultAsync(x => x.UserId == int.Parse(userIdClaim) && x.JwtId == jwtId);
-
-								if (accessToken == null)
-								{
-									//Remove all token of user request
-									IAccessTokenRepository accessTokenRepository = new AccessTokenRepository();
-									await accessTokenRepository.RemoveAllAccessTokenByUserIdAsync(userIdClaim);
-									context.Fail("Unauthorized");
-								}
+								userId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
 							}
+
+							// Get cookie for jwtId
+							var jwtId = string.Empty;
+							var httpContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IHttpContextAccessor>();
+							if (httpContextAccessor != null)
+							{
+								jwtId = httpContextAccessor.HttpContext.Request.Cookies["_tid"];
+							}
+
+							if (string.IsNullOrEmpty(jwtId) || string.IsNullOrEmpty(userId))
+							{
+								//Remove all token of user was request
+								IAccessTokenRepository accessTokenRepository = new AccessTokenRepository();
+								await accessTokenRepository.RemoveAllAccessTokenUserAsync(userId, jwtId);
+								context.Fail("Unauthorized");
+								return;
+							}
+							
+							var accessToken = await dbContext.AccessToken
+								.FirstOrDefaultAsync(x => x.UserId == int.Parse(userId) && x.JwtId == jwtId);
+
+							if(accessToken == null) 
+							{
+								context.Fail("Unauthorized");
+								return;
+							}
+							
 							await Task.CompletedTask;
 						}
 					};
@@ -133,6 +153,7 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IUserRepository, UserRepository>();
 			builder.Services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
 			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
+
 
 			var app = builder.Build();
 

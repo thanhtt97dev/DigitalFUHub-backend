@@ -9,8 +9,8 @@ namespace DataAccess.IRepositories
 {
 	public interface IAccessTokenRepository
 	{
-		Task AddAccessTokenAsync(AccessToken accessToken);
+		Task<AccessToken> AddAccessTokenAsync(AccessToken accessToken);
 
-		Task RemoveAllAccessTokenByUserIdAsync(string? userId);
+		Task RemoveAllAccessTokenUserAsync(string? userId, string? jwtId);
 	}
 }

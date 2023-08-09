@@ -11,8 +11,8 @@ namespace DataAccess.Repositories
 {
 	public class AccessTokenRepository : IAccessTokenRepository
 	{
-		public Task AddAccessTokenAsync(AccessToken accessToken) => AccessTokenDAO.Instance.AddAccessTokenAsync(accessToken);
+		public Task<AccessToken> AddAccessTokenAsync(AccessToken accessToken) => AccessTokenDAO.Instance.AddAccessTokenAsync(accessToken);
 
-		public Task RemoveAllAccessTokenByUserIdAsync(string? userId) => AccessTokenDAO.Instance.RemoveAllAccessTokenByUserIdAsync(userId);
+		public Task RemoveAllAccessTokenUserAsync(string? userId, string? jwtId) => AccessTokenDAO.Instance.RemoveAllAccessTokenUserAsync(userId, jwtId);
 	}
 }

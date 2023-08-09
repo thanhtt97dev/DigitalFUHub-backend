@@ -28,13 +28,12 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Task AddRefreshTokenAsync(RefreshToken refreshToken)
+		internal async Task AddRefreshTokenAsync(RefreshToken refreshToken)
 		{
 			using(ApiContext context = new ApiContext()) 
 			{
 				context.RefreshToken.Add(refreshToken);
-				context.SaveChanges();
-				return Task.CompletedTask;
+				await context.SaveChangesAsync();
 			}
 		}
 
@@ -53,7 +52,7 @@ namespace DataAccess.DAOs
 			{
 				var token = await context.RefreshToken.FirstAsync(x => x.TokenRefresh == refreshTokenId);
 				context.RefreshToken.Remove(token);
-				context.SaveChanges();
+				await context.SaveChangesAsync();
 			}
 		}
 	}
