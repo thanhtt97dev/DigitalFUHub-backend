@@ -12,6 +12,7 @@ using AutoMapper;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using ServerAPI.Services;
+using System.Security.Claims;
 
 namespace ServerAPI
 {
@@ -63,6 +64,34 @@ namespace ServerAPI
 						*/
 						ValidateLifetime = true,
 					};
+
+					//Checking token has been in DB
+					opt.Events = new JwtBearerEvents
+					{
+						OnTokenValidated = async context =>
+						{
+							var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApiContext>();
+							// Retrieve token from headers
+							var jwtId = context.SecurityToken.Id;
+							// Retrieve user's ID from token claims
+							var userIdClaim = context.Principal.FindFirstValue("Id");
+
+							if (!string.IsNullOrEmpty(userIdClaim))
+							{
+								var accessToken = await dbContext.AccessToken
+								.FirstOrDefaultAsync(x => x.UserId == int.Parse(userIdClaim) && x.JwtId == jwtId);
+
+								if (accessToken == null)
+								{
+									//Remove all token of user request
+									IAccessTokenRepository accessTokenRepository = new AccessTokenRepository();
+									await accessTokenRepository.RemoveAllAccessTokenByUserIdAsync(userIdClaim);
+									context.Fail("Unauthorized");
+								}
+							}
+							await Task.CompletedTask;
+						}
+					};
 				});
 
 			//Add for more Policy Authorization
@@ -103,6 +132,7 @@ namespace ServerAPI
 			//Add DI 
 			builder.Services.AddSingleton<IUserRepository, UserRepository>();
 			builder.Services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
+			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
 
 			var app = builder.Build();
 

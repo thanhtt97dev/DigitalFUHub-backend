@@ -2,6 +2,7 @@
 using BusinessObject;
 using DataAccess.IRepositories;
 using DTOs;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +17,17 @@ namespace ServerAPI.Controllers
 		private readonly IConfiguration _configuration;
 		private readonly IUserRepository _userRepository;
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
+		private readonly IAccessTokenRepository _accessTokenRepository;
 		private readonly IMapper _mapper;
 
-		public UsersController(IConfiguration configuration, IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IMapper mapper)
+		public UsersController(IConfiguration configuration, IUserRepository userRepository,  IMapper mapper,
+			IRefreshTokenRepository refreshTokenRepository,IAccessTokenRepository accessTokenRepository)
 		{
 			_configuration = configuration;
 			_userRepository = userRepository;
 			_mapper = mapper;
 			_refreshTokenRepository  = refreshTokenRepository;
+			_accessTokenRepository = accessTokenRepository;
 		}
 
 		[HttpPost("SignIn")]
@@ -38,7 +42,8 @@ namespace ServerAPI.Controllers
 					return NotFound("Email or Password not correct!");
 				}
 
-				var token = await JwtTokenService.Instance.GenerateTokenAsync(user, _refreshTokenRepository, _configuration);
+				var token = await JwtTokenService.Instance
+					.GenerateTokenAsync(user, _accessTokenRepository, _refreshTokenRepository, _configuration);
 
 				return Ok(token);
 			}
@@ -54,21 +59,17 @@ namespace ServerAPI.Controllers
 			try
 			{
 				var isValidRefreshToken = await JwtTokenService.Instance
-					.IsValidRefreshTokenAsync(refreshTokenRequestDTO.AccessToken, refreshTokenRequestDTO.RefreshToken, _refreshTokenRepository, _configuration);
+					.CheckRefreshTokenIsValidAsync(refreshTokenRequestDTO.AccessToken, refreshTokenRequestDTO.RefreshToken,
+					_refreshTokenRepository, _configuration);
 
-				if (!isValidRefreshToken)
-				{
-					return Conflict("Refresh token is invalid!");
-				}
+				if (!isValidRefreshToken) return Unauthorized();
 
 				var user = await _userRepository.GetUserFromRefreshTokenAsync(refreshTokenRequestDTO.RefreshToken);
 
-				if(user == null)
-				{
-					return Conflict();
-				}
+				if (user == null) return Unauthorized();
 
-				var token = await JwtTokenService.Instance.GenerateTokenAsync(user, _refreshTokenRepository, _configuration);
+				var token = await JwtTokenService.Instance.GenerateTokenAsync(user, _accessTokenRepository,
+					_refreshTokenRepository, _configuration);
 
 				await _refreshTokenRepository.RemoveRefreshTokenAysnc(refreshTokenRequestDTO.RefreshToken);
 
@@ -84,7 +85,16 @@ namespace ServerAPI.Controllers
 		[HttpPost("test")]
 		public IActionResult Test()
 		{
-			return Ok();
+			string? accessToken = HttpContext.GetTokenAsync("access_token").Result;
+			return Ok(accessToken);
+		}
+
+		[HttpPost("testConflict")]
+		public IActionResult testConflict()
+		{
+			string? accessToken = HttpContext.GetTokenAsync("access_token").Result;
+			_accessTokenRepository.RemoveAllAccessTokenByUserIdAsync(accessToken);
+			return Conflict("Remove token");
 		}
 
 	}

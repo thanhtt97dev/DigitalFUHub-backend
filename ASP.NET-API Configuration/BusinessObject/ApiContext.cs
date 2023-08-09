@@ -20,6 +20,8 @@ namespace BusinessObject
 
 		public virtual DbSet<Role> Role { get; set; } = null!;
 		public virtual DbSet<User> User { get; set; } = null!;
+
+		public virtual DbSet<AccessToken> AccessToken { get; set; } = null!;
 		public virtual DbSet<RefreshToken> RefreshToken { get; set; } = null!;
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

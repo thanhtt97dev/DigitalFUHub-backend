@@ -1,6 +1,9 @@
 ﻿using BusinessObject;
 using DataAccess.IRepositories;
+using DataAccess.Repositories;
 using DTOs;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ServerAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
@@ -30,7 +33,8 @@ namespace ServerAPI.Services
 			}
 		}
 
-		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user, IRefreshTokenRepository refreshTokenRepository, IConfiguration configuration)
+		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user, IAccessTokenRepository accessTokenRepository, 
+			IRefreshTokenRepository refreshTokenRepository, IConfiguration configuration)
 		{
 			var tokenHandler = new JwtSecurityTokenHandler();
 			var secretKeyBytes = Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? string.Empty);
@@ -46,16 +50,27 @@ namespace ServerAPI.Services
 				new Claim(ClaimTypes.Role, (user.Role == null ? string.Empty : user.Role.RoleName) ?? string.Empty),
 			};
 
+
+			var accessTokenExpiredDate = DateTime.UtcNow.AddMinutes(int.Parse(configuration["JWT:TokenAge"] ?? string.Empty));
 			var tokenDescription = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(claims),
-				Expires = DateTime.UtcNow.AddMinutes(int.Parse(configuration["JWT:TokenAge"] ?? string.Empty)),
+				Expires = accessTokenExpiredDate,
 				SigningCredentials = signingCredentials
 			};
 
 			var token = tokenHandler.CreateToken(tokenDescription);
 			var accessToken = tokenHandler.WriteToken(token);
 
+			var accessTokenModel = new AccessToken
+			{
+				UserId = user.UserId,
+				JwtId = token.Id,
+				Token = accessToken,
+				ExpiredDate = accessTokenExpiredDate
+			};
+
+			await accessTokenRepository.AddAccessTokenAsync(accessTokenModel);
 
 			var refreshToken = GenerateRefreshToken();
 			var refreshTokenModel = new RefreshToken
@@ -89,7 +104,7 @@ namespace ServerAPI.Services
 			}
 		}
 
-		internal async Task<bool> IsValidRefreshTokenAsync(string? accessToken, string? refreshTokenKey, IRefreshTokenRepository refreshTokenRepository, IConfiguration configuration)
+		internal async Task<bool> CheckRefreshTokenIsValidAsync(string? accessToken, string? refreshTokenKey, IRefreshTokenRepository refreshTokenRepository, IConfiguration configuration)
 		{
 			try
 			{
@@ -152,7 +167,6 @@ namespace ServerAPI.Services
 
 			return true;
 		}
-
 
 	}
 }
