@@ -37,11 +37,11 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal async Task<RefreshToken?> GetRefreshToken(string? refreshToken)
+		internal RefreshToken? GetRefreshToken(string? refreshToken)
 		{
 			using (ApiContext context = new ApiContext())
 			{
-				var token = await context.RefreshToken.FirstOrDefaultAsync(x => x.TokenRefresh == refreshToken);
+				var token = context.RefreshToken.FirstOrDefault(x => x.TokenRefresh == refreshToken);
 				return token;
 			}
 		}

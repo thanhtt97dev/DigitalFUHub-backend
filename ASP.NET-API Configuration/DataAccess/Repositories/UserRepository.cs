@@ -11,8 +11,8 @@ namespace DataAccess.Repositories
 {
 	public class UserRepository : IUserRepository
 	{
-		public Task<User?> GetUserByEmailAndPasswordAsync(string? email, string? password) => UserDAO.Instance.GetUserByEmailAndPasswordAsync(email, password);
+		public User GetUserByEmailAndPassword(string? email, string? password) => UserDAO.Instance.GetUserByEmailAndPassword(email, password);
 
-		public Task<User?> GetUserFromRefreshTokenAsync(string? refreshTokenId) => UserDAO.Instance.GetUserFromRefreshTokenAsync(refreshTokenId);
+		public User? GetUserByRefreshToken(string? refreshTokenId) => UserDAO.Instance.GetUserByRefreshToken(refreshTokenId);
 	}
 }

@@ -9,8 +9,8 @@ namespace DataAccess.IRepositories
 {
 	public interface IUserRepository
 	{
-		Task<User?> GetUserByEmailAndPasswordAsync(string? email, string? password);	
+		User? GetUserByEmailAndPassword(string? email, string? password);	
 
-		Task<User?> GetUserFromRefreshTokenAsync(string? refreshTokenId);
+		User? GetUserByRefreshToken(string? refreshTokenId);
 	}
 }

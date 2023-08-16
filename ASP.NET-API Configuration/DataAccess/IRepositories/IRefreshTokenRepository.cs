@@ -11,7 +11,7 @@ namespace DataAccess.IRepositories
 	{
 		Task AddRefreshTokenAsync(RefreshToken refreshToken);
 
-		Task<RefreshToken?> GetRefreshToken(string? refreshTokenId);	
+		RefreshToken? GetRefreshToken(string? refreshTokenStr);	
 
 		Task RemoveRefreshTokenAysnc(string? refreshTokenId);
 

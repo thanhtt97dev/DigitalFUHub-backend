@@ -13,7 +13,7 @@ namespace DataAccess.Repositories
 	{
 		public Task AddRefreshTokenAsync(RefreshToken refreshToken) => RefreshTokenDAO.Instance.AddRefreshTokenAsync(refreshToken);
 
-		public Task<RefreshToken?> GetRefreshToken(string? refreshTokenId) => RefreshTokenDAO.Instance.GetRefreshToken(refreshTokenId);
+		public RefreshToken? GetRefreshToken(string? refreshTokenStr) => RefreshTokenDAO.Instance.GetRefreshToken(refreshTokenStr);
 
 		public Task RemoveRefreshTokenAysnc(string? refreshTokenId) => RefreshTokenDAO.Instance.RemoveRefreshTokenAysnc(refreshTokenId);
 	}

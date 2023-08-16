@@ -80,9 +80,10 @@ namespace ServerAPI
 							string? userId = string.Empty;
 							if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
 							{
-								userId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
+								userId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? "0";
 							}
 
+							/*
 							// Get cookie for jwtId
 							var jwtId = string.Empty;
 							var httpContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IHttpContextAccessor>();
@@ -90,6 +91,7 @@ namespace ServerAPI
 							{
 								jwtId = httpContextAccessor.HttpContext.Request.Cookies["_tid"];
 							}
+							
 
 							if (string.IsNullOrEmpty(jwtId) || string.IsNullOrEmpty(userId))
 							{
@@ -99,11 +101,13 @@ namespace ServerAPI
 								context.Fail("Unauthorized");
 								return;
 							}
-							
-							var accessToken = await dbContext.AccessToken
-								.FirstOrDefaultAsync(x => x.UserId == int.Parse(userId) && x.JwtId == jwtId);
+							*/
 
-							if(accessToken == null) 
+
+							var accessToken = await dbContext.AccessToken
+								.FirstOrDefaultAsync(x => x.UserId == int.Parse(userId));
+
+							if (accessToken == null) 
 							{
 								context.Fail("Unauthorized");
 								return;
@@ -153,6 +157,8 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IUserRepository, UserRepository>();
 			builder.Services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
 			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
+
+			builder.Services.AddSingleton<JwtTokenService>();
 
 
 			var app = builder.Build();

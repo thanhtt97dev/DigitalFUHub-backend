@@ -15,30 +15,25 @@ namespace ServerAPI.Services
 {
 	public class JwtTokenService
 	{
-		private static JwtTokenService? instance;
-		private static readonly object instanceLock = new object();
+		private readonly IConfiguration _configuration;
+		private readonly IUserRepository _userRepository;
+		private readonly IRefreshTokenRepository _refreshTokenRepository;
+		private readonly IAccessTokenRepository _accessTokenRepository;
 
-		public static JwtTokenService Instance
+		public JwtTokenService(IConfiguration configuration, IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IAccessTokenRepository accessTokenRepository)
 		{
-			get
-			{
-				lock (instanceLock)
-				{
-					if (instance == null)
-					{
-						instance = new JwtTokenService();
-					}
-				}
-				return instance;
-			}
+			_configuration = configuration;
+			_userRepository = userRepository;
+			_refreshTokenRepository = refreshTokenRepository;
+			_accessTokenRepository = accessTokenRepository;
 		}
 
-		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user, IAccessTokenRepository accessTokenRepository,
-			IRefreshTokenRepository refreshTokenRepository, IConfiguration configuration)
+
+		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user)
 		{
 			//Create access token
 			var tokenHandler = new JwtSecurityTokenHandler();
-			var secretKeyBytes = Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? string.Empty);
+			var secretKeyBytes = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
 			var signingCredentials =
 				new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha512Signature);
 
@@ -52,7 +47,7 @@ namespace ServerAPI.Services
 			};
 
 
-			var accessTokenExpiredDate = DateTime.UtcNow.AddMinutes(int.Parse(configuration["JWT:TokenAge"] ?? string.Empty));
+			var accessTokenExpiredDate = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JWT:TokenAge"] ?? string.Empty));
 			var tokenDescription = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(claims),
@@ -69,10 +64,11 @@ namespace ServerAPI.Services
 				UserId = user.UserId,
 				JwtId = token.Id,
 				Token = accessToken,
-				ExpiredDate = accessTokenExpiredDate
+				ExpiredDate = accessTokenExpiredDate,
+				isRevoked = false,	
 			};
 
-			 await accessTokenRepository.AddAccessTokenAsync(accessTokenModel);
+			await _accessTokenRepository.AddAccessTokenAsync(accessTokenModel);
 
 			//Create Refresh token
 			var refreshToken = GenerateRefreshToken();
@@ -81,11 +77,11 @@ namespace ServerAPI.Services
 				UserId = user.UserId,
 				TokenRefresh = refreshToken,
 				JwtId = token.Id,
-				ExpiredDate = DateTime.UtcNow.AddMinutes(int.Parse(configuration["JWT:RefreshTokenAge"] ?? string.Empty)),
+				ExpiredDate = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JWT:RefreshTokenAge"] ?? string.Empty)),
 			};
-			
+
 			//Add refresh token to DB
-			await refreshTokenRepository.AddRefreshTokenAsync(refreshTokenModel);
+			await _refreshTokenRepository.AddRefreshTokenAsync(refreshTokenModel);
 
 			var response = new UserSignInResponseDTO
 			{
@@ -94,7 +90,6 @@ namespace ServerAPI.Services
 				RoleName = user.Role == null ? string.Empty : user.Role.RoleName,
 				AccessToken = accessToken,
 				RefreshToken = refreshToken,
-				JwtId = token.Id
 			};
 			return response;
 		}
@@ -110,12 +105,12 @@ namespace ServerAPI.Services
 			}
 		}
 
-		internal async Task<bool> CheckRefreshTokenIsValidAsync(string? accessToken, string? refreshTokenKey, IRefreshTokenRepository refreshTokenRepository, IConfiguration configuration)
+		internal bool CheckRefreshTokenIsValid(string? accessToken, string? refreshTokenKey)
 		{
 			try
 			{
 				JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-				var secretKey = Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? string.Empty);
+				var secretKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
 
 				var tokenValidationParameters = new TokenValidationParameters
 				{
@@ -124,12 +119,14 @@ namespace ServerAPI.Services
 
 					ValidateIssuerSigningKey = true,
 					IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+
 					/*
 					ValidateIssuer = true,
 					ValidIssuer = configuration["JWT:Issuer"],
 					ValidateAudience = true,
 					ValidAudience = configuration["JWT:Audience"],
 					*/
+
 					ClockSkew = TimeSpan.FromMinutes(3),
 					ValidateLifetime = false
 				};
@@ -137,34 +134,19 @@ namespace ServerAPI.Services
 				ClaimsPrincipal tokenVerification = jwtSecurityTokenHandler
 					.ValidateToken(accessToken, tokenValidationParameters, out var validatedToken);
 
-				if (validatedToken is JwtSecurityToken jwtSecurityToken)
-				{
-					bool result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512,
-						StringComparison.InvariantCultureIgnoreCase);
-					if (!result) return false;
-				}
-
-				// check accessToken expired 
-				long utcexpireDate = long.Parse(tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-				DateTime expireDate = Util.Instance.ConvertUnitTimeToDateTime(utcexpireDate);
-				if (expireDate < DateTime.UtcNow)
-				{
-					return false;
-				}
-
 				// check refreshToken exist in DB
-				var refreshToken = await refreshTokenRepository.GetRefreshToken(refreshTokenKey);
+				var refreshToken = _refreshTokenRepository.GetRefreshToken(refreshTokenKey);
 				if (refreshToken == null) return false;
+
+				// check accessToken id equal jwtId of refreshToken
+				var jti = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+				if (refreshToken.JwtId != jti) return false;
 
 				// check refreshToken expired
 				if (refreshToken.ExpiredDate < DateTime.UtcNow)
 				{
 					return false;
 				}
-
-				// check accessToken id equal jwtId of refreshToken
-				var jti = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
-				if (refreshToken.JwtId != jti) return false;
 			}
 			catch (ArgumentException)
 			{

@@ -20,14 +20,17 @@ namespace ServerAPI.Controllers
 		private readonly IAccessTokenRepository _accessTokenRepository;
 		private readonly IMapper _mapper;
 
-		public UsersController(IConfiguration configuration, IUserRepository userRepository,  IMapper mapper,
-			IRefreshTokenRepository refreshTokenRepository,IAccessTokenRepository accessTokenRepository)
+		private readonly JwtTokenService _jwtTokenService;	
+
+		public UsersController(IConfiguration configuration, IUserRepository userRepository, IMapper mapper,
+			IRefreshTokenRepository refreshTokenRepository, IAccessTokenRepository accessTokenRepository, JwtTokenService jwtTokenService)
 		{
 			_configuration = configuration;
 			_userRepository = userRepository;
 			_mapper = mapper;
-			_refreshTokenRepository  = refreshTokenRepository;
+			_refreshTokenRepository = refreshTokenRepository;
 			_accessTokenRepository = accessTokenRepository;
+			_jwtTokenService = jwtTokenService;
 		}
 
 		[HttpPost("SignIn")]
@@ -35,15 +38,14 @@ namespace ServerAPI.Controllers
 		{
 			try
 			{
-				User? user = await _userRepository.GetUserByEmailAndPasswordAsync(userSignIn.Email, userSignIn.Password);
+				User? user = _userRepository.GetUserByEmailAndPassword(userSignIn.Email, userSignIn.Password);
 
 				if (user == null)
 				{
 					return NotFound("Email or Password not correct!");
 				}
 
-				var token = await JwtTokenService.Instance
-					.GenerateTokenAsync(user, _accessTokenRepository, _refreshTokenRepository, _configuration);
+				var token = await _jwtTokenService.GenerateTokenAsync(user);
 
 				return Ok(token);
 			}
@@ -53,24 +55,23 @@ namespace ServerAPI.Controllers
 			}
 		}
 
+		/*
 		[Authorize]
 		[HttpPost("RefreshToken")]
 		public async Task<IActionResult> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
 		{
 			try
 			{
-				var isValidRefreshToken = await JwtTokenService.Instance
-					.CheckRefreshTokenIsValidAsync(refreshTokenRequestDTO.AccessToken, refreshTokenRequestDTO.RefreshToken,
-					_refreshTokenRepository, _configuration);
+				var isValidRefreshToken =  _jwtTokenService
+					.CheckRefreshTokenIsValidAsync(refreshTokenRequestDTO.AccessToken, refreshTokenRequestDTO.RefreshToken);
 
 				if (!isValidRefreshToken) return Unauthorized();
 
-				var user = await _userRepository.GetUserFromRefreshTokenAsync(refreshTokenRequestDTO.RefreshToken);
+				var user = await _userRepository.GetUserByRefreshTokenAsync(refreshTokenRequestDTO.RefreshToken);
 
 				if (user == null) return Unauthorized();
 
-				var token = await JwtTokenService.Instance.GenerateTokenAsync(user, _accessTokenRepository,
-					_refreshTokenRepository, _configuration);
+				var token = await _jwtTokenService.GenerateTokenAsync(user);
 
 				await _refreshTokenRepository.RemoveRefreshTokenAysnc(refreshTokenRequestDTO.RefreshToken);
 
@@ -81,6 +82,50 @@ namespace ServerAPI.Controllers
 				return StatusCode(500);
 			}
 		}
+		*/
+
+		[Authorize]
+		[HttpPost("RefreshToken")]
+		public async Task<IActionResult> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
+		{
+			try
+			{
+				var isValidRefreshToken = _jwtTokenService
+					.CheckRefreshTokenIsValid(refreshTokenRequestDTO.AccessToken, refreshTokenRequestDTO.RefreshToken);
+
+				if (!isValidRefreshToken) return Unauthorized();
+
+				var user = _userRepository.GetUserByRefreshToken(refreshTokenRequestDTO.RefreshToken);
+
+				if (user == null) return Unauthorized();
+
+				var token = _jwtTokenService.GenerateTokenAsync(user);
+
+				await _refreshTokenRepository.RemoveRefreshTokenAysnc(refreshTokenRequestDTO.RefreshToken);
+
+				return Ok(await token);
+			}
+			catch (Exception)
+			{
+				return StatusCode(500);
+			}
+		}
+
+		[Authorize]
+		[HttpPost("RevokeToken")]
+		public async Task<IActionResult> RevokeTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
+		{
+			try
+			{
+				return Ok();
+
+			}
+			catch (Exception)
+			{
+				return StatusCode(500);
+			}
+		}
+
 
 		[Authorize(Roles = "Admin")]
 		[HttpPost("test")]

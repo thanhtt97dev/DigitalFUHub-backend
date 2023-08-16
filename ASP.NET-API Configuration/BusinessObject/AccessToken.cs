@@ -17,6 +17,7 @@ namespace BusinessObject
 		public string? JwtId { get; set; }
 		public string? Token { get; set; }
 		public DateTime ExpiredDate { get; set; }
+		public bool isRevoked { get; set; }	
 
 		[ForeignKey(nameof(UserId))]
 		public virtual User? User { get; set; } = null!;
