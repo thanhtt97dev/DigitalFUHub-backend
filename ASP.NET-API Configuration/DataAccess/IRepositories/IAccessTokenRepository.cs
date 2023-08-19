@@ -11,6 +11,6 @@ namespace DataAccess.IRepositories
 	{
 		Task<AccessToken> AddAccessTokenAsync(AccessToken accessToken);
 
-		Task RemoveAllAccessTokenUserAsync(string? userId, string? jwtId);
+		void RevokeToken(string jwtId);
 	}
 }

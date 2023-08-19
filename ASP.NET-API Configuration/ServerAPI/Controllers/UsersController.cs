@@ -42,12 +42,12 @@ namespace ServerAPI.Controllers
 
 				if (user == null)
 				{
-					return NotFound("Email or Password not correct!");
+					return Unauthorized("Email or Password not correct!");
 				}
 
-				var token = await _jwtTokenService.GenerateTokenAsync(user);
+				var token = _jwtTokenService.GenerateTokenAsync(user);
 
-				return Ok(token);
+				return Ok(await token);
 			}
 			catch (Exception) 
 			{
@@ -55,34 +55,6 @@ namespace ServerAPI.Controllers
 			}
 		}
 
-		/*
-		[Authorize]
-		[HttpPost("RefreshToken")]
-		public async Task<IActionResult> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
-		{
-			try
-			{
-				var isValidRefreshToken =  _jwtTokenService
-					.CheckRefreshTokenIsValidAsync(refreshTokenRequestDTO.AccessToken, refreshTokenRequestDTO.RefreshToken);
-
-				if (!isValidRefreshToken) return Unauthorized();
-
-				var user = await _userRepository.GetUserByRefreshTokenAsync(refreshTokenRequestDTO.RefreshToken);
-
-				if (user == null) return Unauthorized();
-
-				var token = await _jwtTokenService.GenerateTokenAsync(user);
-
-				await _refreshTokenRepository.RemoveRefreshTokenAysnc(refreshTokenRequestDTO.RefreshToken);
-
-				return Ok(token);
-			}
-			catch (Exception) 
-			{
-				return StatusCode(500);
-			}
-		}
-		*/
 
 		[Authorize]
 		[HttpPost("RefreshToken")]
@@ -113,12 +85,13 @@ namespace ServerAPI.Controllers
 
 		[Authorize]
 		[HttpPost("RevokeToken")]
-		public async Task<IActionResult> RevokeTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
+		public IActionResult RevokeToken([FromBody]string jwtId)
 		{
 			try
 			{
+				if (string.IsNullOrEmpty(jwtId)) return BadRequest("Cannot revoke access token!");
+				_accessTokenRepository.RevokeToken(jwtId);
 				return Ok();
-
 			}
 			catch (Exception)
 			{
@@ -135,12 +108,6 @@ namespace ServerAPI.Controllers
 			return Ok(accessToken);
 		}
 
-		[HttpPost("testConflict")]
-		public IActionResult testConflict()
-		{
-			string? accessToken = HttpContext.GetTokenAsync("access_token").Result;
-			return Conflict("Remove token");
-		}
 
 		[Authorize(Roles = "Admin")]
 		[HttpGet("hehe")]

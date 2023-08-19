@@ -73,46 +73,43 @@ namespace ServerAPI
 					{
 						OnTokenValidated = async context =>
 						{
-							var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApiContext>();
-
-							//JwtRegisteredClaimNames.Sub
-							// Retrieve user's ID from token claims
-							string? userId = string.Empty;
+							// Retrieve jwtId from token claims
+							string? jwtId = string.Empty;
+							string? userIdStr = string.Empty;
 							if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
 							{
-								userId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? "0";
+								jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
+								userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
 							}
 
 							/*
-							// Get cookie for jwtId
+							// Get cookie
 							var jwtId = string.Empty;
 							var httpContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IHttpContextAccessor>();
 							if (httpContextAccessor != null)
 							{
 								jwtId = httpContextAccessor.HttpContext.Request.Cookies["_tid"];
 							}
-							
-
-							if (string.IsNullOrEmpty(jwtId) || string.IsNullOrEmpty(userId))
-							{
-								//Remove all token of user was request
-								IAccessTokenRepository accessTokenRepository = new AccessTokenRepository();
-								await accessTokenRepository.RemoveAllAccessTokenUserAsync(userId, jwtId);
-								context.Fail("Unauthorized");
-								return;
-							}
 							*/
 
+							var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApiContext>();
+							var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.isRevoked == false);
 
-							var accessToken = await dbContext.AccessToken
-								.FirstOrDefaultAsync(x => x.UserId == int.Parse(userId));
-
-							if (accessToken == null) 
+							if (accessToken == null)
 							{
+								//Hanlde revoke all token of this user
+								int userId;
+								int.TryParse(userIdStr, out userId);
+
+								var tokens = dbContext.AccessToken.Where(x => x.UserId == userId).ToList();
+								tokens.ForEach((token) => { token.isRevoked = true; });
+								dbContext.SaveChanges();
+
 								context.Fail("Unauthorized");
 								return;
 							}
-							
+
+
 							await Task.CompletedTask;
 						}
 					};

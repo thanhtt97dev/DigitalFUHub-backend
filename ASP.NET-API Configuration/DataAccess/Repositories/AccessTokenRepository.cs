@@ -13,6 +13,7 @@ namespace DataAccess.Repositories
 	{
 		public Task<AccessToken> AddAccessTokenAsync(AccessToken accessToken) => AccessTokenDAO.Instance.AddAccessTokenAsync(accessToken);
 
-		public Task RemoveAllAccessTokenUserAsync(string? userId, string? jwtId) => AccessTokenDAO.Instance.RemoveAllAccessTokenUserAsync(userId, jwtId);
+		public void RevokeToken(string jwtId) => AccessTokenDAO.Instance.RevokeToken(jwtId);
+
 	}
 }
