@@ -14,7 +14,6 @@ namespace ServerAPI.Controllers
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
-		private readonly IConfiguration _configuration;
 		private readonly IUserRepository _userRepository;
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 		private readonly IAccessTokenRepository _accessTokenRepository;
@@ -22,10 +21,9 @@ namespace ServerAPI.Controllers
 
 		private readonly JwtTokenService _jwtTokenService;	
 
-		public UsersController(IConfiguration configuration, IUserRepository userRepository, IMapper mapper,
+		public UsersController(IUserRepository userRepository, IMapper mapper,
 			IRefreshTokenRepository refreshTokenRepository, IAccessTokenRepository accessTokenRepository, JwtTokenService jwtTokenService)
 		{
-			_configuration = configuration;
 			_userRepository = userRepository;
 			_mapper = mapper;
 			_refreshTokenRepository = refreshTokenRepository;
@@ -40,18 +38,15 @@ namespace ServerAPI.Controllers
 			{
 				User? user = _userRepository.GetUserByEmailAndPassword(userSignIn.Email, userSignIn.Password);
 
-				if (user == null)
-				{
-					return Unauthorized("Email or Password not correct!");
-				}
-
+				if (user == null) return NotFound("Email or Password not correct!");
+			
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
 				return Ok(await token);
 			}
 			catch (Exception) 
 			{
-				return StatusCode(500);
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
 
@@ -79,7 +74,7 @@ namespace ServerAPI.Controllers
 			}
 			catch (Exception)
 			{
-				return StatusCode(500);
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
 
@@ -95,26 +90,68 @@ namespace ServerAPI.Controllers
 			}
 			catch (Exception)
 			{
-				return StatusCode(500);
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
 
-
-		[Authorize(Roles = "Admin")]
-		[HttpPost("test")]
-		public IActionResult Test()
+		[Authorize]
+		[HttpGet("GetUsers")]
+		public IActionResult GetUsersByCondition(int? role, int? status, string email = "")
 		{
-			string? accessToken = HttpContext.GetTokenAsync("access_token").Result;
-			return Ok(accessToken);
+			if(role == null || status == null) return BadRequest();
+			
+			try
+			{
+				var userRequestDTO = new UserRequestDTO()
+				{
+					Email = email == null ? string.Empty : email,
+					RoleId = role,
+					Status = status
+				};
+				var users = _userRepository.GetUsers(userRequestDTO);
+
+				return Ok(_mapper.Map<List<UserResponeDTO>>(users));
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+			}
 		}
 
-
-		[Authorize(Roles = "Admin")]
-		[HttpGet("hehe")]
-		public IActionResult daw()
+		[Authorize]
+		[HttpGet("GetUserById/{id}")]
+		public IActionResult GetUserById(int id)
 		{
-			return Ok("hieuld6");
+			if (id == 0) return BadRequest();
+			try
+			{
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return Conflict();
+				return Ok(_mapper.Map<UserResponeDTO>(user));
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+			}
 		}
 
+		[Authorize]
+		[HttpPut("EditUserInfo/{id}")]
+		public async Task<IActionResult> EditUserInfo(int id, UserRequestDTO userRequestDTO)
+		{
+			if(userRequestDTO == null)	return BadRequest();
+			try
+			{
+				User? user = _userRepository.GetUserById(id);
+				if (user == null) return NotFound();	
+				var userUpdate = _mapper.Map<User>(userRequestDTO);	
+				await _userRepository.EditUserInfo(id, userUpdate);
+				return NoContent();
+			}catch(Exception ex) 
+			{
+				var x = ex;
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+			}
+		}
 	}
 }

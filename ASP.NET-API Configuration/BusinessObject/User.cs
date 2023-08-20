@@ -17,10 +17,11 @@ namespace BusinessObject
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long UserId { get; set; }
 		public long RoleId { get; set; }
-		public string? Email { get; set; }
-		public string? Password { get; set; }
+		public string Email { get; set; } = string.Empty;
+		public string Password { get; set; } = string.Empty;
+		public bool Status { get; set; }	
 
 		[ForeignKey(nameof(RoleId))]
-		public virtual Role? Role { get; set; } = null!;
+		public virtual Role Role { get; set; } = null!;
 	}
 }

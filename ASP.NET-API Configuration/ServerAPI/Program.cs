@@ -73,7 +73,7 @@ namespace ServerAPI
 					{
 						OnTokenValidated = async context =>
 						{
-							// Retrieve jwtId from token claims
+							// Retrieve user's info from token claims
 							string? jwtId = string.Empty;
 							string? userIdStr = string.Empty;
 							if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
@@ -92,15 +92,22 @@ namespace ServerAPI
 							}
 							*/
 
+							int userId;
+							int.TryParse(userIdStr, out userId);
+
 							var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApiContext>();
+							var userStatus = dbContext.User.First(x => x.UserId == userId).Status;
+
+							if (userStatus == false) 
+							{
+								context.Fail("Unauthorized");
+								return;
+							}
 							var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.isRevoked == false);
 
 							if (accessToken == null)
 							{
 								//Hanlde revoke all token of this user
-								int userId;
-								int.TryParse(userIdStr, out userId);
-
 								var tokens = dbContext.AccessToken.Where(x => x.UserId == userId).ToList();
 								tokens.ForEach((token) => { token.isRevoked = true; });
 								dbContext.SaveChanges();
@@ -131,11 +138,7 @@ namespace ServerAPI
 				});
 			});
 
-			// Remove cycle object's data in json respone
-			builder.Services.AddControllers().AddJsonOptions(options =>
-			{
-				options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-			});
+			
 			// Disable auto model state validate
 			builder.Services.Configure<ApiBehaviorOptions>(opts =>
 			{
@@ -150,10 +153,17 @@ namespace ServerAPI
 			var mapper = configAutoMapper.CreateMapper();
 			builder.Services.AddSingleton(mapper);
 
+			// Remove cycle object's data in json respone
+			builder.Services.AddControllers().AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+			});
+
 			//Add DI 
 			builder.Services.AddSingleton<IUserRepository, UserRepository>();
 			builder.Services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
 			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
+			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 

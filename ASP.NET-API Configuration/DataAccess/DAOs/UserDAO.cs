@@ -1,7 +1,10 @@
 ﻿using BusinessObject;
+using DTOs;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +31,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		public User GetUserByEmailAndPassword(string? email, string? password)
+		public User? GetUserByEmailAndPassword(string? email, string? password)
 		{
 			using (ApiContext context = new ApiContext())
 			{
@@ -45,6 +48,37 @@ namespace DataAccess.DAOs
 				if (refreshToken == null) return null;
 				var user = context.User.Include(x => x.Role).FirstOrDefault(x => x.UserId == refreshToken.UserId);
 				return user;
+			}
+		}
+
+		internal List<User> GetUsers(UserRequestDTO userDTO)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				var list = context.User.Include(x => x.Role).Where(x => x.Email.Contains(userDTO.Email)).ToList();
+				if(userDTO.RoleId != 0) list = list.Where(x => x.RoleId == userDTO.RoleId).ToList();
+				if(userDTO.Status != -1) list = list.Where(x => x.Status == (userDTO.Status == 1)).ToList();
+				return list;
+			}
+		}
+
+		internal User? GetUserById(int id)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				return context.User.Include(x => x.Role).FirstOrDefault(x => x.UserId == id);
+			}
+		}
+
+		internal async Task EditUserInfo(int id, User userUpdate)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				var user = await context.User.FirstAsync(x => x.UserId == id);
+				user.Email = userUpdate.Email;
+				user.RoleId = userUpdate.RoleId;	
+				user.Status = userUpdate.Status;
+				await context.SaveChangesAsync();
 			}
 		}
 	}
