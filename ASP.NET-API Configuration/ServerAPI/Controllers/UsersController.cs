@@ -1,15 +1,14 @@
-﻿using AutoMapper;
-using BusinessObject;
-using DataAccess.IRepositories;
-using DTOs;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using ServerAPI.Services;
-
-namespace ServerAPI.Controllers
+﻿namespace ServerAPI.Controllers
 {
+	using AutoMapper;
+	using BusinessObject;
+	using DataAccess.IRepositories;
+	using DTOs;
+	using Microsoft.AspNetCore.Authorization;
+	using Microsoft.AspNetCore.Mvc;
+	using ServerAPI.Services;
+
+
 	[Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase

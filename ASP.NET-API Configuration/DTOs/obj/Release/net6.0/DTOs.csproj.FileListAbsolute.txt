@@ -1,0 +1,15 @@
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\bin\Release\net6.0\DTOs.deps.json
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\bin\Release\net6.0\DTOs.dll
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\bin\Release\net6.0\DTOs.pdb
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\bin\Release\net6.0\BusinessObject.dll
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\bin\Release\net6.0\BusinessObject.pdb
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.csproj.AssemblyReference.cache
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.GeneratedMSBuildEditorConfig.editorconfig
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.AssemblyInfoInputs.cache
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.AssemblyInfo.cs
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.csproj.CoreCompileInputs.cache
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.csproj.CopyComplete
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.dll
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\refint\DTOs.dll
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\DTOs.pdb
+D:\FU\Learn React\asp.net-api-configuration\ASP.NET-API Configuration\DTOs\obj\Release\net6.0\ref\DTOs.dll

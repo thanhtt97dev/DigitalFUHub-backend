@@ -12,8 +12,6 @@ using AutoMapper;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using ServerAPI.Services;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ServerAPI
