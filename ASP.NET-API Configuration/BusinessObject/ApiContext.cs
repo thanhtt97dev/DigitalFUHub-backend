@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BusinessObject
 {
@@ -26,16 +28,16 @@ namespace BusinessObject
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			//var directory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().LastIndexOf("\\")) + "\\CinemaWebAPI";
-			//var conf = new ConfigurationBuilder()
-			//	.SetBasePath(directory)
-			//	.AddJsonFile("appsettings.json", true, true)
-			//	.Build();
-			//if (!optionsBuilder.IsConfigured)
-			//{
-			optionsBuilder.UseSqlServer("Server=localhost;Initial Catalog=ApiConfigurationTest;Persist Security Info=False;User ID=sa;Password=sa;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
-			//optionsBuilder.UseSqlServer(conf.GetConnectionString("DB"));
-			//}
+			string projectName = "ServerAPI";
+			var directory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().LastIndexOf("\\")) + "\\" + projectName;
+			var conf = new ConfigurationBuilder()
+				.SetBasePath(directory)
+				.AddJsonFile("appsettings.json", true, true)
+				.Build();
+			if (!optionsBuilder.IsConfigured)
+			{
+			optionsBuilder.UseSqlServer(conf.GetConnectionString("DB") ?? string.Empty);
+			}
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

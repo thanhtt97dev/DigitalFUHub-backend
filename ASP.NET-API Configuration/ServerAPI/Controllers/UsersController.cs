@@ -43,9 +43,9 @@
 
 				return Ok(await token);
 			}
-			catch (Exception) 
+			catch (Exception ex) 
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 
@@ -151,6 +151,13 @@
 				var x = ex;
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
+		}
+
+		[HttpGet("test")]
+		public IActionResult Get()
+		{
+			var user = _userRepository.GetUserById(1);
+			return Ok(user);
 		}
 	}
 }

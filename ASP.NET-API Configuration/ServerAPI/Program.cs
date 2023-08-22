@@ -175,7 +175,8 @@ namespace ServerAPI
 				app.UseSwaggerUI();
 			}
 
-			app.UseHttpsRedirection();
+			// Add https
+			//app.UseHttpsRedirection();
 
 			app.UseCors();
 

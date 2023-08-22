@@ -30,7 +30,7 @@ namespace DataAccess.DAOs
 
 		internal async Task AddRefreshTokenAsync(RefreshToken refreshToken)
 		{
-			using(ApiContext context = new ApiContext()) 
+			using (ApiContext context = new ApiContext())
 			{
 				context.RefreshToken.Add(refreshToken);
 				await context.SaveChangesAsync();
