@@ -41,7 +41,7 @@ namespace BusinessObject
 			}
 			*/
 
-			optionsBuilder.UseSqlServer("server=localhost; database=ApiConfigurationTest; uid=sa; pwd=sa");
+			optionsBuilder.UseSqlServer("server=localhost; database=DbApiTest; uid=sa; pwd=sa");
 			//optionsBuilder.UseSqlServer("Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;");
 		}
 

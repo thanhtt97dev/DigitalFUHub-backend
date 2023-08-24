@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230823034914_init")]
+    [Migration("20230824110124_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,6 +52,33 @@ namespace BusinessObject.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AccessToken");
+                });
+
+            modelBuilder.Entity("BusinessObject.Notification", b =>
+                {
+                    b.Property<long>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("NotificationId"), 1L, 1);
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsReaded")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("NotificationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("BusinessObject.RefreshToken", b =>
@@ -141,7 +168,18 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.AccessToken", b =>
                 {
                     b.HasOne("BusinessObject.User", "User")
-                        .WithMany()
+                        .WithMany("AccessTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Notification", b =>
+                {
+                    b.HasOne("BusinessObject.User", "User")
+                        .WithMany("Notifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -174,6 +212,13 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Role", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("BusinessObject.User", b =>
+                {
+                    b.Navigation("AccessTokens");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }
