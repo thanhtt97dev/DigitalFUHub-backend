@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using RealTimeServerAPI.DTOs;
 using RealTimeServerAPI.Hubs;
+using RealTimeServerAPI.Managers;
 
 namespace RealTimeServerAPI.Controllers
 {
@@ -10,24 +11,33 @@ namespace RealTimeServerAPI.Controllers
 	[ApiController]
 	public class NotificationsController : ControllerBase
 	{
+		
 		private readonly IHubContext<NotificationHub> _hubContext;
 
-		public NotificationsController(IHubContext<NotificationHub> hubContext)
+		private readonly IConnectionManager _connectionManager;
+
+		public NotificationsController(IHubContext<NotificationHub> hubContext, IConnectionManager connectionManager)
 		{
 			_hubContext = hubContext;
+			_connectionManager = connectionManager;	
 		}
 
 		[HttpPost("sendNotification")]
-		public async Task<IActionResult> SendNotification([FromBody] NotificationRequestDTO request)
+		public async Task<IActionResult> SendNotification(string userId, string content)
 		{
+			HashSet<string>? connections = _connectionManager.GetConnections(userId);
 			try
 			{
-				await _hubContext.Clients.Client(request.ConnectionId).SendAsync("ReceiveNotification", request.Message);
+				if (connections == null || connections.Count == 0) return Conflict();
+				foreach (var connection in connections) 
+				{
+					await _hubContext.Clients.Clients(connection).SendAsync("ReceiveNotification", content);	
+				}
 				return Ok();
 			}
-			catch (Exception ex)
+			catch
 			{
-				return BadRequest(ex.Message);
+				return StatusCode(500);
 			}
 		}
 	}

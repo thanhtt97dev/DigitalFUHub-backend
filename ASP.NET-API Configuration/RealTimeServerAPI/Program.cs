@@ -1,4 +1,5 @@
 using RealTimeServerAPI.Hubs;
+using RealTimeServerAPI.Managers;
 
 namespace RealTimeServerAPI
 {
@@ -26,6 +27,9 @@ namespace RealTimeServerAPI
 				});
 			});
 
+			//Add DI
+			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
+
 			var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
@@ -35,11 +39,11 @@ namespace RealTimeServerAPI
 				app.UseSwaggerUI();
 			}
 
-			app.UseAuthorization();
-			app.UseCors();
-
 			//Mapping hubs
 			app.MapHub<NotificationHub>("/notificationHub");
+
+			app.UseAuthorization();
+			app.UseCors();
 
 			app.MapControllers();
 

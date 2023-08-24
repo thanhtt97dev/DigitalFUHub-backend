@@ -24,6 +24,5 @@ namespace BusinessObject
 		[ForeignKey(nameof(RoleId))]
 		public virtual Role Role { get; set; } = null!;
 		public virtual ICollection<AccessToken>? AccessTokens { get; set; }
-		public virtual ICollection<Notification>? Notifications { get; set; }
 	}
 }
