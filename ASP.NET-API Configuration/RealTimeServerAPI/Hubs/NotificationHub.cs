@@ -27,6 +27,7 @@ namespace RealTimeServerAPI.Hubs
 		public void AddConnection()
 		{
 			var httpContext = this.Context.GetHttpContext();
+			if (httpContext == null) return;
 			var userId = httpContext.Request.Query["userId"];
 			if (string.IsNullOrEmpty(userId)) return;		
 			_connectionManager.AddConnection(userId, Context.ConnectionId);
