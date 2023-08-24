@@ -13,6 +13,8 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using ServerAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
+using ServerAPI.Middlewares;
+using ServerAPI.Validations;
 
 namespace ServerAPI
 {
@@ -50,74 +52,8 @@ namespace ServerAPI
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(opt =>
 				{
-					opt.TokenValidationParameters = new TokenValidationParameters
-					{
-						ValidateIssuer = false,
-						ValidateAudience = false,
-
-						ValidateIssuerSigningKey = true,
-						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"] ?? string.Empty)),
-						/*
-						ValidateIssuer = true,
-						ValidIssuer = configuration["JWT:Issuer"],
-						ValidateAudience = true,
-						ValidAudience = configuration["JWT:Audience"],
-						*/
-						ValidateLifetime = true,
-					};
-
-					//Checking token has been in DB
-					opt.Events = new JwtBearerEvents
-					{
-						OnTokenValidated = async context =>
-						{
-							// Retrieve user's info from token claims
-							string? jwtId = string.Empty;
-							string? userIdStr = string.Empty;
-							if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
-							{
-								jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
-								userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
-							}
-
-							/*
-							// Get cookie
-							var jwtId = string.Empty;
-							var httpContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IHttpContextAccessor>();
-							if (httpContextAccessor != null)
-							{
-								jwtId = httpContextAccessor.HttpContext.Request.Cookies["_tid"];
-							}
-							*/
-
-							int userId;
-							int.TryParse(userIdStr, out userId);
-
-							var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApiContext>();
-							var userStatus = dbContext.User.First(x => x.UserId == userId).Status;
-
-							if (userStatus == false) 
-							{
-								context.Fail("Unauthorized");
-								return;
-							}
-							var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.isRevoked == false);
-
-							if (accessToken == null)
-							{
-								//Hanlde revoke all token of this user
-								var tokens = dbContext.AccessToken.Where(x => x.UserId == userId).ToList();
-								tokens.ForEach((token) => { token.isRevoked = true; });
-								dbContext.SaveChanges();
-
-								context.Fail("Unauthorized");
-								return;
-							}
-
-
-							await Task.CompletedTask;
-						}
-					};
+					opt.TokenValidationParameters = new JwtValidationParameters();
+					opt.Events = new JwtValidationEvents();
 				});
 
 			//Add for more Policy Authorization
@@ -136,7 +72,7 @@ namespace ServerAPI
 				});
 			});
 
-			
+
 			// Disable auto model state validate
 			builder.Services.Configure<ApiBehaviorOptions>(opts =>
 			{
@@ -164,7 +100,6 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
-
 
 			var app = builder.Build();
 

@@ -28,6 +28,7 @@ namespace BusinessObject
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
+			/*
 			string projectName = "ServerAPI";
 			var directory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().LastIndexOf("\\")) + "\\" + projectName;
 			var conf = new ConfigurationBuilder()
@@ -38,6 +39,10 @@ namespace BusinessObject
 			{
 			optionsBuilder.UseSqlServer(conf.GetConnectionString("DB") ?? string.Empty);
 			}
+			*/
+
+			optionsBuilder.UseSqlServer("server=localhost; database=ApiConfigurationTest; uid=sa; pwd=sa");
+			//optionsBuilder.UseSqlServer("Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;");
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

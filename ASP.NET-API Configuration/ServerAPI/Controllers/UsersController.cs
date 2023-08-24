@@ -49,7 +49,6 @@
 			}
 		}
 
-
 		[Authorize]
 		[HttpPost("RefreshToken")]
 		public async Task<IActionResult> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
@@ -68,7 +67,7 @@
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
 				await _refreshTokenRepository.RemoveRefreshTokenAysnc(refreshTokenRequestDTO.RefreshToken);
-
+				
 				return Ok(await token);
 			}
 			catch (Exception)
