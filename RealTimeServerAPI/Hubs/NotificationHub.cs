@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObject;
 using DataAccess.IRepositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using RealTimeServerAPI.DTOs;
@@ -9,6 +10,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RealTimeServerAPI.Hubs
 {
+
 	public class NotificationHub: Hub
 	{
 		private IConnectionManager _connectionManager;

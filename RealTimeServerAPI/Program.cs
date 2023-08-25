@@ -3,6 +3,11 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using RealTimeServerAPI.Hubs;
 using RealTimeServerAPI.Managers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using RealTimeServerAPI.Validations;
+using BusinessObject;
+using Microsoft.EntityFrameworkCore;
 
 namespace RealTimeServerAPI
 {
@@ -22,13 +27,12 @@ namespace RealTimeServerAPI
 			//Add SignalR
 			builder.Services.AddSignalR();
 
-			//Add cors
-			builder.Services.AddCors(options =>
+			
+
+			// Add database
+			builder.Services.AddDbContext<ApiContext>(opts =>
 			{
-				options.AddDefaultPolicy(policy =>
-				{
-					policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-				});
+				opts.UseSqlServer(builder.Configuration.GetConnectionString("DB") ?? string.Empty);
 			});
 
 			//Add Auto Mapper
@@ -42,6 +46,25 @@ namespace RealTimeServerAPI
 			//Add DI
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
+
+			//Add JWT
+			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddJwtBearer(opt =>
+				{
+					opt.TokenValidationParameters = new JwtValidationParameters();
+ 					opt.Events = new JwtValidationEvents();
+				});
+
+
+			//Add cors
+			builder.Services.AddCors(options =>
+			{
+				options.AddDefaultPolicy(policy =>
+				{
+					policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+				});
+			});
+
 
 			var app = builder.Build();
 

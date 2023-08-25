@@ -139,3 +139,4 @@ D:\FU\Learn React\asp.net-api-configuration\RealTimeServerAPI\bin\Debug\net6.0\D
 D:\FU\Learn React\asp.net-api-configuration\RealTimeServerAPI\bin\Debug\net6.0\BusinessObject.pdb
 D:\FU\Learn React\asp.net-api-configuration\RealTimeServerAPI\bin\Debug\net6.0\DataAccess.pdb
 D:\FU\Learn React\asp.net-api-configuration\RealTimeServerAPI\bin\Debug\net6.0\DTOs.pdb
+D:\FU\Learn React\asp.net-api-configuration\RealTimeServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

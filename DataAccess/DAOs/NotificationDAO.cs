@@ -33,7 +33,8 @@ namespace DataAccess.DAOs
 			List<Notification> notifications = new List<Notification>();	
 			using (ApiContext context = new ApiContext())
 			{
-				notifications = context.Notification.Where(x => x.UserId == userId).ToList();
+				notifications = context.Notification.Where(x => x.UserId == userId)
+					.OrderByDescending(x => x.DateCreated).ToList();
 			}
 			return notifications;	
 		}

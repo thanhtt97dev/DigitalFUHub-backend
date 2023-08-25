@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObject;
 using DataAccess.IRepositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -34,6 +35,7 @@ namespace RealTimeServerAPI.Controllers
 		}
 
 		#region Send notification to a user
+		[Authorize]
 		[HttpPost("sendNotification/{userId}")]
 		public async Task<IActionResult> SendNotification([FromRoute]int userId, NotificationRequest notificationRequest)
 		{

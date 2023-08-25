@@ -15,6 +15,8 @@ using ServerAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using ServerAPI.Middlewares;
 using ServerAPI.Validations;
+using ServerAPI.Hubs;
+using ServerAPI.Managers;
 
 namespace ServerAPI
 {
@@ -98,8 +100,14 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IRefreshTokenRepository, RefreshTokenRepository>();
 			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
+			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
+
+			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
+
+			//Add SignalR
+			builder.Services.AddSignalR();
 
 			var app = builder.Build();
 
@@ -109,6 +117,9 @@ namespace ServerAPI
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+
+			//Mapping hubs
+			app.MapHub<NotificationHub>("/notificationHub");
 
 			// Add https
 			//app.UseHttpsRedirection();

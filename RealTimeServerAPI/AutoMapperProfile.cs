@@ -2,6 +2,7 @@
 using BusinessObject;
 using DTOs;
 using RealTimeServerAPI.DTOs;
+using NotificationRespone = RealTimeServerAPI.DTOs.NotificationRespone;
 
 namespace RealTimeServerAPI
 {
