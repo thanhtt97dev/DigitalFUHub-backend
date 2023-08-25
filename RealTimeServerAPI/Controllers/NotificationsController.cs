@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using RealTimeServerAPI.DTOs;
 using RealTimeServerAPI.Hubs;
 using RealTimeServerAPI.Managers;
@@ -22,8 +23,8 @@ namespace RealTimeServerAPI.Controllers
 			_connectionManager = connectionManager;	
 		}
 
-		[HttpPost("sendNotification")]
-		public async Task<IActionResult> SendNotification(string userId, string content)
+		[HttpPost("sendNotification/{userId}")]
+		public async Task<IActionResult> SendNotification(string userId, NotificationRespone notificationRespone)
 		{
 			HashSet<string>? connections = _connectionManager.GetConnections(userId);
 			try
@@ -31,7 +32,8 @@ namespace RealTimeServerAPI.Controllers
 				if (connections == null || connections.Count == 0) return Conflict();
 				foreach (var connection in connections) 
 				{
-					await _hubContext.Clients.Clients(connection).SendAsync("ReceiveNotification", content);	
+					await _hubContext.Clients.Clients(connection).SendAsync("ReceiveNotification",
+						JsonConvert.SerializeObject(notificationRespone));	
 				}
 				return Ok();
 			}
