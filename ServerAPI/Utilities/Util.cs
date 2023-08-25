@@ -23,11 +23,13 @@ namespace ServerAPI.Services
 			}
 		}
 
+		#region Convert unit date to DateTime
 		public DateTime ConvertUnitTimeToDateTime(long? utcExpireDate)
 		{
 			var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			dateTimeInterval = dateTimeInterval.AddSeconds(utcExpireDate ?? 0).ToUniversalTime();
 			return dateTimeInterval;
 		}
+		#endregion
 	}
 }

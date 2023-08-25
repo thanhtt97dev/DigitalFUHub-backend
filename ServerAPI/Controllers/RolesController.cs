@@ -19,6 +19,7 @@ namespace ServerAPI.Controllers
 			_mapper = mapper;
 		}
 
+		#region Get all roles
 		[HttpGet("GetAllRoles")]
 		public IActionResult GetAllRoles() 
 		{
@@ -31,5 +32,7 @@ namespace ServerAPI.Controllers
 				return StatusCode(500);
 			}
 		}
+		#endregion
+
 	}
 }

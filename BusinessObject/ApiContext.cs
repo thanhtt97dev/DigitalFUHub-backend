@@ -25,6 +25,7 @@ namespace BusinessObject
 
 		public virtual DbSet<AccessToken> AccessToken { get; set; } = null!;
 		public virtual DbSet<RefreshToken> RefreshToken { get; set; } = null!;
+		public virtual DbSet<Notification> Notification { get; set; } = null!;
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -41,7 +42,7 @@ namespace BusinessObject
 			}
 			*/
 
-			optionsBuilder.UseSqlServer("server=localhost; database=DbApiTest; uid=sa; pwd=sa");
+			optionsBuilder.UseSqlServer("server=localhost; database=DBTest; uid=sa; pwd=sa");
 			//optionsBuilder.UseSqlServer("Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;");
 		}
 

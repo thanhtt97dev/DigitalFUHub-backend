@@ -30,6 +30,7 @@
 			_jwtTokenService = jwtTokenService;
 		}
 
+		#region SignIn
 		[HttpPost("SignIn")]
 		public async Task<IActionResult> SignInAsync(UserSignInRequestDTO userSignIn)
 		{
@@ -48,7 +49,9 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
+		#endregion
 
+		#region Refresh token
 		[Authorize]
 		[HttpPost("RefreshToken")]
 		public async Task<IActionResult> RefreshTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
@@ -75,7 +78,9 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
+		#endregion
 
+		#region Revoke token
 		[Authorize]
 		[HttpPost("RevokeToken")]
 		public IActionResult RevokeToken([FromBody]string jwtId)
@@ -91,7 +96,9 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
+		#endregion
 
+		#region Get users by conditions
 		[Authorize]
 		[HttpGet("GetUsers")]
 		public IActionResult GetUsersByCondition(int? role, int? status, string email = "")
@@ -115,7 +122,9 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
+		#endregion
 
+		#region Get user by Id
 		[Authorize]
 		[HttpGet("GetUserById/{id}")]
 		public IActionResult GetUserById(int id)
@@ -132,7 +141,9 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
+		#endregion
 
+		#region Edit user info
 		[Authorize]
 		[HttpPut("EditUserInfo/{id}")]
 		public async Task<IActionResult> EditUserInfo(int id, UserRequestDTO userRequestDTO)
@@ -151,6 +162,7 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
+		#endregion
 
 		[HttpGet("test")]
 		public IActionResult Get()

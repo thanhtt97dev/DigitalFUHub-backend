@@ -23,6 +23,7 @@ namespace RealTimeServerAPI.Controllers
 			_connectionManager = connectionManager;	
 		}
 
+		#region Send notification to a user
 		[HttpPost("sendNotification/{userId}")]
 		public async Task<IActionResult> SendNotification([FromRoute]string userId, NotificationRequest notificationRequest)
 		{
@@ -43,5 +44,6 @@ namespace RealTimeServerAPI.Controllers
 				return StatusCode(500);
 			}
 		}
+		#endregion
 	}
 }

@@ -28,7 +28,7 @@ namespace ServerAPI.Services
 			_accessTokenRepository = accessTokenRepository;
 		}
 
-
+		#region Generate token
 		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user)
 		{
 			//Create access token
@@ -96,7 +96,9 @@ namespace ServerAPI.Services
 			};
 			return response;
 		}
+		#endregion
 
+		#region Generate token key
 		private string GenerateRefreshToken()
 		{
 			var random = new byte[32];
@@ -107,7 +109,9 @@ namespace ServerAPI.Services
 				return Convert.ToBase64String(random);
 			}
 		}
+		#endregion
 
+		#region Check token valid
 		internal bool CheckRefreshTokenIsValid(string? accessToken, string? refreshTokenKey)
 		{
 			try
@@ -135,7 +139,9 @@ namespace ServerAPI.Services
 
 			return true;
 		}
+		#endregion
 
+		#region Get JwtId by access token
 		internal string GetJwtIdByAccessToken(string? accessToken)
 		{
 			if (string.IsNullOrEmpty(accessToken)) throw new NullReferenceException(nameof(accessToken));
@@ -169,6 +175,7 @@ namespace ServerAPI.Services
 
 			return jti;
 		}
+		#endregion
 
 	}
 }

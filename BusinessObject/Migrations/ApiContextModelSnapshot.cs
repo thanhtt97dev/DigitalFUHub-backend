@@ -177,7 +177,7 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Notification", b =>
                 {
                     b.HasOne("BusinessObject.User", "User")
-                        .WithMany("Notifications")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -215,8 +215,6 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.User", b =>
                 {
                     b.Navigation("AccessTokens");
-
-                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }
