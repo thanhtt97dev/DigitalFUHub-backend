@@ -24,7 +24,7 @@ namespace RealTimeServerAPI.Controllers
 		}
 
 		[HttpPost("sendNotification/{userId}")]
-		public async Task<IActionResult> SendNotification(string userId, NotificationRespone notificationRespone)
+		public async Task<IActionResult> SendNotification([FromRoute]string userId, NotificationRequest notificationRequest)
 		{
 			HashSet<string>? connections = _connectionManager.GetConnections(userId);
 			try
@@ -32,6 +32,7 @@ namespace RealTimeServerAPI.Controllers
 				if (connections == null || connections.Count == 0) return Conflict();
 				foreach (var connection in connections) 
 				{
+					var notificationRespone = new NotificationRespone(notificationRequest.Title, notificationRequest.Message);
 					await _hubContext.Clients.Clients(connection).SendAsync("ReceiveNotification",
 						JsonConvert.SerializeObject(notificationRespone));	
 				}

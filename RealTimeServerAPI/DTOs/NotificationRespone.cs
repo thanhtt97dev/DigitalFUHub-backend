@@ -4,6 +4,13 @@
 	{
 		public string Title { get; set; } = null!;
 		public string Message { get; set; } = null!;
-		public DateTime Date { get; set; } = DateTime.Now;
+		public DateTime Date { get; set; }
+
+		public NotificationRespone(string title, string message)
+		{
+			Title = title;
+			Message = message;
+			Date = DateTime.Now;
+		}
 	}
 }
