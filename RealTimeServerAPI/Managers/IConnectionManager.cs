@@ -2,9 +2,9 @@
 {
 	public interface IConnectionManager
 	{
-		void AddConnection(string userId, string connectionId);
+		void AddConnection(int userId, string connectionId);
 		void RemoveConnection(string connectionId);
-		HashSet<string>? GetConnections(string userId);
-		IEnumerable<string> OnlineUsers { get; }
+		HashSet<string>? GetConnections(int userId);
+		IEnumerable<int> OnlineUsers { get; }
 	}
 }

@@ -1,21 +1,35 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using AutoMapper;
+using BusinessObject;
+using DataAccess.IRepositories;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using RealTimeServerAPI.DTOs;
 using RealTimeServerAPI.Managers;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RealTimeServerAPI.Hubs
 {
 	public class NotificationHub: Hub
 	{
-		private IConnectionManager _connectionManager;	
+		private IConnectionManager _connectionManager;
 
-		public NotificationHub(IConnectionManager connectionManager)
+		private readonly INotificationRepositiory _notificationRepositiory;
+
+		private readonly IMapper _mapper;
+
+		public NotificationHub(IConnectionManager connectionManager, INotificationRepositiory notificationRepositiory,
+			IMapper mapper)
 		{
-			_connectionManager = connectionManager;	
+			_connectionManager = connectionManager;
+			_notificationRepositiory = notificationRepositiory;
+			_mapper = mapper;	
 		}
 
-		public override Task OnConnectedAsync()
+		public override async Task OnConnectedAsync()
 		{
 			AddConnection();
-			return base.OnConnectedAsync();
+
+		 	await SendAllNotificationToUserCaller();
 		}
 
 		public override Task OnDisconnectedAsync(Exception? exception)
@@ -24,12 +38,33 @@ namespace RealTimeServerAPI.Hubs
 			return base.OnDisconnectedAsync(exception);
 		}
 
+		private async Task SendAllNotificationToUserCaller()
+		{
+			var httpContext = this.Context.GetHttpContext();
+			if (httpContext == null) return;
+
+			var userIdRaw = httpContext.Request.Query["userId"];
+			if (string.IsNullOrEmpty(userIdRaw)) return;
+
+			int userId;
+			int.TryParse(userIdRaw, out userId);
+
+			var notifications = _notificationRepositiory.GetNotifications(userId);
+
+			await Clients.Caller.SendAsync("ReceiveAllNotification",
+						JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(notifications)));
+		}
+
 		public void AddConnection()
 		{
 			var httpContext = this.Context.GetHttpContext();
 			if (httpContext == null) return;
-			var userId = httpContext.Request.Query["userId"];
-			if (string.IsNullOrEmpty(userId)) return;		
+
+			var userIdRaw = httpContext.Request.Query["userId"];
+			if (string.IsNullOrEmpty(userIdRaw)) return;
+
+			int userId;
+			int.TryParse(userIdRaw, out userId);
 			_connectionManager.AddConnection(userId, Context.ConnectionId);
 		}
 

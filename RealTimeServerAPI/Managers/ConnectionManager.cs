@@ -3,9 +3,9 @@
 	public class ConnectionManager : IConnectionManager
 	{
 		//Save connectionIds with a identifier user
-		private static Dictionary<string, HashSet<string>> useMap = new Dictionary<string, HashSet<string>>();	
+		private static Dictionary<int, HashSet<string>> useMap = new Dictionary<int, HashSet<string>>();	
 
-		public void AddConnection(string userId, string connectionId)
+		public void AddConnection(int userId, string connectionId)
 		{
 			lock(useMap) 
 			{
@@ -35,14 +35,14 @@
 			}
 		}
 
-		public HashSet<string>? GetConnections(string connectionId)
+		public HashSet<string>? GetConnections(int userId)
 		{
 			var connections = new HashSet<string>();
 			try
 			{
 				lock (useMap)
 				{
-					connections = useMap[connectionId];	
+					connections = useMap[userId];	
 				}
 			}catch
 			{
@@ -51,6 +51,6 @@
 			return connections;
 		}
 
-		public IEnumerable<string> OnlineUsers { get { return useMap.Keys; } }	
+		public IEnumerable<int> OnlineUsers { get { return useMap.Keys; } }	
 	}
 }

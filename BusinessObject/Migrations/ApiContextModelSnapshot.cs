@@ -69,6 +69,12 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsReaded")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Link")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using BusinessObject;
+using DataAccess.IRepositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
@@ -17,26 +20,44 @@ namespace RealTimeServerAPI.Controllers
 
 		private readonly IConnectionManager _connectionManager;
 
-		public NotificationsController(IHubContext<NotificationHub> hubContext, IConnectionManager connectionManager)
+		private readonly INotificationRepositiory _notificationRepositiory;
+
+		private readonly IMapper _mapper;
+
+		public NotificationsController(IHubContext<NotificationHub> hubContext, IConnectionManager connectionManager,
+			INotificationRepositiory notificationRepositiory, IMapper mapper)
 		{
 			_hubContext = hubContext;
-			_connectionManager = connectionManager;	
+			_connectionManager = connectionManager;
+			_notificationRepositiory = notificationRepositiory;
+			_mapper = mapper;
 		}
 
 		#region Send notification to a user
 		[HttpPost("sendNotification/{userId}")]
-		public async Task<IActionResult> SendNotification([FromRoute]string userId, NotificationRequest notificationRequest)
+		public async Task<IActionResult> SendNotification([FromRoute]int userId, NotificationRequest notificationRequest)
 		{
 			HashSet<string>? connections = _connectionManager.GetConnections(userId);
 			try
 			{
-				if (connections == null || connections.Count == 0) return Conflict();
-				foreach (var connection in connections) 
+				Notification notification = new Notification()
 				{
-					var notificationRespone = new NotificationRespone(notificationRequest.Title, notificationRequest.Message);
+					UserId = userId,
+					Title = notificationRequest.Title,
+					Content = notificationRequest.Content,
+					Link = "",
+					DateCreated = DateTime.Now,
+					IsReaded = false,
+				};
+
+				if (connections == null || connections.Count == 0) return Ok("User not online!");
+				foreach (var connection in connections)
+				{
 					await _hubContext.Clients.Clients(connection).SendAsync("ReceiveNotification",
-						JsonConvert.SerializeObject(notificationRespone));	
+						JsonConvert.SerializeObject(_mapper.Map<NotificationRespone>(notification)));
 				}
+
+				_notificationRepositiory.AddNotification(notification);
 				return Ok();
 			}
 			catch

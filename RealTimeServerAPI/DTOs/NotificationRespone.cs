@@ -2,15 +2,12 @@
 {
 	public class NotificationRespone
 	{
-		public string Title { get; set; } = null!;
-		public string Message { get; set; } = null!;
+		public long NotificationId { get; set; }
+		public string? Title { get; set; } = null!;
+		public string? Content { get; set; } = null!;
+		public string? Link { get; set; }
 		public DateTime Date { get; set; }
+		public bool IsReaded { get; set; }
 
-		public NotificationRespone(string title, string message)
-		{
-			Title = title;
-			Message = message;
-			Date = DateTime.Now;
-		}
 	}
 }

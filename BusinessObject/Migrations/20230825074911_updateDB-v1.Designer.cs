@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230825070827_updateDB-v1")]
+    [Migration("20230825074911_updateDB-v1")]
     partial class updateDBv1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,6 +70,12 @@ namespace BusinessObject.Migrations
 
                     b.Property<bool>("IsReaded")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");

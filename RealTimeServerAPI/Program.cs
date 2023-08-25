@@ -1,3 +1,6 @@
+using AutoMapper;
+using DataAccess.IRepositories;
+using DataAccess.Repositories;
 using RealTimeServerAPI.Hubs;
 using RealTimeServerAPI.Managers;
 
@@ -18,6 +21,7 @@ namespace RealTimeServerAPI
 
 			//Add SignalR
 			builder.Services.AddSignalR();
+
 			//Add cors
 			builder.Services.AddCors(options =>
 			{
@@ -27,8 +31,17 @@ namespace RealTimeServerAPI
 				});
 			});
 
+			//Add Auto Mapper
+			var configAutoMapper = new MapperConfiguration(config =>
+			{
+				config.AddProfile(new AutoMapperProfile());
+			});
+			var mapper = configAutoMapper.CreateMapper();
+			builder.Services.AddSingleton(mapper);
+
 			//Add DI
-			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
+			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
 
 			var app = builder.Build();
 
