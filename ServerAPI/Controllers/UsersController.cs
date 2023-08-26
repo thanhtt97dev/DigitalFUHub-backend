@@ -6,6 +6,10 @@
 	using DTOs;
 	using Microsoft.AspNetCore.Authorization;
 	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.AspNetCore.SignalR;
+	using Newtonsoft.Json;
+	using ServerAPI.Hubs;
+	using ServerAPI.Managers;
 	using ServerAPI.Services;
 
 
@@ -17,17 +21,26 @@
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 		private readonly IAccessTokenRepository _accessTokenRepository;
 		private readonly IMapper _mapper;
+		private readonly IHubContext<NotificationHub> _notificationHubContext;
+		private readonly IConnectionManager _connectionManager;
+		private readonly INotificationRepositiory _notificationRepositiory;
 
 		private readonly JwtTokenService _jwtTokenService;	
 
-		public UsersController(IUserRepository userRepository, IMapper mapper,
-			IRefreshTokenRepository refreshTokenRepository, IAccessTokenRepository accessTokenRepository, JwtTokenService jwtTokenService)
+		public UsersController(IUserRepository userRepository, IMapper mapper,IRefreshTokenRepository refreshTokenRepository, 
+			IAccessTokenRepository accessTokenRepository, JwtTokenService jwtTokenService,
+			IHubContext<NotificationHub> notificationHubContext, IConnectionManager connectionManager,
+			INotificationRepositiory notificationRepositiory
+			)
 		{
 			_userRepository = userRepository;
 			_mapper = mapper;
 			_refreshTokenRepository = refreshTokenRepository;
 			_accessTokenRepository = accessTokenRepository;
 			_jwtTokenService = jwtTokenService;
+			_notificationHubContext = notificationHubContext;
+			_connectionManager = connectionManager;
+			_notificationRepositiory = notificationRepositiory;
 		}
 
 		#region SignIn
@@ -39,6 +52,7 @@
 				User? user = _userRepository.GetUserByEmailAndPassword(userSignIn.Email, userSignIn.Password);
 
 				if (user == null) return NotFound("Email or Password not correct!");
+				if (!user.Status) return Conflict("Your account was baned!");
 			
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
@@ -152,11 +166,38 @@
 			try
 			{
 				User? user = _userRepository.GetUserById(id);
-				if (user == null) return NotFound();	
+				if (user == null) return NotFound();
+
+				//Just for testing notification
+				if (userRequestDTO.Status != 1)
+				{
+					HashSet<string>? connections = _connectionManager.GetConnections(id);
+					Notification notification = new Notification()
+					{
+						UserId = id,
+						Title = "Change status account",
+						Content = $"You account has been Ban",
+						Link = "",
+						DateCreated = DateTime.Now,
+						IsReaded = false,
+					};
+
+					if (connections != null)
+					{
+						foreach (var connection in connections)
+						{
+							await _notificationHubContext.Clients.Clients(connection).SendAsync("ReceiveNotification",
+								JsonConvert.SerializeObject(_mapper.Map<NotificationRespone>(notification)));
+						}
+					}
+					_notificationRepositiory.AddNotification(notification);
+
+				}
 				var userUpdate = _mapper.Map<User>(userRequestDTO);	
 				await _userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
-			}catch(Exception ex) 
+			}
+			catch(Exception ex) 
 			{
 				var x = ex;
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");

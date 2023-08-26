@@ -4,54 +4,52 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using ServerAPI.Managers;
 using DTOs;
+using Microsoft.AspNetCore.Authorization;
+using ServerAPI.Utilities;
 
 namespace ServerAPI.Hubs
 {
+
 	public class NotificationHub : Hub
 	{
-		private IConnectionManager _connectionManager;
 
 		private readonly INotificationRepositiory _notificationRepositiory;
 
 		private readonly IMapper _mapper;
 
-		public NotificationHub(IConnectionManager connectionManager, INotificationRepositiory notificationRepositiory,
-			IMapper mapper)
+		private readonly HubConnectionService _hubConnectionService;
+
+		public NotificationHub( INotificationRepositiory notificationRepositiory, IMapper mapper, 
+			HubConnectionService hubConnectionService)
 		{
-			_connectionManager = connectionManager;
 			_notificationRepositiory = notificationRepositiory;
 			_mapper = mapper;
+			_hubConnectionService = hubConnectionService;
 		}
 
 		public override async Task OnConnectedAsync()
 		{
-			AddConnection();
-
+			_hubConnectionService.AddConnection(Context);
 			await SendAllNotificationToUserCaller();
 		}
 
 		public override Task OnDisconnectedAsync(Exception? exception)
 		{
-			RemoveConnection();
+			_hubConnectionService.RemoveConnection(Context);
 			return base.OnDisconnectedAsync(exception);
 		}
 
 		private async Task SendAllNotificationToUserCaller()
 		{
-			var httpContext = this.Context.GetHttpContext();
-			if (httpContext == null) return;
-
-			var userIdRaw = httpContext.Request.Query["userId"];
-			if (string.IsNullOrEmpty(userIdRaw)) return;
-
-			int userId;
-			int.TryParse(userIdRaw, out userId);
+			var userId = _hubConnectionService.GetUserIdFromHubCaller(Context);
+			if (userId == 0) return;
 
 			var notifications = _notificationRepositiory.GetNotifications(userId);
-
 			await Clients.Caller.SendAsync("ReceiveAllNotification",
 						JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(notifications)));
 		}
+
+		/*
 
 		public void AddConnection()
 		{
@@ -71,5 +69,6 @@ namespace ServerAPI.Hubs
 			var connectionId = Context.ConnectionId;
 			_connectionManager.RemoveConnection(connectionId);
 		}
+		*/
 	}
 }

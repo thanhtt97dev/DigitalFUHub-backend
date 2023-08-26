@@ -34,6 +34,7 @@ namespace ServerAPI.Controllers
 		}
 
 		#region Send notification to a user
+		[Authorize]
 		[HttpPost("sendNotification/{userId}")]
 		public async Task<IActionResult> SendNotification([FromRoute] int userId, NotificationRequest notificationRequest)
 		{
@@ -60,7 +61,7 @@ namespace ServerAPI.Controllers
 					}
 				}
 				
-				//_notificationRepositiory.AddNotification(notification);
+				_notificationRepositiory.AddNotification(notification);
 				return Ok();
 			}
 			catch

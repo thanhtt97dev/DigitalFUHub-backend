@@ -4,19 +4,16 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 using AutoMapper;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using ServerAPI.Services;
-using System.IdentityModel.Tokens.Jwt;
-using ServerAPI.Middlewares;
-using ServerAPI.Validations;
+using ServerAPI.Comons;
 using ServerAPI.Hubs;
 using ServerAPI.Managers;
+using ServerAPI.Utilities;
 
 namespace ServerAPI
 {
@@ -105,6 +102,7 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
+			builder.Services.AddSingleton<HubConnectionService>();
 
 			//Add SignalR
 			builder.Services.AddSignalR();
@@ -118,19 +116,27 @@ namespace ServerAPI
 				app.UseSwaggerUI();
 			}
 
-			//Mapping hubs
-			app.MapHub<NotificationHub>("/notificationHub");
-
-			// Add https
-			//app.UseHttpsRedirection();
-
 			app.UseCors();
 
 			app.UseAuthentication();
 
+			app.UseRouting();
+
 			app.UseAuthorization();
 
-			app.MapControllers();
+			//Mapping hubs
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapHub<NotificationHub>("/notificationHub");
+			});
+
+			//app.MapHub<NotificationHub>("/notificationHub");
+
+			// Add https
+			//app.UseHttpsRedirection();
+
+
+			app.MapControllers();    
 
 			app.Run();
 		}
