@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230826073209_init")]
-    partial class init
+    [Migration("20230827075742_updateDB")]
+    partial class updateDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -142,6 +142,30 @@ namespace BusinessObject.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BusinessObject.Storage", b =>
+                {
+                    b.Property<long>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ImageId"), 1L, 1);
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ImageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Storage");
+                });
+
             modelBuilder.Entity("BusinessObject.User", b =>
                 {
                     b.Property<long>("UserId")
@@ -194,6 +218,17 @@ namespace BusinessObject.Migrations
                 });
 
             modelBuilder.Entity("BusinessObject.RefreshToken", b =>
+                {
+                    b.HasOne("BusinessObject.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Storage", b =>
                 {
                     b.HasOne("BusinessObject.User", "User")
                         .WithMany()

@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "wEdA1q1+V3kHhkzQc0pTCp7KubzpNYu7wwOMrHsj41bCxF7sN7i+p27mhCtg/Tfg/e4jf3eEpQ7uVn3eqo8ApA==",
+  "dgSpecHash": "CbQpPcmk9+auDesNVAQm0Px3r362/q8pT/NtIkQNw9ioJqMuRlUv0FnrwC++Lm/HrQ9e8h6QeA85p2spxQ23fQ==",
   "success": true,
-  "projectFilePath": "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+  "projectFilePath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\dell\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.2.0\\microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.data.sqlclient.sni.runtime\\2.1.1\\microsoft.data.sqlclient.sni.runtime.2.1.1.nupkg.sha512",

@@ -28,3 +28,18 @@ D:\FU\Learn React\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.dll
 D:\FU\Learn React\asp.net-api-configuration\DTOs\obj\Debug\net6.0\refint\DTOs.dll
 D:\FU\Learn React\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.pdb
 D:\FU\Learn React\asp.net-api-configuration\DTOs\obj\Debug\net6.0\ref\DTOs.dll
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\bin\Debug\net6.0\DTOs.deps.json
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\bin\Debug\net6.0\DTOs.dll
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\bin\Debug\net6.0\DTOs.pdb
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\bin\Debug\net6.0\BusinessObject.dll
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\bin\Debug\net6.0\BusinessObject.pdb
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.csproj.AssemblyReference.cache
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfoInputs.cache
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfo.cs
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.csproj.CoreCompileInputs.cache
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.csproj.CopyComplete
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.dll
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\refint\DTOs.dll
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.pdb
+C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DTOs\obj\Debug\net6.0\ref\DTOs.dll

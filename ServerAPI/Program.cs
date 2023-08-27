@@ -98,6 +98,7 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
+			builder.Services.AddSingleton<IStorageRepository, StorageRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 

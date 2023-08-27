@@ -2,6 +2,22 @@
   "version": 3,
   "targets": {
     "net6.0": {
+      "Microsoft.AspNetCore.Http.Features/2.2.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "2.2.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Http.Features.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.AspNetCore.Http.Features.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.CSharp/4.5.0": {
         "type": "package",
         "compile": {
@@ -926,7 +942,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
-          "BusinessObject": "1.0.0"
+          "BusinessObject": "1.0.0",
+          "Microsoft.AspNetCore.Http.Features": "2.2.0"
         },
         "compile": {
           "bin/placeholder/DTOs.dll": {}
@@ -938,6 +955,19 @@
     }
   },
   "libraries": {
+    "Microsoft.AspNetCore.Http.Features/2.2.0": {
+      "sha512": "ziFz5zH8f33En4dX81LW84I6XrYXKf9jg6aM39cM+LffN9KJahViKZ61dGMSO2gd3e+qe5yBRwsesvyqlZaSMg==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.http.features/2.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/Microsoft.AspNetCore.Http.Features.dll",
+        "lib/netstandard2.0/Microsoft.AspNetCore.Http.Features.xml",
+        "microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",
+        "microsoft.aspnetcore.http.features.nuspec"
+      ]
+    },
     "Microsoft.CSharp/4.5.0": {
       "sha512": "kaj6Wb4qoMuH3HySFJhxwQfe8R/sJsNJnANrvv8WdFPMoNbKY5htfNscv+LHCu5ipz+49m2e+WQXpLXr9XYemQ==",
       "type": "package",
@@ -2394,24 +2424,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dell\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\dell\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\FU\\Learn React\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+      "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
       "projectName": "DataAccess",
-      "projectPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+      "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
       "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-      "outputPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\DataAccess\\obj\\",
+      "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
         "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2425,11 +2450,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-              "projectPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+            "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+              "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
             },
-            "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
-              "projectPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
+            "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+              "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
             }
           }
         }

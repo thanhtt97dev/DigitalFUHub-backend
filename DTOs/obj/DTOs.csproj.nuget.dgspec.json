@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {}
+    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {}
   },
   "projects": {
-    "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\obj\\",
+        "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -85,21 +81,17 @@
         }
       }
     },
-    "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+        "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
         "projectName": "DTOs",
-        "projectPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+        "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\DTOs\\obj\\",
+        "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -113,8 +105,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "D:\\FU\\Learn React\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
               }
             }
           }
@@ -128,6 +120,12 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Http.Features": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
