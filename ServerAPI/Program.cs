@@ -14,6 +14,7 @@ using ServerAPI.Comons;
 using ServerAPI.Hubs;
 using ServerAPI.Managers;
 using ServerAPI.Utilities;
+using AspNetCoreRateLimit;
 
 namespace ServerAPI
 {
@@ -49,10 +50,10 @@ namespace ServerAPI
 
 			//Add JWT
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-				.AddJwtBearer(opt =>
+				.AddJwtBearer(options =>
 				{
-					opt.TokenValidationParameters = new JwtValidationParameters();
-					opt.Events = new JwtValidationEvents();
+					options.TokenValidationParameters = new JwtValidationParameters();
+					options.Events = new JwtValidationEvents();
 				});
 
 			//Add for more Policy Authorization
@@ -108,6 +109,22 @@ namespace ServerAPI
 			//Add SignalR
 			builder.Services.AddSignalR();
 
+			//Add rate limit request
+			builder.Services.Configure<IpRateLimitOptions>(options =>
+			{
+				options.EnableEndpointRateLimiting = true;
+				options.StackBlockedRequests = false;
+				options.HttpStatusCode = 429;
+				options.RealIpHeader = "X-Real-IP";
+				options.ClientIdHeader = "X-ClientId";
+				options.GeneralRules = Constants.RateLimitRules;
+			});
+			builder.Services.AddMemoryCache();
+			builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+			builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+			builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+			builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+
 			var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
@@ -116,6 +133,9 @@ namespace ServerAPI
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+
+
+			app.UseIpRateLimiting();
 
 			app.UseCors();
 
@@ -131,13 +151,10 @@ namespace ServerAPI
 				endpoints.MapHub<NotificationHub>("/notificationHub");
 			});
 
-			//app.MapHub<NotificationHub>("/notificationHub");
-
 			// Add https
 			//app.UseHttpsRedirection();
 
-
-			app.MapControllers();    
+			app.MapControllers();
 
 			app.Run();
 		}

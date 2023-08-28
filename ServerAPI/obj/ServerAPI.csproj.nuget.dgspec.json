@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj": {}
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -81,17 +85,21 @@
         }
       }
     },
-    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
         "projectName": "DataAccess",
-        "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -105,11 +113,11 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
               },
-              "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
-                "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
               }
             }
           }
@@ -143,17 +151,21 @@
         }
       }
     },
-    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
         "projectName": "DTOs",
-        "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -167,8 +179,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
               }
             }
           }
@@ -208,17 +220,21 @@
         }
       }
     },
-    "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj": {
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj",
         "projectName": "ServerAPI",
-        "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\ServerAPI\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -233,14 +249,14 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
               },
-              "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
-                "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj"
               },
-              "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
-                "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
               }
             }
           }
@@ -255,6 +271,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "AspNetCoreRateLimit": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
             "AutoMapper": {
               "target": "Package",
               "version": "[12.0.0, )"

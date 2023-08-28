@@ -2460,19 +2460,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dell\\.nuget\\packages\\": {}
+    "C:\\Users\\dell\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+      "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
       "projectName": "BusinessObject",
-      "projectPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+      "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
       "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dell\\Desktop\\fptu\\asp.net-api-configuration\\BusinessObject\\obj\\",
+      "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

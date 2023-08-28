@@ -49,3 +49,20 @@ C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DataAccess\obj\Debug\net6.0
 C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\refint\DataAccess.dll
 C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.pdb
 C:\Users\dell\Desktop\fptu\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\ref\DataAccess.dll
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\bin\Debug\net6.0\DataAccess.deps.json
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\bin\Debug\net6.0\DataAccess.dll
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\bin\Debug\net6.0\DataAccess.pdb
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\bin\Debug\net6.0\BusinessObject.dll
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\bin\Debug\net6.0\DTOs.dll
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\bin\Debug\net6.0\BusinessObject.pdb
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\bin\Debug\net6.0\DTOs.pdb
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.csproj.AssemblyReference.cache
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.AssemblyInfoInputs.cache
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.AssemblyInfo.cs
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.csproj.CoreCompileInputs.cache
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.csproj.CopyComplete
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.dll
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\refint\DataAccess.dll
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\DataAccess.pdb
+D:\FU\Capstone Project\asp.net-api-configuration\DataAccess\obj\Debug\net6.0\ref\DataAccess.dll
