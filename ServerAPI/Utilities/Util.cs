@@ -31,5 +31,19 @@ namespace ServerAPI.Services
 			return dateTimeInterval;
 		}
 		#endregion
+
+		#region Get access token from httpContext
+		public string GetAccessToken(HttpContext httpContext)
+		{
+			string token = string.Empty;
+			string authorization = httpContext.Request.Headers["Authorization"].ToString();
+			string tokenType = "Bearer ";
+			if (authorization.Contains(tokenType))
+			{
+				token = authorization.Substring(tokenType.Length);
+			}
+			return token;	
+		}
+		#endregion
 	}
 }

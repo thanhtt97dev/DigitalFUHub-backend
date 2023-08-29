@@ -138,16 +138,22 @@
 		}
 		#endregion
 
-		#region Get user by Id
+		#region Get user by Id, Access token (for authentication)
 		[Authorize]
-		[HttpGet("GetUserById/{id}")]
+		[HttpGet("GetUser/{id}")]
 		public IActionResult GetUserById(int id)
 		{
 			if (id == 0) return BadRequest();
 			try
 			{
 				var user = _userRepository.GetUserById(id);
-				if (user == null) return Conflict();
+				if (user == null) return NotFound();
+
+				string accessToken = Util.Instance.GetAccessToken(HttpContext);
+
+				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
+				if (user.UserId != userIdInAccessToken) return NotFound();
+
 				return Ok(_mapper.Map<UserResponeDTO>(user));
 			}
 			catch (Exception)

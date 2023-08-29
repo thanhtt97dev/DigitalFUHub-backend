@@ -5,6 +5,7 @@ using DTOs;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using ServerAPI.Comons;
 using ServerAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -149,24 +150,7 @@ namespace ServerAPI.Services
 			JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
 			var secretKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
 
-			var tokenValidationParameters = new TokenValidationParameters
-			{
-				ValidateIssuer = false,
-				ValidateAudience = false,
-
-				ValidateIssuerSigningKey = true,
-				IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-
-				/*
-				ValidateIssuer = true,
-				ValidIssuer = configuration["JWT:Issuer"],
-				ValidateAudience = true,
-				ValidAudience = configuration["JWT:Audience"],
-				*/
-
-				ClockSkew = TimeSpan.FromMinutes(3),
-				ValidateLifetime = false
-			};
+			var tokenValidationParameters = new JwtValidationParameters();
 
 			ClaimsPrincipal tokenVerification = jwtSecurityTokenHandler
 				.ValidateToken(accessToken, tokenValidationParameters, out var validatedToken);
@@ -174,6 +158,26 @@ namespace ServerAPI.Services
 			var jti = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
 
 			return jti;
+		}
+		#endregion
+
+		#region Get UserId by access token
+		internal int GetUserIdByAccessToken(string? accessToken)
+		{
+			if (string.IsNullOrEmpty(accessToken)) throw new NullReferenceException(nameof(accessToken));
+
+			JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+			var secretKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
+
+			var tokenValidationParameters = new JwtValidationParameters();
+
+			ClaimsPrincipal tokenVerification = jwtSecurityTokenHandler
+				.ValidateToken(accessToken, tokenValidationParameters, out var validatedToken);
+
+			var userIdRaw = tokenVerification.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value; //Sub
+			int userId;
+			int.TryParse(userIdRaw, out userId);	
+			return userId;
 		}
 		#endregion
 
