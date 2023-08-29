@@ -141,7 +141,7 @@
 		#region Get user by Id, Access token (for authentication)
 		[Authorize]
 		[HttpGet("GetUser/{id}")]
-		public IActionResult GetUserById(int id)
+		public IActionResult GetUserForAuth(int id)
 		{
 			if (id == 0) return BadRequest();
 			try
@@ -154,6 +154,25 @@
 				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 				if (user.UserId != userIdInAccessToken) return NotFound();
 
+				return Ok(_mapper.Map<UserResponeDTO>(user));
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+			}
+		}
+		#endregion
+
+		#region Get user by Id
+		[Authorize]
+		[HttpGet("GetUserById/{id}")]
+		public IActionResult GetUserById(int id)
+		{
+			if (id == 0) return BadRequest();
+			try
+			{
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return NotFound();
 				return Ok(_mapper.Map<UserResponeDTO>(user));
 			}
 			catch (Exception)
