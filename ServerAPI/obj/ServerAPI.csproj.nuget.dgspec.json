@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj": {}
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\ServerAPI\\ServerAPI.csproj": {}
   },
   "projects": {
-    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
-        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\obj\\",
+        "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -85,24 +85,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DataAccess\\DataAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+        "projectUniqueName": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DataAccess\\DataAccess.csproj",
         "projectName": "DataAccess",
-        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
-        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\obj\\",
+        "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DataAccess\\DataAccess.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DataAccess\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -117,11 +117,11 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj"
               },
-              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
-                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
+              "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\DTOs.csproj": {
+                "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\DTOs.csproj"
               }
             }
           }
@@ -151,24 +151,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\DTOs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+        "projectUniqueName": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\DTOs.csproj",
         "projectName": "DTOs",
-        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
-        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\obj\\",
+        "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\DTOs.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -183,8 +183,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj"
               }
             }
           }
@@ -220,24 +220,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj": {
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\ServerAPI\\ServerAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj",
+        "projectUniqueName": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\ServerAPI\\ServerAPI.csproj",
         "projectName": "ServerAPI",
-        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\ServerAPI.csproj",
-        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\ServerAPI\\obj\\",
+        "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\ServerAPI\\ServerAPI.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\ServerAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -246,21 +246,21 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\7.0.302\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
+          "C:\\Program Files\\dotnet\\sdk\\7.0.304\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\BusinessObject\\BusinessObject.csproj"
               },
-              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
-                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj"
+              "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DataAccess\\DataAccess.csproj": {
+                "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DataAccess\\DataAccess.csproj"
               },
-              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
-                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
+              "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\DTOs.csproj": {
+                "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src\\be\\DTOs\\DTOs.csproj"
               }
             }
           }
@@ -327,7 +327,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     }

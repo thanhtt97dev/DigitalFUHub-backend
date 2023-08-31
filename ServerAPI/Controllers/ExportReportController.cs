@@ -19,17 +19,20 @@ namespace ServerAPI.Controllers
 
         #region Get report user (sample)
         [HttpPost("user")]
-        public IActionResult ExportUser (int id)
+        public IActionResult ExportUser ([FromBody] ExportRequestDTO exportRequestDTO)
         {
             try
             {
 
-                var fileContents = _exportService.ExportUserToExcel(id);
+                var fileContents = _exportService.ExportUserToExcel(exportRequestDTO.Id);
 
                 if (fileContents == null || fileContents.Length == 0)
                     return NotFound("Unable to create Excel file");
 
+
                 return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  "export_user.xlsx");
+
+                //return Ok(fileContents);
 
             } catch (Exception ex)
             {

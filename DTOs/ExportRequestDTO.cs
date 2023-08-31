@@ -8,7 +8,6 @@ namespace DTOs
 {
     public class ExportRequestDTO
     {   
-
-        public string Params { get; set; } = "";
+        public int Id { get; set; }
     }
 }

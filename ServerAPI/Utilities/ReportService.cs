@@ -65,7 +65,7 @@ namespace ServerAPI.Utilities
 			List<object?> data = GetData("getByQuery", listParams, typeof(User));
 			List<User> userList = data.Cast<User>().ToList();
 
-			ws.Cells.LoadFromCollection(data, true);
+			ws.Cells.LoadFromCollection(userList, true);
 
 			return pack.GetAsByteArray();
 		}
