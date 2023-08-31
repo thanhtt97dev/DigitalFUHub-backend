@@ -4,57 +4,70 @@ using Microsoft.Data.SqlClient;
 using Microsoft.OData.Edm;
 using OfficeOpenXml;
 using System.Data;
+using System.Reflection;
 
 namespace ServerAPI.Utilities
 {
-    public class ReportService
-    {
-        private readonly string _connectionString;
+	public class ReportService
+	{
 
-        public ReportService()
-        {
-            _connectionString = "server=localhost;database=DBTest;uid=sa;pwd=sa;Integrated security=true;TrustServerCertificate=true";
-        }
-        public byte[] ExportUserToExcel(int id)
-        {
-            string reportname = $"export_user_{Guid.NewGuid():N}.xlsx";
-            using ExcelPackage pack = new ExcelPackage();
-            ExcelWorksheet ws = pack.Workbook.Worksheets.Add(reportname);
-            //List<SqlParameter> listParams = new List<SqlParameter> { 
-            //    new SqlParameter
-            //    {
-            //        ParameterName = "@id",
-            //        SqlDbType = SqlDbType.Int,
-            //        Value = id,
-            //        Direction = ParameterDirection.Input,
-            //    }
-            //};
-            IDictionary<string, object> listParams = new Dictionary<string, object>();
-            listParams.Add("@id", id);
+		private readonly string? _connectionString;
+		public ReportService()
+		{
+			_connectionString = "server=localhost;database=DBTest;uid=sa;pwd=sa;Integrated security=true;TrustServerCertificate=true";
+		}
 
-            SqlDataReader sdr = CallProcedureService<User>.Instance.GetData("getByQuery", listParams);
+		#region Get data from procedure
+		public List<object?> GetData(string nameProcedure, IDictionary<string, object> listParams, Type objectResultType)
+		{
+			List<object?> data = new List<object?>();
+			using (SqlConnection connection = new SqlConnection(_connectionString))
+			{
+				connection.Open();
+				using (SqlCommand cmd = new SqlCommand(nameProcedure, connection))
+				{
+					cmd.CommandType = CommandType.StoredProcedure;
+					foreach (var item in listParams)
+					{
+						cmd.Parameters.AddWithValue(item.Key, item.Value);
+					}
 
-            List<string> demo = new List<string>();
+					SqlDataReader reader = cmd.ExecuteReader();
+					while (reader.Read())
+					{
+						object? instanceObject = Activator.CreateInstance(objectResultType);
+						int s = reader.FieldCount;
+						for (int i = 0; i < reader.FieldCount; i++)
+						{
+							string columnName = reader.GetName(i);
+							object columnValue = reader[i];
+							PropertyInfo? property = objectResultType.GetProperty(columnName);
+							if (property != null) property.SetValue(instanceObject, columnValue, null);
+						}
+						data.Add(instanceObject);
+					}
+				}
+				connection.Close();
+				return data;
+			}
+		}
+		#endregion
 
-                while (sdr.Read())
-                {
-                    // Đọc dữ liệu từ các cột và xử lý nó
-                    // Tên cột và giá trị có thể thay đổi động
-                    for (int i = 0; i < sdr.FieldCount; i++)
-                    {
-                        string columnName = sdr.GetName(i);
-                        object columnValue = sdr[i];
-                    demo.Add(columnName);
+		public byte[] ExportUserToExcel(int id)
+		{
+			string reportname = $"export_user_{Guid.NewGuid():N}.xlsx";
+			using ExcelPackage pack = new ExcelPackage();
+			ExcelWorksheet ws = pack.Workbook.Worksheets.Add(reportname);
 
-                        // Xử lý dữ liệu ở đây
-                    }
-                }
-            
+			IDictionary<string, object> listParams = new Dictionary<string, object>() { };
+			listParams.Add("@id", id);
 
+			List<object?> data = GetData("getByQuery", listParams, typeof(User));
+			List<User> userList = data.Cast<User>().ToList();
 
-            ws.Cells.LoadFromCollection(new List<string>{ "hieu", "a"}, true);
+			ws.Cells.LoadFromCollection(data, true);
 
-            return pack.GetAsByteArray();
-        }
-    }
+			return pack.GetAsByteArray();
+		}
+	}
 }

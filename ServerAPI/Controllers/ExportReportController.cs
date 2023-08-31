@@ -17,6 +17,7 @@ namespace ServerAPI.Controllers
             _exportService = exportService;
         }
 
+        #region Get report user (sample)
         [HttpPost("user")]
         public IActionResult ExportUser (int id)
         {
@@ -35,7 +36,7 @@ namespace ServerAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+		#endregion
 
-
-    }
+	}
 }
