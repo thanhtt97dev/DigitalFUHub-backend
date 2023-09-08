@@ -1,28 +1,44 @@
 ﻿using BusinessObject;
-using DTOs;
 using Microsoft.Data.SqlClient;
-using Microsoft.OData.Edm;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ServerAPI.Utilities
+namespace DataAccess.DAOs
 {
-	public class ReportService
+	internal class ReportDAO
 	{
+		private static ReportDAO? instance;
+		private static readonly object instanceLock = new object();
 
-		private readonly string? _connectionString;
-		public ReportService()
+		public static ReportDAO Instance
 		{
-			_connectionString = "server=localhost;database=DBTest;uid=sa;pwd=sa;Integrated security=true;TrustServerCertificate=true";
+			get
+			{
+				lock (instanceLock)
+				{
+					if (instance == null)
+					{
+						instance = new ReportDAO();
+					}
+				}
+				return instance;
+			}
 		}
 
 		#region Get data from procedure
-		public List<object?> GetData(string nameProcedure, IDictionary<string, object> listParams, Type objectResultType)
+		private async Task<List<object?>> GetData(string nameProcedure, IDictionary<string, object> listParams, Type objectResultType)
 		{
 			List<object?> data = new List<object?>();
-			using (SqlConnection connection = new SqlConnection(_connectionString))
+			using (ApiContext context = new ApiContext())
 			{
+				SqlConnection connection = new SqlConnection(context.connectionString);
 				connection.Open();
 				using (SqlCommand cmd = new SqlCommand(nameProcedure, connection))
 				{
@@ -32,11 +48,10 @@ namespace ServerAPI.Utilities
 						cmd.Parameters.AddWithValue(item.Key, item.Value);
 					}
 
-					SqlDataReader reader = cmd.ExecuteReader();
+					SqlDataReader reader = await cmd.ExecuteReaderAsync();
 					while (reader.Read())
 					{
 						object? instanceObject = Activator.CreateInstance(objectResultType);
-						int s = reader.FieldCount;
 						for (int i = 0; i < reader.FieldCount; i++)
 						{
 							string columnName = reader.GetName(i);
@@ -53,7 +68,7 @@ namespace ServerAPI.Utilities
 		}
 		#endregion
 
-		public byte[] ExportUserToExcel(int id)
+		internal async Task<byte[]> GetReportUserInfoToExcel(int id)
 		{
 			string workSheetName = "Report User";
 			using ExcelPackage pack = new ExcelPackage();
@@ -62,7 +77,7 @@ namespace ServerAPI.Utilities
 			IDictionary<string, object> listParams = new Dictionary<string, object>() { };
 			listParams.Add("@id", id);
 
-			List<object?> data = GetData("getByQuery", listParams, typeof(User));
+			List<object?> data = await GetData("getByQuery", listParams, typeof(User));
 			List<User> userList = data.Cast<User>().ToList();
 
 			ws.Cells.LoadFromCollection(userList, true);

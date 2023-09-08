@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "E:\\fpt\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {}
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {}
   },
   "projects": {
-    "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -85,17 +89,21 @@
         }
       }
     },
-    "E:\\fpt\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\fpt\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
         "projectName": "DataAccess",
-        "projectPath": "E:\\fpt\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "E:\\fpt\\asp.net-api-configuration\\DataAccess\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -109,11 +117,11 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
               },
-              "E:\\fpt\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
-                "projectPath": "E:\\fpt\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
               }
             }
           }
@@ -147,17 +155,21 @@
         }
       }
     },
-    "E:\\fpt\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
+    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\fpt\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
         "projectName": "DTOs",
-        "projectPath": "E:\\fpt\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "E:\\fpt\\asp.net-api-configuration\\DTOs\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -171,8 +183,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "E:\\fpt\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+              "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
               }
             }
           }

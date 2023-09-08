@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using ServerAPI.Managers;
 
-namespace ServerAPI.Utilities
+namespace ServerAPI.Services
 {
 	public class HubConnectionService
 	{

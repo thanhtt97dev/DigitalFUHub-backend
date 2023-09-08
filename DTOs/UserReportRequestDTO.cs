@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs
 {
-    public class ExportRequestDTO
+    public class UserReportRequestDTO
     {   
         public int Id { get; set; }
     }

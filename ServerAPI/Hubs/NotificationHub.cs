@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using ServerAPI.Managers;
 using DTOs;
 using Microsoft.AspNetCore.Authorization;
-using ServerAPI.Utilities;
+using ServerAPI.Services;
 
 namespace ServerAPI.Hubs
 {

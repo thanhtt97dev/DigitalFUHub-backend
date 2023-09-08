@@ -322,7 +322,6 @@ D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Micr
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Connections.Abstractions.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Http.Connections.Client.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Http.Connections.Common.dll
-D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.OData.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.SignalR.Client.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.SignalR.Common.dll
@@ -354,11 +353,7 @@ D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Micr
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
-D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.OData.Core.dll
-D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.OData.Edm.dll
-D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.OData.ModelBuilder.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.OpenApi.dll
-D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.Spatial.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Newtonsoft.Json.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll

@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BusinessObject;
-using Microsoft.AspNetCore.OData;
-using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
@@ -13,7 +10,6 @@ using ServerAPI.Services;
 using ServerAPI.Comons;
 using ServerAPI.Hubs;
 using ServerAPI.Managers;
-using ServerAPI.Utilities;
 using AspNetCoreRateLimit;
 
 namespace ServerAPI
@@ -36,14 +32,6 @@ namespace ServerAPI
 			{
 				opts.UseSqlServer(builder.Configuration.GetConnectionString("DB") ?? string.Empty);
 			});
-
-			//Add Odata
-			builder.Services.AddControllers()
-				.AddOData(options =>
-				{
-					options.Select().Filter().Count().OrderBy().SetMaxTop(100).Expand()
-					.AddRouteComponents("odata", GetEdmModel());
-				});
 
 			// Add HttpContextAccessor 
 			builder.Services.AddHttpContextAccessor();
@@ -100,14 +88,12 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
 			builder.Services.AddSingleton<IStorageRepository, StorageRepository>();
+			builder.Services.AddSingleton<IReportRepository, ReportRepository>();	
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
-            builder.Services.AddSingleton<ReportService>();
-
-
 
             //Add SignalR
             builder.Services.AddSignalR();
@@ -161,14 +147,5 @@ namespace ServerAPI
 
 			app.Run();
 		}
-
-		private static IEdmModel GetEdmModel()
-		{
-			ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-
-			return builder.GetEdmModel();
-		}
-
-
 	}
 }
