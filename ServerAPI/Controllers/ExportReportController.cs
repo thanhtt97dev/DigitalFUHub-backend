@@ -1,6 +1,7 @@
 ﻿using DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using ServerAPI.Utilities;
 
 namespace ServerAPI.Controllers
@@ -29,8 +30,7 @@ namespace ServerAPI.Controllers
                 if (fileContents == null || fileContents.Length == 0)
                     return NotFound("Unable to create Excel file");
 
-
-                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  "export_user.xlsx");
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "user_report.xlsx");
 
                 //return Ok(fileContents);
 

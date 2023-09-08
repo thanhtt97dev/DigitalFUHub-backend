@@ -55,9 +55,9 @@ namespace ServerAPI.Utilities
 
 		public byte[] ExportUserToExcel(int id)
 		{
-			string reportname = $"export_user_{Guid.NewGuid():N}.xlsx";
+			string workSheetName = "Report User";
 			using ExcelPackage pack = new ExcelPackage();
-			ExcelWorksheet ws = pack.Workbook.Worksheets.Add(reportname);
+			ExcelWorksheet ws = pack.Workbook.Worksheets.Add(workSheetName);
 
 			IDictionary<string, object> listParams = new Dictionary<string, object>() { };
 			listParams.Add("@id", id);
