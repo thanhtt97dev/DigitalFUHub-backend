@@ -73,3 +73,18 @@ D:\fu-workspace\Semester 9\SEP490\src\be\DTOs\obj\Debug\net6.0\DTOs.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\DTOs\obj\Debug\net6.0\refint\DTOs.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\DTOs\obj\Debug\net6.0\DTOs.pdb
 D:\fu-workspace\Semester 9\SEP490\src\be\DTOs\obj\Debug\net6.0\ref\DTOs.dll
+E:\fpt\asp.net-api-configuration\DTOs\bin\Debug\net6.0\DTOs.deps.json
+E:\fpt\asp.net-api-configuration\DTOs\bin\Debug\net6.0\DTOs.dll
+E:\fpt\asp.net-api-configuration\DTOs\bin\Debug\net6.0\DTOs.pdb
+E:\fpt\asp.net-api-configuration\DTOs\bin\Debug\net6.0\BusinessObject.dll
+E:\fpt\asp.net-api-configuration\DTOs\bin\Debug\net6.0\BusinessObject.pdb
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.csproj.AssemblyReference.cache
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.GeneratedMSBuildEditorConfig.editorconfig
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfoInputs.cache
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfo.cs
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.csproj.CoreCompileInputs.cache
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.csproj.CopyComplete
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.dll
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\refint\DTOs.dll
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.pdb
+E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\ref\DTOs.dll
