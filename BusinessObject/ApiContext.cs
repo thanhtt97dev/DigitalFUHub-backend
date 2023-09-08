@@ -13,17 +13,12 @@ namespace BusinessObject
 	public class ApiContext : DbContext
 	{
 
-		public readonly string connectionString = string.Empty;
-		public ApiContext()
-		{
-			connectionString = "server=localhost; database=DBTest; uid=sa; pwd=sa;MultipleActiveResultSets=true";
-			//_connectionString = "Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
-		}
+		public readonly string connectionString = "server=localhost; database=DBTest; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+		//public readonly string connectionString = "Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
+		
+		public ApiContext(){}
 
-		public ApiContext(DbContextOptions options) : base(options)
-		{
-			
-		}
+		public ApiContext(DbContextOptions options) : base(options){}
 
 		public virtual DbSet<Role> Role { get; set; } = null!;
 		public virtual DbSet<User> User { get; set; } = null!;
