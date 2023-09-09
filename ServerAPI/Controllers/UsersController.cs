@@ -1,19 +1,20 @@
 ﻿namespace ServerAPI.Controllers
 {
-	using AutoMapper;
-	using BusinessObject;
-	using DataAccess.IRepositories;
-	using DTOs;
-	using Microsoft.AspNetCore.Authorization;
-	using Microsoft.AspNetCore.Mvc;
-	using Microsoft.AspNetCore.SignalR;
-	using Newtonsoft.Json;
-	using ServerAPI.Hubs;
-	using ServerAPI.Managers;
-	using ServerAPI.Services;
+    using AutoMapper;
+    using BusinessObject;
+    using DataAccess.IRepositories;
+    using DTOs;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.SignalR;
+    using Newtonsoft.Json;
+    using ServerAPI.Comons;
+    using ServerAPI.Hubs;
+    using ServerAPI.Managers;
+    using ServerAPI.Services;
 
 
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{

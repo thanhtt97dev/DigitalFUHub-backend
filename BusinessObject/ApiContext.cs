@@ -40,6 +40,11 @@ namespace BusinessObject
 				new Role{RoleId = 1, RoleName="Admin"},
 				new Role{RoleId = 2, RoleName="User"}
 			});
+
+			modelBuilder.Entity<User>().HasData(new User[]
+			{
+				new User{RoleId = 1, Email = "admin", Password="admin", Status = true},
+			});
 		}
 	}
 }
