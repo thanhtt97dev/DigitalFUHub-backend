@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230827075742_updateDB")]
-    partial class updateDB
+    [Migration("20230910214833_updateDB-v6")]
+    partial class updateDBv6
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -186,6 +186,9 @@ namespace BusinessObject.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("TwoFactorAuthentication")
                         .HasColumnType("bit");
 
                     b.HasKey("UserId");

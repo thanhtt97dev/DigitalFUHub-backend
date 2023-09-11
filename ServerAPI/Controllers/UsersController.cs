@@ -4,14 +4,19 @@
     using BusinessObject;
     using DataAccess.IRepositories;
     using DTOs;
-    using Microsoft.AspNetCore.Authorization;
+	using Google.Authenticator;
+	using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.SignalR;
     using Newtonsoft.Json;
-    using ServerAPI.Comons;
+	using QRCoder;
+	using ServerAPI.Comons;
     using ServerAPI.Hubs;
     using ServerAPI.Managers;
     using ServerAPI.Services;
+	using System.Drawing;
+	using System.Numerics;
+	using static System.Net.WebRequestMethods;
 
 
     [Route("api/[controller]")]
@@ -25,13 +30,19 @@
 		private readonly IHubContext<NotificationHub> _notificationHubContext;
 		private readonly IConnectionManager _connectionManager;
 		private readonly INotificationRepositiory _notificationRepositiory;
+		private readonly ITwoFactorAuthenticationRepository _twoFactorAuthenticationRepository;
 
-		private readonly JwtTokenService _jwtTokenService;	
+		private readonly JwtTokenService _jwtTokenService;
+		private readonly TwoFactorAuthenticationService _twoFactorAuthenticationService;
 
-		public UsersController(IUserRepository userRepository, IMapper mapper,IRefreshTokenRepository refreshTokenRepository, 
-			IAccessTokenRepository accessTokenRepository, JwtTokenService jwtTokenService,
+		public UsersController(IUserRepository userRepository, IMapper mapper,
+			IRefreshTokenRepository refreshTokenRepository, 
+			IAccessTokenRepository accessTokenRepository,
 			IHubContext<NotificationHub> notificationHubContext, IConnectionManager connectionManager,
-			INotificationRepositiory notificationRepositiory
+			INotificationRepositiory notificationRepositiory,
+			ITwoFactorAuthenticationRepository twoFactorAuthenticationRepository,
+			JwtTokenService jwtTokenService,
+			TwoFactorAuthenticationService twoFactorAuthenticationService
 			)
 		{
 			_userRepository = userRepository;
@@ -42,6 +53,8 @@
 			_notificationHubContext = notificationHubContext;
 			_connectionManager = connectionManager;
 			_notificationRepositiory = notificationRepositiory;
+			_twoFactorAuthenticationService = twoFactorAuthenticationService;
+			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 		}
 
 		#region SignIn
@@ -93,6 +106,7 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
 			}
 		}
+
 		#endregion
 
 		#region Revoke token
@@ -109,6 +123,80 @@
 			catch (Exception)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+			}
+		}
+		#endregion
+
+		#region Generate Two Factor Authentication Key
+		//[Authorize]
+		[HttpPost("Generate2FaKey/{id}")]
+		public IActionResult Generate2FaKey(int id)
+		{
+			try
+			{
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return BadRequest();
+				if (user.TwoFactorAuthentication) return Conflict("User has been 2FA key!");
+
+				string secretKey = _twoFactorAuthenticationService.GenerateSecretKey();
+
+				string qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
+
+				User2FAResponeDTO user2FAResponeDTO = new User2FAResponeDTO()
+				{
+					SecretKey = secretKey,
+					QRCode = qrCode
+				};
+
+				return Ok(user2FAResponeDTO);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Activate Two Factor Authentication
+		//[Authorize]
+		[HttpPut("Activate2Fa/{id}")]
+		public IActionResult ActivateTwoFactorAuthentication(int id, User2FARequestActivateDTO user2FARequestDTO)
+		{
+			try
+			{
+				if (user2FARequestDTO.SecretKey == null) return BadRequest();
+				bool pinvalid = _twoFactorAuthenticationService
+					.ValidateTwoFactorPin(user2FARequestDTO.SecretKey, user2FARequestDTO.Code);
+				if (!pinvalid) return Conflict("Code is invalid!");
+				_twoFactorAuthenticationRepository.Add2FAKey(id, user2FARequestDTO.SecretKey);
+				_userRepository.Update2FA(id);
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Disable Two Factor Authentication
+		//[Authorize]
+		[HttpPut("Deactivate2Fa/{id}")]
+		public IActionResult DisableTwoFactorAuthentication(int id, User2FARequestDisableDTO user2FARequestDisableDTO)
+		{
+			try
+			{
+				var secretKey = _twoFactorAuthenticationRepository.Get2FAKey(id);
+				if (secretKey == null) return BadRequest();
+				bool pinvalid = _twoFactorAuthenticationService
+					.ValidateTwoFactorPin(secretKey, user2FARequestDisableDTO.Code);
+				if (!pinvalid) return Conflict("Code is invalid!");
+				_userRepository.Update2FA(id);
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
 			}
 		}
 		#endregion

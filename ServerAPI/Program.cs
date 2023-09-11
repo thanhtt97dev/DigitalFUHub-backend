@@ -88,15 +88,17 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
 			builder.Services.AddSingleton<IStorageRepository, StorageRepository>();
-			builder.Services.AddSingleton<IReportRepository, ReportRepository>();	
+			builder.Services.AddSingleton<IReportRepository, ReportRepository>();
+			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
+			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 
-            //Add SignalR
-            builder.Services.AddSignalR();
+			//Add SignalR
+			builder.Services.AddSignalR();
 
 			//Add rate limit request
 			builder.Services.Configure<IpRateLimitOptions>(options =>

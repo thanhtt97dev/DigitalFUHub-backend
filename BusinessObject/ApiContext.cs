@@ -27,6 +27,7 @@ namespace BusinessObject
 		public virtual DbSet<AccessToken> AccessToken { get; set; } = null!;
 		public virtual DbSet<RefreshToken> RefreshToken { get; set; } = null!;
 		public virtual DbSet<Notification> Notification { get; set; } = null!;
+		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{

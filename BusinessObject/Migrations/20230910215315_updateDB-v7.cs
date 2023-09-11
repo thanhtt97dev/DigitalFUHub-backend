@@ -4,25 +4,24 @@
 
 namespace BusinessObject.Migrations
 {
-    public partial class updateDB : Migration
+    public partial class updateDBv7 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Storage",
+                name: "TwoFactorAuthentication",
                 columns: table => new
                 {
-                    ImageId = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsPublic = table.Column<bool>(type: "bit", nullable: false)
+                    SecretKey = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Storage", x => x.ImageId);
+                    table.PrimaryKey("PK_TwoFactorAuthentication", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Storage_User_UserId",
+                        name: "FK_TwoFactorAuthentication_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
@@ -30,15 +29,15 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Storage_UserId",
-                table: "Storage",
+                name: "IX_TwoFactorAuthentication_UserId",
+                table: "TwoFactorAuthentication",
                 column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Storage");
+                name: "TwoFactorAuthentication");
         }
     }
 }

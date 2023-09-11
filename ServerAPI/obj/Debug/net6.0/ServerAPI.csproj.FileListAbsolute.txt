@@ -659,3 +659,6 @@ E:\fpt\asp.net-api-configuration\ServerAPI\obj\Debug\net6.0\refint\ServerAPI.dll
 E:\fpt\asp.net-api-configuration\ServerAPI\obj\Debug\net6.0\ServerAPI.pdb
 E:\fpt\asp.net-api-configuration\ServerAPI\obj\Debug\net6.0\ServerAPI.genruntimeconfig.cache
 E:\fpt\asp.net-api-configuration\ServerAPI\obj\Debug\net6.0\ref\ServerAPI.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Google.Authenticator.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\QRCoder.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\zxing.dll
