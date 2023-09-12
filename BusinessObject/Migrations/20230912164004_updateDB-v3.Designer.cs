@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230912043959_init db")]
-    partial class initdb
+    [Migration("20230912164004_updateDB-v3")]
+    partial class updateDBv3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

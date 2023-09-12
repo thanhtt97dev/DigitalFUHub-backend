@@ -14,10 +14,13 @@
           "BusinessObject": "1.0.0",
           "DTOs": "1.0.0",
           "DataAccess": "1.0.0",
+          "GoogleAuthenticator": "3.1.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "6.0.20",
           "Microsoft.AspNetCore.SignalR": "1.1.0",
           "Microsoft.AspNetCore.SignalR.Client": "7.0.10",
-          "Swashbuckle.AspNetCore": "6.2.3"
+          "QRCoder": "1.4.3",
+          "Swashbuckle.AspNetCore": "6.2.3",
+          "ZXing.Net": "0.16.9"
         },
         "runtime": {
           "ServerAPI.dll": {}
@@ -122,6 +125,17 @@
           "lib/net6.0/EPPlus.System.Drawing.dll": {
             "assemblyVersion": "6.1.1.0",
             "fileVersion": "6.1.1.0"
+          }
+        }
+      },
+      "GoogleAuthenticator/3.1.0": {
+        "dependencies": {
+          "QRCoder": "1.4.3"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Google.Authenticator.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.0.0"
           }
         }
       },
@@ -763,6 +777,14 @@
           }
         }
       },
+      "QRCoder/1.4.3": {
+        "runtime": {
+          "lib/net6.0/QRCoder.dll": {
+            "assemblyVersion": "1.4.3.0",
+            "fileVersion": "1.4.3.0"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/6.2.3": {
         "dependencies": {
           "Microsoft.Extensions.ApiDescription.Server": "3.0.0",
@@ -1105,6 +1127,14 @@
           }
         }
       },
+      "ZXing.Net/0.16.9": {
+        "runtime": {
+          "lib/net6.0/zxing.dll": {
+            "assemblyVersion": "0.16.9.0",
+            "fileVersion": "0.16.9.0"
+          }
+        }
+      },
       "BusinessObject/1.0.0": {
         "dependencies": {
           "EPPlus": "6.2.6",
@@ -1196,6 +1226,13 @@
       "sha512": "sha512-lRF5gHYrmkHOOiLMI0t6q8zNYjUrzRgAM5BCXumv5xiqXko8fx3AWI+HCNZfhEqVFGOop+42KfR5GiUcCoyoMw==",
       "path": "epplus.system.drawing/6.1.1",
       "hashPath": "epplus.system.drawing.6.1.1.nupkg.sha512"
+    },
+    "GoogleAuthenticator/3.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-xVu1xsUW2W3wXGQYhs1bwFKYAiPh5KlRakAuXI6WNwmluqALMERgGZKZ3us70qz03yvzAyTv8gLXOvB3FDVEmA==",
+      "path": "googleauthenticator/3.1.0",
+      "hashPath": "googleauthenticator.3.1.0.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Authentication.Abstractions/2.2.0": {
       "type": "package",
@@ -1659,6 +1696,13 @@
       "path": "newtonsoft.json/13.0.2",
       "hashPath": "newtonsoft.json.13.0.2.nupkg.sha512"
     },
+    "QRCoder/1.4.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fWuFqjm8GTlEb2GqBl3Hi8HZZeZQwBSHxvRPtPjyNbT82H0ff0JwavKRBmMaXCno1Av6McPC8aJzri0Mj2w9Jw==",
+      "path": "qrcoder/1.4.3",
+      "hashPath": "qrcoder.1.4.3.nupkg.sha512"
+    },
     "Swashbuckle.AspNetCore/6.2.3": {
       "type": "package",
       "serviceable": true,
@@ -1924,6 +1968,13 @@
       "sha512": "sha512-CeWTdRNfRaSh0pm2gDTJFwVaXfTq6Xwv/sA887iwPTneW7oMtMlpvDIO+U60+3GWTB7Aom6oQwv5VZVUhQRdPQ==",
       "path": "system.windows.extensions/4.7.0",
       "hashPath": "system.windows.extensions.4.7.0.nupkg.sha512"
+    },
+    "ZXing.Net/0.16.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7WaVMHklpT3Ye2ragqRIwlFRsb6kOk63BOGADV0fan3ulVfGLUYkDi5yNUsZS/7FVNkWbtHAlDLmu4WnHGfqvQ==",
+      "path": "zxing.net/0.16.9",
+      "hashPath": "zxing.net.0.16.9.nupkg.sha512"
     },
     "BusinessObject/1.0.0": {
       "type": "project",

@@ -187,7 +187,7 @@
 		#endregion
 
 		#region Activate Two Factor Authentication
-		[Authorize]
+		//[Authorize]
 		[HttpPut("Activate2Fa/{id}")]
 		public IActionResult ActivateTwoFactorAuthentication(int id, User2FARequestActivateDTO user2FARequestDTO)
 		{
@@ -215,7 +215,7 @@
 		#endregion
 
 		#region Disable Two Factor Authentication
-		[Authorize]
+		//[Authorize]
 		[HttpPut("Deactivate2Fa/{id}")]
 		public IActionResult DisableTwoFactorAuthentication(int id, User2FARequestDisableDTO user2FARequestDisableDTO)
 		{

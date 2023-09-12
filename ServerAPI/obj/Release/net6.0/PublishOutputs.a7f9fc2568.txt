@@ -13,6 +13,7 @@ D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\Pu
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\EPPlus.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\EPPlus.Interfaces.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\EPPlus.System.Drawing.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Google.Authenticator.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.Connections.Abstractions.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.Http.Connections.Client.dll
@@ -52,6 +53,7 @@ D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\Pu
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.OpenApi.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\QRCoder.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -71,6 +73,7 @@ D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\Pu
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\System.Text.Json.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\System.Threading.Channels.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\System.Windows.Extensions.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\zxing.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\obj\Release\net6.0\PubTmp\Out\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll

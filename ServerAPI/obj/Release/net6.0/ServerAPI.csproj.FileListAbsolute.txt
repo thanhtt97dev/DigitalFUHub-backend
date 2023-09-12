@@ -429,3 +429,6 @@ D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Release\net6.0\ru
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Release\net6.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Release\net6.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Release\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Release\net6.0\Google.Authenticator.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Release\net6.0\QRCoder.dll
+D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Release\net6.0\zxing.dll
