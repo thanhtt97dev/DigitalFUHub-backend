@@ -1,0 +1,45 @@
+﻿using BusinessObject;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+
+
+namespace DataAccess.DAOs
+{
+    internal class ReportDAO
+    {
+        private static ReportDAO? instance;
+        private static readonly object instanceLock = new object();
+
+        public static ReportDAO Instance
+        {
+            get
+            {
+                lock (instanceLock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new ReportDAO();
+                    }
+                }
+                return instance;
+            }
+        }
+
+
+        #region Get Users Report (sample)
+        public List<User> GetUsersReport(int id)
+        {
+            using (ApiContext context = new ApiContext())
+            {
+                string sql = "EXECUTE dbo.getUserReport @id";
+                List<User> result = context.User.FromSqlRaw(sql,
+                        new SqlParameter("@id", id)
+                    ).ToList();
+
+                return result;
+            }
+
+        }
+        #endregion
+    }
+}

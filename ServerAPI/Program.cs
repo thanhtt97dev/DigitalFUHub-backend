@@ -100,12 +100,12 @@ namespace ServerAPI
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
 			builder.Services.AddSingleton<IStorageRepository, StorageRepository>();
+            builder.Services.AddSingleton<IReportRepository, ReportRepository>();
 
-			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
-            builder.Services.AddSingleton<ReportService>();
 
 
 
