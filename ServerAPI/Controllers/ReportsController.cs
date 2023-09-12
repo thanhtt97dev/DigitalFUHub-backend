@@ -1,39 +1,34 @@
 ﻿using DataAccess.IRepositories;
-using DataAccess.Repositories;
 using DTOs;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 
 namespace ServerAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/reports")]
     [ApiController]
     public class ReportsController : ControllerBase
     {
-        private readonly IReportRepository _reportRepository;
+        private readonly IReportRepository _repository;
 
-        public ReportsController(IReportRepository reportRepository)
+        public ReportsController(IReportRepository repository)
         {
-            _reportRepository = reportRepository;   
+            _repository = repository;
         }
 
         #region Get report user (sample)
-        [Authorize]
         [HttpPost("user")]
-        public async Task<IActionResult> UserInfo ([FromBody] UserReportRequestDTO userReportRequestDTO)
+        public async Task<IActionResult> ReportUser ([FromBody] UserReportRequestDTO reportRequestDTO)
         {
             try
             {
-				var fileContents = await _reportRepository.GetReportUserInfoToExcel(userReportRequestDTO.Id);
 
-				if (fileContents == null || fileContents.Length == 0) return NotFound();
+                var fileContents = await _repository.ReportUser(reportRequestDTO.Id);
 
-				return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "user_report.xlsx");
-            } catch (Exception ex)
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "user_report.xlsx");
+
+            } catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Message = ex.Message });
             }
         }
 		#endregion

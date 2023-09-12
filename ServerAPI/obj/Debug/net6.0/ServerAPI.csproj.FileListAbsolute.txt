@@ -431,7 +431,6 @@ D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.As
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Connections.Abstractions.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Http.Connections.Client.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Http.Connections.Common.dll
-D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.OData.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.SignalR.Client.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.AspNetCore.SignalR.Common.dll
@@ -464,11 +463,7 @@ D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.Id
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.IO.RecyclableMemoryStream.dll
-D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.OData.Core.dll
-D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.OData.Edm.dll
-D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.OData.ModelBuilder.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.OpenApi.dll
-D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.Spatial.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Newtonsoft.Json.dll
 D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
@@ -662,3 +657,6 @@ E:\fpt\asp.net-api-configuration\ServerAPI\obj\Debug\net6.0\ref\ServerAPI.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\Google.Authenticator.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\QRCoder.dll
 D:\FU\Capstone Project\asp.net-api-configuration\ServerAPI\bin\Debug\net6.0\zxing.dll
+D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\Google.Authenticator.dll
+D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\QRCoder.dll
+D:\fu-workspace\Semester 9\SEP490\src\be\ServerAPI\bin\Debug\net6.0\zxing.dll
