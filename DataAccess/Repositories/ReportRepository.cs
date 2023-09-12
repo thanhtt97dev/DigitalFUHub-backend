@@ -12,13 +12,13 @@ namespace DataAccess.Repositories
 {
     public class ReportRepository : IReportRepository
     {
-        public byte[] ReportUser(int id)
+        public async Task<byte[]> ReportUser(int id)
         {
             string workSheetName = "Report User";
             using ExcelPackage pack = new ExcelPackage();
             ExcelWorksheet ws = pack.Workbook.Worksheets.Add(workSheetName);
 
-            IEnumerable<User> userList = ReportDAO.Instance.GetUsersReport(id);
+            IEnumerable<User> userList = await ReportDAO.Instance.GetUsersReport(id);
 
             ws.Cells.LoadFromCollection(userList, true);
 

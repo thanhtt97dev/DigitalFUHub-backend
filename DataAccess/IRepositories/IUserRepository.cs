@@ -18,6 +18,8 @@ namespace DataAccess.IRepositories
 
 		User? GetUserById(int id);
 
-		Task EditUserInfo(int id, User user);	
+		Task EditUserInfo(int id, User user);
+
+		void Update2FA(int id);
 	}
 }

@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BusinessObject;
-using Microsoft.AspNetCore.OData;
-using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
@@ -13,7 +10,6 @@ using ServerAPI.Services;
 using ServerAPI.Comons;
 using ServerAPI.Hubs;
 using ServerAPI.Managers;
-using ServerAPI.Utilities;
 using AspNetCoreRateLimit;
 
 namespace ServerAPI
@@ -36,14 +32,6 @@ namespace ServerAPI
 			{
 				opts.UseSqlServer(builder.Configuration.GetConnectionString("DB") ?? string.Empty);
 			});
-
-			//Add Odata
-			builder.Services.AddControllers()
-				.AddOData(options =>
-				{
-					options.Select().Filter().Count().OrderBy().SetMaxTop(100).Expand()
-					.AddRouteComponents("odata", GetEdmModel());
-				});
 
 			// Add HttpContextAccessor 
 			builder.Services.AddHttpContextAccessor();
@@ -107,10 +95,8 @@ namespace ServerAPI
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
 
-
-
-            //Add SignalR
-            builder.Services.AddSignalR();
+			//Add SignalR
+			builder.Services.AddSignalR();
 
 			//Add rate limit request
 			builder.Services.Configure<IpRateLimitOptions>(options =>
@@ -130,8 +116,8 @@ namespace ServerAPI
 
 			var app = builder.Build();
 
-			// Configure the HTTP request pipeline.
-			if (app.Environment.IsDevelopment())
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
@@ -161,14 +147,5 @@ namespace ServerAPI
 
 			app.Run();
 		}
-
-		private static IEdmModel GetEdmModel()
-		{
-			ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-
-			return builder.GetEdmModel();
-		}
-
-
 	}
 }

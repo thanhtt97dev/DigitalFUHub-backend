@@ -81,5 +81,16 @@ namespace DataAccess.DAOs
 				await context.SaveChangesAsync();
 			}
 		}
+
+		internal void Update2FA(int id)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				var user =  context.User.FirstOrDefault(x => x.UserId == id);
+				if (user == null) throw new Exception("User not existed!");
+				user.TwoFactorAuthentication = !user.TwoFactorAuthentication;
+				context.SaveChanges();
+			}
+		}
 	}
 }

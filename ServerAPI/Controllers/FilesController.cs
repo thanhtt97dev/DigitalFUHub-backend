@@ -54,15 +54,15 @@ namespace ServerAPI.Controllers
 		[Route("GetFile/{filename}")]
 		public async Task<IActionResult> GetFile(string filename)
 		{
-			Storage? file = _storageRepository.GetFileByName(filename);
-			if (file == null)
-			{
-				return NotFound();
-			}
-			else if (!file.IsPublic)
-			{
-				return BadRequest();
-			}
+			//Storage? file = _storageRepository.GetFileByName(filename);
+			//if (file == null)
+			//{
+			//	return NotFound();
+			//}
+			//else if (!file.IsPublic)
+			//{
+			//	return BadRequest();
+			//}
 			BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
 			Stream? streamContent = await _storageRepository.GetFileFromAzureAsync(container.GetBlobClient(filename).Uri.ToString());
 			if (streamContent == null)

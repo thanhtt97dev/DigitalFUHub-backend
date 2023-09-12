@@ -27,14 +27,14 @@ namespace DataAccess.DAOs
 
 
         #region Get Users Report (sample)
-        public List<User> GetUsersReport(int id)
+        public async Task<List<User>> GetUsersReport(int id)
         {
             using (ApiContext context = new ApiContext())
             {
                 string sql = "EXECUTE dbo.getUserReport @id";
-                List<User> result = context.User.FromSqlRaw(sql,
+                List<User> result = await context.User.FromSqlRaw(sql,
                         new SqlParameter("@id", id)
-                    ).ToList();
+                    ).ToListAsync();
 
                 return result;
             }

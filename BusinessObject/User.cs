@@ -11,7 +11,6 @@ namespace BusinessObject
 {
 	public class User
 	{
-		
 
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,6 +19,7 @@ namespace BusinessObject
 		public string Email { get; set; } = string.Empty;
 		public string Password { get; set; } = string.Empty;
 		public bool Status { get; set; }	
+		public bool TwoFactorAuthentication { get; set; }	
 
 		[ForeignKey(nameof(RoleId))]
 		public virtual Role Role { get; set; } = null!;

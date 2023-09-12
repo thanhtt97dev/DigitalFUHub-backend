@@ -12,13 +12,13 @@ namespace BusinessObject
 {
 	public class ApiContext : DbContext
 	{
-		public ApiContext()
-		{
-		}
 
-		public ApiContext(DbContextOptions options) : base(options)
-		{
-		}
+		public readonly string connectionString = "server=localhost; database=DBTest; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+		//public readonly string connectionString = "Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
+		
+		public ApiContext(){}
+
+		public ApiContext(DbContextOptions options) : base(options){}
 
 		public virtual DbSet<Role> Role { get; set; } = null!;
 		public virtual DbSet<User> User { get; set; } = null!;
@@ -27,24 +27,11 @@ namespace BusinessObject
 		public virtual DbSet<AccessToken> AccessToken { get; set; } = null!;
 		public virtual DbSet<RefreshToken> RefreshToken { get; set; } = null!;
 		public virtual DbSet<Notification> Notification { get; set; } = null!;
+		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			/*
-			string projectName = "ServerAPI";
-			var directory = Directory.GetCurrentDirectory().Substring(0, Directory.GetCurrentDirectory().LastIndexOf("\\")) + "\\" + projectName;
-			var conf = new ConfigurationBuilder()
-				.SetBasePath(directory)
-				.AddJsonFile("appsettings.json", true, true)
-				.Build();
-			if (!optionsBuilder.IsConfigured)
-			{
-			optionsBuilder.UseSqlServer(conf.GetConnectionString("DB") ?? string.Empty);
-			}
-			*/
-
-			optionsBuilder.UseSqlServer("server=localhost; database=DBTest; uid=sa; pwd=sa;MultipleActiveResultSets=true");
-			//optionsBuilder.UseSqlServer("Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;");
+			optionsBuilder.UseSqlServer(connectionString);
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

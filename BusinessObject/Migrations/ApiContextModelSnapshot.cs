@@ -164,6 +164,28 @@ namespace BusinessObject.Migrations
                     b.ToTable("Storage");
                 });
 
+            modelBuilder.Entity("BusinessObject.TwoFactorAuthentication", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<string>("SecretKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TwoFactorAuthentication");
+                });
+
             modelBuilder.Entity("BusinessObject.User", b =>
                 {
                     b.Property<long>("UserId")
@@ -184,6 +206,9 @@ namespace BusinessObject.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("TwoFactorAuthentication")
                         .HasColumnType("bit");
 
                     b.HasKey("UserId");
@@ -227,6 +252,17 @@ namespace BusinessObject.Migrations
                 });
 
             modelBuilder.Entity("BusinessObject.Storage", b =>
+                {
+                    b.HasOne("BusinessObject.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.TwoFactorAuthentication", b =>
                 {
                     b.HasOne("BusinessObject.User", "User")
                         .WithMany()

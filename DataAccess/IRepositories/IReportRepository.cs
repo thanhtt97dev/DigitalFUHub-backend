@@ -9,6 +9,6 @@ namespace DataAccess.IRepositories
 {
     public interface IReportRepository
     {
-        byte[] ReportUser(int id);
+        Task<byte[]> ReportUser(int id);
     }
 }

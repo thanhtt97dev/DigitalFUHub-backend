@@ -20,5 +20,8 @@ namespace DataAccess.Repositories
 		public User? GetUserById(int id) => UserDAO.Instance.GetUserById(id);
 
 		public Task EditUserInfo(int id, User user) => UserDAO.Instance.EditUserInfo(id,user);
+
+		public void Update2FA(int id) => UserDAO.Instance.Update2FA(id);
+
 	}
 }

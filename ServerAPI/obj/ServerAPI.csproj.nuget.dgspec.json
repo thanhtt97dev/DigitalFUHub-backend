@@ -287,13 +287,13 @@
               "target": "Package",
               "version": "[12.17.0, )"
             },
+            "GoogleAuthenticator": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[6.0.20, )"
-            },
-            "Microsoft.AspNetCore.OData": {
-              "target": "Package",
-              "version": "[8.0.10, )"
             },
             "Microsoft.AspNetCore.SignalR": {
               "target": "Package",
@@ -303,9 +303,17 @@
               "target": "Package",
               "version": "[7.0.10, )"
             },
+            "QRCoder": {
+              "target": "Package",
+              "version": "[1.4.3, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.2.3, )"
+            },
+            "ZXing.Net": {
+              "target": "Package",
+              "version": "[0.16.9, )"
             }
           },
           "imports": [
