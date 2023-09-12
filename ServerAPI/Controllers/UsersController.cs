@@ -67,6 +67,10 @@
 
 				if (user == null) return NotFound("Email or Password not correct!");
 				if (!user.Status) return Conflict("Your account was baned!");
+				if (user.TwoFactorAuthentication)
+				{
+					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
+				}
 			
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
@@ -75,6 +79,36 @@
 			catch (Exception ex) 
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Generate access token by Two Factor Authentication Code
+		[HttpPost("GenerateAccessToken/{id}")]
+		public async Task<IActionResult> GenerateAccessTokenBy2FA(int id, User2FARequestValidateDTO user2FARequestValidateDTO)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(user2FARequestValidateDTO.Code)) return BadRequest();
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return BadRequest();
+				if (!user.TwoFactorAuthentication)
+					return Conflict("This account is not using Two Factor Authentication!");
+
+				var secretKey = _twoFactorAuthenticationRepository.Get2FAKey(id);
+				if (secretKey == null) return BadRequest();
+
+				bool isPinvalid = _twoFactorAuthenticationService
+					.ValidateTwoFactorPin(secretKey, user2FARequestValidateDTO.Code);
+				if (!isPinvalid) return Conflict("Code is invalid!");
+
+				var token = _jwtTokenService.GenerateTokenAsync(user);
+
+				return Ok(await token);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
 			}
 		}
 		#endregion
@@ -128,7 +162,6 @@
 		#endregion
 
 		#region Generate Two Factor Authentication Key
-		//[Authorize]
 		[HttpPost("Generate2FaKey/{id}")]
 		public IActionResult Generate2FaKey(int id)
 		{
@@ -136,7 +169,8 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
-				if (user.TwoFactorAuthentication) return Conflict("User has been 2FA key!");
+				if (user.TwoFactorAuthentication) 
+					return Conflict("This account has enabled Two Factor Authentication!");
 
 				string secretKey = _twoFactorAuthenticationService.GenerateSecretKey();
 
@@ -158,16 +192,22 @@
 		#endregion
 
 		#region Activate Two Factor Authentication
-		//[Authorize]
+		[Authorize]
 		[HttpPut("Activate2Fa/{id}")]
 		public IActionResult ActivateTwoFactorAuthentication(int id, User2FARequestActivateDTO user2FARequestDTO)
 		{
 			try
 			{
-				if (user2FARequestDTO.SecretKey == null) return BadRequest();
-				bool pinvalid = _twoFactorAuthenticationService
+				if (string.IsNullOrEmpty(user2FARequestDTO.SecretKey) || 
+					string.IsNullOrEmpty(user2FARequestDTO.Code)) return BadRequest();
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return BadRequest();
+				if (user.TwoFactorAuthentication) 
+					return Conflict("This account has enabled Two Factor Authentication!");
+
+				bool isPinvalid = _twoFactorAuthenticationService
 					.ValidateTwoFactorPin(user2FARequestDTO.SecretKey, user2FARequestDTO.Code);
-				if (!pinvalid) return Conflict("Code is invalid!");
+				if (!isPinvalid) return Conflict("Code is invalid!");
 				_twoFactorAuthenticationRepository.Add2FAKey(id, user2FARequestDTO.SecretKey);
 				_userRepository.Update2FA(id);
 				return Ok();
@@ -180,18 +220,28 @@
 		#endregion
 
 		#region Disable Two Factor Authentication
-		//[Authorize]
+		[Authorize]
 		[HttpPut("Deactivate2Fa/{id}")]
 		public IActionResult DisableTwoFactorAuthentication(int id, User2FARequestDisableDTO user2FARequestDisableDTO)
 		{
 			try
 			{
+				if(string.IsNullOrEmpty(user2FARequestDisableDTO.Code)) return BadRequest();
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return BadRequest();
+				if (!user.TwoFactorAuthentication) 
+					return Conflict("This account is not using Two Factor Authentication!");
+
 				var secretKey = _twoFactorAuthenticationRepository.Get2FAKey(id);
 				if (secretKey == null) return BadRequest();
-				bool pinvalid = _twoFactorAuthenticationService
+
+				bool isPinvalid = _twoFactorAuthenticationService
 					.ValidateTwoFactorPin(secretKey, user2FARequestDisableDTO.Code);
-				if (!pinvalid) return Conflict("Code is invalid!");
+				if (!isPinvalid) return Conflict("Code is invalid!");
+
 				_userRepository.Update2FA(id);
+				_twoFactorAuthenticationRepository.Delete2FAKey(id);
+
 				return Ok();
 			}
 			catch (Exception ex)
@@ -319,11 +369,5 @@
 		}
 		#endregion
 
-		[HttpGet("test")]
-		public IActionResult Get()
-		{
-			var user = _userRepository.GetUserById(1);
-			return Ok(user);
-		}
 	}
 }
