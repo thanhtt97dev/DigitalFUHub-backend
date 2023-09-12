@@ -1,11 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using BusinessObject;
 using DataAccess.IRepositories;
-using DataAccess.Repositories;
 using DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 
 namespace ServerAPI.Controllers
 {

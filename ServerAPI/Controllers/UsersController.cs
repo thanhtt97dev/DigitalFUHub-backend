@@ -4,19 +4,14 @@
     using BusinessObject;
     using DataAccess.IRepositories;
     using DTOs;
-	using Google.Authenticator;
 	using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.SignalR;
     using Newtonsoft.Json;
-	using QRCoder;
 	using ServerAPI.Comons;
     using ServerAPI.Hubs;
     using ServerAPI.Managers;
     using ServerAPI.Services;
-	using System.Drawing;
-	using System.Numerics;
-	using static System.Net.WebRequestMethods;
 
 
     [Route("api/[controller]")]
