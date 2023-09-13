@@ -1,0 +1,20 @@
+[
+  {
+    "postingDate": "2023-09-12T14:06:00",
+    "transactionDate": "2023-09-12T14:06:00",
+    "accountNo": "0336687454",
+    "creditAmount": 10000,
+    "debitAmount": 0,
+    "currency": "VND",
+    "description": "CUSTOMER LE DUC HIEU chuyen tien qua MoMo    Ma giao dich  Trace913189 Trace 913 189",
+    "availableBalance": 68591,
+    "beneficiaryAccount": null,
+    "refNo": "FT23255361560900\\BNK",
+    "benAccountName": "",
+    "bankName": "",
+    "benAccountNo": "",
+    "dueDate": null,
+    "docId": null,
+    "transactionType": "ACSM"
+  }
+]

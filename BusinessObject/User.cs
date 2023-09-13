@@ -19,10 +19,13 @@ namespace BusinessObject
 		public string Email { get; set; } = string.Empty;
 		public string Password { get; set; } = string.Empty;
 		public bool Status { get; set; }	
-		public bool TwoFactorAuthentication { get; set; }	
+		public bool TwoFactorAuthentication { get; set; }
+		public long CustomerBalance { get; set; }
+		public long SellerBalance { get; set; }
 
 		[ForeignKey(nameof(RoleId))]
 		public virtual Role Role { get; set; } = null!;
 		public virtual ICollection<AccessToken>? AccessTokens { get; set; }
+		public virtual ICollection<DepositTransaction>? DepositTransactions { get; set; }
 	}
 }

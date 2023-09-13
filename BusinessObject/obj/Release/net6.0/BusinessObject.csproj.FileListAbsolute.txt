@@ -54,3 +54,17 @@ D:\fu-workspace\Semester 9\SEP490\src\be\BusinessObject\obj\Release\net6.0\refin
 D:\fu-workspace\Semester 9\SEP490\src\be\BusinessObject\obj\Release\net6.0\BusinessObject.pdb
 D:\fu-workspace\Semester 9\SEP490\src\be\BusinessObject\obj\Release\net6.0\BusinessObject.genruntimeconfig.cache
 D:\fu-workspace\Semester 9\SEP490\src\be\BusinessObject\obj\Release\net6.0\ref\BusinessObject.dll
+D:\FU\Capstone Project\Back-end\BusinessObject\bin\Release\net6.0\BusinessObject.deps.json
+D:\FU\Capstone Project\Back-end\BusinessObject\bin\Release\net6.0\BusinessObject.runtimeconfig.json
+D:\FU\Capstone Project\Back-end\BusinessObject\bin\Release\net6.0\BusinessObject.dll
+D:\FU\Capstone Project\Back-end\BusinessObject\bin\Release\net6.0\BusinessObject.pdb
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.csproj.AssemblyReference.cache
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.GeneratedMSBuildEditorConfig.editorconfig
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.AssemblyInfoInputs.cache
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.AssemblyInfo.cs
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.csproj.CoreCompileInputs.cache
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.dll
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\refint\BusinessObject.dll
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.pdb
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\BusinessObject.genruntimeconfig.cache
+D:\FU\Capstone Project\Back-end\BusinessObject\obj\Release\net6.0\ref\BusinessObject.dll

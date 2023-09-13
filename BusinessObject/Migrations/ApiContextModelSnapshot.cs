@@ -52,6 +52,39 @@ namespace BusinessObject.Migrations
                     b.ToTable("AccessToken");
                 });
 
+            modelBuilder.Entity("BusinessObject.DepositTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPay")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DepositTransaction");
+                });
+
             modelBuilder.Entity("BusinessObject.Notification", b =>
                 {
                     b.Property<long>("NotificationId")
@@ -126,18 +159,6 @@ namespace BusinessObject.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Role");
-
-                    b.HasData(
-                        new
-                        {
-                            RoleId = 1L,
-                            RoleName = "Admin"
-                        },
-                        new
-                        {
-                            RoleId = 2L,
-                            RoleName = "User"
-                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Storage", b =>
@@ -194,6 +215,9 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("UserId"), 1L, 1);
 
+                    b.Property<long>("CustomerBalance")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -203,6 +227,9 @@ namespace BusinessObject.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("RoleId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SellerBalance")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("Status")
@@ -222,6 +249,17 @@ namespace BusinessObject.Migrations
                 {
                     b.HasOne("BusinessObject.User", "User")
                         .WithMany("AccessTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.DepositTransaction", b =>
+                {
+                    b.HasOne("BusinessObject.User", "User")
+                        .WithMany("DepositTransactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -292,6 +330,8 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.User", b =>
                 {
                     b.Navigation("AccessTokens");
+
+                    b.Navigation("DepositTransactions");
                 });
 #pragma warning restore 612, 618
         }
