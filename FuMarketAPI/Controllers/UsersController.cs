@@ -29,15 +29,17 @@
 
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly TwoFactorAuthenticationService _twoFactorAuthenticationService;
+		private readonly MailService _mailService;
 
 		public UsersController(IUserRepository userRepository, IMapper mapper,
-			IRefreshTokenRepository refreshTokenRepository, 
+			IRefreshTokenRepository refreshTokenRepository,
 			IAccessTokenRepository accessTokenRepository,
 			IHubContext<NotificationHub> notificationHubContext, IConnectionManager connectionManager,
 			INotificationRepositiory notificationRepositiory,
 			ITwoFactorAuthenticationRepository twoFactorAuthenticationRepository,
 			JwtTokenService jwtTokenService,
-			TwoFactorAuthenticationService twoFactorAuthenticationService
+			TwoFactorAuthenticationService twoFactorAuthenticationService,
+			MailService mailService
 			)
 		{
 			_userRepository = userRepository;
@@ -50,6 +52,7 @@
 			_notificationRepositiory = notificationRepositiory;
 			_twoFactorAuthenticationService = twoFactorAuthenticationService;
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
+			_mailService = mailService;
 		}
 
 		#region SignIn
@@ -157,6 +160,7 @@
 		#endregion
 
 		#region Generate Two Factor Authentication Key
+		[Authorize]		
 		[HttpPost("Generate2FaKey/{id}")]
 		public IActionResult Generate2FaKey(int id)
 		{
@@ -187,8 +191,8 @@
 		#endregion
 
 		#region Activate Two Factor Authentication
-		//[Authorize]
-		[HttpPut("Activate2Fa/{id}")]
+		[Authorize]
+		[HttpPost("Activate2Fa/{id}")]
 		public IActionResult ActivateTwoFactorAuthentication(int id, User2FARequestActivateDTO user2FARequestDTO)
 		{
 			try
@@ -215,8 +219,8 @@
 		#endregion
 
 		#region Disable Two Factor Authentication
-		//[Authorize]
-		[HttpPut("Deactivate2Fa/{id}")]
+		[Authorize]
+		[HttpPost("Deactivate2Fa/{id}")]
 		public IActionResult DisableTwoFactorAuthentication(int id, User2FARequestDisableDTO user2FARequestDisableDTO)
 		{
 			try
@@ -236,6 +240,37 @@
 
 				_userRepository.Update2FA(id);
 				_twoFactorAuthenticationRepository.Delete2FAKey(id);
+
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Send QRCode Factor Authentication to user's mail
+		[HttpPost("Send2FaQrCode/{id}")]
+		public async Task<IActionResult> SendTwoFactorAuthenticationQrCode(int id)
+		{
+			try
+			{
+				
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return BadRequest();
+				if (!user.TwoFactorAuthentication)
+					return Conflict("This account is not using Two Factor Authentication!");
+
+				var secretKey = _twoFactorAuthenticationRepository.Get2FAKey(id);
+				if (secretKey == null) return BadRequest();
+
+				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
+
+				string title = "FU-Market: QR Code for Two Factor Authentication";
+				string body = $"<div>Hello, {user.Email}!</div><div>Please click <a href='{qrCode}'>here</a> to get QR code!</div>";
+
+				await _mailService.SendEmailAsync(user.Email, title, body);
 
 				return Ok();
 			}

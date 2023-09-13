@@ -96,6 +96,7 @@ namespace FuMarketAPI
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
+			builder.Services.AddSingleton<MailService>();
 
 			//Add SignalR
 			builder.Services.AddSignalR();
