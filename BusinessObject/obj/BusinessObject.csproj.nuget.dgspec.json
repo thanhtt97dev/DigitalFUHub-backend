@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {}
+    "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj": {}
   },
   "projects": {
-    "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
+    "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

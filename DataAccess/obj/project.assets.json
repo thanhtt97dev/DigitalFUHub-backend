@@ -2683,11 +2683,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+      "projectUniqueName": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
       "projectName": "DataAccess",
-      "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\DataAccess.csproj",
+      "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
       "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-      "outputPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DataAccess\\obj\\",
+      "outputPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2708,11 +2708,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj": {
-              "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\BusinessObject\\BusinessObject.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj"
             },
-            "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj": {
-              "projectPath": "D:\\FU\\Capstone Project\\asp.net-api-configuration\\DTOs\\DTOs.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj"
             }
           }
         }
