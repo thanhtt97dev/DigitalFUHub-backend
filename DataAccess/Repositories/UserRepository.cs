@@ -12,7 +12,7 @@ namespace DataAccess.Repositories
 {
 	public class UserRepository : IUserRepository
 	{
-		public User? GetUserByEmailAndPassword(string? email, string? password) => UserDAO.Instance.GetUserByEmailAndPassword(email, password);
+		public User? GetUserByUsernameAndPassword(string? email, string? password) => UserDAO.Instance.GetUserByUsernameAndPassword(email, password);
 	
 		public User? GetUserByRefreshToken(string? refreshTokenId) => UserDAO.Instance.GetUserByRefreshToken(refreshTokenId);
 

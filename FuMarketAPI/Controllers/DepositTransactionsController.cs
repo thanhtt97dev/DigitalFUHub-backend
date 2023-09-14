@@ -30,7 +30,7 @@ namespace FuMarketAPI.Controllers
 			try
 			{
 				var transaction = mapper.Map<DepositTransaction>(depositTransactionDTO);
-				transaction.Code = Util.GetRandomString(10);
+				transaction.Code = Util.GetRandomString(10) + depositTransactionDTO.UserId + "FUMARKET";
 				depositTransactionRepository.CreateTransaction(transaction);
 				return Ok(transaction.Code);
 			}

@@ -61,9 +61,9 @@
 		{
 			try
 			{
-				User? user = _userRepository.GetUserByEmailAndPassword(userSignIn.Email, userSignIn.Password);
+				User? user = _userRepository.GetUserByUsernameAndPassword(userSignIn.Username, userSignIn.Password);
 
-				if (user == null) return NotFound("Email or Password not correct!");
+				if (user == null) return NotFound("Username or Password not correct!");
 				if (!user.Status) return Conflict("Your account was baned!");
 				if (user.TwoFactorAuthentication)
 				{
@@ -268,7 +268,7 @@
 				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
 
 				string title = "FU-Market: QR Code for Two Factor Authentication";
-				string body = $"<div>Hello, {user.Email}!</div><div>Please click <a href='{qrCode}'>here</a> to get QR code!</div>";
+				string body = $"<div>Hello, {user.Username}!</div><div>Please click <a href='{qrCode}'>here</a> to get QR code!</div>";
 
 				await _mailService.SendEmailAsync(user.Email, title, body);
 
@@ -354,16 +354,16 @@
 		#region Edit user info
 		[Authorize]
 		[HttpPut("EditUserInfo/{id}")]
-		public async Task<IActionResult> EditUserInfo(int id, UserRequestDTO userRequestDTO)
+		public async Task<IActionResult> EditUserInfo(int id, UserUpdateRequestDTO userUpdateRequestDTO)
 		{
-			if(userRequestDTO == null)	return BadRequest();
+			if(userUpdateRequestDTO == null)	return BadRequest();
 			try
 			{
 				User? user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
 
 				//Just for testing notification
-				if (userRequestDTO.Status != 1)
+				if (userUpdateRequestDTO.Status != 1)
 				{
 					HashSet<string>? connections = _connectionManager.GetConnections(id);
 					Notification notification = new Notification()
@@ -387,7 +387,7 @@
 					_notificationRepositiory.AddNotification(notification);
 
 				}
-				var userUpdate = _mapper.Map<User>(userRequestDTO);	
+				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);	
 				await _userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
 			}

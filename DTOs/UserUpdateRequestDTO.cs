@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace DTOs
 {
-	public class UserRequestDTO
+	public class UserUpdateRequestDTO
 	{
 		public long? RoleId { get; set; }
 		public int? Status { get; set; }
-		public string Email { get; set; } = null!;
 	}
 }
