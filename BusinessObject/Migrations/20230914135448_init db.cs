@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class init : Migration
+    public partial class initdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -30,11 +30,15 @@ namespace BusinessObject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoleId = table.Column<long>(type: "bigint", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fullname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorAuthentication = table.Column<bool>(type: "bit", nullable: false),
                     CustomerBalance = table.Column<long>(type: "bigint", nullable: false),
-                    SellerBalance = table.Column<long>(type: "bigint", nullable: false)
+                    SellerBalance = table.Column<long>(type: "bigint", nullable: false),
+                    SignInGoogle = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

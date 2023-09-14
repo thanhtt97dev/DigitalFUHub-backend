@@ -238,11 +238,11 @@ namespace BusinessObject.Migrations
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("SignInGoogle")
-                        .HasColumnType("bit");
-
                     b.Property<long>("SellerBalance")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SignInGoogle")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230914075936_updateDB-v2")]
-    partial class updateDBv2
+    [Migration("20230914135448_init db")]
+    partial class initdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -242,6 +242,9 @@ namespace BusinessObject.Migrations
 
                     b.Property<long>("SellerBalance")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("SignInGoogle")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
