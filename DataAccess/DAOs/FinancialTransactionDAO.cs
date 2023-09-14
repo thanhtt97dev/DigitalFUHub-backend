@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	public class DepositTransactionDAO
+	public class FinancialTransactionDAO
 	{
-		private static DepositTransactionDAO? instance;
+		private static FinancialTransactionDAO? instance;
 		private static readonly object instanceLock = new object();
 
-		public static DepositTransactionDAO Instance
+		public static FinancialTransactionDAO Instance
 		{
 			get
 			{
@@ -22,14 +22,14 @@ namespace DataAccess.DAOs
 				{
 					if (instance == null)
 					{
-						instance = new DepositTransactionDAO();
+						instance = new FinancialTransactionDAO();
 					}
 				}
 				return instance;
 			}
 		}
 
-		internal void CreateTransaction(DepositTransaction transaction)
+		internal void CreateDepositTransaction(DepositTransaction transaction)
 		{
 			using (ApiContext context = new ApiContext())
 			{

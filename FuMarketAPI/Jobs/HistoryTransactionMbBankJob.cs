@@ -79,7 +79,7 @@ namespace FuMarketAPI.Jobs
 				// Save new data into file
 				Util.WriteFile("Data/historyTransactionMbBank.json", transactionHistoryCreditList);
 				//Update DB
-				DepositTransactionDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
+				FinancialTransactionDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
 			}
 
 		}

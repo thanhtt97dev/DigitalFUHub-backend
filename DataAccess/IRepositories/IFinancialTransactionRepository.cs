@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepositories
 {
-	public interface IDepositTransactionRepository
+	public interface IFinancialTransactionRepository
 	{
-		void CreateTransaction(DepositTransaction transaction);
+		void CreateDepositTransaction(DepositTransaction transaction);
 	}
 }

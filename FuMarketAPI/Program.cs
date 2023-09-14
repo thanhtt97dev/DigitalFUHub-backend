@@ -92,6 +92,7 @@ namespace FuMarketAPI
 			builder.Services.AddSingleton<IStorageRepository, StorageRepository>();
             builder.Services.AddSingleton<IReportRepository, ReportRepository>();
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
+			builder.Services.AddSingleton<IFinancialTransactionRepository, FinancialTransactionRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 

@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-	public class DepositTransactionRepository : IDepositTransactionRepository
+	public class FinancialTransactionRepository : IFinancialTransactionRepository
 	{
-		public void CreateTransaction(DepositTransaction transaction) => DepositTransactionDAO.Instance.CreateTransaction(transaction);
+		public void CreateDepositTransaction(DepositTransaction transaction) => FinancialTransactionDAO.Instance.CreateDepositTransaction(transaction);
 	}
 }

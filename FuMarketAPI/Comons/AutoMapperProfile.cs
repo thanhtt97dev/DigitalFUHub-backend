@@ -12,6 +12,7 @@ namespace FuMarketAPI.Comons
             CreateMap<User, UserUpdateRequestDTO>().ReverseMap();
             CreateMap<Role, RoleDTO>().ReverseMap();
             CreateMap<Notification, NotificationRespone>().ReverseMap();
-        }
+			CreateMap<DepositTransaction, DepositTransactionRequestDTO>().ReverseMap();
+		}
     }
 }

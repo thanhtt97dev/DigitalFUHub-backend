@@ -19,6 +19,8 @@ namespace BusinessObject
 		public string Email { get; set; } = string.Empty;
 		public string Username { get; set; } = string.Empty;
 		public string Password { get; set; } = string.Empty;
+		public string Fullname { get; set; } = string.Empty;
+		public string Avatar { get; set; } = string.Empty;
 		public bool Status { get; set; }	
 		public bool TwoFactorAuthentication { get; set; }
 		public long CustomerBalance { get; set; }
