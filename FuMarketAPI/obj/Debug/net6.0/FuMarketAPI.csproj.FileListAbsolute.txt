@@ -231,6 +231,7 @@ D:\FU\Capstone Project\Back-end\FuMarketAPI\obj\Debug\net6.0\FuMarketAPI.pdb
 D:\FU\Capstone Project\Back-end\FuMarketAPI\obj\Debug\net6.0\FuMarketAPI.genruntimeconfig.cache
 D:\FU\Capstone Project\Back-end\FuMarketAPI\obj\Debug\net6.0\ref\FuMarketAPI.dll
 <<<<<<< HEAD
+<<<<<<< HEAD
 D:\fu-workspace\Semester 9\SEP490\src-final\be\FuMarketAPI\bin\Debug\net6.0\appsettings.Development.json
 D:\fu-workspace\Semester 9\SEP490\src-final\be\FuMarketAPI\bin\Debug\net6.0\appsettings.json
 D:\fu-workspace\Semester 9\SEP490\src-final\be\FuMarketAPI\bin\Debug\net6.0\FuMarketAPI.exe
@@ -350,6 +351,8 @@ D:\fu-workspace\Semester 9\SEP490\src-final\be\FuMarketAPI\obj\Debug\net6.0\FuMa
 D:\fu-workspace\Semester 9\SEP490\src-final\be\FuMarketAPI\obj\Debug\net6.0\ref\FuMarketAPI.dll
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 4bd4433bb7f642e387853223c8b34d1325032ea6
 E:\fpt\fu-market-backend\FuMarketAPI\bin\Debug\net6.0\appsettings.Development.json
 E:\fpt\fu-market-backend\FuMarketAPI\bin\Debug\net6.0\appsettings.json
 E:\fpt\fu-market-backend\FuMarketAPI\bin\Debug\net6.0\FuMarketAPI.exe
@@ -475,4 +478,7 @@ D:\FU\Capstone Project\Back-end\FuMarketAPI\bin\Debug\net6.0\runtimes\win\lib\ne
 D:\FU\Capstone Project\Back-end\FuMarketAPI\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 D:\FU\Capstone Project\Back-end\FuMarketAPI\bin\Debug\net6.0\Data\historyTransactionMbBank.json
 >>>>>>> 264cb1be2d8adf9ec358c2ae0d15931306b5b80d
+<<<<<<< HEAD
+>>>>>>> 4bd4433bb7f642e387853223c8b34d1325032ea6
+=======
 >>>>>>> 4bd4433bb7f642e387853223c8b34d1325032ea6
