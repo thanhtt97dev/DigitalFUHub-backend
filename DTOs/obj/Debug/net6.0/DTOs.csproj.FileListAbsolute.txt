@@ -88,21 +88,6 @@ E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.dll
 E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\refint\DTOs.dll
 E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\DTOs.pdb
 E:\fpt\asp.net-api-configuration\DTOs\obj\Debug\net6.0\ref\DTOs.dll
-D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\DTOs.deps.json
-D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\DTOs.dll
-D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\DTOs.pdb
-D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\BusinessObject.dll
-D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\BusinessObject.pdb
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.csproj.AssemblyReference.cache
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.GeneratedMSBuildEditorConfig.editorconfig
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfoInputs.cache
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfo.cs
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.csproj.CoreCompileInputs.cache
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.csproj.CopyComplete
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.dll
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\refint\DTOs.dll
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.pdb
-D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\ref\DTOs.dll
 E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\DTOs.deps.json
 E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\DTOs.dll
 E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\DTOs.pdb
@@ -118,3 +103,18 @@ E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.dll
 E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\refint\DTOs.dll
 E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.pdb
 E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\ref\DTOs.dll
+D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\DTOs.deps.json
+D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\DTOs.dll
+D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\DTOs.pdb
+D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\BusinessObject.dll
+D:\FU\Capstone Project\Back-end\DTOs\bin\Debug\net6.0\BusinessObject.pdb
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.csproj.AssemblyReference.cache
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.GeneratedMSBuildEditorConfig.editorconfig
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfoInputs.cache
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfo.cs
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.csproj.CoreCompileInputs.cache
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.csproj.CopyComplete
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.dll
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\refint\DTOs.dll
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.pdb
+D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\ref\DTOs.dll

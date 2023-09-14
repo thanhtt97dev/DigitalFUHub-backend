@@ -83,24 +83,28 @@
 
 		#region SignInGoogle
 		[HttpPost("SignInhGoogle")]
-		public async Task<IActionResult> SignInGoogleAsync(UserSignInRequestDTO userSignIn)
+		public async Task<IActionResult> SignInGoogleAsync(UserSignInGoogleRequestDTO userSignIn)
 		{
 			try
 			{
-				User? user = _userRepository.GetUserByEmail(userSignIn.Username);
+				User? user = _userRepository.GetUserByEmail(userSignIn.Email);
 
 				if (user == null)
 				{
+					// Phải bắt nó sang trang sign-up r comfirm email chứ Tiến hehe !!!
+					/*
 					User newUser = new User
 					{
-						Email = userSignIn.Username,
+						Email = userSignIn.Email,
 						TwoFactorAuthentication = false,
 						RoleId = 1,
 						SignInGoogle = true,
 						Status = true
 					};
 					_userRepository.AddUser(newUser);
-					user = _userRepository.GetUserByEmail(userSignIn.Username);
+					user = _userRepository.GetUserByEmail(userSignIn.Email);
+					*/
+					return Conflict("You must be sign-up!");
 				}
 				else
 				{
