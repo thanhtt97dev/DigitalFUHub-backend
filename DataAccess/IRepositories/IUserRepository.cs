@@ -10,16 +10,19 @@ namespace DataAccess.IRepositories
 {
 	public interface IUserRepository
 	{
-		User? GetUserByUsernameAndPassword(string? email, string? password);	
+		User? GetUserByEmailAndPassword(string? email, string? password);
+		User? GetUserByEmail(string? email);
 
 		User? GetUserByRefreshToken(string? refreshTokenId);
 
-		List<User> GetUsers(UserRequestDTO user);	
+		List<User> GetUsers(UserRequestDTO user);
 
 		User? GetUserById(int id);
 
 		Task EditUserInfo(int id, User user);
 
 		void Update2FA(int id);
+
+		void AddUser(User user);
 	}
 }

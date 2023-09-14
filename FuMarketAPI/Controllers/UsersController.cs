@@ -1,20 +1,20 @@
 ﻿namespace FuMarketAPI.Controllers
 {
-    using AutoMapper;
-    using BusinessObject;
-    using DataAccess.IRepositories;
-    using DTOs;
+	using AutoMapper;
+	using BusinessObject;
+	using DataAccess.IRepositories;
+	using DTOs;
 	using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.SignalR;
-    using Newtonsoft.Json;
+	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.AspNetCore.SignalR;
+	using Newtonsoft.Json;
 	using FuMarketAPI.Comons;
-    using FuMarketAPI.Hubs;
-    using FuMarketAPI.Managers;
-    using FuMarketAPI.Services;
+	using FuMarketAPI.Hubs;
+	using FuMarketAPI.Managers;
+	using FuMarketAPI.Services;
+	using Microsoft.Extensions.Azure;
 
-
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -69,12 +69,53 @@
 				{
 					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
 				}
-			
+
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
 				return Ok(await token);
 			}
-			catch (Exception ex) 
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region SignInGoogle
+		[HttpPost("SignInhGoogle")]
+		public async Task<IActionResult> SignInGoogleAsync(UserSignInRequestDTO userSignIn)
+		{
+			try
+			{
+				User? user = _userRepository.GetUserByEmail(userSignIn.Email);
+
+				if (user == null)
+				{
+					User newUser = new User
+					{
+						Email = userSignIn.Email,
+						TwoFactorAuthentication = false,
+						RoleId = 1,
+						SignInGoogle = true,
+						Status = true
+					};
+					_userRepository.AddUser(newUser);
+					user = _userRepository.GetUserByEmail(userSignIn.Email);
+				}
+				else
+				{
+					if (!user.Status) return Conflict("Your account was baned!");
+					if (user.TwoFactorAuthentication)
+					{
+						return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
+					}
+				}
+
+				var token = await _jwtTokenService.GenerateTokenAsync(user);
+
+				return Ok(token);
+			}
+			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
@@ -130,7 +171,7 @@
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
 				await _refreshTokenRepository.RemoveRefreshTokenAysnc(refreshTokenRequestDTO.RefreshToken);
-				
+
 				return Ok(await token);
 			}
 			catch (Exception)
@@ -144,7 +185,7 @@
 		#region Revoke token
 		[Authorize]
 		[HttpPost("RevokeToken")]
-		public IActionResult RevokeToken([FromBody]string jwtId)
+		public IActionResult RevokeToken([FromBody] string jwtId)
 		{
 			try
 			{
@@ -160,7 +201,7 @@
 		#endregion
 
 		#region Generate Two Factor Authentication Key
-		[Authorize]		
+		[Authorize]
 		[HttpPost("Generate2FaKey/{id}")]
 		public IActionResult Generate2FaKey(int id)
 		{
@@ -168,7 +209,7 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
-				if (user.TwoFactorAuthentication) 
+				if (user.TwoFactorAuthentication)
 					return Conflict("This account has enabled Two Factor Authentication!");
 
 				string secretKey = _twoFactorAuthenticationService.GenerateSecretKey();
@@ -197,11 +238,11 @@
 		{
 			try
 			{
-				if (string.IsNullOrEmpty(user2FARequestDTO.SecretKey) || 
+				if (string.IsNullOrEmpty(user2FARequestDTO.SecretKey) ||
 					string.IsNullOrEmpty(user2FARequestDTO.Code)) return BadRequest();
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
-				if (user.TwoFactorAuthentication) 
+				if (user.TwoFactorAuthentication)
 					return Conflict("This account has enabled Two Factor Authentication!");
 
 				bool isPinvalid = _twoFactorAuthenticationService
@@ -225,10 +266,10 @@
 		{
 			try
 			{
-				if(string.IsNullOrEmpty(user2FARequestDisableDTO.Code)) return BadRequest();
+				if (string.IsNullOrEmpty(user2FARequestDisableDTO.Code)) return BadRequest();
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
-				if (!user.TwoFactorAuthentication) 
+				if (!user.TwoFactorAuthentication)
 					return Conflict("This account is not using Two Factor Authentication!");
 
 				var secretKey = _twoFactorAuthenticationRepository.Get2FAKey(id);
@@ -256,7 +297,7 @@
 		{
 			try
 			{
-				
+
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
 				if (!user.TwoFactorAuthentication)
@@ -286,8 +327,8 @@
 		[HttpGet("GetUsers")]
 		public IActionResult GetUsersByCondition(int? role, int? status, string email = "")
 		{
-			if(role == null || status == null) return BadRequest();
-			
+			if (role == null || status == null) return BadRequest();
+
 			try
 			{
 				var userRequestDTO = new UserRequestDTO()
@@ -387,11 +428,11 @@
 					_notificationRepositiory.AddNotification(notification);
 
 				}
-				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);	
+				var userUpdate = _mapper.Map<User>(userRequestDTO);	
 				await _userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
 			}
-			catch(Exception ex) 
+			catch (Exception ex)
 			{
 				var x = ex;
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");

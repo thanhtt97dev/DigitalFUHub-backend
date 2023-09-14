@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pZ7Jc8gyF7hiAcylQ3oRGBWkqK8/pWlAEbT/kKbQC/Gmtl5E+svm/kr5cRXmIMpFU33zJosvlwUW2pVIVT9yNQ==",
+  "dgSpecHash": "6dxE/OCmURCGpSc82v0oM0C/nYXEfJbjowMmZt+r1EToePvMtlmq31u9r5oSb+KyctUhLOfLtORbMFSuhKTj4A==",
   "success": true,
-  "projectFilePath": "D:\\FU\\Capstone Project\\Back-end\\FuMarketAPI\\FuMarketAPI.csproj",
+  "projectFilePath": "E:\\fpt\\fu-market-backend\\FuMarketAPI\\FuMarketAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dell\\.nuget\\packages\\aspnetcoreratelimit\\5.0.0\\aspnetcoreratelimit.5.0.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\automapper\\12.0.0\\automapper.12.0.0.nupkg.sha512",
@@ -123,5 +123,12 @@
     "C:\\Users\\dell\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\zxing.net\\0.16.9\\zxing.net.0.16.9.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file E:\\fpt\\fu-market-backend\\FuMarketAPI\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

@@ -103,3 +103,18 @@ D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.dll
 D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\refint\DTOs.dll
 D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\DTOs.pdb
 D:\FU\Capstone Project\Back-end\DTOs\obj\Debug\net6.0\ref\DTOs.dll
+E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\DTOs.deps.json
+E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\DTOs.dll
+E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\DTOs.pdb
+E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\BusinessObject.dll
+E:\fpt\fu-market-backend\DTOs\bin\Debug\net6.0\BusinessObject.pdb
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.csproj.AssemblyReference.cache
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.GeneratedMSBuildEditorConfig.editorconfig
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfoInputs.cache
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.AssemblyInfo.cs
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.csproj.CoreCompileInputs.cache
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.csproj.CopyComplete
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.dll
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\refint\DTOs.dll
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\DTOs.pdb
+E:\fpt\fu-market-backend\DTOs\obj\Debug\net6.0\ref\DTOs.dll
