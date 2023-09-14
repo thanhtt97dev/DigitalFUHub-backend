@@ -23,7 +23,6 @@ namespace BusinessObject
 		public bool TwoFactorAuthentication { get; set; }
 		public long CustomerBalance { get; set; }
 		public long SellerBalance { get; set; }
-		public bool TwoFactorAuthentication { get; set; }	
 		public bool SignInGoogle { get; set; }
 
 		[ForeignKey(nameof(RoleId))]
