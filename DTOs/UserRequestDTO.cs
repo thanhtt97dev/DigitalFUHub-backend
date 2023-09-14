@@ -9,7 +9,7 @@ namespace DTOs
 	public class UserRequestDTO
 	{
 		public long? RoleId { get; set; }
-		public string Email { get; set; } = string.Empty;
 		public int? Status { get; set; }
+		public string Email { get; set; } = null!;
 	}
 }

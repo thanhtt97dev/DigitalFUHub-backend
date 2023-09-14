@@ -31,11 +31,11 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		public User? GetUserByEmailAndPassword(string? email, string? password)
+		public User? GetUserByUsernameAndPassword(string? username, string? password)
 		{
 			using (ApiContext context = new ApiContext())
 			{
-				var user = context.User.Include(x => x.Role).FirstOrDefault(x => x.Email == email && x.Password == password);
+				var user = context.User.Include(x => x.Role).FirstOrDefault(x => x.Username == username && x.Password == password);
 				return user;
 			}
 		}
@@ -75,8 +75,7 @@ namespace DataAccess.DAOs
 			using (ApiContext context = new ApiContext())
 			{
 				var user = await context.User.FirstAsync(x => x.UserId == id);
-				user.Email = userUpdate.Email;
-				user.RoleId = userUpdate.RoleId;
+				user.RoleId = userUpdate.RoleId;	
 				user.Status = userUpdate.Status;
 				await context.SaveChangesAsync();
 			}
