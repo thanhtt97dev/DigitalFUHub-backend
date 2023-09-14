@@ -10,7 +10,7 @@ namespace DataAccess.IRepositories
 {
 	public interface IUserRepository
 	{
-		User? GetUserByEmailAndPassword(string? email, string? password);
+		User? GetUserByUsernameAndPassword(string? email, string? password);
 		User? GetUserByEmail(string? email);
 
 		User? GetUserByRefreshToken(string? refreshTokenId);

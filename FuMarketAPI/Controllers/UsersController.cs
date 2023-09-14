@@ -87,20 +87,20 @@
 		{
 			try
 			{
-				User? user = _userRepository.GetUserByEmail(userSignIn.Email);
+				User? user = _userRepository.GetUserByEmail(userSignIn.Username);
 
 				if (user == null)
 				{
 					User newUser = new User
 					{
-						Email = userSignIn.Email,
+						Email = userSignIn.Username,
 						TwoFactorAuthentication = false,
 						RoleId = 1,
 						SignInGoogle = true,
 						Status = true
 					};
 					_userRepository.AddUser(newUser);
-					user = _userRepository.GetUserByEmail(userSignIn.Email);
+					user = _userRepository.GetUserByEmail(userSignIn.Username);
 				}
 				else
 				{
@@ -110,7 +110,7 @@
 						return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
 					}
 				}
-
+				if (user == null) return BadRequest();
 				var token = await _jwtTokenService.GenerateTokenAsync(user);
 
 				return Ok(token);
@@ -428,7 +428,7 @@
 					_notificationRepositiory.AddNotification(notification);
 
 				}
-				var userUpdate = _mapper.Map<User>(userRequestDTO);	
+				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);	
 				await _userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
 			}

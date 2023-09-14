@@ -8,7 +8,7 @@ namespace DTOs
 {
 	public class DepositTransactionResponeDTO
 	{
-		public string Code { get; set; }
+		public string Code { get; set; } = string.Empty;	
 		public long Amount { get; set; }
 	}
 }
