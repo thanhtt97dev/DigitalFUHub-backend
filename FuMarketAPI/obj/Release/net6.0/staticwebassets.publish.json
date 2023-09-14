@@ -1,8 +1,8 @@
 {
   "Version": 1,
-  "Hash": "jTqGIeiR3F9c5E65+SwJIJV9jw6xn6ECjTiaURtshY8=",
-  "Source": "ServerAPI",
-  "BasePath": "_content/ServerAPI",
+  "Hash": "ovSCzy5tS92/v3s/lI1dA3bMecxJCqQwCl2UOqW3d88=",
+  "Source": "FuMarketAPI",
+  "BasePath": "_content/FuMarketAPI",
   "Mode": "Default",
   "ManifestType": "Publish",
   "ReferencedProjectsConfiguration": [],

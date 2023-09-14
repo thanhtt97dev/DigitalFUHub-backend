@@ -11,6 +11,8 @@ using FuMarketAPI.Comons;
 using FuMarketAPI.Hubs;
 using FuMarketAPI.Managers;
 using AspNetCoreRateLimit;
+using Quartz;
+using FuMarketAPI.Jobs;
 
 namespace FuMarketAPI
 {
@@ -90,6 +92,7 @@ namespace FuMarketAPI
 			builder.Services.AddSingleton<IStorageRepository, StorageRepository>();
             builder.Services.AddSingleton<IReportRepository, ReportRepository>();
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
+			builder.Services.AddSingleton<IFinancialTransactionRepository, FinancialTransactionRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
@@ -116,6 +119,24 @@ namespace FuMarketAPI
 			builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 			builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 			builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+
+			// add job scheduler get history transaction bank
+			builder.Services.AddQuartz(q =>
+			{
+				q.UseMicrosoftDependencyInjectionJobFactory();
+				var jobKeyGetHistoryTransaction = new JobKey("GetHistoryTransactionJob");
+				q.AddJob<HistoryTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyGetHistoryTransaction));
+				q.AddTrigger(opts => opts
+					.ForJob(jobKeyGetHistoryTransaction)
+					.StartNow()
+					.WithSimpleSchedule(x =>
+						x.WithIntervalInMinutes(1)
+						.RepeatForever()
+						)
+					);
+			});
+
+			builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 			var app = builder.Build();
 

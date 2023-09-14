@@ -40,7 +40,7 @@ namespace FuMarketAPI.Services
 
 			var claims = new[]
 			{
-				new Claim(ClaimTypes.Name, user.Email ?? string.Empty),
+				new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
 				new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
 				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 				new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),

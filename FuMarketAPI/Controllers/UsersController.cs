@@ -1,20 +1,20 @@
 ﻿namespace FuMarketAPI.Controllers
 {
-    using AutoMapper;
-    using BusinessObject;
-    using DataAccess.IRepositories;
-    using DTOs;
+	using AutoMapper;
+	using BusinessObject;
+	using DataAccess.IRepositories;
+	using DTOs;
 	using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.SignalR;
-    using Newtonsoft.Json;
+	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.AspNetCore.SignalR;
+	using Newtonsoft.Json;
 	using FuMarketAPI.Comons;
-    using FuMarketAPI.Hubs;
-    using FuMarketAPI.Managers;
-    using FuMarketAPI.Services;
+	using FuMarketAPI.Hubs;
+	using FuMarketAPI.Managers;
+	using FuMarketAPI.Services;
+	using Microsoft.Extensions.Azure;
 
-
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -61,20 +61,65 @@
 		{
 			try
 			{
-				User? user = _userRepository.GetUserByEmailAndPassword(userSignIn.Email, userSignIn.Password);
+				User? user = _userRepository.GetUserByUsernameAndPassword(userSignIn.Username, userSignIn.Password);
 
-				if (user == null) return NotFound("Email or Password not correct!");
+				if (user == null) return NotFound("Username or Password not correct!");
 				if (!user.Status) return Conflict("Your account was baned!");
 				if (user.TwoFactorAuthentication)
 				{
 					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
 				}
-			
+
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
 				return Ok(await token);
 			}
-			catch (Exception ex) 
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region SignInGoogle
+		[HttpPost("SignInhGoogle")]
+		public async Task<IActionResult> SignInGoogleAsync(UserSignInGoogleRequestDTO userSignIn)
+		{
+			try
+			{
+				User? user = _userRepository.GetUserByEmail(userSignIn.Email);
+
+				if (user == null)
+				{
+					// Phải bắt nó sang trang sign-up r comfirm email chứ Tiến hehe !!!
+					/*
+					User newUser = new User
+					{
+						Email = userSignIn.Email,
+						TwoFactorAuthentication = false,
+						RoleId = 1,
+						SignInGoogle = true,
+						Status = true
+					};
+					_userRepository.AddUser(newUser);
+					user = _userRepository.GetUserByEmail(userSignIn.Email);
+					*/
+					return Conflict("You must be sign-up!");
+				}
+				else
+				{
+					if (!user.Status) return Conflict("Your account was baned!");
+					if (user.TwoFactorAuthentication)
+					{
+						return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
+					}
+				}
+				if (user == null) return BadRequest();
+				var token = await _jwtTokenService.GenerateTokenAsync(user);
+
+				return Ok(token);
+			}
+			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
@@ -130,7 +175,7 @@
 				var token = _jwtTokenService.GenerateTokenAsync(user);
 
 				await _refreshTokenRepository.RemoveRefreshTokenAysnc(refreshTokenRequestDTO.RefreshToken);
-				
+
 				return Ok(await token);
 			}
 			catch (Exception)
@@ -144,7 +189,7 @@
 		#region Revoke token
 		[Authorize]
 		[HttpPost("RevokeToken")]
-		public IActionResult RevokeToken([FromBody]string jwtId)
+		public IActionResult RevokeToken([FromBody] string jwtId)
 		{
 			try
 			{
@@ -160,7 +205,7 @@
 		#endregion
 
 		#region Generate Two Factor Authentication Key
-		[Authorize]		
+		[Authorize]
 		[HttpPost("Generate2FaKey/{id}")]
 		public IActionResult Generate2FaKey(int id)
 		{
@@ -168,7 +213,7 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
-				if (user.TwoFactorAuthentication) 
+				if (user.TwoFactorAuthentication)
 					return Conflict("This account has enabled Two Factor Authentication!");
 
 				string secretKey = _twoFactorAuthenticationService.GenerateSecretKey();
@@ -197,11 +242,11 @@
 		{
 			try
 			{
-				if (string.IsNullOrEmpty(user2FARequestDTO.SecretKey) || 
+				if (string.IsNullOrEmpty(user2FARequestDTO.SecretKey) ||
 					string.IsNullOrEmpty(user2FARequestDTO.Code)) return BadRequest();
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
-				if (user.TwoFactorAuthentication) 
+				if (user.TwoFactorAuthentication)
 					return Conflict("This account has enabled Two Factor Authentication!");
 
 				bool isPinvalid = _twoFactorAuthenticationService
@@ -225,10 +270,10 @@
 		{
 			try
 			{
-				if(string.IsNullOrEmpty(user2FARequestDisableDTO.Code)) return BadRequest();
+				if (string.IsNullOrEmpty(user2FARequestDisableDTO.Code)) return BadRequest();
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
-				if (!user.TwoFactorAuthentication) 
+				if (!user.TwoFactorAuthentication)
 					return Conflict("This account is not using Two Factor Authentication!");
 
 				var secretKey = _twoFactorAuthenticationRepository.Get2FAKey(id);
@@ -256,7 +301,7 @@
 		{
 			try
 			{
-				
+
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
 				if (!user.TwoFactorAuthentication)
@@ -268,7 +313,7 @@
 				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
 
 				string title = "FU-Market: QR Code for Two Factor Authentication";
-				string body = $"<div>Hello, {user.Email}!</div><div>Please click <a href='{qrCode}'>here</a> to get QR code!</div>";
+				string body = $"<div>Hello, {user.Username}!</div><div>Please click <a href='{qrCode}'>here</a> to get QR code!</div>";
 
 				await _mailService.SendEmailAsync(user.Email, title, body);
 
@@ -286,8 +331,8 @@
 		[HttpGet("GetUsers")]
 		public IActionResult GetUsersByCondition(int? role, int? status, string email = "")
 		{
-			if(role == null || status == null) return BadRequest();
-			
+			if (role == null || status == null) return BadRequest();
+
 			try
 			{
 				var userRequestDTO = new UserRequestDTO()
@@ -354,16 +399,16 @@
 		#region Edit user info
 		[Authorize]
 		[HttpPut("EditUserInfo/{id}")]
-		public async Task<IActionResult> EditUserInfo(int id, UserRequestDTO userRequestDTO)
+		public async Task<IActionResult> EditUserInfo(int id, UserUpdateRequestDTO userUpdateRequestDTO)
 		{
-			if(userRequestDTO == null)	return BadRequest();
+			if(userUpdateRequestDTO == null)	return BadRequest();
 			try
 			{
 				User? user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
 
 				//Just for testing notification
-				if (userRequestDTO.Status != 1)
+				if (userUpdateRequestDTO.Status != 1)
 				{
 					HashSet<string>? connections = _connectionManager.GetConnections(id);
 					Notification notification = new Notification()
@@ -387,11 +432,11 @@
 					_notificationRepositiory.AddNotification(notification);
 
 				}
-				var userUpdate = _mapper.Map<User>(userRequestDTO);	
+				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);	
 				await _userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
 			}
-			catch(Exception ex) 
+			catch (Exception ex)
 			{
 				var x = ex;
 				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");

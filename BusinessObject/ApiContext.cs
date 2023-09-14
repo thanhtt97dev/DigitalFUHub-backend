@@ -28,6 +28,7 @@ namespace BusinessObject
 		public virtual DbSet<RefreshToken> RefreshToken { get; set; } = null!;
 		public virtual DbSet<Notification> Notification { get; set; } = null!;
 		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
+		public virtual DbSet<DepositTransaction> DepositTransaction { get; set; } = null!;
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -36,11 +37,7 @@ namespace BusinessObject
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Role>().HasData(new Role[]
-			{
-				new Role{RoleId = 1, RoleName="Admin"},
-				new Role{RoleId = 2, RoleName="User"}
-			});
+			
 		}
 	}
 }
