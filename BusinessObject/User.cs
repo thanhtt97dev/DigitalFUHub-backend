@@ -20,6 +20,7 @@ namespace BusinessObject
 		public string Password { get; set; } = string.Empty;
 		public bool Status { get; set; }	
 		public bool TwoFactorAuthentication { get; set; }	
+		public bool SignInGoogle { get; set; }
 
 		[ForeignKey(nameof(RoleId))]
 		public virtual Role Role { get; set; } = null!;

@@ -23,5 +23,8 @@ namespace DataAccess.Repositories
 
 		public void Update2FA(int id) => UserDAO.Instance.Update2FA(id);
 
+		public User? GetUserByEmail(string? email) => UserDAO.Instance.GetUserByEmail(email);
+
+		public void AddUser(User user) => UserDAO.Instance.AddUser(user);
 	}
 }

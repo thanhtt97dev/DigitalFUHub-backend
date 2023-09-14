@@ -56,8 +56,8 @@ namespace DataAccess.DAOs
 			using (ApiContext context = new ApiContext())
 			{
 				var list = context.User.Include(x => x.Role).Where(x => x.Email.Contains(userDTO.Email)).ToList();
-				if(userDTO.RoleId != 0) list = list.Where(x => x.RoleId == userDTO.RoleId).ToList();
-				if(userDTO.Status != -1) list = list.Where(x => x.Status == (userDTO.Status == 1)).ToList();
+				if (userDTO.RoleId != 0) list = list.Where(x => x.RoleId == userDTO.RoleId).ToList();
+				if (userDTO.Status != -1) list = list.Where(x => x.Status == (userDTO.Status == 1)).ToList();
 				return list;
 			}
 		}
@@ -76,7 +76,7 @@ namespace DataAccess.DAOs
 			{
 				var user = await context.User.FirstAsync(x => x.UserId == id);
 				user.Email = userUpdate.Email;
-				user.RoleId = userUpdate.RoleId;	
+				user.RoleId = userUpdate.RoleId;
 				user.Status = userUpdate.Status;
 				await context.SaveChangesAsync();
 			}
@@ -86,10 +86,35 @@ namespace DataAccess.DAOs
 		{
 			using (ApiContext context = new ApiContext())
 			{
-				var user =  context.User.FirstOrDefault(x => x.UserId == id);
+				var user = context.User.FirstOrDefault(x => x.UserId == id);
 				if (user == null) throw new Exception("User not existed!");
 				user.TwoFactorAuthentication = !user.TwoFactorAuthentication;
 				context.SaveChanges();
+			}
+		}
+
+		internal User? GetUserByEmail(string? email)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				return context.User.Include(x => x.Role).FirstOrDefault(x => x.Email == email);
+			}
+		}
+
+		internal void AddUser(User user)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				try
+				{
+					context.User.Add(user);
+					context.SaveChanges();
+				}
+				catch (Exception e)
+				{
+
+					throw new Exception(e.Message);
+				}
 			}
 		}
 	}

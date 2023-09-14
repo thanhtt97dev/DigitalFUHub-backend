@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "q6MTC0wTE/KlpWL+IC03Rfk5lvMgASCgDyiPqvuLGz/b4MRJpPz5W/rewbHEck8AOGuewQMmqWiNa3LQRGgE/g==",
+  "dgSpecHash": "9/IKSl7R/x9KYOj/Lwkqz7v7hWPeVciD7Yw74U3YbI5HGZ9XLdQeIj+jW9l3QQTaBMiSW+ycjA4BbRpx3wWrxg==",
   "success": true,
-  "projectFilePath": "D:\\FU\\Capstone Project\\Back-end\\FuMarketAPI\\FuMarketAPI.csproj",
+  "projectFilePath": "E:\\fpt\\fu-market-backend\\FuMarketAPI\\FuMarketAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dell\\.nuget\\packages\\aspnetcoreratelimit\\5.0.0\\aspnetcoreratelimit.5.0.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\automapper\\12.0.0\\automapper.12.0.0.nupkg.sha512",
