@@ -18,7 +18,7 @@ namespace BusinessObject
 		public long RoleId { get; set; }
 		public string Email { get; set; } = string.Empty;
 		public string Password { get; set; } = string.Empty;
-		public bool Status { get; set; }	
+        public bool Status { get; set; }	
 		public bool TwoFactorAuthentication { get; set; }	
 
 		[ForeignKey(nameof(RoleId))]

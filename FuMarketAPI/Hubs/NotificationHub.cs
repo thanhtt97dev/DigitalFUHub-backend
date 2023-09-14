@@ -49,7 +49,7 @@ namespace FuMarketAPI.Hubs
 						JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(notifications)));
 		}
 
-		/*
+        /*
 
 		public void AddConnection()
 		{
@@ -70,5 +70,5 @@ namespace FuMarketAPI.Hubs
 			_connectionManager.RemoveConnection(connectionId);
 		}
 		*/
-	}
+    }
 }

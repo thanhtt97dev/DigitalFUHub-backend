@@ -141,7 +141,8 @@ namespace FuMarketAPI
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapHub<NotificationHub>("/notificationHub");
-			});
+                endpoints.MapHub<ChatHub>("/chatHub");
+            });
 
 			// Add https
 			//app.UseHttpsRedirection();
