@@ -91,8 +91,6 @@
 
 				if (user == null)
 				{
-					// Phải bắt nó sang trang sign-up r comfirm email chứ Tiến hehe !!!
-					/*
 					User newUser = new User
 					{
 						Email = userSignIn.Email,
@@ -103,7 +101,6 @@
 					};
 					_userRepository.AddUser(newUser);
 					user = _userRepository.GetUserByEmail(userSignIn.Email);
-					*/
 					return Conflict("You must be sign-up!");
 				}
 				else
