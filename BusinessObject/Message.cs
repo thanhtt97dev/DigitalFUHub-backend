@@ -11,6 +11,7 @@ namespace BusinessObject
     public class Message
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long MessageId { get; set; }
         public long UserId { get; set; }
         public long ConversationId { get; set; }
