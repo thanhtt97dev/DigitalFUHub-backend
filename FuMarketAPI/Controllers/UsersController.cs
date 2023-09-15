@@ -101,7 +101,6 @@
 					};
 					_userRepository.AddUser(newUser);
 					user = _userRepository.GetUserByEmail(userSignIn.Email);
-					return Conflict("You must be sign-up!");
 				}
 				else
 				{
