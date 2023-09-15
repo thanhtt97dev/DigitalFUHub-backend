@@ -101,17 +101,16 @@
 					};
 					_userRepository.AddUser(newUser);
 					user = _userRepository.GetUserByEmail(userSignIn.Email);
-					var tokenForNewUser = await _jwtTokenService.GenerateTokenAsync(newUser);
-					return Ok(tokenForNewUser);
+					var tokenForNewUser = _jwtTokenService.GenerateTokenAsync(newUser);
+					return Ok(await tokenForNewUser);
 				}
 
 				if (!user.Status) return Conflict("Your account was baned!");
 				if (user.TwoFactorAuthentication)
 					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
 
-				var token = await _jwtTokenService.GenerateTokenAsync(user);
-
-				return Ok(token);
+				var token =  _jwtTokenService.GenerateTokenAsync(user);
+				return Ok(await token);
 			}
 			catch (Exception ex)
 			{
