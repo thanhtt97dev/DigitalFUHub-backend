@@ -16,7 +16,7 @@ namespace BusinessObject
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long UserId { get; set; }
 		public long RoleId { get; set; }
-		public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 		public string Username { get; set; } = string.Empty;
 		public string Password { get; set; } = string.Empty;
 		public string Fullname { get; set; } = string.Empty;
@@ -31,5 +31,7 @@ namespace BusinessObject
 		public virtual Role Role { get; set; } = null!;
 		public virtual ICollection<AccessToken>? AccessTokens { get; set; }
 		public virtual ICollection<DepositTransaction>? DepositTransactions { get; set; }
-	}
+        public virtual ICollection<UserConversation>? UserConversations { get; set; }
+
+    }
 }
