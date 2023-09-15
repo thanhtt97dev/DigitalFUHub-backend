@@ -145,7 +145,7 @@
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, ex.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -172,9 +172,9 @@
 
 				return Ok(await token);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 
@@ -191,9 +191,9 @@
 				_accessTokenRepository.RevokeToken(jwtId);
 				return Ok();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -224,7 +224,7 @@
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, ex.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -252,7 +252,7 @@
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, ex.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -284,7 +284,7 @@
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, ex.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -315,7 +315,7 @@
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, ex.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -339,9 +339,9 @@
 
 				return Ok(_mapper.Map<List<UserResponeDTO>>(users));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -364,9 +364,9 @@
 
 				return Ok(_mapper.Map<UserResponeDTO>(user));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -383,9 +383,47 @@
 				if (user == null) return NotFound();
 				return Ok(_mapper.Map<UserResponeDTO>(user));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get Customer Balance
+		[Authorize]
+		[HttpGet("GetCustomerBalance/{id}")]
+		public IActionResult GetCustomerBalanceById(int id)
+		{
+			if (id == 0) return BadRequest();
+			try
+			{
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return NotFound();
+				return Ok(user.CustomerBalance);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get Seller Balance
+		[Authorize]
+		[HttpGet("GetSellerBalance/{id}")]
+		public IActionResult GetSellerBalanceById(int id)
+		{
+			if (id == 0) return BadRequest();
+			try
+			{
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return NotFound();
+				return Ok(user.SellerBalance);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
@@ -432,8 +470,7 @@
 			}
 			catch (Exception ex)
 			{
-				var x = ex;
-				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred on the server");
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
