@@ -20,7 +20,8 @@ namespace BusinessObject
 
 		public ApiContext(DbContextOptions options) : base(options){}
 
-		public virtual DbSet<Role> Role { get; set; } = null!;
+        #region DbSet
+        public virtual DbSet<Role> Role { get; set; } = null!;
 		public virtual DbSet<User> User { get; set; } = null!;
 		public virtual DbSet<Storage> Storage { get; set; } = null!;
 
@@ -29,8 +30,13 @@ namespace BusinessObject
 		public virtual DbSet<Notification> Notification { get; set; } = null!;
 		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
 		public virtual DbSet<DepositTransaction> DepositTransaction { get; set; } = null!;
+        public virtual DbSet<UserConversation> UserConversations { get; set; } = null!;
+        public virtual DbSet<Conversation> Conversations { get; set; } = null!;
+        public virtual DbSet<Message> Messages { get; set; } = null!;
+        public virtual DbSet<SenderConversation> SenderConversations { get; set; } = null!;
+        #endregion
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			optionsBuilder.UseSqlServer(connectionString);
 		}

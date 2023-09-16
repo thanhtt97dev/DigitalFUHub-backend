@@ -93,8 +93,9 @@ namespace FuMarketAPI
             builder.Services.AddSingleton<IReportRepository, ReportRepository>();
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
 			builder.Services.AddSingleton<IFinancialTransactionRepository, FinancialTransactionRepository>();
+            builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 
-			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
