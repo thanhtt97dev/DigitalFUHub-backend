@@ -93,6 +93,7 @@ namespace FuMarketAPI
             builder.Services.AddSingleton<IReportRepository, ReportRepository>();
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
 			builder.Services.AddSingleton<IFinancialTransactionRepository, FinancialTransactionRepository>();
+			builder.Services.AddSingleton<IBankRepository, BankRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
@@ -100,6 +101,7 @@ namespace FuMarketAPI
 			builder.Services.AddSingleton<HubConnectionService>();
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 			builder.Services.AddSingleton<MailService>();
+			builder.Services.AddSingleton<MbBankService>();	
 
 			//Add SignalR
 			builder.Services.AddSignalR();

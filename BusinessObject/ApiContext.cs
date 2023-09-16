@@ -29,6 +29,8 @@ namespace BusinessObject
 		public virtual DbSet<Notification> Notification { get; set; } = null!;
 		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
 		public virtual DbSet<DepositTransaction> DepositTransaction { get; set; } = null!;
+		public virtual DbSet<Bank> Bank { get; set; } = null!;
+		public virtual DbSet<UserBank> UserBank { get; set; } = null!;
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{

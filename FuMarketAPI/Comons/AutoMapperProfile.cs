@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessObject;
+using DataAccess.DAOs;
 using DTOs;
 
 namespace FuMarketAPI.Comons
@@ -13,6 +14,7 @@ namespace FuMarketAPI.Comons
             CreateMap<Role, RoleDTO>().ReverseMap();
             CreateMap<Notification, NotificationRespone>().ReverseMap();
 			CreateMap<DepositTransaction, DepositTransactionRequestDTO>().ReverseMap();
+			CreateMap<Bank, BankResponeDTO>().ReverseMap();
 		}
     }
 }

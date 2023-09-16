@@ -52,6 +52,23 @@ namespace BusinessObject.Migrations
                     b.ToTable("AccessToken");
                 });
 
+            modelBuilder.Entity("BusinessObject.Bank", b =>
+                {
+                    b.Property<long>("BankId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("isActivate")
+                        .HasColumnType("bit");
+
+                    b.HasKey("BankId");
+
+                    b.ToTable("Bank");
+                });
+
             modelBuilder.Entity("BusinessObject.Conversation", b =>
                 {
                     b.Property<long>("ConversationId")
@@ -317,6 +334,37 @@ namespace BusinessObject.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("BusinessObject.UserBank", b =>
+                {
+                    b.Property<long>("UserBankId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("UserBankId"), 1L, 1);
+
+                    b.Property<long>("BankId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CreditAccount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditAccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("UserBankId");
+
+                    b.HasIndex("BankId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserBank");
+                });
+
             modelBuilder.Entity("BusinessObject.UserConversation", b =>
                 {
                     b.Property<long>("UserConversationId")
@@ -436,6 +484,25 @@ namespace BusinessObject.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("BusinessObject.UserBank", b =>
+                {
+                    b.HasOne("BusinessObject.Bank", "Bank")
+                        .WithMany()
+                        .HasForeignKey("BankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.User", "User")
+                        .WithMany("UserBanks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bank");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BusinessObject.UserConversation", b =>
                 {
                     b.HasOne("BusinessObject.Conversation", "Conversation")
@@ -472,6 +539,8 @@ namespace BusinessObject.Migrations
                     b.Navigation("AccessTokens");
 
                     b.Navigation("DepositTransactions");
+
+                    b.Navigation("UserBanks");
 
                     b.Navigation("UserConversations");
                 });

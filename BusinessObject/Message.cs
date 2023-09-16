@@ -15,8 +15,8 @@ namespace BusinessObject
         public long MessageId { get; set; }
         public long UserId { get; set; }
         public long ConversationId { get; set; }
-        public string Content { get; set; } = "";
-        public string MessageType { get; set; } = "";
+        public string Content { get; set; } = string.Empty;
+        public string MessageType { get; set; } = string.Empty;
         public DateTime DateCreate { get; set; }
         public bool isDelete { get; set; }
 
