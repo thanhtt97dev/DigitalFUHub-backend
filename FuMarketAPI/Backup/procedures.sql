@@ -1,7 +1,11 @@
-﻿USE [DBTest]
+﻿/*
+	USE database và execute để tạo procedures
+*/
+
+USE [DBTest]
 GO;
 
--- Reports
+-- Reports (Demo)
 CREATE PROCEDURE dbo.getUserReport
 	@id INT
 AS
