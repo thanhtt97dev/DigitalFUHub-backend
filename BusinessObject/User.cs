@@ -32,6 +32,7 @@ namespace BusinessObject
 		public virtual ICollection<AccessToken>? AccessTokens { get; set; }
 		public virtual ICollection<DepositTransaction>? DepositTransactions { get; set; }
         public virtual ICollection<UserConversation>? UserConversations { get; set; }
+		public virtual ICollection<UserBank>? UserBanks { get; set; }
 
-    }
+	}
 }

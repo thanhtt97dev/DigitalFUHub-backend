@@ -13,5 +13,6 @@ namespace FuMarketAPI.Comons
 				Limit = 10,
 			}
 		};
+		public static string BankIdMbBank = "970422";
 	}
 }

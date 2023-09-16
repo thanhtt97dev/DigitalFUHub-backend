@@ -30,11 +30,16 @@ namespace BusinessObject
 		public virtual DbSet<Notification> Notification { get; set; } = null!;
 		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
 		public virtual DbSet<DepositTransaction> DepositTransaction { get; set; } = null!;
+<<<<<<< HEAD
         public virtual DbSet<UserConversation> UserConversations { get; set; } = null!;
         public virtual DbSet<Conversation> Conversations { get; set; } = null!;
         public virtual DbSet<Message> Messages { get; set; } = null!;
         public virtual DbSet<SenderConversation> SenderConversations { get; set; } = null!;
         #endregion
+=======
+		public virtual DbSet<Bank> Bank { get; set; } = null!;
+		public virtual DbSet<UserBank> UserBank { get; set; } = null!;
+>>>>>>> 2a35c2705cc6c4356a418aa88ed8970bc76a292c
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
