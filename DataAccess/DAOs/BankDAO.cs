@@ -63,5 +63,14 @@ namespace DataAccess.DAOs
 				context.SaveChanges();
 			}
 		}
+
+		internal UserBank? GetUserBank(int userId)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				var bank = context.UserBank.Include(x => x.Bank).FirstOrDefault(x => x.UserId == userId);
+				return bank;
+			}
+		}
 	}
 }

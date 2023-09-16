@@ -85,5 +85,20 @@ namespace FuMarketAPI.Comons
 			return str_build.ToString();
 		}
 		#endregion
+
+		#region Hide text with * charactor
+		public static string HideCharacters(string input, int startAt)
+		{
+			if (input.Length <= startAt)
+			{
+				return new string('*', input.Length);
+			}
+			else
+			{
+				string hiddenText = new string('*', startAt) + input.Substring(startAt);
+				return hiddenText;
+			}
+		}
+		#endregion
 	}
 }

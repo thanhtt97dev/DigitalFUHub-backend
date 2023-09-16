@@ -4,6 +4,7 @@ using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DTOs;
+using FuMarketAPI.Comons;
 using FuMarketAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,8 @@ namespace FuMarketAPI.Controllers
 			this.mbBankService = mbBankService;
 		}
 
+		
+
 		#region Get all bank info
 		[HttpGet("getAll")]
 		public IActionResult GetAll()
@@ -36,6 +39,46 @@ namespace FuMarketAPI.Controllers
 			{
 				var banks = bankRepository.GetAll();
 				var result = mapper.Map<List<BankResponeDTO>>(banks);
+				return Ok(result);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Check connect with MB Bank with sessionId
+		[HttpGet("connect")]
+		public async Task<IActionResult> Connect()
+		{
+			try
+			{
+				var canConnect = await mbBankService.TestConnection();
+				if (!canConnect) return Conflict("Cannot connect!");
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get user bank account
+		[HttpGet("user/{id}")]
+		public IActionResult CheckUserBankAccount(int id)
+		{
+			try
+			{
+				if (id == 0) return BadRequest();
+				
+				var user = userRepository.GetUserById(id);
+				if (user == null) return NotFound("User not existed");
+
+				var bank = bankRepository.GetUserBank(id);
+				if (bank == null) return NotFound();
+				var result = mapper.Map<BankAccountResponeDTO>(bank);
 				return Ok(result);
 			}
 			catch (Exception ex)
@@ -62,8 +105,8 @@ namespace FuMarketAPI.Controllers
 		}
 		#endregion
 
-		#region Link bank account with user
-		[HttpPost("linkBankAccount")]
+		#region Add bank account with user
+		[HttpPost("AddBankAccount")]
 		public async Task<IActionResult> LinkBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
 			try
@@ -111,7 +154,6 @@ namespace FuMarketAPI.Controllers
 			}
 		}
 		#endregion
-
 
 	}
 }

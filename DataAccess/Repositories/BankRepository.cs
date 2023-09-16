@@ -16,6 +16,8 @@ namespace DataAccess.Repositories
 
 		public List<UserBank> GetAllBankInfoUserLinked(int userId) => BankDAO.Instance.GetAllBankInfoUserLinked(userId);
 
+		public UserBank? GetUserBank(int userId) => BankDAO.Instance.GetUserBank(userId);
+
 		public int TotalUserLinkedBank(int userId) => BankDAO.Instance.TotalUserLinkedBank(userId);
 
 	}

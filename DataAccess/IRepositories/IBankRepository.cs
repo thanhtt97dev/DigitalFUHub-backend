@@ -13,5 +13,6 @@ namespace DataAccess.IRepositories
 		List<UserBank> GetAllBankInfoUserLinked(int userId);
 		int TotalUserLinkedBank(int userId);
 		void AddUserBank(UserBank userBank);
+		UserBank? GetUserBank(int userId);
 	}
 }

@@ -22,6 +22,45 @@ namespace FuMarketAPI.Services
 			client.DefaultRequestHeaders.Add("Authorization", "Basic " + configuration["MbBank:BasicAuthBase64"]);
 		}
 
+		public async Task<bool> TestConnection()
+		{
+			BankInquiryAccountNameRequestDTO requestInfo = new BankInquiryAccountNameRequestDTO()
+			{
+				BankId = Constants.BankIdMbBank,
+				CreditAccount = "688811112001"
+			};
+
+			MbBankRequestBodyInquiryAccountNameDTO mbBank = new MbBankRequestBodyInquiryAccountNameDTO()
+			{
+				bankCode = requestInfo.BankId,
+				creditAccount = requestInfo.CreditAccount,
+				creditAccountType = "ACCOUNT",
+				debitAccount = configuration["MbBank:AccountNo"],
+				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
+				refNo = configuration["MbBank:RefNo"],
+				remark = string.Empty,
+				sessionId = configuration["MbBank:SessionId"],
+				type = requestInfo.BankId == Constants.BankIdMbBank ? "INHOUSE" : "FAST"
+			};
+
+			var jsonData = JsonSerializer.Serialize(mbBank);
+			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+			var request = await client.PostAsync(configuration["MbBank:APIInquiryAccountName"], content);
+
+			var respone = await request.Content.ReadAsStringAsync();
+
+			var options = new JsonSerializerOptions();
+			options.Converters.Add(new JsonSerializerDateTimeConverter());
+			options.Converters.Add(new JsonSerializerIntConverter());
+
+			var data = JsonSerializer.Deserialize<MbBankResponeInquiryAccountNameDTO>(respone, options);
+
+			//Check session of Mb Bank was exprided
+			if (data == null) return false;
+			if (data.result.responseCode != "00") return false;
+			return true;
+		}
+
 
 		public async Task<MbBankResponeHistoryTransactionDataDTO?> GetHistoryTransaction()
 		{
