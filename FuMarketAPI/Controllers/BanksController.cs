@@ -49,7 +49,7 @@ namespace FuMarketAPI.Controllers
 		}
 		#endregion
 
-		#region Check connect with MB Bank with sessionId
+		#region Check connect with MB Bank
 		[HttpGet("connect")]
 		public async Task<IActionResult> Connect()
 		{

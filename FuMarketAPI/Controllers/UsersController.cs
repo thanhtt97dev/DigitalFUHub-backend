@@ -362,7 +362,7 @@
 				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 				if (user.UserId != userIdInAccessToken) return NotFound();
 
-				return Ok(_mapper.Map<UserResponeDTO>(user));
+				return Ok(_mapper.Map<UserSignInResponseDTO>(user));
 			}
 			catch (Exception ex)
 			{

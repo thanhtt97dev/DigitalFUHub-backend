@@ -94,6 +94,11 @@ namespace FuMarketAPI.Services
 				JwtId = token.Id,
 				AccessToken = accessToken,
 				RefreshToken = refreshToken,
+				TwoFactorAuthentication = user.TwoFactorAuthentication,
+				Avatar = user.Avatar,
+				Fullname = user.Fullname,
+				SignInGoogle = user.SignInGoogle,
+				Username = user.Username	
 			};
 			return response;
 		}
