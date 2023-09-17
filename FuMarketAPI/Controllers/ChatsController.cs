@@ -1,4 +1,6 @@
 ﻿using BusinessObject;
+using DataAccess.IRepositories;
+using DataAccess.Repositories;
 using DTOs;
 using FuMarketAPI.Hubs;
 using FuMarketAPI.Managers;
@@ -16,11 +18,13 @@ namespace FuMarketAPI.Controllers
     {
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IConnectionManager _connectionManager;
+        private readonly IChatRepository _chatRepository;
 
-        public ChatsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager)
+        public ChatsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, IChatRepository chatRepository)
         {
             _hubContext = hubContext;
             _connectionManager = connectionManager;
+            _chatRepository = chatRepository;
         }
 
         [HttpPost("SendMessage")]
@@ -28,33 +32,38 @@ namespace FuMarketAPI.Controllers
         {
             try
             {
-                HashSet<string>? connections = _connectionManager.GetConnections(chatRequest.ReceiverId);
-
-                ChatMessage chatMessage = new ChatMessage()
-                {
-                    UserId = chatRequest.ReceiverId,
-                    MessageContent = chatRequest.MessageContent,
-                    Link = "",
-                    DateCreated = DateTime.Now,
-                    IsReaded = false,
-                };
+                int recipientId = unchecked((int)chatRequest.RecipientId);
+                HashSet<string>? connections = _connectionManager.GetConnections(recipientId);
 
                 if (connections != null)
                 {
                     foreach (var connection in connections)
                     {
-                        await _hubContext.Clients.Clients(connection).SendAsync("ReceiveMessage", new { SenderId = chatRequest.SenderId, MessageContent = chatRequest.MessageContent});
+                        await _hubContext.Clients.Clients(connection).SendAsync("ReceiveMessage", new { SenderId = chatRequest.SenderId, MessageContent = chatRequest.Content});
                     }
                 }
 
-                //_notificationRepositiory.AddNotification(notification);
+                await _chatRepository.SendChatMessage(chatRequest);
                 return Ok();
             }
-            catch
+            catch (ArgumentException ex)
             {
-                return StatusCode(500);
+                return BadRequest(new { Message = ex.Message });
             }
 
+        }
+
+        [HttpGet("getSenders/{userId}")]
+        public async Task<IActionResult> GetSendersConversation([FromRoute] long userId)
+        {
+            try
+            {
+                List<SenderConversation> senderConversations = await _chatRepository.GetSenderConversations(userId);
+                return Ok(senderConversations);
+            } catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
     }
 }

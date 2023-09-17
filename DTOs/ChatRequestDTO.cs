@@ -8,8 +8,10 @@ namespace DTOs
 {
     public class ChatRequestDTO
     {
-        public int SenderId { get; set; }
-        public int ReceiverId { get; set; }
-        public string MessageContent { get; set; } = "";
+        public long ConversationId { get; set; } = 0;
+        public long SenderId { get; set; }
+        public long RecipientId { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public DateTime DateCreate { get; set; }
     }
 }
