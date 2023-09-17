@@ -77,7 +77,7 @@ namespace FuMarketAPI.Controllers
 				if (user == null) return BadRequest();
 
 				var bank = bankRepository.GetUserBank(id);
-				if (bank == null) return NotFound();
+				if (bank == null) return Ok(null);
 				var result = mapper.Map<BankAccountResponeDTO>(bank);
 				return Ok(result);
 			}
