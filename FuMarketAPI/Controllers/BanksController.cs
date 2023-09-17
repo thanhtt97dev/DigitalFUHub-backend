@@ -74,7 +74,7 @@ namespace FuMarketAPI.Controllers
 				if (id == 0) return BadRequest();
 				
 				var user = userRepository.GetUserById(id);
-				if (user == null) return NotFound("User not existed");
+				if (user == null) return BadRequest();
 
 				var bank = bankRepository.GetUserBank(id);
 				if (bank == null) return NotFound();
