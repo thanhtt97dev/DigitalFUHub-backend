@@ -17,6 +17,7 @@ namespace BusinessObject
 		public long BankId { get; set; }
 		public string CreditAccount { get; set; } = null!;
 		public string CreditAccountName { get; set; } = null!;
+		public DateTime UpdateAt { get; set; }
 
 		[ForeignKey(nameof(BankId))]
 		public virtual Bank Bank { get; set; } = null!;

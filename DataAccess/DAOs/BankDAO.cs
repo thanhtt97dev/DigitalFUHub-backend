@@ -121,5 +121,19 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+
+		internal void UpdateUserBank(UserBank userBankUpdate)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == userBankUpdate.UserId);
+				if (userBank == null) throw new Exception("User's bank account not existed!");
+				userBank.BankId = userBankUpdate.BankId;	
+				userBank.CreditAccount = userBankUpdate.CreditAccount;
+				userBank.CreditAccountName = userBankUpdate.CreditAccountName;	
+				userBank.UpdateAt = DateTime.Now;
+				context.SaveChanges();
+			}
+		}
 	}
 }
