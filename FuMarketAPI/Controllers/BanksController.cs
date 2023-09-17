@@ -6,6 +6,7 @@ using DataAccess.Repositories;
 using DTOs;
 using FuMarketAPI.Comons;
 using FuMarketAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -152,6 +153,31 @@ namespace FuMarketAPI.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
+		}
+		#endregion
+
+		#region Create Deposit Transaction
+		[Authorize]
+		[HttpPost("CreateDepositTransaction")]
+		public IActionResult CreateDepositTransaction(DepositTransactionRequestDTO depositTransactionDTO)
+		{
+			try
+			{
+				var transaction = mapper.Map<DepositTransaction>(depositTransactionDTO);
+				transaction.Code = Util.GetRandomString(10) + depositTransactionDTO.UserId + "FU";
+				bankRepository.CreateDepositTransaction(transaction);
+				var result = new DepositTransactionResponeDTO()
+				{
+					Amount = transaction.Amount,
+					Code = transaction.Code
+				};
+				return Ok(result);
+			}
+			catch (Exception)
+			{
+				return Conflict("Some things went wrong!");
+			}
+
 		}
 		#endregion
 

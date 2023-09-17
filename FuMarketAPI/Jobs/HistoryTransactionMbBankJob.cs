@@ -19,7 +19,7 @@ namespace FuMarketAPI.Jobs
 
 		public async Task Execute(IJobExecutionContext context)
 		{
-			return;
+			//return;
 			var data = await mbBankService.GetHistoryTransaction();
 
 			if (data == null) return;
@@ -53,7 +53,7 @@ namespace FuMarketAPI.Jobs
 				// Save new data into file
 				Util.WriteFile("Data/historyTransactionMbBank.json", transactionHistoryCreditList);
 				//Update DB
-				FinancialTransactionDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
+				BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
 			}
 
 		}

@@ -20,5 +20,7 @@ namespace DataAccess.Repositories
 
 		public int TotalUserLinkedBank(int userId) => BankDAO.Instance.TotalUserLinkedBank(userId);
 
+		public void CreateDepositTransaction(DepositTransaction transaction) => BankDAO.Instance.CreateDepositTransaction(transaction);
+
 	}
 }

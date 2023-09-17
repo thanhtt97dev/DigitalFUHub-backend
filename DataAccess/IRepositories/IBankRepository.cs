@@ -14,5 +14,6 @@ namespace DataAccess.IRepositories
 		int TotalUserLinkedBank(int userId);
 		void AddUserBank(UserBank userBank);
 		UserBank? GetUserBank(int userId);
+		void CreateDepositTransaction(DepositTransaction transaction);
 	}
 }
