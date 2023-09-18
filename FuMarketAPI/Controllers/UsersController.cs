@@ -437,33 +437,7 @@
 			try
 			{
 				User? user = _userRepository.GetUserById(id);
-				if (user == null) return NotFound();
-
-				//Just for testing notification
-				if (userUpdateRequestDTO.Status != 1)
-				{
-					HashSet<string>? connections = _connectionManager.GetConnections(id);
-					Notification notification = new Notification()
-					{
-						UserId = id,
-						Title = "Change status account",
-						Content = $"You account has been Ban",
-						Link = "",
-						DateCreated = DateTime.Now,
-						IsReaded = false,
-					};
-
-					if (connections != null)
-					{
-						foreach (var connection in connections)
-						{
-							await _notificationHubContext.Clients.Clients(connection).SendAsync("ReceiveNotification",
-								JsonConvert.SerializeObject(_mapper.Map<NotificationRespone>(notification)));
-						}
-					}
-					_notificationRepositiory.AddNotification(notification);
-
-				}
+				if (user == null) return Conflict();
 				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);	
 				await _userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
