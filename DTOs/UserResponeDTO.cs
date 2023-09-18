@@ -19,5 +19,6 @@ namespace DTOs
 		public string? Avatar { get; set; }
 		public bool TwoFactorAuthentication { get; set; }
 		public bool? Status { get; set; }
-	}
+        public string? Fullname { get; set; }
+    }
 }

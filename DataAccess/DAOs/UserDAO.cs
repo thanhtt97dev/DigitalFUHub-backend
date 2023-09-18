@@ -77,6 +77,7 @@ namespace DataAccess.DAOs
 				var user = await context.User.FirstAsync(x => x.UserId == id);
 				user.RoleId = userUpdate.RoleId;	
 				user.Status = userUpdate.Status;
+				user.Fullname = userUpdate.Fullname;
 				await context.SaveChangesAsync();
 			}
 		}
