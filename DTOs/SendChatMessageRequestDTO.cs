@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs
 {
-    public class ChatRequestDTO
+    public class SendChatMessageRequestDTO
     {
         public long ConversationId { get; set; } = 0;
         public long SenderId { get; set; }
