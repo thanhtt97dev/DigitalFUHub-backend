@@ -10,5 +10,8 @@ namespace DTOs
 	{
 		public long? RoleId { get; set; }
 		public int? Status { get; set; }
-	}
+		public string? Fullname { get; set; }
+        public string? Avatar { get; set; }
+
+    }
 }
