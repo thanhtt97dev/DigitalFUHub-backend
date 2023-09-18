@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace FuMarketAPI.Comons
 {
@@ -98,6 +99,17 @@ namespace FuMarketAPI.Comons
 				string hiddenText = new string('*', startAt) + input.Substring(startAt);
 				return hiddenText;
 			}
+		}
+		#endregion
+
+		#region Compare Date Equal Greater Than Days Condition
+		public static bool CompareDateEqualGreaterThanDaysCondition(DateTime start, int days)
+		{
+			if (days < 0 ) return false;
+			DateTime end = start.AddDays(days);
+			DateTime today = DateTime.Now;
+			if(end >= today) return false;
+			return true;
 		}
 		#endregion
 	}

@@ -13,13 +13,6 @@ namespace DTOs
 		public List<TransactionHistory>? transactionHistoryList { get; set; }
 	}
 
-	public class Result
-	{
-		public string? responseCode { get; set; }
-		public string? message { get; set; }
-		public bool ok { get; set; }
-	}
-
 	public class TransactionHistory
 	{
 		public DateTime? postingDate { get; set; }

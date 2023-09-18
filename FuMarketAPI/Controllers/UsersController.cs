@@ -306,7 +306,8 @@
 				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
 
 				string title = "FU-Market: QR Code for Two Factor Authentication";
-				string body = $"<div>Hello, {user.Username}!</div><div>Please click <a href='{qrCode}'>here</a> to get QR code!</div>";
+				string body = $"<html><body><p>Here's an image:</p> <a href='{qrCode}'>clickgea</a></body></html>";
+
 
 				await _mailService.SendEmailAsync(user.Email, title, body);
 
@@ -361,7 +362,7 @@
 				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 				if (user.UserId != userIdInAccessToken) return NotFound();
 
-				return Ok(_mapper.Map<UserResponeDTO>(user));
+				return Ok(_mapper.Map<UserSignInResponseDTO>(user));
 			}
 			catch (Exception ex)
 			{

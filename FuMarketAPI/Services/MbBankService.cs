@@ -26,7 +26,7 @@ namespace FuMarketAPI.Services
 		{
 			BankInquiryAccountNameRequestDTO requestInfo = new BankInquiryAccountNameRequestDTO()
 			{
-				BankId = Constants.BankIdMbBank,
+				BankId = Constants.BANK_ID_MB_BANK,
 				CreditAccount = "688811112001"
 			};
 
@@ -40,7 +40,7 @@ namespace FuMarketAPI.Services
 				refNo = configuration["MbBank:RefNo"],
 				remark = string.Empty,
 				sessionId = configuration["MbBank:SessionId"],
-				type = requestInfo.BankId == Constants.BankIdMbBank ? "INHOUSE" : "FAST"
+				type = requestInfo.BankId == Constants.BANK_ID_MB_BANK ? "INHOUSE" : "FAST"
 			};
 
 			var jsonData = JsonSerializer.Serialize(mbBank);
@@ -101,7 +101,7 @@ namespace FuMarketAPI.Services
 				refNo = configuration["MbBank:RefNo"],
 				remark = string.Empty,
 				sessionId = configuration["MbBank:SessionId"],
-				type = bankInquiryAccountNameRequestDTO.BankId == Constants.BankIdMbBank ? "INHOUSE" : "FAST"
+				type = bankInquiryAccountNameRequestDTO.BankId == Constants.BANK_ID_MB_BANK ? "INHOUSE" : "FAST"
 			};
 
 			var jsonData = JsonSerializer.Serialize(mbBank);
