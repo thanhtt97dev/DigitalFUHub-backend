@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using BusinessObject.Migrations;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DTOs;
@@ -12,23 +13,35 @@ namespace DataAccess.Repositories
 {
     public class ChatRepository : IChatRepository
     {
-        public async Task<List<SenderConversation>> GetSenderConversations(long userId)
+        public async Task<List<Message>> GetListMessage(long conversationId)
+        {
+            if (conversationId == 0)
+            {
+                throw new ArgumentException("conversationId = 0, Can not get list message");
+            }
+
+            return await ChatDAO.Instance.GetListMessage(conversationId);
+        }
+
+        public async Task<List<SenderConversation>> GetSenderConversations(long userId, int page, int limit)
         {
             if (userId == 0)
             {
                 throw new ArgumentException("UserId = 0, Can not get sender conversations");
             }
 
-            return await ChatDAO.Instance.GetSenderConversations(userId);
+            return await ChatDAO.Instance.GetSenderConversations(userId, page, limit);
         }
 
-        public async Task SendChatMessage(ChatRequestDTO chatRequestDTO)
+        public async Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest)
         {
-            if (chatRequestDTO == null)
+            if (sendChatMessageRequest == null)
             {
                 throw new ArgumentException("ChatRequestDTO is null");
             }
-            await ChatDAO.Instance.SendChatMessage(chatRequestDTO);
+            await ChatDAO.Instance.SendChatMessage(sendChatMessageRequest);
         }
+
+
     }
 }

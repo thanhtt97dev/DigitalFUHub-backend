@@ -76,7 +76,7 @@ namespace FuMarketAPI.Services
 
 			var jsonData = JsonSerializer.Serialize(mbBank);
 			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-			var request = await client.PostAsync(configuration["MbBank:APIHistoryTransaction"], content);
+			var request = await client.PostAsync(configuration["MbBank:ApiHistoryTransaction"], content);
 
 			var respone = await request.Content.ReadAsStringAsync();
 
@@ -106,7 +106,7 @@ namespace FuMarketAPI.Services
 
 			var jsonData = JsonSerializer.Serialize(mbBank);
 			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-			var request = await client.PostAsync(configuration["MbBank:APIInquiryAccountName"], content);
+			var request = await client.PostAsync(configuration["MbBank:ApiInquiryAccountName"], content);
 
 			var respone = await request.Content.ReadAsStringAsync();
 

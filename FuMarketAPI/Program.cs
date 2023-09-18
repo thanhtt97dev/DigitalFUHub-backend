@@ -125,7 +125,6 @@ namespace FuMarketAPI
 			// add job scheduler get history transaction bank
 			builder.Services.AddQuartz(q =>
 			{
-				q.UseMicrosoftDependencyInjectionJobFactory();
 				var jobKeyGetHistoryTransaction = new JobKey("GetHistoryTransactionJob");
 				q.AddJob<HistoryTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyGetHistoryTransaction));
 				q.AddTrigger(opts => opts

@@ -5,18 +5,9 @@
 USE [DBTest]
 GO;
 
--- Reports (Demo)
-CREATE PROCEDURE dbo.getUserReport
-	@id INT
-AS
-BEGIN
-	SELECT * FROM [User] WHERE [User].UserId = @id;
-END;
-GO;
-
--- Danh sách những người gửi đang tham gia vào cuộc trò chuyện
+-- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
 CREATE PROCEDURE dbo.GetSenderConversation
-	@userId int
+	@userId INT, @page INT, @limit INT
 AS
 BEGIN
 	
@@ -24,17 +15,20 @@ BEGIN
 	u.*,
 	m.ConversationId
 	FROM [User] as u
-	INNER JOIN [Message] as m ON u.UserId = m.UserId
+	INNER JOIN [Messages] as m ON u.UserId = m.UserId
 	WHERE m.ConversationId IN (
 	SELECT 
 		ConversationId
-	FROM UserConversation WHERE UserId = 4)
+	FROM UserConversations WHERE UserId = @userId)
+	AND u.UserId != @userId
+	ORDER BY m.ConversationId DESC
+	OFFSET (@page - 1) * @limit ROWS FETCH NEXT @limit ROWS ONLY;
 END;
 GO;
 
 -- EXEC
 /*
-	EXEC dbo.GetSenderConversation 4;
+	EXEC dbo.GetSenderConversation 11, 1, 2;
 	GO;
 */
 
@@ -43,34 +37,44 @@ GO;
 	DROP PROCEDURE dbo.GetSenderConversation
 */
 
+-- Lấy danh sách tin nhắn theo cuộc trò chuyện
+/*
+	SELECT 
+	*
+	FROM [Message]
+	WHERE ConversationId = 2
+	ORDER BY DateCreate ASC;
+	GO;
+*/
+select * FROM [USer]
 
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage
 	@conversationId INT, @senderId INT, @recipientId INT, @content TEXT, @dateCreate DATETIME
 AS
 BEGIN
-	SET NOCOUNT ON;
+	-- SET NOCOUNT ON;
 	BEGIN TRY
 			DECLARE @conversationIdCur INT
 			IF (@conversationId = 0 )
 				BEGIN
 					BEGIN TRANSACTION
-					INSERT INTO [Conversation] (DateCreate, isActivate)
+					INSERT INTO [Conversations] (DateCreate, isActivate)
 					VALUES (GETDATE(), 1)
 
-					SELECT @conversationIdCur = IDENT_CURRENT(N'dbo.Conversation')
+					SELECT @conversationIdCur = IDENT_CURRENT(N'dbo.Conversations')
 
-					INSERT INTO [UserConversation] (UserId, ConversationId)
+					INSERT INTO [UserConversations] (UserId, ConversationId)
 					VALUES (@senderId, @conversationIdCur),
 							(@recipientId, @conversationIdCur)
 
-					INSERT INTO [Message] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
 					VALUES (@senderId, @conversationIdCur, @content, '1', @dateCreate, '0')
 				END;
 			ELSE 
 				BEGIN
 					BEGIN TRANSACTION
-					INSERT INTO [Message] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
 					VALUES (@senderId, @conversationId, @content, '1', @dateCreate, '0');
 				END
 			COMMIT;
@@ -86,11 +90,14 @@ BEGIN
 END;
 GO;
 
+
+
 -- EXEC
 /*
-	EXEC dbo.SendChatMessage 0, 9, 4, 'Xin chao Hieu, minh la Hoang', '2023-09-16';
-	EXEC dbo.SendChatMessage 0, 0, 4, 'Xin chao Hieu, minh la Hoang', '2023-09-16';
-	EXEC dbo.SendChatMessage 4, 4, 9, 'Ok. Chao Hoang nhe', '2023-09-16';
+	EXEC dbo.SendChatMessage 0, 13, 11, 'Xin chao Hieu, minh la Tien', '2023-09-16';
+	EXEC dbo.SendChatMessage 0, 15, 11, 'Xin chao Hieu, minh la HieuLD', '2023-09-17';
+	EXEC dbo.SendChatMessage 0, 0, 4, 'Xin chao Hieu, minh la Tien', '2023-09-16';
+	EXEC dbo.SendChatMessage 4, 4, 9, 'Ok. Chao Tien nhe', '2023-09-16';
 */
 
 -- DROP PROCEDURE

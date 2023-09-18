@@ -47,9 +47,19 @@ namespace FuMarketAPI.Services
 				new Claim(ClaimTypes.Role, (user.Role == null ? string.Empty : user.Role.RoleName) ?? string.Empty),
 			};
 
+			//rule: Admin use  token-base authentication(session), other roles use cookie-base authentication
+			// settings token expired time for specific user's role
 			int tokenExpiredDate;
 			int.TryParse(_configuration["JWT:TokenAge"], out tokenExpiredDate);
-			var accessTokenExpiredDate = DateTime.UtcNow.AddDays(tokenExpiredDate);
+			DateTime accessTokenExpiredDate = DateTime.UtcNow;
+			if (user.RoleId == Constants.ADMIN_ROLE)
+			{
+				accessTokenExpiredDate = DateTime.UtcNow.AddMinutes(tokenExpiredDate);
+			}
+			else
+			{
+				accessTokenExpiredDate = DateTime.UtcNow.AddDays(tokenExpiredDate);
+			}
 
 			var tokenDescription = new SecurityTokenDescriptor
 			{
@@ -73,18 +83,24 @@ namespace FuMarketAPI.Services
 
 			await _accessTokenRepository.AddAccessTokenAsync(accessTokenModel);
 
-			//Create Refresh token
-			var refreshToken = GenerateRefreshToken();
-			var refreshTokenModel = new RefreshToken
+			//Create Refresh token just for token-base authentication
+			string? refreshToken = null;
+			if (user.RoleId == Constants.ADMIN_ROLE)
 			{
-				UserId = user.UserId,
-				TokenRefresh = refreshToken,
-				JwtId = token.Id,
-				ExpiredDate = DateTime.UtcNow.AddDays(tokenExpiredDate + 1),
-			};
+				refreshToken = GenerateRefreshToken();
+				int refreshTokenExpiredDate;
+				int.TryParse(_configuration["JWT:RefreshTokenAge"], out refreshTokenExpiredDate);
+				var refreshTokenModel = new RefreshToken
+				{
+					UserId = user.UserId,
+					TokenRefresh = refreshToken,
+					JwtId = token.Id,
+					ExpiredDate = DateTime.UtcNow.AddMinutes(refreshTokenExpiredDate),
+				};
 
-			//Add refresh token to DB
-			await _refreshTokenRepository.AddRefreshTokenAsync(refreshTokenModel);
+				//Add refresh token to DB
+				await _refreshTokenRepository.AddRefreshTokenAsync(refreshTokenModel);
+			}
 
 			var response = new UserSignInResponseDTO
 			{
