@@ -75,8 +75,7 @@ namespace DataAccess.DAOs
 			using (ApiContext context = new ApiContext())
 			{
 				var user = await context.User.FirstAsync(x => x.UserId == id);
-				user.RoleId = userUpdate.RoleId;	
-				user.Status = userUpdate.Status;
+				user.Avatar = userUpdate.Avatar;	
 				user.Fullname = userUpdate.Fullname;
 				await context.SaveChangesAsync();
 			}
