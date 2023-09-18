@@ -12,5 +12,6 @@ namespace DTOs
 		public string BankName { get; set; } = null!;
 		public string CreditAccount { get; set; } = null!;
 		public string CreditAccountName { get; set; } = null!;
+		public DateTime UpdateAt { get; set; }
 	}
 }
