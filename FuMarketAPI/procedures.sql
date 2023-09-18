@@ -1,11 +1,16 @@
-﻿/*
-	USE database và execute để tạo procedures
-*/
-
-USE [DBTest]
+﻿USE [DBTest]
 GO;
 
--- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
+-- Reports
+CREATE PROCEDURE dbo.getUserReport
+	@id INT
+AS
+BEGIN
+	SELECT * FROM [User] WHERE [User].UserId = @id;
+END;
+GO;
+
+-- Danh sách những người gửi đang tham gia vào cuộc trò chuyện
 CREATE PROCEDURE dbo.GetSenderConversation
 	@userId INT, @page INT, @limit INT
 AS
@@ -19,11 +24,11 @@ BEGIN
 	WHERE m.ConversationId IN (
 	SELECT 
 		ConversationId
-	FROM UserConversations WHERE UserId = @userId)
-	AND u.UserId != @userId
+	FROM [UserConversations] WHERE UserId = @userId)
 	ORDER BY m.ConversationId DESC
 	OFFSET (@page - 1) * @limit ROWS FETCH NEXT @limit ROWS ONLY;
 END;
+
 GO;
 
 -- EXEC
@@ -37,23 +42,13 @@ GO;
 	DROP PROCEDURE dbo.GetSenderConversation
 */
 
--- Lấy danh sách tin nhắn theo cuộc trò chuyện
-/*
-	SELECT 
-	*
-	FROM [Message]
-	WHERE ConversationId = 2
-	ORDER BY DateCreate ASC;
-	GO;
-*/
-select * FROM [USer]
 
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage
 	@conversationId INT, @senderId INT, @recipientId INT, @content TEXT, @dateCreate DATETIME
 AS
 BEGIN
-	-- SET NOCOUNT ON;
+	SET NOCOUNT ON;
 	BEGIN TRY
 			DECLARE @conversationIdCur INT
 			IF (@conversationId = 0 )
@@ -90,14 +85,14 @@ BEGIN
 END;
 GO;
 
-
-
 -- EXEC
 /*
 	EXEC dbo.SendChatMessage 0, 13, 11, 'Xin chao Hieu, minh la Tien', '2023-09-16';
-	EXEC dbo.SendChatMessage 0, 15, 11, 'Xin chao Hieu, minh la HieuLD', '2023-09-17';
-	EXEC dbo.SendChatMessage 0, 0, 4, 'Xin chao Hieu, minh la Tien', '2023-09-16';
-	EXEC dbo.SendChatMessage 4, 4, 9, 'Ok. Chao Tien nhe', '2023-09-16';
+	EXEC dbo.SendChatMessage 0, 15, 11, 'Xin chao Hieu, minh la HieuLD', '2023-09-16';
+	EXEC dbo.SendChatMessage 0, 18, 11, 'Xin chao Hieu, minh la Phuc Du', '2023-09-16';
+
+	EXEC dbo.SendChatMessage 0, 0, 4, 'Xin chao Hieu, minh la Hoang', '2023-09-16';
+	EXEC dbo.SendChatMessage 4, 4, 9, 'Ok. Chao Hoang nhe', '2023-09-16';
 */
 
 -- DROP PROCEDURE
@@ -105,7 +100,7 @@ GO;
 	DROP PROCEDURE dbo.SendChatMessage;
 */
 
-
+select * from [User]
 -- Report Errors
 /*
 	CREATE PROCEDURE dbo.UspReportErrorSql

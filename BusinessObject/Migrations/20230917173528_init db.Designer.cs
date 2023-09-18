@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230916022201_version-2")]
-    partial class version2
+    [Migration("20230917173528_init db")]
+    partial class initdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -87,7 +87,7 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("ConversationId");
 
-                    b.ToTable("Conversation");
+                    b.ToTable("Conversations");
                 });
 
             modelBuilder.Entity("BusinessObject.DepositTransaction", b =>
@@ -158,7 +158,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Message");
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("BusinessObject.Notification", b =>
@@ -235,6 +235,33 @@ namespace BusinessObject.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Role");
+                });
+
+            modelBuilder.Entity("BusinessObject.SenderConversation", b =>
+                {
+                    b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ConversationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Fullname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("SenderConversations");
                 });
 
             modelBuilder.Entity("BusinessObject.Storage", b =>
@@ -351,6 +378,10 @@ namespace BusinessObject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CreditAccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
@@ -383,7 +414,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserConversation");
+                    b.ToTable("UserConversations");
                 });
 
             modelBuilder.Entity("BusinessObject.AccessToken", b =>

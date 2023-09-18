@@ -21,6 +21,7 @@ namespace FuMarketAPI.Comons
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.Bank.BankName))
 				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => Util.HideCharacters(src.CreditAccount,5)))
 				.ReverseMap();
-		}
+            CreateMap<Message, MessageResponseDTO>().ReverseMap();
+        }
     }
 }

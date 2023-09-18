@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class init : Migration
+    public partial class initdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -23,7 +23,7 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Conversation",
+                name: "Conversations",
                 columns: table => new
                 {
                     ConversationId = table.Column<long>(type: "bigint", nullable: false)
@@ -33,7 +33,7 @@ namespace BusinessObject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Conversation", x => x.ConversationId);
+                    table.PrimaryKey("PK_Conversations", x => x.ConversationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,6 +47,21 @@ namespace BusinessObject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Role", x => x.RoleId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SenderConversations",
+                columns: table => new
+                {
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fullname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ConversationId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
                 });
 
             migrationBuilder.CreateTable(
@@ -126,7 +141,7 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Message",
+                name: "Messages",
                 columns: table => new
                 {
                     MessageId = table.Column<long>(type: "bigint", nullable: false)
@@ -140,15 +155,15 @@ namespace BusinessObject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Message", x => x.MessageId);
+                    table.PrimaryKey("PK_Messages", x => x.MessageId);
                     table.ForeignKey(
-                        name: "FK_Message_Conversation_ConversationId",
+                        name: "FK_Messages_Conversations_ConversationId",
                         column: x => x.ConversationId,
-                        principalTable: "Conversation",
+                        principalTable: "Conversations",
                         principalColumn: "ConversationId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Message_User_UserId",
+                        name: "FK_Messages_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
@@ -249,7 +264,9 @@ namespace BusinessObject.Migrations
                     UserBankId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    BankId = table.Column<long>(type: "bigint", nullable: false)
+                    BankId = table.Column<long>(type: "bigint", nullable: false),
+                    CreditAccount = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreditAccountName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -269,7 +286,7 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserConversation",
+                name: "UserConversations",
                 columns: table => new
                 {
                     UserConversationId = table.Column<long>(type: "bigint", nullable: false)
@@ -279,15 +296,15 @@ namespace BusinessObject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserConversation", x => x.UserConversationId);
+                    table.PrimaryKey("PK_UserConversations", x => x.UserConversationId);
                     table.ForeignKey(
-                        name: "FK_UserConversation_Conversation_ConversationId",
+                        name: "FK_UserConversations_Conversations_ConversationId",
                         column: x => x.ConversationId,
-                        principalTable: "Conversation",
+                        principalTable: "Conversations",
                         principalColumn: "ConversationId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserConversation_User_UserId",
+                        name: "FK_UserConversations_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
@@ -305,13 +322,13 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_ConversationId",
-                table: "Message",
+                name: "IX_Messages_ConversationId",
+                table: "Messages",
                 column: "ConversationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_UserId",
-                table: "Message",
+                name: "IX_Messages_UserId",
+                table: "Messages",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -350,13 +367,13 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserConversation_ConversationId",
-                table: "UserConversation",
+                name: "IX_UserConversations_ConversationId",
+                table: "UserConversations",
                 column: "ConversationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserConversation_UserId",
-                table: "UserConversation",
+                name: "IX_UserConversations_UserId",
+                table: "UserConversations",
                 column: "UserId");
         }
 
@@ -369,13 +386,16 @@ namespace BusinessObject.Migrations
                 name: "DepositTransaction");
 
             migrationBuilder.DropTable(
-                name: "Message");
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Notification");
 
             migrationBuilder.DropTable(
                 name: "RefreshToken");
+
+            migrationBuilder.DropTable(
+                name: "SenderConversations");
 
             migrationBuilder.DropTable(
                 name: "Storage");
@@ -387,13 +407,13 @@ namespace BusinessObject.Migrations
                 name: "UserBank");
 
             migrationBuilder.DropTable(
-                name: "UserConversation");
+                name: "UserConversations");
 
             migrationBuilder.DropTable(
                 name: "Bank");
 
             migrationBuilder.DropTable(
-                name: "Conversation");
+                name: "Conversations");
 
             migrationBuilder.DropTable(
                 name: "User");

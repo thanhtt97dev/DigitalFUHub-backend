@@ -85,7 +85,7 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("ConversationId");
 
-                    b.ToTable("Conversation");
+                    b.ToTable("Conversations");
                 });
 
             modelBuilder.Entity("BusinessObject.DepositTransaction", b =>
@@ -156,7 +156,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Message");
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("BusinessObject.Notification", b =>
@@ -233,6 +233,33 @@ namespace BusinessObject.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Role");
+                });
+
+            modelBuilder.Entity("BusinessObject.SenderConversation", b =>
+                {
+                    b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ConversationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Fullname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("SenderConversations");
                 });
 
             modelBuilder.Entity("BusinessObject.Storage", b =>
@@ -385,7 +412,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserConversation");
+                    b.ToTable("UserConversations");
                 });
 
             modelBuilder.Entity("BusinessObject.AccessToken", b =>
