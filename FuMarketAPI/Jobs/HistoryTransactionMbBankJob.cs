@@ -11,9 +11,12 @@ namespace FuMarketAPI.Jobs
 {
 	public class HistoryTransactionMbBankJob : IJob
 	{
+		private readonly IConfiguration configuration;
 		private readonly MbBankService mbBankService;
-		public HistoryTransactionMbBankJob(MbBankService mbBankService)
+
+		public HistoryTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
 		{
+			this.configuration = configuration;
 			this.mbBankService = mbBankService;
 		}
 
@@ -34,7 +37,10 @@ namespace FuMarketAPI.Jobs
 
 			if (data.result.responseCode == "00")// Get data success
 			{
-				string dataPreviousText = Util.ReadFile("Data/historyTransactionMbBank.json");
+				string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreData"];
+				if (directoryPathStoreData == null) return;
+
+				string dataPreviousText = Util.ReadFile(directoryPathStoreData);
 				List<TransactionHistory>? dataPrevious = new List<TransactionHistory>();
 				if (!string.IsNullOrEmpty(dataPreviousText)) 
 				{
@@ -46,12 +52,13 @@ namespace FuMarketAPI.Jobs
 				bool isSame = true;
 				if (dataPrevious != null)
 				{
-					isSame = dataPrevious.SequenceEqual(transactionHistoryCreditList, new MbBankResponeHistoryTransactionDataEqualityComparer());
+					isSame = dataPrevious.SequenceEqual(transactionHistoryCreditList, 
+						new MbBankResponeHistoryTransactionDataEqualityComparer());
 				}
 				if (isSame) return;
 				//Have new recharge info
 				// Save new data into file
-				Util.WriteFile("Data/historyTransactionMbBank.json", transactionHistoryCreditList);
+				Util.WriteFile(directoryPathStoreData, transactionHistoryCreditList);
 				//Update DB
 				BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
 			}
