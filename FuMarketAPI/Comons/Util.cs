@@ -112,5 +112,38 @@ namespace FuMarketAPI.Comons
 			return true;
 		}
 		#endregion
+
+		#region Get Content Type File 
+		public static string GetContentType(string filename)
+		{
+			string fileExtension = filename.Substring(filename.LastIndexOf("."));
+			string contentType = "";
+			if (fileExtension.Contains(".jpg") || fileExtension.Contains(".jpeg"))
+			{
+				contentType = "image/jpeg";
+			}
+			else if (fileExtension.Contains(".png"))
+			{
+				contentType = "image/png";
+			}
+			else if (fileExtension.Contains(".gif"))
+			{
+				contentType = "image/gif";
+			}
+			else if (fileExtension.Contains(".txt"))
+			{
+				contentType = "text/xml";
+			}
+			else if (fileExtension.Contains(".mp3") || fileExtension.Contains(".mp4"))
+			{
+				contentType = "audio/mpeg";
+			}
+			else
+			{
+				contentType = "application/octet-stream";
+			}
+			return contentType;
+		}
+		#endregion
 	}
 }
