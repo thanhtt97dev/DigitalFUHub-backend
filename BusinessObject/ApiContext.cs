@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,14 @@ namespace BusinessObject
         public virtual DbSet<SenderConversation> SenderConversations { get; set; } = null!;
 		public virtual DbSet<Bank> Bank { get; set; } = null!;
 		public virtual DbSet<UserBank> UserBank { get; set; } = null!;
+		public virtual DbSet<Product> Product { get; set; } = null!;
+		public virtual DbSet<Coupon> Coupon { get; set; } = null!;
+		public virtual DbSet<ProductWarehouse> ProductWarehouse { get; set; } = null!;
+		public virtual DbSet<Order> Order { get; set; } = null!;
+		public virtual DbSet<OrderDetail> OrderDetail { get; set; } = null!;
+		public virtual DbSet<Feedback> Feedback { get; set; } = null!;
+		public virtual DbSet<ProductImage> ProductImage { get; set; } = null!;
+		public virtual DbSet<Category> Category { get; set; } = null!;
 
         #endregion
 
@@ -47,7 +56,18 @@ namespace BusinessObject
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			
+			modelBuilder.Entity<OrderDetail>().HasKey(x => new {x.OrderId, x.ProductId});
+			modelBuilder.Entity<Feedback>().
+				HasOne(x => x.Buyer)
+				.WithMany(x => x.Feedbacks)
+				.HasForeignKey(x => x.BuyerId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<OrderDetail>()
+				.HasOne(x => x.Product)
+				.WithMany(x => x.OrderDetails)
+				.HasForeignKey(x => x.ProductId)
+				.OnDelete(DeleteBehavior.NoAction);
+
 		}
 	}
 }

@@ -6,11 +6,22 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OfficeOpenXml.Style;
 
 namespace BusinessObject
 {
 	public class User
 	{
+		public User()
+		{
+			AccessTokens = new List<AccessToken>();
+			DepositTransactions = new List<DepositTransaction>();
+			UserConversations = new List<UserConversation>();
+			UserBanks = new List<UserBank>();
+			Orders = new List<Order>();
+			Products = new List<Product>();
+			Feedbacks = new List<Feedback>();
+		}
 
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -33,6 +44,9 @@ namespace BusinessObject
 		public virtual ICollection<DepositTransaction>? DepositTransactions { get; set; }
         public virtual ICollection<UserConversation>? UserConversations { get; set; }
 		public virtual ICollection<UserBank>? UserBanks { get; set; }
+		public virtual ICollection<Order>? Orders { get; set; }
+		public virtual ICollection<Product>? Products { get; set; }
+		public virtual ICollection<Feedback>? Feedbacks { get; set; }
 
 	}
 }
