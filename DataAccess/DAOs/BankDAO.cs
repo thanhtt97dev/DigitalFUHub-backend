@@ -96,12 +96,11 @@ namespace DataAccess.DAOs
 				{
 					foreach (var item in transactionHistoryCreditList)
 					{
-						var isTransactionExisted = context.DepositTransaction
-							.FirstOrDefault(x => item.description.Contains(x.Code) && x.Amount == item.creditAmount) != null;
-						if (isTransactionExisted)
+						var deposit = context.DepositTransaction
+								.FirstOrDefault(x => string.Equals(x.Code.ToLower(), item.description.ToLower()) && 
+								x.Amount == item.creditAmount);
+						if (deposit != null)
 						{
-							var deposit = context.DepositTransaction
-								.First(x => item.description.Contains(x.Code) && x.Amount == item.creditAmount);
 							if (deposit.IsPay == true) continue;
 							//update sataus recharge
 							deposit.IsPay = true;
