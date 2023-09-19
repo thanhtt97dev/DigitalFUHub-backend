@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -112,12 +111,11 @@ namespace DigitalFUHubApi.Comons
 			return true;
 		}
 		#endregion
-
-		#region Get Content Type File 
+		#region Get Content Type File
 		public static string GetContentType(string filename)
 		{
+			var contentType = "";
 			string fileExtension = filename.Substring(filename.LastIndexOf("."));
-			string contentType = "";
 			if (fileExtension.Contains(".jpg") || fileExtension.Contains(".jpeg"))
 			{
 				contentType = "image/jpeg";

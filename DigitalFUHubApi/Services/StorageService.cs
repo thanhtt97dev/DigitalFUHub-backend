@@ -2,7 +2,7 @@
 using Azure.Storage.Blobs;
 using DataAccess.IRepositories;
 
-namespace FuMarketAPI.Services
+namespace DigitalFUHubApi.Services
 {
 	public class StorageService
 	{

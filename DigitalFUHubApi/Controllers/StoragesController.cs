@@ -3,14 +3,14 @@ using Azure.Storage.Blobs.Specialized;
 using BusinessObject;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
+using DigitalFUHubApi.Comons;
+using DigitalFUHubApi.Services;
 using DTOs;
-using FuMarketAPI.Comons;
-using FuMarketAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Text;
 
-namespace FuMarketAPI.Controllers
+namespace DigitalFUHubApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]

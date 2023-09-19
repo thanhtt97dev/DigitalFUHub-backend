@@ -53,10 +53,11 @@ namespace DataAccess.DAOs
 			}
 		}
 
+
 		internal void RemoveFile(string filename)
 		{
 			Storage? file = GetFileByName(filename);
-			if(file != null)
+			if (file != null)
 			{
 				using (ApiContext context = new ApiContext())
 				{
