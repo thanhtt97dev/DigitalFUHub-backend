@@ -49,23 +49,6 @@ namespace FuMarketAPI.Controllers
 		}
 		#endregion
 
-		#region Check connect with MB Bank
-		[HttpGet("connect")]
-		public async Task<IActionResult> Connect()
-		{
-			try
-			{
-				var canConnect = await mbBankService.TestConnection();
-				if (!canConnect) return Conflict("Cannot connect!");
-				return Ok();
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-			}
-		}
-		#endregion
-
 		#region Get user bank account
 		[HttpGet("user/{id}")]
 		public IActionResult CheckUserBankAccount(int id)
