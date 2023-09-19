@@ -1,5 +1,4 @@
 ﻿using BusinessObject;
-using BusinessObject.Migrations;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DTOs;
