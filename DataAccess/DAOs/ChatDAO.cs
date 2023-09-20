@@ -51,15 +51,14 @@ namespace DataAccess.DAOs
         {
             using (ApiContext context = new ApiContext())
             {
-                string sql = "EXEC dbo.SendChatMessage @conversationId, @senderId, @recipientId, @content, @dateCreate, @messageType";
-                await context.Database.ExecuteSqlRawAsync(sql,
-                       new SqlParameter("@conversationId", sendChatMessageRequest.ConversationId),
-                       new SqlParameter("@senderId", sendChatMessageRequest.SenderId),
-                       new SqlParameter("@recipientId", sendChatMessageRequest.RecipientId),
-                       new SqlParameter("@content", sendChatMessageRequest.Content),
-                       new SqlParameter("@dateCreate", sendChatMessageRequest.DateCreate),
-                       new SqlParameter("@messageType", sendChatMessageRequest.MessageType)
-                   );
+                string sql = "EXEC dbo.SendChatMessage @conversationId, @senderId, @recipientId, @content, @dateCreate";
+                 await context.Database.ExecuteSqlRawAsync(sql,
+                        new SqlParameter("@conversationId", sendChatMessageRequest.ConversationId),
+                        new SqlParameter("@senderId", sendChatMessageRequest.SenderId),
+                        new SqlParameter("@recipientId", sendChatMessageRequest.RecipientId),
+                        new SqlParameter("@content", sendChatMessageRequest.Content),
+                        new SqlParameter("@dateCreate", sendChatMessageRequest.DateCreate)
+                    );
 
             }
 

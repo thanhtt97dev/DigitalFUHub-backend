@@ -6,46 +6,29 @@ USE [DBTest]
 GO;
 
 -- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
-/*
-	CREATE PROCEDURE dbo.GetSenderConversation
-		@userId INT, @page INT, @limit INT
-	AS
-	BEGIN
+CREATE PROCEDURE dbo.GetSenderConversation
+	@userId INT, @page INT, @limit INT
+AS
+BEGIN
 	
-		SELECT DISTINCT
-		u.*,
-		m.ConversationId
-		FROM [User] as u
-		INNER JOIN [Messages] as m ON u.UserId = m.UserId
-		WHERE m.ConversationId IN (
-		SELECT 
-			ConversationId
-		FROM UserConversations WHERE UserId = 2)
-		AND u.UserId != @userId
-		ORDER BY m.ConversationId DESC
-		OFFSET (@page - 1) * @limit ROWS FETCH NEXT @limit ROWS ONLY;
-	END;
-	GO;
-*/
-
-	CREATE PROCEDURE dbo.GetSenderConversation
-		@userId INT, @page INT, @limit INT
-	AS
-	BEGIN
-		SELECT 
-		u.*, 
-		r.ConversationId 
-		FROM [User] as u,
-		(SELECT UserId, ConversationId FROM UserConversations as u WHERE ConversationId IN (
-		SELECT ConversationId FROM UserConversations WHERE UserId = @userId)) as r
-		WHERE u.UserId = r.userId
-		AND u.UserId != @userId
-	END;
-	GO;
+	SELECT DISTINCT
+	u.*,
+	m.ConversationId
+	FROM [User] as u
+	INNER JOIN [Messages] as m ON u.UserId = m.UserId
+	WHERE m.ConversationId IN (
+	SELECT 
+		ConversationId
+	FROM UserConversations WHERE UserId = @userId)
+	AND u.UserId != @userId
+	ORDER BY m.ConversationId DESC
+	OFFSET (@page - 1) * @limit ROWS FETCH NEXT @limit ROWS ONLY;
+END;
+GO;
 
 -- EXEC
 /*
-	EXEC dbo.GetSenderConversation 2, 1, 2;
+	EXEC dbo.GetSenderConversation 11, 1, 2;
 	GO;
 */
 
@@ -63,11 +46,11 @@ GO;
 	ORDER BY DateCreate ASC;
 	GO;
 */
-
+select * FROM [USer]
 
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage
-	@conversationId INT, @senderId INT, @recipientId INT, @content NVARCHAR(MAX), @dateCreate DATETIME, @messageType NVARCHAR(50)
+	@conversationId INT, @senderId INT, @recipientId INT, @content TEXT, @dateCreate DATETIME
 AS
 BEGIN
 	-- SET NOCOUNT ON;
@@ -86,13 +69,13 @@ BEGIN
 							(@recipientId, @conversationIdCur)
 
 					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationIdCur, @content, @messageType, @dateCreate, '0')
+					VALUES (@senderId, @conversationIdCur, @content, '1', @dateCreate, '0')
 				END;
 			ELSE 
 				BEGIN
 					BEGIN TRANSACTION
 					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationId, @content, @messageType, @dateCreate, '0');
+					VALUES (@senderId, @conversationId, @content, '1', @dateCreate, '0');
 				END
 			COMMIT;
 	END TRY
