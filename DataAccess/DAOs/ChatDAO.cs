@@ -30,15 +30,13 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal async Task<List<SenderConversation>> GetSenderConversations(long userId, int page, int limit)
+        internal async Task<List<SenderConversation>> GetSenderConversations(long userId)
         {
                 using (ApiContext context = new ApiContext())
                 {
-                    string sql = "EXECUTE dbo.GetSenderConversation @userId, @page, @limit";
+                    string sql = "EXECUTE dbo.GetSenderConversation @userId";
                     List<SenderConversation> result = await context.SenderConversations.FromSqlRaw(sql,
-                            new SqlParameter("@userId", userId),
-                            new SqlParameter("@page", page),
-                            new SqlParameter("@limit", limit)
+                            new SqlParameter("@userId", userId)
                         ).ToListAsync();
                     
 

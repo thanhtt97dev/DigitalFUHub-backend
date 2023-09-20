@@ -7,7 +7,7 @@ GO;
 
 -- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
 CREATE PROCEDURE dbo.GetSenderConversation
-	@userId INT, @page INT, @limit INT
+	@userId INT
 AS
 BEGIN
 	
@@ -22,7 +22,6 @@ BEGIN
 	FROM UserConversations WHERE UserId = @userId)
 	AND u.UserId != @userId
 	ORDER BY m.ConversationId DESC
-	OFFSET (@page - 1) * @limit ROWS FETCH NEXT @limit ROWS ONLY;
 END;
 GO;
 
@@ -46,7 +45,7 @@ GO;
 	ORDER BY DateCreate ASC;
 	GO;
 */
-select * FROM [USer]
+
 
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage

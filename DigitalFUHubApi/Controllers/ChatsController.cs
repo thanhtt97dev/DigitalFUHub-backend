@@ -65,11 +65,11 @@ namespace DigitalFUHubApi.Controllers
         }
 
         [HttpGet("getSenders")]
-        public async Task<IActionResult> GetSendersConversation(long userId, int page = 1, int limit = 10)
+        public async Task<IActionResult> GetSendersConversation(long userId)
         {
             try
             {
-                List<SenderConversation> senderConversations = await _chatRepository.GetSenderConversations(userId, page, limit);
+                List<SenderConversation> senderConversations = await _chatRepository.GetSenderConversations(userId);
                 return Ok(senderConversations);
             } catch (ArgumentException ex)
             {
