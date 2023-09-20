@@ -383,20 +383,20 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Image",
+                name: "MessageImage",
                 columns: table => new
                 {
-                    ImageId = table.Column<long>(type: "bigint", nullable: false)
+                    MessageImageId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MessageId = table.Column<long>(type: "bigint", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Image", x => x.ImageId);
+                    table.PrimaryKey("PK_MessageImage", x => x.MessageImageId);
                     table.ForeignKey(
-                        name: "FK_Image_Messages_MessageId",
+                        name: "FK_MessageImage_Messages_MessageId",
                         column: x => x.MessageId,
                         principalTable: "Messages",
                         principalColumn: "MessageId",
@@ -545,8 +545,8 @@ namespace BusinessObject.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_MessageId",
-                table: "Image",
+                name: "IX_MessageImage_MessageId",
+                table: "MessageImage",
                 column: "MessageId");
 
             migrationBuilder.CreateIndex(
@@ -650,7 +650,7 @@ namespace BusinessObject.Migrations
                 name: "Feedback");
 
             migrationBuilder.DropTable(
-                name: "Image");
+                name: "MessageImage");
 
             migrationBuilder.DropTable(
                 name: "Notification");

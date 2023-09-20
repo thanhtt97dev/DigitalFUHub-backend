@@ -194,32 +194,6 @@ namespace BusinessObject.Migrations
                     b.ToTable("Feedback");
                 });
 
-            modelBuilder.Entity("BusinessObject.Image", b =>
-                {
-                    b.Property<long>("ImageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ImageId"), 1L, 1);
-
-                    b.Property<string>("ImagePath")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<long>("MessageId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ImageId");
-
-                    b.HasIndex("MessageId");
-
-                    b.ToTable("Image");
-                });
-
             modelBuilder.Entity("BusinessObject.Message", b =>
                 {
                     b.Property<long>("MessageId")
@@ -254,6 +228,32 @@ namespace BusinessObject.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("BusinessObject.MessageImage", b =>
+                {
+                    b.Property<long>("MessageImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("MessageImageId"), 1L, 1);
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long>("MessageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageImageId");
+
+                    b.HasIndex("MessageId");
+
+                    b.ToTable("MessageImage");
                 });
 
             modelBuilder.Entity("BusinessObject.Notification", b =>
@@ -713,17 +713,6 @@ namespace BusinessObject.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BusinessObject.Image", b =>
-                {
-                    b.HasOne("BusinessObject.Message", "Message")
-                        .WithMany("Images")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Message");
-                });
-
             modelBuilder.Entity("BusinessObject.Message", b =>
                 {
                     b.HasOne("BusinessObject.Conversation", "Conversation")
@@ -741,6 +730,17 @@ namespace BusinessObject.Migrations
                     b.Navigation("Conversation");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.MessageImage", b =>
+                {
+                    b.HasOne("BusinessObject.Message", "Message")
+                        .WithMany("MessageImages")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
                 });
 
             modelBuilder.Entity("BusinessObject.Notification", b =>
@@ -921,7 +921,7 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Message", b =>
                 {
-                    b.Navigation("Images");
+                    b.Navigation("MessageImages");
                 });
 
             modelBuilder.Entity("BusinessObject.Order", b =>

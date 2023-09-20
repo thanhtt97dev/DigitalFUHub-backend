@@ -26,6 +26,6 @@ namespace BusinessObject
         [ForeignKey(nameof(ConversationId))]
         public Conversation Conversation { get; set; } = null!;
 
-        public virtual ICollection<Image>? Images { get; set; }
+        public virtual ICollection<MessageImage>? MessageImages { get; set; }
     }
 }
