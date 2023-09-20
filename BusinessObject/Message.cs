@@ -16,7 +16,7 @@ namespace BusinessObject
         public long UserId { get; set; }
         public long ConversationId { get; set; }
         public string Content { get; set; } = string.Empty;
-        public string MessageType { get; set; } = string.Empty;
+        public bool isImage { get; set; }
         public DateTime DateCreate { get; set; }
         public bool isDelete { get; set; }
 
@@ -25,5 +25,7 @@ namespace BusinessObject
 
         [ForeignKey(nameof(ConversationId))]
         public Conversation Conversation { get; set; } = null!;
+
+        public virtual ICollection<Image>? Images { get; set; }
     }
 }
