@@ -44,7 +44,8 @@ namespace DigitalFUHubApi.Controllers
                     UserId = sendChatMessageRequest.SenderId,
                     ConversationId = sendChatMessageRequest.ConversationId,
                     Content = sendChatMessageRequest.Content,
-                    DateCreate = sendChatMessageRequest.DateCreate
+                    DateCreate = sendChatMessageRequest.DateCreate,
+                    isImage = sendChatMessageRequest.isImage
                 };
                 if (connections != null)
                 {
