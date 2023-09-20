@@ -1,6 +1,16 @@
 #Build files
-bin
-obj
+#Build files
+/BusinessObject/bin/
+/BusinessObject/obj/
+
+/DataAccess/bin/
+/DataAccess/obj/
+
+/DigitalFUHubApi/bin/
+/DigitalFUHubApi/obj/
+
+/DTOs/bin/
+/DTOs/obj/
 
 
 # ASP.NET artifacts
