@@ -53,14 +53,18 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal async Task<Stream?> GetFileFromAzureAsync(string uri)
+
+		internal void RemoveFile(string filename)
 		{
-			HttpClient client = new HttpClient();
-			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			HttpResponseMessage response = await client.GetAsync(uri);
-			if (!response.IsSuccessStatusCode) return null;
-			Stream content = await response.Content.ReadAsStreamAsync();
-			return content;
+			Storage? file = GetFileByName(filename);
+			if (file != null)
+			{
+				using (ApiContext context = new ApiContext())
+				{
+					context.Storage.Remove(file);
+					context.SaveChanges();
+				}
+			}
 		}
 	}
 }

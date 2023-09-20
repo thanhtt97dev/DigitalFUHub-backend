@@ -102,6 +102,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 			builder.Services.AddSingleton<MailService>();
 			builder.Services.AddSingleton<MbBankService>();	
+			builder.Services.AddSingleton<StorageService>();	
 
 			//Add SignalR
 			builder.Services.AddSignalR();

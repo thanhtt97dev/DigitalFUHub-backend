@@ -15,6 +15,6 @@ namespace DataAccess.Repositories
 
 		public Storage? GetFileByName(string filename) => StorageDAO.Instance.GetFileByName(filename);
 
-		public async Task<Stream?> GetFileFromAzureAsync(string filename) => await StorageDAO.Instance.GetFileFromAzureAsync(filename);
+		public void RemoveFile(string filename) => StorageDAO.Instance.RemoveFile(filename);
 	}
 }

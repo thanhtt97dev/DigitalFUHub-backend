@@ -11,6 +11,6 @@ namespace DataAccess.IRepositories
 	{
 		void AddFile(Storage file);
 		Storage? GetFileByName(string filename);
-		Task<Stream?> GetFileFromAzureAsync(string fileName);
+		void RemoveFile(string filename);
 	}
 }
