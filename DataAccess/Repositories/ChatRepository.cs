@@ -22,14 +22,14 @@ namespace DataAccess.Repositories
             return await ChatDAO.Instance.GetListMessage(conversationId);
         }
 
-        public async Task<List<SenderConversation>> GetSenderConversations(long userId, int page, int limit)
+        public async Task<List<SenderConversation>> GetSenderConversations(long userId)
         {
             if (userId == 0)
             {
                 throw new ArgumentException("UserId = 0, Can not get sender conversations");
             }
 
-            return await ChatDAO.Instance.GetSenderConversations(userId, page, limit);
+            return await ChatDAO.Instance.GetSenderConversations(userId);
         }
 
         public async Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest)

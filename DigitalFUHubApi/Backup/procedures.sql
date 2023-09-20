@@ -7,7 +7,7 @@ GO;
 
 -- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
 CREATE PROCEDURE dbo.GetSenderConversation
-	@userId INT, @page INT, @limit INT
+	@userId INT
 AS
 BEGIN
 	
@@ -22,13 +22,12 @@ BEGIN
 	FROM UserConversations WHERE UserId = @userId)
 	AND u.UserId != @userId
 	ORDER BY m.ConversationId DESC
-	OFFSET (@page - 1) * @limit ROWS FETCH NEXT @limit ROWS ONLY;
 END;
 GO;
 
 -- EXEC
 /*
-	EXEC dbo.GetSenderConversation 11, 1, 2;
+	EXEC dbo.GetSenderConversation 1;
 	GO;
 */
 
@@ -46,11 +45,11 @@ GO;
 	ORDER BY DateCreate ASC;
 	GO;
 */
-select * FROM [USer]
+
 
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage
-	@conversationId INT, @senderId INT, @recipientId INT, @content TEXT, @dateCreate DATETIME
+	@conversationId INT, @senderId INT, @recipientId INT, @content NVARCHAR(MAX), @dateCreate DATETIME, @isImage BIT
 AS
 BEGIN
 	-- SET NOCOUNT ON;
@@ -68,14 +67,14 @@ BEGIN
 					VALUES (@senderId, @conversationIdCur),
 							(@recipientId, @conversationIdCur)
 
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationIdCur, @content, '1', @dateCreate, '0')
+					INSERT INTO [Messages] (UserId, ConversationId, [Content], isImage, DateCreate, isDelete)
+					VALUES (@senderId, @conversationIdCur, @content, @isImage, @dateCreate, '0')
 				END;
 			ELSE 
 				BEGIN
 					BEGIN TRANSACTION
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationId, @content, '1', @dateCreate, '0');
+					INSERT INTO [Messages] (UserId, ConversationId, [Content], isImage, DateCreate, isDelete)
+					VALUES (@senderId, @conversationId, @content, @isImage, @dateCreate, '0');
 				END
 			COMMIT;
 	END TRY
@@ -94,10 +93,7 @@ GO;
 
 -- EXEC
 /*
-	EXEC dbo.SendChatMessage 0, 13, 11, 'Xin chao Hieu, minh la Tien', '2023-09-16';
-	EXEC dbo.SendChatMessage 0, 15, 11, 'Xin chao Hieu, minh la HieuLD', '2023-09-17';
-	EXEC dbo.SendChatMessage 0, 0, 4, 'Xin chao Hieu, minh la Tien', '2023-09-16';
-	EXEC dbo.SendChatMessage 4, 4, 9, 'Ok. Chao Tien nhe', '2023-09-16';
+	EXEC dbo.SendChatMessage 1, 1, 2, 'Test isImage', '2023-09-16', 0;
 */
 
 -- DROP PROCEDURE

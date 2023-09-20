@@ -30,15 +30,13 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal async Task<List<SenderConversation>> GetSenderConversations(long userId, int page, int limit)
+        internal async Task<List<SenderConversation>> GetSenderConversations(long userId)
         {
                 using (ApiContext context = new ApiContext())
                 {
-                    string sql = "EXECUTE dbo.GetSenderConversation @userId, @page, @limit";
+                    string sql = "EXECUTE dbo.GetSenderConversation @userId";
                     List<SenderConversation> result = await context.SenderConversations.FromSqlRaw(sql,
-                            new SqlParameter("@userId", userId),
-                            new SqlParameter("@page", page),
-                            new SqlParameter("@limit", limit)
+                            new SqlParameter("@userId", userId)
                         ).ToListAsync();
                     
 
@@ -51,13 +49,14 @@ namespace DataAccess.DAOs
         {
             using (ApiContext context = new ApiContext())
             {
-                string sql = "EXEC dbo.SendChatMessage @conversationId, @senderId, @recipientId, @content, @dateCreate";
+                string sql = "EXEC dbo.SendChatMessage @conversationId, @senderId, @recipientId, @content, @dateCreate, @isImage";
                  await context.Database.ExecuteSqlRawAsync(sql,
                         new SqlParameter("@conversationId", sendChatMessageRequest.ConversationId),
                         new SqlParameter("@senderId", sendChatMessageRequest.SenderId),
                         new SqlParameter("@recipientId", sendChatMessageRequest.RecipientId),
                         new SqlParameter("@content", sendChatMessageRequest.Content),
-                        new SqlParameter("@dateCreate", sendChatMessageRequest.DateCreate)
+                        new SqlParameter("@dateCreate", sendChatMessageRequest.DateCreate),
+                        new SqlParameter("@isImage", sendChatMessageRequest.isImage)
                     );
 
             }

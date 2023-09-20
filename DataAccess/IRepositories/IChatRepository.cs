@@ -10,7 +10,7 @@ namespace DataAccess.IRepositories
 {
     public interface IChatRepository
     {
-        Task<List<SenderConversation>> GetSenderConversations(long userId, int page, int limit);
+        Task<List<SenderConversation>> GetSenderConversations(long userId);
 
         Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest);
 

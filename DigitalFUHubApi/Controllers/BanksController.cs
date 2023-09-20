@@ -76,11 +76,57 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("InquiryAccountName")]
 		public async Task<IActionResult> InquiryAccountName(BankInquiryAccountNameRequestDTO inquiryAccountNameRequestDTO)
 		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
 			try
 			{
-				var benName = await mbBankService.InquiryAccountName(inquiryAccountNameRequestDTO);
-				if (benName == null) return Conflict("Bank account not existed!");
-				return Ok(benName);
+				if (inquiryAccountNameRequestDTO == null || 
+					string.IsNullOrEmpty(inquiryAccountNameRequestDTO.BankId) || 
+					string.IsNullOrEmpty(inquiryAccountNameRequestDTO.CreditAccount))
+				{
+					return BadRequest();
+				}
+				MbBankResponse? mbBankResponse = await mbBankService.InquiryAccountName(inquiryAccountNameRequestDTO);
+				if (mbBankResponse == null) 
+					return StatusCode(StatusCodes.Status500InternalServerError, "Server err!");
+
+				if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SAME_URI_IN_SAME_TIME)
+				{
+					status.Message = "Request many time in same time!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+				}else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SESSION_INVALID)
+				{
+					status.Message = "Third-party's session invalid";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+				}
+				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR)
+				{
+					status.Message = "Search data err";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+				}
+				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND)
+				{
+					status.Message = "Not found";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+				}
+				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+				{
+					status.Message = "Success";
+					status.Ok = true;
+					status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+					responseData.Status = status;
+					responseData.Result = mbBankResponse.Result;
+				}
+
+				return Ok(responseData);
 			}
 			catch (Exception ex)
 			{
@@ -93,6 +139,8 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("AddBankAccount")]
 		public async Task<IActionResult> AddBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
 			try
 			{
 				if (bankLinkAccountRequestDTO == null) return BadRequest();
@@ -105,11 +153,18 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				var user = userRepository.GetUserById(bankLinkAccountRequestDTO.UserId);
-				if (user == null) return NotFound("User not existed");
+				if (user == null) return Conflict("User not existed");
 
-				//check rule : 1 user just linked with 1 bank accout
+				//rule : 1 user just linked with 1 bank accout
 				var totalUserLinkedBank = bankRepository.TotalUserLinkedBank(bankLinkAccountRequestDTO.UserId);
-				if (totalUserLinkedBank > 1) return Conflict("You was linked with bank account!");
+				if (totalUserLinkedBank > 1)
+				{
+					status.Message = "You was linked with bank account!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
 				BankInquiryAccountNameRequestDTO bankInquiryAccount = new BankInquiryAccountNameRequestDTO()
 				{
@@ -117,21 +172,53 @@ namespace DigitalFUHubApi.Controllers
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 				};
 
-				var benName = await mbBankService.InquiryAccountName(bankInquiryAccount);
-				if (benName == null) return Conflict("Bank account not existed!");
-
+				var mbBank = await mbBankService.InquiryAccountName(bankInquiryAccount);
+				if(mbBank == null || mbBank.Result == null) 
+				{
+					status.Message = "Third-party's server err";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				else
+				{
+					if (mbBank.Code != Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+					{
+						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND)
+						{
+							status.Message = "Not found";
+							status.Ok = false;
+							status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+							responseData.Status = status;
+						}
+						else
+						{
+							status.Message = "Third-party's server err";
+							status.Ok = false;
+							status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+							responseData.Status = status;
+						}
+						return Ok(responseData);
+					}
+				}
+				var benName = mbBank.Result;
 				UserBank userBank = new UserBank()
 				{
 					BankId = long.Parse(bankLinkAccountRequestDTO.BankId),
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
-					CreditAccountName = benName.ToString(),
+					CreditAccountName = benName.ToString() ?? string.Empty,
 					UpdateAt = DateTime.UtcNow,	
 				};
 
 				bankRepository.AddUserBank(userBank);
 
-				return Ok();
+				status.Message = "Add bank account success!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				return Ok(responseData);
 			}
 			catch (Exception ex)
 			{
@@ -145,7 +232,7 @@ namespace DigitalFUHubApi.Controllers
 		public async Task<IActionResult> UpdateBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
 			ResponseData responseData = new ResponseData();
-			Result result = new Result();
+			Status status = new Status();
 			try
 			{
 				if (bankLinkAccountRequestDTO == null) return BadRequest();
@@ -158,19 +245,19 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				var user = userRepository.GetUserById(bankLinkAccountRequestDTO.UserId);
-				if (user == null) return NotFound("User not existed");
+				if (user == null) return Conflict("User not existed");
 
 				var userBankAccount = bankRepository.GetUserBank(bankLinkAccountRequestDTO.UserId);
-				if (userBankAccount == null) return Conflict();
+				if (userBankAccount == null) return Conflict("User not have bank account to update!");
 
 				//rule: user can update bank account if updated date is less than 15 days with current day
 				bool acceptUpdate = Util.CompareDateEqualGreaterThanDaysCondition(userBankAccount.UpdateAt, Constants.NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT);
 				if (!acceptUpdate)
 				{
-					result.message = "After 15 days can update";
-					result.ok = false;
-					result.responseCode = "01";
-					responseData.Status = result;
+					status.Message = "After 15 days can update";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
 					return Ok(responseData);
 				}
 
@@ -180,33 +267,52 @@ namespace DigitalFUHubApi.Controllers
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 				};
 
-				var benName = await mbBankService.InquiryAccountName(bankInquiryAccount);
-				if (benName == null)
+				var mbBank = await mbBankService.InquiryAccountName(bankInquiryAccount);
+				if (mbBank == null || mbBank.Result == null)
 				{
+					status.Message = "Third-party's server err";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				else
+				{
+					if (mbBank.Code != Constants.MB_BANK_RESPONE_CODE_SUCCESS)
 					{
-						result.message = "Bank account not existed!";
-						result.ok = false;
-						result.responseCode = "02";
-						responseData.Status = result;
+						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND)
+						{
+							status.Message = "Not found";
+							status.Ok = false;
+							status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+							responseData.Status = status;
+						}
+						else
+						{
+							status.Message = "Third-party's server err";
+							status.Ok = false;
+							status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+							responseData.Status = status;
+						}
 						return Ok(responseData);
 					}
 				}
-
+				var benName = mbBank.Result;
 				UserBank userBank = new UserBank()
 				{
 					BankId = long.Parse(bankLinkAccountRequestDTO.BankId),
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
-					CreditAccountName = benName.ToString(),
+					CreditAccountName = benName.ToString() ?? string.Empty,
 					UpdateAt = DateTime.UtcNow,	
 				};
 
 				bankRepository.UpdateUserBank(userBank);
 
-				result.message = "Update user's bank account success!";
-				result.ok = true;
-				result.responseCode = "00";
-				responseData.Status = result;
+				status.Message = "Update user's bank account success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
 
 				return Ok(responseData);
 			}
@@ -242,24 +348,5 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		[HttpGet("test")]
-		public IActionResult Test()
-		{
-			ResponseData responseData = new ResponseData()
-			{
-				Status = new Result()
-				{
-					message = "",
-					ok = false,
-					responseCode = "01"
-				},
-				Result = new User()
-				{
-					Avatar="daw"
-				}
-			};
-			return Ok(responseData);
-		}
-		
 	}
 }

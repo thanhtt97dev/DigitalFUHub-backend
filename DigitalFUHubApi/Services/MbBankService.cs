@@ -50,7 +50,7 @@ namespace DigitalFUHubApi.Services
 			return data;
 		}
 
-		public async Task<string?> InquiryAccountName(BankInquiryAccountNameRequestDTO bankInquiryAccountNameRequestDTO)
+		public async Task<MbBankResponse?> InquiryAccountName(BankInquiryAccountNameRequestDTO bankInquiryAccountNameRequestDTO)
 		{
 			MbBankRequestBodyInquiryAccountNameDTO mbBank = new MbBankRequestBodyInquiryAccountNameDTO()
 			{
@@ -79,9 +79,13 @@ namespace DigitalFUHubApi.Services
 
 			if (data == null) return null;
 
-			if(data.result.responseCode != "00") return await Task.FromResult<string?>(null);
+			MbBankResponse mbBankResponse = new MbBankResponse()
+			{
+				Code = data.result.responseCode,
+				Result = data.benName
+			};
 
-			return data.benName;
+			return mbBankResponse;
 		}
 	}
 }
