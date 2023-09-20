@@ -87,7 +87,7 @@
 		{
 			try
 			{
-				User? user = _userRepository.GetUserByEmail(userSignIn.Email);
+				User? user = await _userRepository.GetUserByEmail(userSignIn.Email);
 
 				if (user == null)
 				{
@@ -99,8 +99,8 @@
 						SignInGoogle = true,
 						Status = true
 					};
-					_userRepository.AddUser(newUser);
-					user = _userRepository.GetUserByEmail(userSignIn.Email);
+					await _userRepository.AddUser(newUser);
+					user = await _userRepository.GetUserByEmail(userSignIn.Email);
 					var tokenForNewUser = _jwtTokenService.GenerateTokenAsync(newUser);
 					return Ok(await tokenForNewUser);
 				}
@@ -116,6 +116,48 @@
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
+		}
+		#endregion
+
+		#region SignUp
+		[HttpPost]
+		[Route("SignUp")]
+		public async Task<IActionResult> SignUp([FromBody] UserSignUpRequestDTO request)
+		{
+			if(!ModelState.IsValid)
+			{
+				return UnprocessableEntity(ModelState);
+			}
+			try
+			{
+				bool isExistUsernameOrEmail = _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
+				if(isExistUsernameOrEmail)
+				{
+					return Conflict();
+				}
+				User userSignUp = new User
+				{
+					Email = request.Email,
+					Password = request.Password,
+					Fullname = request.Fullname,
+					RoleId = 1,
+					SignInGoogle = false,
+					Status = true,
+					Username = request.Username,
+					Avatar = "",
+					CustomerBalance = 0,
+					SellerBalance = 0,
+					TwoFactorAuthentication = false,
+				};
+				await _userRepository.AddUser(userSignUp);
+				// send mail confirm email
+			}
+			catch (Exception)
+			{
+
+				return Conflict();
+			}
+			return Ok();
 		}
 		#endregion
 
@@ -304,7 +346,6 @@
 				if (secretKey == null) return BadRequest();
 
 				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
-
 				string title = "FU-Market: QR Code for Two Factor Authentication";
 				string body = $"<html><body><p>Here's an image:</p> <a href='data:image/png;base64,{qrCode}'>click here</a></body></html>";
 
@@ -446,6 +487,31 @@
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
+		}
+		#endregion
+
+		#region Get Check Exist Email
+		[HttpGet("CheckExistEmail/{email}")]
+		public async Task<IActionResult> CheckExistEmail(string email)
+		{
+			User? user = await _userRepository.GetUserByEmail(email);
+			if(user == null)
+			{
+				return Ok("N");
+			}
+			return Ok("Y");
+		}
+		#endregion
+		#region Get Check Exist Username
+		[HttpGet("CheckExistUsername/{username}")]
+		public async Task<IActionResult> CheckExistUsername(string username)
+		{
+			User? user = await _userRepository.GetUserByUsername(username);
+			if(user == null)
+			{
+				return Ok("N");
+			}
+			return Ok("Y");
 		}
 		#endregion
 

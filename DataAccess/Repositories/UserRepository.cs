@@ -23,8 +23,12 @@ namespace DataAccess.Repositories
 
 		public void Update2FA(int id) => UserDAO.Instance.Update2FA(id);
 
-		public User? GetUserByEmail(string? email) => UserDAO.Instance.GetUserByEmail(email);
+		public async Task<User?> GetUserByEmail(string? email) => await UserDAO.Instance.GetUserByEmail(email);
 
-		public void AddUser(User user) => UserDAO.Instance.AddUser(user);
+		public async Task AddUser(User user) => await UserDAO.Instance.AddUser(user);
+
+		public async Task<User?> GetUserByUsername(string username) => await UserDAO.Instance.GetUserByUsername(username);
+
+		public async Task<bool> IsExistUsernameOrEmail(string username, string email) => await UserDAO.Instance.IsExistUsernameOrEmail(username, email);
 	}
 }

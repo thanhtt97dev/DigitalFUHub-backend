@@ -92,28 +92,43 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal User? GetUserByEmail(string? email)
+		internal async Task<User?> GetUserByEmail(string? email)
 		{
 			using (ApiContext context = new ApiContext())
 			{
-				return context.User.Include(x => x.Role).FirstOrDefault(x => x.Email == email);
+				return await context.User.Include(x => x.Role).FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
 			}
 		}
 
-		internal void AddUser(User user)
+		internal async Task AddUser(User user)
 		{
 			using (ApiContext context = new ApiContext())
 			{
 				try
 				{
-					context.User.Add(user);
-					context.SaveChanges();
+					await context.User.AddAsync(user);
+					await context.SaveChangesAsync();
 				}
 				catch (Exception e)
 				{
-
 					throw new Exception(e.Message);
 				}
+			}
+		}
+
+		internal async Task<User?> GetUserByUsername(string username)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				return await context.User.Include(x => x.Role).FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
+			}
+		}
+
+		internal async Task<bool> IsExistUsernameOrEmail(string username, string email)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				return await context.User.AnyAsync(x=> x.Username.ToLower() == username.ToLower() || x.Email.ToLower() == email.ToLower());
 			}
 		}
 	}
