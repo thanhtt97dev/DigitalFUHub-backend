@@ -130,7 +130,7 @@
 			}
 			try
 			{
-				bool isExistUsernameOrEmail = _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
+				bool isExistUsernameOrEmail = await _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
 				if(isExistUsernameOrEmail)
 				{
 					return Conflict();
