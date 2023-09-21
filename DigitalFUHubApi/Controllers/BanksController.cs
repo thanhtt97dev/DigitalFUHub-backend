@@ -136,6 +136,17 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Add user's bank account
+		/// <summary>
+		///		Add user's bank account link with DigitalFUHub
+		///		//RULE:
+		///		1. If user was have > 1 bank account  
+		///		2. If Mb bank can not response data
+		///		3. If user's bank account not found
+		///		=> Not accept
+		/// </summary>
+		/// <param name="UserId"></param>
+		/// <param name="BankId"></param>
+		/// <param name="CreditAccount"></param>
 		[HttpPost("AddBankAccount")]
 		public async Task<IActionResult> AddBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
@@ -155,7 +166,7 @@ namespace DigitalFUHubApi.Controllers
 				var user = userRepository.GetUserById(bankLinkAccountRequestDTO.UserId);
 				if (user == null) return Conflict("User not existed");
 
-				//rule : 1 user just linked with 1 bank accout
+				//RULE 1
 				var totalUserLinkedBank = bankRepository.TotalUserLinkedBank(bankLinkAccountRequestDTO.UserId);
 				if (totalUserLinkedBank > 1)
 				{
@@ -173,7 +184,8 @@ namespace DigitalFUHubApi.Controllers
 				};
 
 				var mbBank = await mbBankService.InquiryAccountName(bankInquiryAccount);
-				if(mbBank == null || mbBank.Result == null) 
+				
+				if (mbBank == null || mbBank.Result == null) //RULE 2
 				{
 					status.Message = "Third-party's server err";
 					status.Ok = false;
@@ -185,14 +197,14 @@ namespace DigitalFUHubApi.Controllers
 				{
 					if (mbBank.Code != Constants.MB_BANK_RESPONE_CODE_SUCCESS)
 					{
-						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND)
+						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND) //RULE 3
 						{
 							status.Message = "Not found";
 							status.Ok = false;
 							status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
 							responseData.Status = status;
 						}
-						else
+						else //RULE 2
 						{
 							status.Message = "Third-party's server err";
 							status.Ok = false;
@@ -228,6 +240,17 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Update user's bank account
+		/// <summary>
+		///		Update user's bank account link with DigitalFUHub
+		///		//RULE:
+		///		1. User can update bank account if updated date is less than 15 days with current day
+		///		2. If Mb bank can not response data
+		///		3. If user's bank account not found
+		///		=> Not accept
+		/// </summary>
+		/// <param name="UserId"></param>
+		/// <param name="BankId"></param>
+		/// <param name="CreditAccount"></param>
 		[HttpPost("UpdateBankAccount")]
 		public async Task<IActionResult> UpdateBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
@@ -250,9 +273,9 @@ namespace DigitalFUHubApi.Controllers
 				var userBankAccount = bankRepository.GetUserBank(bankLinkAccountRequestDTO.UserId);
 				if (userBankAccount == null) return Conflict("User not have bank account to update!");
 
-				//rule: user can update bank account if updated date is less than 15 days with current day
+				
 				bool acceptUpdate = Util.CompareDateEqualGreaterThanDaysCondition(userBankAccount.UpdateAt, Constants.NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT);
-				if (!acceptUpdate)
+				if (!acceptUpdate) //RULE 1
 				{
 					status.Message = "After 15 days can update";
 					status.Ok = false;
@@ -268,7 +291,7 @@ namespace DigitalFUHubApi.Controllers
 				};
 
 				var mbBank = await mbBankService.InquiryAccountName(bankInquiryAccount);
-				if (mbBank == null || mbBank.Result == null)
+				if (mbBank == null || mbBank.Result == null) //RULE2 2
 				{
 					status.Message = "Third-party's server err";
 					status.Ok = false;
@@ -280,14 +303,14 @@ namespace DigitalFUHubApi.Controllers
 				{
 					if (mbBank.Code != Constants.MB_BANK_RESPONE_CODE_SUCCESS)
 					{
-						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND)
+						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND) //RULE 3
 						{
 							status.Message = "Not found";
 							status.Ok = false;
 							status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
 							responseData.Status = status;
 						}
-						else
+						else //RULE 2
 						{
 							status.Message = "Third-party's server err";
 							status.Ok = false;
