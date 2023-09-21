@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	internal class TwoFactorAuthenticationDAO
+    internal class TwoFactorAuthenticationDAO
 	{
 		private static TwoFactorAuthenticationDAO? instance;
 		private static readonly object instanceLock = new object();

@@ -1,10 +1,10 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace DigitalFUHubApi.Comons
 {
-	public class JwtValidationEvents : JwtBearerEvents
+    public class JwtValidationEvents : JwtBearerEvents
 	{
 		public override Task TokenValidated(TokenValidatedContext context)
 		{

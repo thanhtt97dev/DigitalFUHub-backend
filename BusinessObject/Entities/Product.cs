@@ -7,19 +7,19 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject
+namespace BusinessObject.Entities
 {
-	public class Product
-	{
-		public Product()
-		{
-			ProductImages = new List<ProductImage>();
-			Coupons = new List<Coupon>();
-			Feedbacks = new List<Feedback>();
-			OrderDetails = new List<OrderDetail>();
-		}
+    public class Product
+    {
+        public Product()
+        {
+            ProductImages = new List<ProductImage>();
+            Coupons = new List<Coupon>();
+            Feedbacks = new List<Feedback>();
+            OrderDetails = new List<OrderDetail>();
+        }
 
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public long ProductId { get; set; }
         public long SellerId { get; set; }
@@ -35,9 +35,9 @@ namespace BusinessObject
 
         [ForeignKey(nameof(SellerId))]
         public virtual User Seller { get; set; } = null!;
-		[ForeignKey(nameof(CategoryId))]
+        [ForeignKey(nameof(CategoryId))]
         public virtual Category Category { get; set; } = null!;
-		public virtual ICollection<ProductImage> ProductImages { get; set; }
+        public virtual ICollection<ProductImage> ProductImages { get; set; }
         public virtual ICollection<Coupon> Coupons { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }

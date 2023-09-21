@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	internal class StorageDAO
+    internal class StorageDAO
 	{
 		private static StorageDAO? instance;
 		private static readonly object instanceLock = new object();

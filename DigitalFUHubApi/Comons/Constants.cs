@@ -33,8 +33,6 @@ namespace DigitalFUHubApi.Comons
 		public static string RESPONSE_CODE_NOT_ACCEPT = "01";
 		public static string RESPONSE_CODE_DATA_NOT_FOUND = "02";
 		public static string RESPONSE_CODE_FAILD = "03";
-		public static string RESPONSE_CODE_CANT_CREATE = "04";
-		public static string RESPONSE_CODE_CANT_UPDATE = "05";
-		public static string RESPONSE_CODE_CANT_DELETE = "06";
+		
 	}
 }

@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-	public class AccessTokenRepository : IAccessTokenRepository
+    public class AccessTokenRepository : IAccessTokenRepository
 	{
 		public Task<AccessToken> AddAccessTokenAsync(AccessToken accessToken) => AccessTokenDAO.Instance.AddAccessTokenAsync(accessToken);
 

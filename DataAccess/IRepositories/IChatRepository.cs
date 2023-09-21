@@ -1,4 +1,5 @@
-﻿using BusinessObject;
+﻿using BusinessObject.DataTransfer;
+using BusinessObject.Entities;
 using DTOs;
 using System;
 using System.Collections.Generic;
