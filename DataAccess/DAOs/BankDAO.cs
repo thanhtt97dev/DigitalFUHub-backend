@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using DTOs;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	public class BankDAO
+    public class BankDAO
 	{
 		private static BankDAO? instance;
 		private static readonly object instanceLock = new object();

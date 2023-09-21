@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using DTOs;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepositories
 {
-	public interface IUserRepository
+    public interface IUserRepository
 	{
 		User? GetUserByUsernameAndPassword(string? email, string? password);
 		Task<User?> GetUserByEmail(string? email);

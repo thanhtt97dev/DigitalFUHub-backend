@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using BusinessObject;
 using DataAccess.DAOs;
 using DTOs;
 using DigitalFUHubApi.Comons;
+using BusinessObject.Entities;
 
 namespace DigitalFUHubApi.Comons
 {

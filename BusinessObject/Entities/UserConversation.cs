@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject
+namespace BusinessObject.Entities
 {
     public class UserConversation
     {
@@ -17,7 +17,7 @@ namespace BusinessObject
         public long ConversationId { get; set; }
 
         [ForeignKey(nameof(ConversationId))]
-        public virtual Conversation Conversation { get; set; }= null!;
+        public virtual Conversation Conversation { get; set; } = null!;
 
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;

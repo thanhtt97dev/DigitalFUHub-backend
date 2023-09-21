@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-	public class BankRepository : IBankRepository
+    public class BankRepository : IBankRepository
 	{
 		public void AddUserBank(UserBank userBank) => BankDAO.Instance.AddUserBank(userBank);
 		public List<Bank> GetAll() => BankDAO.Instance.GetAll();

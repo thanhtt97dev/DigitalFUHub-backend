@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using DTOs;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	internal class UserDAO
+    internal class UserDAO
 	{
 		private static UserDAO? instance;
 		private static readonly object instanceLock = new object();

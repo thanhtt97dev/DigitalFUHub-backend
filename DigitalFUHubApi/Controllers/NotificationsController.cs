@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BusinessObject;
 using DataAccess.IRepositories;
 using DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -8,10 +7,11 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using DigitalFUHubApi.Hubs;
 using DigitalFUHubApi.Managers;
+using BusinessObject.Entities;
 
 namespace DigitalFUHubApi.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class NotificationsController : ControllerBase
 	{

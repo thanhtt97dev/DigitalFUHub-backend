@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using OfficeOpenXml;

@@ -1,20 +1,20 @@
 ﻿namespace DigitalFUHubApi.Controllers
 {
-	using AutoMapper;
-	using BusinessObject;
-	using DataAccess.IRepositories;
-	using DTOs;
-	using Microsoft.AspNetCore.Authorization;
-	using Microsoft.AspNetCore.Mvc;
-	using Microsoft.AspNetCore.SignalR;
-	using Newtonsoft.Json;
-	using DigitalFUHubApi.Comons;
-	using DigitalFUHubApi.Hubs;
-	using DigitalFUHubApi.Managers;
-	using DigitalFUHubApi.Services;
-	using Microsoft.Extensions.Azure;
+    using AutoMapper;
+    using DataAccess.IRepositories;
+    using DTOs;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.SignalR;
+    using Newtonsoft.Json;
+    using DigitalFUHubApi.Comons;
+    using DigitalFUHubApi.Hubs;
+    using DigitalFUHubApi.Managers;
+    using DigitalFUHubApi.Services;
+    using Microsoft.Extensions.Azure;
+    using BusinessObject.Entities;
 
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{

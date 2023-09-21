@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	internal class AccessTokenDAO
+    internal class AccessTokenDAO
 	{
 		private static AccessTokenDAO? instance;
 		private static readonly object instanceLock = new object();

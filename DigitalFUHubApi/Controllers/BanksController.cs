@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BusinessObject;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
@@ -9,10 +8,11 @@ using DigitalFUHubApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BusinessObject.Entities;
 
 namespace DigitalFUHubApi.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class BanksController : ControllerBase
 	{

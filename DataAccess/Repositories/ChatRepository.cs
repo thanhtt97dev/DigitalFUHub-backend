@@ -1,4 +1,5 @@
-﻿using BusinessObject;
+﻿using BusinessObject.DataTransfer;
+using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DTOs;

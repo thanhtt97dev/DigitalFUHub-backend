@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-	public class StorageRepository : IStorageRepository
+    public class StorageRepository : IStorageRepository
 	{
 		public void AddFile(Storage file) => StorageDAO.Instance.AddFile(file);
 
