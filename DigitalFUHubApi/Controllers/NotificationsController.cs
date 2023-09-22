@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using DigitalFUHubApi.Hubs;
 using DigitalFUHubApi.Managers;
+using DigitalFUHubApi.Comons;
 using BusinessObject.Entities;
 using DTOs.Notification;
 
@@ -39,7 +40,8 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				HashSet<string>? connections = _connectionManager.GetConnections(userId);
+				HashSet<string>? connections = _connectionManager
+					.GetConnections(userId, Constants.SIGNAL_R_NOTIFICATION_HUB);
 
 				Notification notification = new Notification()
 				{
@@ -55,7 +57,8 @@ namespace DigitalFUHubApi.Controllers
 				{
 					foreach (var connection in connections)
 					{
-						await _hubContext.Clients.Clients(connection).SendAsync("ReceiveNotification",
+						await _hubContext.Clients.Clients(connection)
+							.SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_NOTIFICATION,
 							JsonConvert.SerializeObject(_mapper.Map<NotificationRespone>(notification)));
 					}
 				}

@@ -2,6 +2,7 @@
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Hubs;
+using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Managers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,8 @@ namespace DigitalFUHubApi.Controllers
             try
             {
                 int recipientId = unchecked((int)sendChatMessageRequest.RecipientId);
-                HashSet<string>? connections = _connectionManager.GetConnections(recipientId);
+                HashSet<string>? connections = _connectionManager
+                    .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
 
                 MessageResponseDTO messageResponse = new MessageResponseDTO
                 {
@@ -51,7 +53,8 @@ namespace DigitalFUHubApi.Controllers
                 {
                     foreach (var connection in connections)
                     {
-                        await _hubContext.Clients.Clients(connection).SendAsync("ReceiveMessage", messageResponse);
+                        await _hubContext.Clients.Clients(connection)
+                            .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, messageResponse);
                     }
                 }
 
@@ -84,7 +87,8 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-                List<MessageResponseDTO> messages = _mapper.Map<List<MessageResponseDTO>>(await _chatRepository.GetListMessage(conversationId));
+                List<MessageResponseDTO> messages = _mapper
+                    .Map<List<MessageResponseDTO>>(await _chatRepository.GetListMessage(conversationId));
                 return Ok(messages);
             }
             catch (ArgumentException ex)

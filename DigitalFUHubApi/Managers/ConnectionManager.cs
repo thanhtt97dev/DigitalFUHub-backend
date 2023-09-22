@@ -1,48 +1,54 @@
-﻿namespace DigitalFUHubApi.Managers
+﻿using System.Linq;
+
+namespace DigitalFUHubApi.Managers
 {
-	public class ConnectionManager : IConnectionManager
+	public class ConnectionManager : IConnectionManager	
 	{
-		//Save connectionIds with a identifier user
-		private static Dictionary<int, HashSet<string>> useMap = new Dictionary<int, HashSet<string>>();
+		//Save Hub type with connectionIds of a user
+		private static Dictionary<int, Dictionary<string, HashSet<string>>> data = new Dictionary<int, Dictionary<string, HashSet<string>>>();
 
-		public void AddConnection(int userId, string connectionId)
+		public void AddConnection(int userId,string hubName , string connectionId)
 		{
-			lock (useMap)
+			lock (data)
 			{
-				if (!useMap.ContainsKey(userId))
+				if(!data.ContainsKey(userId)) 
 				{
-					useMap[userId] = new HashSet<string>();
+					data[userId] = new Dictionary<string, HashSet<string>>();
 				}
-				useMap[userId].Add(connectionId);
+				HashSet<string> connections = new HashSet<string> { connectionId };	
+				data[userId].Add(hubName, connections);
 			}
 		}
 
-		public void RemoveConnection(string connectionId)
+		public void RemoveConnection(string connectionId, string hubName)
 		{
-			lock (useMap)
+			lock (data)
 			{
-				foreach (var userId in useMap.Keys)
+				try
 				{
-					if (useMap[userId].Contains(connectionId))
+					foreach (var userId in data.Keys)
 					{
-						useMap[userId].Remove(connectionId);
+						if (data[userId][hubName].Contains(connectionId))
+						{
+							data[userId][hubName].Remove(connectionId);
+						}
+						if (data[userId][hubName].Count() == 0)
+						{
+							data.Remove(userId);
+						}
 					}
-					if (useMap[userId].Count() == 0)
-					{
-						useMap.Remove(userId);
-					}
-				}
+				}catch { }
 			}
 		}
 
-		public HashSet<string>? GetConnections(int userId)
+		public HashSet<string>? GetConnections(int userId, string hubName)
 		{
 			var connections = new HashSet<string>();
 			try
 			{
-				lock (useMap)
+				lock (data)
 				{
-					connections = useMap[userId];
+					connections = data[userId][hubName];
 				}
 			}
 			catch
@@ -51,7 +57,5 @@
 			}
 			return connections;
 		}
-
-		public IEnumerable<int> OnlineUsers { get { return useMap.Keys; } }
 	}
 }

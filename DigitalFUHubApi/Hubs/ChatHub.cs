@@ -1,5 +1,6 @@
 ﻿using DigitalFUHubApi.Services;
 using Microsoft.AspNetCore.SignalR;
+using DigitalFUHubApi.Comons;
 
 namespace DigitalFUHubApi.Hubs
 {
@@ -14,13 +15,13 @@ namespace DigitalFUHubApi.Hubs
 
         public override Task OnConnectedAsync()
         {
-            _hubConnectionService.AddConnection(Context);
+            _hubConnectionService.AddConnection(Context, Constants.SIGNAL_R_CHAT_HUB);
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            _hubConnectionService.RemoveConnection(Context);
+            _hubConnectionService.RemoveConnection(Context, Constants.SIGNAL_R_CHAT_HUB);
             return base.OnDisconnectedAsync(exception);
         }
     }
