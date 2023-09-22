@@ -3,14 +3,14 @@ using DataAccess.IRepositories;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using DigitalFUHubApi.Managers;
-using DTOs;
 using Microsoft.AspNetCore.Authorization;
 using DigitalFUHubApi.Services;
+using DTOs.Notification;
 
 namespace DigitalFUHubApi.Hubs
 {
 
-	public class NotificationHub : Hub
+    public class NotificationHub : Hub
 	{
 
 		private readonly INotificationRepositiory _notificationRepositiory;

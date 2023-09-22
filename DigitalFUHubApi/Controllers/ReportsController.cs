@@ -1,5 +1,5 @@
 ﻿using DataAccess.IRepositories;
-using DTOs;
+using DTOs.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalFUHubApi.Controllers

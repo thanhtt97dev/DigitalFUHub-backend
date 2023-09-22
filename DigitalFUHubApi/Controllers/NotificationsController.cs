@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DataAccess.IRepositories;
-using DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -8,6 +7,7 @@ using Newtonsoft.Json;
 using DigitalFUHubApi.Hubs;
 using DigitalFUHubApi.Managers;
 using BusinessObject.Entities;
+using DTOs.Notification;
 
 namespace DigitalFUHubApi.Controllers
 {

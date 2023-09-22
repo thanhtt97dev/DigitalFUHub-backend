@@ -2,13 +2,14 @@
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
-using DTOs;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BusinessObject.Entities;
+using DTOs.Bank;
+using DTOs.MbBank;
 
 namespace DigitalFUHubApi.Controllers
 {

@@ -2,7 +2,6 @@
 {
     using AutoMapper;
     using DataAccess.IRepositories;
-    using DTOs;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.SignalR;
@@ -13,6 +12,7 @@
     using DigitalFUHubApi.Services;
     using Microsoft.Extensions.Azure;
     using BusinessObject.Entities;
+    using DTOs.User;
 
     [Route("api/[controller]")]
 	[ApiController]

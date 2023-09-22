@@ -1,5 +1,5 @@
 ﻿using BusinessObject.Entities;
-using DTOs;
+using DTOs.User;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;

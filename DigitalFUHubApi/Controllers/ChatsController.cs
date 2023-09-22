@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
-using DTOs;
 using DigitalFUHubApi.Hubs;
 using DigitalFUHubApi.Managers;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using BusinessObject.DataTransfer;
+using DTOs.Chat;
 
 namespace DigitalFUHubApi.Controllers
 {
