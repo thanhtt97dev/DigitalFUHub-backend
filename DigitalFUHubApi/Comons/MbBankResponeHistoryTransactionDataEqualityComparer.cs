@@ -1,9 +1,9 @@
-﻿using DTOs;
+﻿using DTOs.MbBank;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DigitalFUHubApi.Comons
 {
-	public class MbBankResponeHistoryTransactionDataEqualityComparer : IEqualityComparer<TransactionHistory>
+    public class MbBankResponeHistoryTransactionDataEqualityComparer : IEqualityComparer<TransactionHistory>
 	{
 		public bool Equals(TransactionHistory? x, TransactionHistory? y)
 		{

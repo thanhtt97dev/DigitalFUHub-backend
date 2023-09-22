@@ -3,13 +3,13 @@ using Quartz;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text;
-using DTOs;
 using DataAccess.DAOs;
 using DigitalFUHubApi.Services;
+using DTOs.MbBank;
 
 namespace DigitalFUHubApi.Jobs
 {
-	public class HistoryTransactionMbBankJob : IJob
+    public class HistoryTransactionMbBankJob : IJob
 	{
 		private readonly IConfiguration configuration;
 		private readonly MbBankService mbBankService;

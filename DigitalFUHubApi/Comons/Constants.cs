@@ -33,6 +33,17 @@ namespace DigitalFUHubApi.Comons
 		public static string RESPONSE_CODE_NOT_ACCEPT = "01";
 		public static string RESPONSE_CODE_DATA_NOT_FOUND = "02";
 		public static string RESPONSE_CODE_FAILD = "03";
+
+		//SignalR
+		public static string SIGNAL_R_CHAT_HUB = "chat";
+		public static string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 		
+
+		public static string SIGNAL_R_NOTIFICATION_HUB = "notification";
+		public static string SIGNAL_R_CHAT_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
+		public static string SIGNAL_R_CHAT_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
+
+
+
 	}
 }

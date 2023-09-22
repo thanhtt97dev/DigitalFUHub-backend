@@ -1,5 +1,5 @@
 ﻿using BusinessObject.Entities;
-using DTOs;
+using DTOs.MbBank;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
