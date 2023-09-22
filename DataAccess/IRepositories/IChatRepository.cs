@@ -1,5 +1,6 @@
-﻿using BusinessObject;
-using DTOs;
+﻿using BusinessObject.DataTransfer;
+using BusinessObject.Entities;
+using DTOs.Chat;
 using System;
 using System.Collections.Generic;
 using System.Linq;

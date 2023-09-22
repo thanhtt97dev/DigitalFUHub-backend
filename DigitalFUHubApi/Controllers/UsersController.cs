@@ -1,20 +1,20 @@
 ﻿namespace DigitalFUHubApi.Controllers
 {
-	using AutoMapper;
-	using BusinessObject;
-	using DataAccess.IRepositories;
-	using DTOs;
-	using Microsoft.AspNetCore.Authorization;
-	using Microsoft.AspNetCore.Mvc;
-	using Microsoft.AspNetCore.SignalR;
-	using Newtonsoft.Json;
-	using DigitalFUHubApi.Comons;
-	using DigitalFUHubApi.Hubs;
-	using DigitalFUHubApi.Managers;
-	using DigitalFUHubApi.Services;
-	using Microsoft.Extensions.Azure;
+    using AutoMapper;
+    using DataAccess.IRepositories;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.SignalR;
+    using Newtonsoft.Json;
+    using DigitalFUHubApi.Comons;
+    using DigitalFUHubApi.Hubs;
+    using DigitalFUHubApi.Managers;
+    using DigitalFUHubApi.Services;
+    using Microsoft.Extensions.Azure;
+    using BusinessObject.Entities;
+    using DTOs.User;
 
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -130,7 +130,7 @@
 			}
 			try
 			{
-				bool isExistUsernameOrEmail = _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
+				bool isExistUsernameOrEmail = await _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
 				if(isExistUsernameOrEmail)
 				{
 					return Conflict();

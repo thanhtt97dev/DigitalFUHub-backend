@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
-using BusinessObject;
 using DataAccess.DAOs;
 using DTOs;
 using DigitalFUHubApi.Comons;
+using BusinessObject.Entities;
+using DTOs.Bank;
+using DTOs.User;
+using DTOs.Notification;
+using DTOs.Chat;
 
 namespace DigitalFUHubApi.Comons
 {

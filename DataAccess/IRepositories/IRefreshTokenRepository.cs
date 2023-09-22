@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessObject;
-
+using BusinessObject.Entities;
 
 namespace DataAccess.IRepositories
 {
-	public interface IRefreshTokenRepository
+    public interface IRefreshTokenRepository
 	{
 		Task AddRefreshTokenAsync(RefreshToken refreshToken);
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using BusinessObject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
@@ -13,10 +12,11 @@ using DigitalFUHubApi.Managers;
 using AspNetCoreRateLimit;
 using Quartz;
 using DigitalFUHubApi.Jobs;
+using BusinessObject.Entities;
 
 namespace DigitalFUHubApi
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -95,7 +95,7 @@ namespace DigitalFUHubApi
             builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 			builder.Services.AddSingleton<IBankRepository, BankRepository>();
 
-            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();

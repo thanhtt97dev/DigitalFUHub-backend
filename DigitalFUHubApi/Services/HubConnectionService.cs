@@ -11,7 +11,7 @@ namespace DigitalFUHubApi.Services
 			_connectionManager = connectionManager;
 		}
 
-		public void AddConnection(HubCallerContext hubCallerContext)
+		public void AddConnection(HubCallerContext hubCallerContext, string hubName)
 		{
 			var httpContext = hubCallerContext.GetHttpContext();
 			if (httpContext == null) return;
@@ -21,13 +21,13 @@ namespace DigitalFUHubApi.Services
 
 			int userId;
 			int.TryParse(userIdRaw, out userId);
-			_connectionManager.AddConnection(userId, hubCallerContext.ConnectionId);
+			_connectionManager.AddConnection(userId,hubName, hubCallerContext.ConnectionId);
 		}
 
-		public void RemoveConnection(HubCallerContext hubCallerContext)
+		public void RemoveConnection(HubCallerContext hubCallerContext, string hubName)
 		{
 			var connectionId = hubCallerContext.ConnectionId;
-			_connectionManager.RemoveConnection(connectionId);
+			_connectionManager.RemoveConnection(connectionId, hubName);
 		}
 
 		public int GetUserIdFromHubCaller(HubCallerContext hubCallerContext)

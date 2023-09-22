@@ -1,7 +1,5 @@
-﻿using BusinessObject;
-using DataAccess.IRepositories;
+﻿using DataAccess.IRepositories;
 using DataAccess.Repositories;
-using DTOs;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -11,10 +9,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using BusinessObject.Entities;
+using DTOs.User;
 
 namespace DigitalFUHubApi.Services
 {
-	public class JwtTokenService
+    public class JwtTokenService
 	{
 		private readonly IConfiguration _configuration;
 		private readonly IUserRepository _userRepository;

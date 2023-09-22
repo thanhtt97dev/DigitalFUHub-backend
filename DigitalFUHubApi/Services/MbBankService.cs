@@ -1,14 +1,15 @@
 ﻿using BusinessObject;
-using DTOs;
 using DigitalFUHubApi.Comons;
 using System.Net.Http.Headers;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
+using DTOs.Bank;
+using DTOs.MbBank;
 
 namespace DigitalFUHubApi.Services
 {
-	public class MbBankService
+    public class MbBankService
 	{
 		private  HttpClient client;
 		private readonly IConfiguration configuration;

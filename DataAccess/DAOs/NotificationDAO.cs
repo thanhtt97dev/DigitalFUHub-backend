@@ -1,4 +1,4 @@
-﻿using BusinessObject;
+﻿using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	internal class NotificationDAO
+    internal class NotificationDAO
 	{
 		private static NotificationDAO? instance;
 		private static readonly object instanceLock = new object();

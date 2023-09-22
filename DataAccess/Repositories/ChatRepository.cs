@@ -1,7 +1,8 @@
-﻿using BusinessObject;
+﻿using BusinessObject.DataTransfer;
+using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
-using DTOs;
+using DTOs.Chat;
 using System;
 using System.Collections.Generic;
 using System.Linq;

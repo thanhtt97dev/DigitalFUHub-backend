@@ -1,5 +1,6 @@
-﻿using BusinessObject;
-using DTOs;
+﻿using BusinessObject.DataTransfer;
+using BusinessObject.Entities;
+using DTOs.Chat;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;

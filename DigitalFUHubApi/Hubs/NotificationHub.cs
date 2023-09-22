@@ -3,14 +3,15 @@ using DataAccess.IRepositories;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using DigitalFUHubApi.Managers;
-using DTOs;
 using Microsoft.AspNetCore.Authorization;
 using DigitalFUHubApi.Services;
+using DigitalFUHubApi.Comons;
+using DTOs.Notification;
 
 namespace DigitalFUHubApi.Hubs
 {
 
-	public class NotificationHub : Hub
+    public class NotificationHub : Hub
 	{
 
 		private readonly INotificationRepositiory _notificationRepositiory;
@@ -29,13 +30,13 @@ namespace DigitalFUHubApi.Hubs
 
 		public override async Task OnConnectedAsync()
 		{
-			_hubConnectionService.AddConnection(Context);
+			_hubConnectionService.AddConnection(Context, Constants.SIGNAL_R_NOTIFICATION_HUB);
 			await SendAllNotificationToUserCaller();
 		}
 
 		public override Task OnDisconnectedAsync(Exception? exception)
 		{
-			_hubConnectionService.RemoveConnection(Context);
+			_hubConnectionService.RemoveConnection(Context, Constants.SIGNAL_R_NOTIFICATION_HUB);
 			return base.OnDisconnectedAsync(exception);
 		}
 
@@ -45,30 +46,9 @@ namespace DigitalFUHubApi.Hubs
 			if (userId == 0) return;
 
 			var notifications = _notificationRepositiory.GetNotifications(userId);
-			await Clients.Caller.SendAsync("ReceiveAllNotification",
+			await Clients.Caller.SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_ALL_NOTIFICATION,
 						JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(notifications)));
 		}
 
-        /*
-
-		public void AddConnection()
-		{
-			var httpContext = this.Context.GetHttpContext();
-			if (httpContext == null) return;
-
-			var userIdRaw = httpContext.Request.Query["userId"];
-			if (string.IsNullOrEmpty(userIdRaw)) return;
-
-			int userId;
-			int.TryParse(userIdRaw, out userId);
-			_connectionManager.AddConnection(userId, Context.ConnectionId);
-		}
-
-		public void RemoveConnection()
-		{
-			var connectionId = Context.ConnectionId;
-			_connectionManager.RemoveConnection(connectionId);
-		}
-		*/
     }
 }
