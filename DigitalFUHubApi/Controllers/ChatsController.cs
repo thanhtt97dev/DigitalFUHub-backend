@@ -32,7 +32,7 @@ namespace DigitalFUHubApi.Controllers
         }
 
         [HttpPost("SendMessage")]
-        public async Task<IActionResult> SendMessage([FromBody] SendChatMessageRequestDTO sendChatMessageRequest)
+        public async Task<IActionResult> SendMessage([FromForm] SendChatMessageRequestDTO sendChatMessageRequest)
         {
             try
             {
