@@ -40,8 +40,8 @@ namespace DigitalFUHubApi.Comons
 		
 
 		public static string SIGNAL_R_NOTIFICATION_HUB = "notification";
-		public static string SIGNAL_R_CHAT_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
-		public static string SIGNAL_R_CHAT_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
+		public static string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
+		public static string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
 
 
 
