@@ -1,20 +1,21 @@
 ﻿namespace DigitalFUHubApi.Controllers
 {
-    using AutoMapper;
-    using DataAccess.IRepositories;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.SignalR;
-    using Newtonsoft.Json;
-    using DigitalFUHubApi.Comons;
-    using DigitalFUHubApi.Hubs;
-    using DigitalFUHubApi.Managers;
-    using DigitalFUHubApi.Services;
-    using Microsoft.Extensions.Azure;
-    using BusinessObject.Entities;
-    using DTOs.User;
+	using AutoMapper;
+	using DataAccess.IRepositories;
+	using Microsoft.AspNetCore.Authorization;
+	using Microsoft.AspNetCore.Mvc;
+	using Microsoft.AspNetCore.SignalR;
+	using Newtonsoft.Json;
+	using DigitalFUHubApi.Comons;
+	using DigitalFUHubApi.Hubs;
+	using DigitalFUHubApi.Managers;
+	using DigitalFUHubApi.Services;
+	using Microsoft.Extensions.Azure;
+	using BusinessObject.Entities;
+	using DTOs.User;
+	using System.Net;
 
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -54,7 +55,7 @@
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
 		}
-
+		
 		#region SignIn
 		[HttpPost("SignIn")]
 		public async Task<IActionResult> SignInAsync(UserSignInRequestDTO userSignIn)
@@ -109,7 +110,7 @@
 				if (user.TwoFactorAuthentication)
 					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
 
-				var token =  _jwtTokenService.GenerateTokenAsync(user);
+				var token = _jwtTokenService.GenerateTokenAsync(user);
 				return Ok(await token);
 			}
 			catch (Exception ex)
@@ -124,14 +125,14 @@
 		[Route("SignUp")]
 		public async Task<IActionResult> SignUp([FromBody] UserSignUpRequestDTO request)
 		{
-			if(!ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{
 				return UnprocessableEntity(ModelState);
 			}
 			try
 			{
 				bool isExistUsernameOrEmail = await _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
-				if(isExistUsernameOrEmail)
+				if (isExistUsernameOrEmail)
 				{
 					return Conflict();
 				}
@@ -150,7 +151,10 @@
 					TwoFactorAuthentication = false,
 				};
 				await _userRepository.AddUser(userSignUp);
-				// send mail confirm email
+
+				// send mail confirm to email
+				string token = _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
+				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Confirm signup account.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Click here to confirm email.</a>");
 			}
 			catch (Exception)
 			{
@@ -158,6 +162,27 @@
 				return Conflict();
 			}
 			return Ok();
+		}
+		#endregion
+
+		#region Confirm Email
+		[HttpGet("ConfirmEmail/{token}")]
+		public async Task<IActionResult> ConfirmEmail(string token)
+		{
+			try
+			{
+				bool result = await _jwtTokenService.CheckTokenConfirmEmailAsync(token);
+				return result ? Ok() : BadRequest();
+			}
+			catch (NullReferenceException)
+			{
+				return NotFound();
+			}
+			catch (ArgumentOutOfRangeException)
+			{
+				return Conflict();
+			}
+
 		}
 		#endregion
 
@@ -474,12 +499,12 @@
 		[HttpPut("EditUserInfo/{id}")]
 		public async Task<IActionResult> EditUserInfo(int id, UserUpdateRequestDTO userUpdateRequestDTO)
 		{
-			if(userUpdateRequestDTO == null)	return BadRequest();
+			if (userUpdateRequestDTO == null) return BadRequest();
 			try
 			{
 				User? user = _userRepository.GetUserById(id);
 				if (user == null) return Conflict();
-				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);	
+				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);
 				await _userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
 			}
@@ -495,19 +520,20 @@
 		public async Task<IActionResult> CheckExistEmail(string email)
 		{
 			User? user = await _userRepository.GetUserByEmail(email);
-			if(user == null)
+			if (user == null)
 			{
 				return Ok("N");
 			}
 			return Ok("Y");
 		}
 		#endregion
+
 		#region Get Check Exist Username
 		[HttpGet("CheckExistUsername/{username}")]
 		public async Task<IActionResult> CheckExistUsername(string username)
 		{
 			User? user = await _userRepository.GetUserByUsername(username);
-			if(user == null)
+			if (user == null)
 			{
 				return Ok("N");
 			}

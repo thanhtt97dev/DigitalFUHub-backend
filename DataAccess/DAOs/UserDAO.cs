@@ -131,5 +131,13 @@ namespace DataAccess.DAOs
 				return await context.User.AnyAsync(x=> x.Username.ToLower() == username.ToLower() || x.Email.ToLower() == email.ToLower());
 			}
 		}
+
+		internal async Task<User?> GetUser(string email, string username, string fullname)
+		{
+			using (ApiContext context = new ApiContext())
+			{
+				return await context.User.FirstOrDefaultAsync(x => x.Username == username && x.Email == email && x.Fullname == fullname);
+			}
+		}
 	}
 }

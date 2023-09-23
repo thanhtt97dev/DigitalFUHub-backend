@@ -46,7 +46,7 @@ namespace DigitalFUHubApi.Hubs
 			if (userId == 0) return;
 
 			var notifications = _notificationRepositiory.GetNotifications(userId);
-			await Clients.Caller.SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_ALL_NOTIFICATION,
+			await Clients.Caller.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION,
 						JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(notifications)));
 		}
 

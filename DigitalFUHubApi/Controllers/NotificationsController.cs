@@ -58,7 +58,7 @@ namespace DigitalFUHubApi.Controllers
 					foreach (var connection in connections)
 					{
 						await _hubContext.Clients.Clients(connection)
-							.SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_NOTIFICATION,
+							.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION,
 							JsonConvert.SerializeObject(_mapper.Map<NotificationRespone>(notification)));
 					}
 				}
