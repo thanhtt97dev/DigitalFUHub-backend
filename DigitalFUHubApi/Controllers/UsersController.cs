@@ -66,6 +66,7 @@
 
 				if (user == null) return NotFound("Username or Password not correct!");
 				if (!user.Status) return Conflict("Your account was baned!");
+				if (!user.IsConfirm) return Conflict("Your account not authenticate email!");
 				if (user.TwoFactorAuthentication)
 				{
 					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
@@ -149,12 +150,12 @@
 					CustomerBalance = 0,
 					SellerBalance = 0,
 					TwoFactorAuthentication = false,
+					IsConfirm = false,
 				};
 				await _userRepository.AddUser(userSignUp);
 
-				// send mail confirm to email
-				string token = _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
-				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Confirm signup account.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Click here to confirm email.</a>");
+				string token = await _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
+				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
 			}
 			catch (Exception)
 			{
@@ -172,7 +173,7 @@
 			try
 			{
 				bool result = await _jwtTokenService.CheckTokenConfirmEmailAsync(token);
-				return result ? Ok() : BadRequest();
+				return result ? Ok("Y") : Ok("N");
 			}
 			catch (NullReferenceException)
 			{
@@ -183,6 +184,28 @@
 				return Conflict();
 			}
 
+		}
+		#endregion
+		#region Generate token confirm email
+		[HttpGet("GenerateTokenConfirmEmail/{email}")]
+		public async Task<IActionResult> GenerateTokenConfirmEmail(string email)
+		{
+			User? user = await _userRepository.GetUserByEmail(email);
+			if(user == null)
+			{
+				return NotFound();
+			} else
+			{
+				if (user.IsConfirm)
+				{
+					return Conflict();
+				} else
+				{
+					string token = await _jwtTokenService.GenerateTokenConfirmEmail(user);
+					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
+				}
+			}
+			return Ok();
 		}
 		#endregion
 

@@ -122,7 +122,7 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Generate token confirm email
-		public string GenerateTokenConfirmEmail(User user)
+		public async Task<string> GenerateTokenConfirmEmail(User user)
 		{
 			JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 			byte[] secretKeyBytes = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
@@ -146,6 +146,13 @@ namespace DigitalFUHubApi.Services
 			SecurityToken securityToken = tokenHandler.CreateToken(tokenDescription);
 			string token = tokenHandler.WriteToken(securityToken);
 
+			using (ApiContext context = new ApiContext())
+			{
+				User userUp = context.User.First(x => x.Email == user.Email);
+				userUp.IsConfirm = true;
+				context.User.Update(userUp);
+				await context.SaveChangesAsync();
+			}
 			return token;
 		}
 		#endregion
@@ -194,28 +201,45 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Check token confirm email
-		internal async Task<bool> CheckTokenConfirmEmailAsync(string accessToken)
+		internal async Task<bool> CheckTokenConfirmEmailAsync(string token)
 		{
 
 			JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-			var secretKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? "");
+			byte[] secretKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? "");
 
-			var tokenValidationParameters = new JwtValidationParameters();
+			var tokenValidationParams = new JwtValidationParameters()
+			{
+				ValidateIssuer = false,
+				ValidateAudience = false,
+
+				ClockSkew = TimeSpan.Zero,
+				ValidateLifetime = false
+			};
 
 			ClaimsPrincipal tokenVerification = jwtSecurityTokenHandler
-				.ValidateToken(accessToken, tokenValidationParameters, out SecurityToken validatedToken);
-			string? fullname = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.GivenName).Value;
-			string? username = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Name).Value;
-			string? email = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Email).Value;
+				.ValidateToken(token, tokenValidationParams, out SecurityToken validatedToken);
+
+			if (validatedToken is JwtSecurityToken jwtSecurityToken)
+			{
+				bool result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512,
+					StringComparison.InvariantCultureIgnoreCase);
+				if (!result) throw new NullReferenceException("invalid");
+			}
+
+			string? username = tokenVerification.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+			string? email = tokenVerification.Claims.First(x => x.Type == ClaimTypes.Email).Value;
+			string? fullname = tokenVerification.Claims.First(x => x.Type == ClaimTypes.GivenName).Value;
 			if (fullname == null || username == null || email == null) throw new NullReferenceException("invalid");
 			User? user = await _userRepository.GetUser(email, username, fullname);
 			if (user == null) throw new NullReferenceException("invalid");
-			//if (user.IsConfirm) return false;
+			if (user.IsConfirm) return false;
 			long utcExpireDate = long.Parse(tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 			DateTime expireDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			expireDate = expireDate.AddSeconds(utcExpireDate).ToUniversalTime();
 
 			if (expireDate < DateTime.UtcNow) throw new ArgumentOutOfRangeException("expired");
+
+
 			return true;
 		}
 		#endregion
