@@ -26,5 +26,6 @@ namespace DataAccess.IRepositories
 		Task AddUser(User user);
 		Task<User?> GetUserByUsername(string username);
 		Task<bool> IsExistUsernameOrEmail(string username, string email);
+		Task<User?> GetUser(string email, string username, string fullname);
 	}
 }

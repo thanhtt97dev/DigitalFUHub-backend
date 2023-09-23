@@ -11,10 +11,11 @@ using System.Security.Cryptography;
 using System.Text;
 using BusinessObject.Entities;
 using DTOs.User;
+using Quartz.Util;
 
 namespace DigitalFUHubApi.Services
 {
-    public class JwtTokenService
+	public class JwtTokenService
 	{
 		private readonly IConfiguration _configuration;
 		private readonly IUserRepository _userRepository;
@@ -29,7 +30,7 @@ namespace DigitalFUHubApi.Services
 			_accessTokenRepository = accessTokenRepository;
 		}
 
-		#region Generate token
+		#region Generate access token
 		public async Task<UserSignInResponseDTO> GenerateTokenAsync(User user)
 		{
 			//Create access token
@@ -78,7 +79,7 @@ namespace DigitalFUHubApi.Services
 				JwtId = token.Id,
 				Token = accessToken,
 				ExpiredDate = accessTokenExpiredDate,
-				isRevoked = false,	
+				isRevoked = false,
 			};
 
 			await _accessTokenRepository.AddAccessTokenAsync(accessTokenModel);
@@ -114,9 +115,38 @@ namespace DigitalFUHubApi.Services
 				Avatar = user.Avatar,
 				Fullname = user.Fullname,
 				SignInGoogle = user.SignInGoogle,
-				Username = user.Username	
+				Username = user.Username
 			};
 			return response;
+		}
+		#endregion
+
+		#region Generate token confirm email
+		public string GenerateTokenConfirmEmail(User user)
+		{
+			JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+			byte[] secretKeyBytes = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
+			SigningCredentials signingCredentials =
+				new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha512Signature);
+
+			Claim[] claims = new[]
+			{
+				new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
+				new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+				new Claim(JwtRegisteredClaimNames.GivenName, user.Fullname),
+			};
+
+			SecurityTokenDescriptor tokenDescription = new SecurityTokenDescriptor
+			{
+				Subject = new ClaimsIdentity(claims),
+				Expires = DateTime.UtcNow.AddMinutes(15),
+				SigningCredentials = signingCredentials
+			};
+
+			SecurityToken securityToken = tokenHandler.CreateToken(tokenDescription);
+			string token = tokenHandler.WriteToken(securityToken);
+
+			return token;
 		}
 		#endregion
 
@@ -163,6 +193,33 @@ namespace DigitalFUHubApi.Services
 		}
 		#endregion
 
+		#region Check token confirm email
+		internal async Task<bool> CheckTokenConfirmEmailAsync(string accessToken)
+		{
+
+			JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+			var secretKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? "");
+
+			var tokenValidationParameters = new JwtValidationParameters();
+
+			ClaimsPrincipal tokenVerification = jwtSecurityTokenHandler
+				.ValidateToken(accessToken, tokenValidationParameters, out SecurityToken validatedToken);
+			string? fullname = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.GivenName).Value;
+			string? username = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Name).Value;
+			string? email = tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Email).Value;
+			if (fullname == null || username == null || email == null) throw new NullReferenceException("invalid");
+			User? user = await _userRepository.GetUser(email, username, fullname);
+			if (user == null) throw new NullReferenceException("invalid");
+			//if (user.IsConfirm) return false;
+			long utcExpireDate = long.Parse(tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+			DateTime expireDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+			expireDate = expireDate.AddSeconds(utcExpireDate).ToUniversalTime();
+
+			if (expireDate < DateTime.UtcNow) throw new ArgumentOutOfRangeException("expired");
+			return true;
+		}
+		#endregion
+
 		#region Get JwtId by access token
 		internal string GetJwtIdByAccessToken(string? accessToken)
 		{
@@ -197,7 +254,7 @@ namespace DigitalFUHubApi.Services
 
 			var userIdRaw = tokenVerification.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value; //Sub
 			int userId;
-			int.TryParse(userIdRaw, out userId);	
+			int.TryParse(userIdRaw, out userId);
 			return userId;
 		}
 		#endregion
