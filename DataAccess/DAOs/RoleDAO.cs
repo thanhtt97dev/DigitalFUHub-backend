@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace DataAccess.DAOs
 
 		internal List<Role> GetAllRole()
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Role.ToList();
 			}

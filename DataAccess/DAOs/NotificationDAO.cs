@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ namespace DataAccess.DAOs
 		internal List<Notification> GetNotifications(int userId)
 		{
 			List<Notification> notifications = new List<Notification>();	
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				notifications = context.Notification.Where(x => x.UserId == userId)
 					.OrderByDescending(x => x.DateCreated).ToList();
@@ -41,7 +42,7 @@ namespace DataAccess.DAOs
 
 		internal void AddNotification(Notification notification)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				context.Notification.Add(notification);
 				context.SaveChanges();

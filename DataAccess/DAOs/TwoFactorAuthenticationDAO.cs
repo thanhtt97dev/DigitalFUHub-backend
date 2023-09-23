@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace DataAccess.DAOs
 
 		internal string Get2FAKey(long userId)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var twoFA = context.TwoFactorAuthentication.FirstOrDefault(x => x.UserId == userId);
 				if (twoFA == null) throw new Exception("2FA is not existed!");
@@ -39,7 +40,7 @@ namespace DataAccess.DAOs
 
 		internal void Add2FAKey(long userId, string key)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var twoFA = context.TwoFactorAuthentication.FirstOrDefault(x => x.UserId == userId);
 				if (twoFA != null) throw new Exception("2FA is existed!");
@@ -55,7 +56,7 @@ namespace DataAccess.DAOs
 
 		internal void Update2FAKey(long userId, string key)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var twoFA = context.TwoFactorAuthentication.FirstOrDefault(x => x.UserId == userId);
 				if (twoFA == null) throw new Exception("2FA is not existed!");
@@ -66,7 +67,7 @@ namespace DataAccess.DAOs
 
 		internal void Delete2FAKey(long userId)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var twoFA = context.TwoFactorAuthentication.FirstOrDefault(x => x.UserId == userId);
 				if (twoFA == null) throw new Exception("2FA is not existed!");

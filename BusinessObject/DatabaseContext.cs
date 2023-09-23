@@ -1,17 +1,19 @@
 ﻿using BusinessObject.DataTransfer;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
-namespace BusinessObject.Entities
+namespace BusinessObject
 {
-    public class ApiContext : DbContext
+    public class DatabaseContext : DbContext
     {
 
         public readonly string connectionString = "server=localhost; database=DBTest; uid=sa; pwd=sa;MultipleActiveResultSets=true";
         //public readonly string connectionString = "Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
 
-        public ApiContext() { }
+        public DatabaseContext() { }
 
-        public ApiContext(DbContextOptions options) : base(options) { }
+        public DatabaseContext(DbContextOptions options) : base(options) { }
 
         #region DbSet
         public virtual DbSet<Role> Role { get; set; } = null!;

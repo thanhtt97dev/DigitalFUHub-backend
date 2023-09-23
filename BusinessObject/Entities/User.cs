@@ -37,6 +37,7 @@ namespace BusinessObject.Entities
         public long CustomerBalance { get; set; }
         public long SellerBalance { get; set; }
         public bool SignInGoogle { get; set; }
+        public bool IsConfirm { get; set; }
 
         [ForeignKey(nameof(RoleId))]
         public virtual Role Role { get; set; } = null!;
