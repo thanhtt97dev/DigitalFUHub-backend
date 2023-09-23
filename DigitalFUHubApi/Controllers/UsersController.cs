@@ -502,6 +502,7 @@
 			return Ok("Y");
 		}
 		#endregion
+
 		#region Get Check Exist Username
 		[HttpGet("CheckExistUsername/{username}")]
 		public async Task<IActionResult> CheckExistUsername(string username)
