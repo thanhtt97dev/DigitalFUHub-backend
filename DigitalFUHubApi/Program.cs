@@ -12,7 +12,7 @@ using DigitalFUHubApi.Managers;
 using AspNetCoreRateLimit;
 using Quartz;
 using DigitalFUHubApi.Jobs;
-using BusinessObject.Entities;
+using BusinessObject;
 
 namespace DigitalFUHubApi
 {
@@ -30,7 +30,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddSwaggerGen();
 
 			// Add database
-			builder.Services.AddDbContext<ApiContext>(opts =>
+			builder.Services.AddDbContext<DatabaseContext>(opts =>
 			{
 				opts.UseSqlServer(builder.Configuration.GetConnectionString("DB") ?? string.Empty);
 			});

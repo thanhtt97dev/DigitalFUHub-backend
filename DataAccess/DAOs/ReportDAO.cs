@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,7 @@ namespace DataAccess.DAOs
         #region Get Users Report (sample)
         public async Task<List<User>> GetUsersReport(int id)
         {
-            using (ApiContext context = new ApiContext())
+            using (DatabaseContext context = new DatabaseContext())
             {
                 string sql = "EXECUTE dbo.getUserReport @id";
                 List<User> result = await context.User.FromSqlRaw(sql,
