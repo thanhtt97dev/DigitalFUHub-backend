@@ -1,5 +1,6 @@
 ﻿using BusinessObject.DataTransfer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace BusinessObject.Entities
 {
@@ -44,11 +45,11 @@ namespace BusinessObject.Entities
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(connectionString);
-        }
+		}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OrderDetail>().HasKey(x => new { x.OrderId, x.ProductId });
+			modelBuilder.Entity<OrderDetail>().HasKey(x => new { x.OrderId, x.ProductId });
             modelBuilder.Entity<Feedback>().
                 HasOne(x => x.Buyer)
                 .WithMany(x => x.Feedbacks)
