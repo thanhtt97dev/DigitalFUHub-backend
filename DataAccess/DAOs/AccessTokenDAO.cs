@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -31,7 +32,7 @@ namespace DataAccess.DAOs
 
 		internal async Task<AccessToken> AddAccessTokenAsync(AccessToken accessToken)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				EntityEntry<AccessToken> token = await context.AccessToken.AddAsync(accessToken);
 				await context.SaveChangesAsync();
@@ -41,7 +42,7 @@ namespace DataAccess.DAOs
 
 		internal async Task<AccessToken?> GetAccessTokenAsync(string? token)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var accessToken = await context.AccessToken.FirstOrDefaultAsync(x => x.Token == token);
 				return accessToken;
@@ -50,7 +51,7 @@ namespace DataAccess.DAOs
 
 		internal void RevokeToken(string jwtId)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var token = context.AccessToken.FirstOrDefault(x => x.JwtId == jwtId);
 				if (token == null) throw new NullReferenceException("AccessToken is not existed!");

@@ -1,4 +1,4 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -30,7 +30,7 @@ namespace DigitalFUHubApi.Comons
 			int userId;
 			int.TryParse(userIdStr, out userId);
 
-			var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApiContext>();
+			var dbContext = context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
 			var userStatus = dbContext.User.First(x => x.UserId == userId).Status;
 
 			if (userStatus == false)

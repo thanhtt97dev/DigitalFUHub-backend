@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace DataAccess.DAOs
 
 		internal async Task AddRefreshTokenAsync(RefreshToken refreshToken)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				context.RefreshToken.Add(refreshToken);
 				await context.SaveChangesAsync();
@@ -39,7 +40,7 @@ namespace DataAccess.DAOs
 
 		internal RefreshToken? GetRefreshToken(string? refreshToken)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var token = context.RefreshToken.FirstOrDefault(x => x.TokenRefresh == refreshToken);
 				return token;
@@ -48,7 +49,7 @@ namespace DataAccess.DAOs
 
 		internal async Task RemoveRefreshTokenAysnc(string? refreshTokenId)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var token = await context.RefreshToken.FirstAsync(x => x.TokenRefresh == refreshTokenId);
 				context.RefreshToken.Remove(token);

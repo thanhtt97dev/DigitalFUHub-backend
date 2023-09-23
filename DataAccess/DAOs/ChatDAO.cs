@@ -1,4 +1,5 @@
-﻿using BusinessObject.DataTransfer;
+﻿using BusinessObject;
+using BusinessObject.DataTransfer;
 using BusinessObject.Entities;
 using DTOs.Chat;
 using Microsoft.Data.SqlClient;
@@ -33,7 +34,7 @@ namespace DataAccess.DAOs
 
         internal async Task<List<SenderConversation>> GetSenderConversations(long userId)
         {
-                using (ApiContext context = new ApiContext())
+                using (DatabaseContext context = new DatabaseContext())
                 {
                     string sql = "EXECUTE dbo.GetSenderConversation @userId";
                     List<SenderConversation> result = await context.SenderConversations.FromSqlRaw(sql,
@@ -48,7 +49,7 @@ namespace DataAccess.DAOs
 
         internal async Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest)
         {
-            using (ApiContext context = new ApiContext())
+            using (DatabaseContext context = new DatabaseContext())
             {
                 string sql = "EXEC dbo.SendChatMessage @conversationId, @senderId, @recipientId, @content, @dateCreate, @isImage";
                  await context.Database.ExecuteSqlRawAsync(sql,
@@ -66,7 +67,7 @@ namespace DataAccess.DAOs
 
         internal async Task<List<Message>> GetListMessage(long conversationId)
         {
-            using (ApiContext context = new ApiContext())
+            using (DatabaseContext context = new DatabaseContext())
             {
                 List<Message> result = await context.Messages
                     .Where(m => m.ConversationId == conversationId)

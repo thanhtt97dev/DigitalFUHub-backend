@@ -2677,19 +2677,36 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
     "C:\\Users\\dell\\.nuget\\packages\\": {}
+=======
+    "C:\\Users\\dell\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+>>>>>>> 01e59c9bd8a5ba01d91766a3f325b5818f4c37e1
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
       "projectName": "DataAccess",
       "projectPath": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
       "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
       "outputPath": "E:\\fpt\\fu-market-backend\\DataAccess\\obj\\",
+=======
+      "projectUniqueName": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
+      "projectName": "DataAccess",
+      "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
+      "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+      "outputPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\obj\\",
+>>>>>>> 01e59c9bd8a5ba01d91766a3f325b5818f4c37e1
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+<<<<<<< HEAD
+=======
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+>>>>>>> 01e59c9bd8a5ba01d91766a3f325b5818f4c37e1
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2703,11 +2720,19 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
+<<<<<<< HEAD
             "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
               "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj"
             },
             "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj": {
               "projectPath": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj"
+=======
+            "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj"
+            },
+            "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj"
+>>>>>>> 01e59c9bd8a5ba01d91766a3f325b5818f4c37e1
             }
           }
         }
@@ -2737,7 +2762,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+=======
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+>>>>>>> 01e59c9bd8a5ba01d91766a3f325b5818f4c37e1
       }
     }
   }

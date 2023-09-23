@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using DTOs.User;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ namespace DataAccess.DAOs
 
 		public User? GetUserByUsernameAndPassword(string? username, string? password)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var user = context.User.Include(x => x.Role).FirstOrDefault(x => x.Username == username && x.Password == password);
 				return user;
@@ -42,7 +43,7 @@ namespace DataAccess.DAOs
 
 		internal User? GetUserByRefreshToken(string? refreshTokenStr)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var refreshToken = RefreshTokenDAO.Instance.GetRefreshToken(refreshTokenStr);
 				if (refreshToken == null) return null;
@@ -53,7 +54,7 @@ namespace DataAccess.DAOs
 
 		internal List<User> GetUsers(UserRequestDTO userDTO)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var list = context.User.Include(x => x.Role).Where(x => x.Email.Contains(userDTO.Email)).ToList();
 				if (userDTO.RoleId != 0) list = list.Where(x => x.RoleId == userDTO.RoleId).ToList();
@@ -64,7 +65,7 @@ namespace DataAccess.DAOs
 
 		internal User? GetUserById(int id)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.User.Include(x => x.Role).FirstOrDefault(x => x.UserId == id);
 			}
@@ -72,7 +73,7 @@ namespace DataAccess.DAOs
 
 		internal async Task EditUserInfo(int id, User userUpdate)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var user = await context.User.FirstAsync(x => x.UserId == id);
 				user.Avatar = userUpdate.Avatar;	
@@ -83,7 +84,7 @@ namespace DataAccess.DAOs
 
 		internal void Update2FA(int id)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var user = context.User.FirstOrDefault(x => x.UserId == id);
 				if (user == null) throw new Exception("User not existed!");
@@ -94,7 +95,7 @@ namespace DataAccess.DAOs
 
 		internal async Task<User?> GetUserByEmail(string? email)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				return await context.User.Include(x => x.Role).FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
 			}
@@ -102,7 +103,7 @@ namespace DataAccess.DAOs
 
 		internal async Task AddUser(User user)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				try
 				{
@@ -118,7 +119,7 @@ namespace DataAccess.DAOs
 
 		internal async Task<User?> GetUserByUsername(string username)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				return await context.User.Include(x => x.Role).FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
 			}
@@ -126,7 +127,7 @@ namespace DataAccess.DAOs
 
 		internal async Task<bool> IsExistUsernameOrEmail(string username, string email)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				return await context.User.AnyAsync(x=> x.Username.ToLower() == username.ToLower() || x.Email.ToLower() == email.ToLower());
 			}
@@ -134,7 +135,7 @@ namespace DataAccess.DAOs
 
 		internal async Task<User?> GetUser(string email, string username, string fullname)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				return await context.User.FirstOrDefaultAsync(x => x.Username == username && x.Email == email && x.Fullname == fullname);
 			}

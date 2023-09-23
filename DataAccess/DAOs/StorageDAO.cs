@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace DataAccess.DAOs
 
 		public void AddFile(Storage file)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				try
 				{
@@ -47,7 +48,7 @@ namespace DataAccess.DAOs
 
 		internal Storage? GetFileByName(string filename)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Storage.FirstOrDefault(x => x.FileName == filename);
 			}
@@ -59,7 +60,7 @@ namespace DataAccess.DAOs
 			Storage? file = GetFileByName(filename);
 			if (file != null)
 			{
-				using (ApiContext context = new ApiContext())
+				using (DatabaseContext context = new DatabaseContext())
 				{
 					context.Storage.Remove(file);
 					context.SaveChanges();

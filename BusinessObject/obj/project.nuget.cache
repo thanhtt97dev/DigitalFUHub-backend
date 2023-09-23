@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "wdttPn81GC/2cR5h+OAEcZ+r6fdMG3HNGgH5G1lZt5kf80jhmW5rMFKEtfItdXj5TUGWmx4R6e6TlJaC1kRZBw==",
   "success": true,
   "projectFilePath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj",
+=======
+  "dgSpecHash": "JW3Kp1JjOewNcajJbUYMQ1EDfFBSCb+iauD0nsE2p4nswy/2GHqIeH3YrN5jhF1By7NNjpj3tiaBRx9KwcXfYA==",
+  "success": true,
+  "projectFilePath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj",
+>>>>>>> 01e59c9bd8a5ba01d91766a3f325b5818f4c37e1
   "expectedPackageFiles": [
     "C:\\Users\\dell\\.nuget\\packages\\epplus\\6.2.6\\epplus.6.2.6.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\epplus.interfaces\\6.1.1\\epplus.interfaces.6.1.1.nupkg.sha512",

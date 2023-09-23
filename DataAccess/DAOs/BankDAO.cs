@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
 using DTOs.MbBank;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -31,7 +32,7 @@ namespace DataAccess.DAOs
 
 		internal List<Bank> GetAll()
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var banks = context.Bank.Where(x => x.isActivate).ToList();	
 				return banks;
@@ -40,7 +41,7 @@ namespace DataAccess.DAOs
 
 		internal List<UserBank> GetAllBankInfoUserLinked(int userId)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var userBanks = context.UserBank.Where(x => x.UserId == userId).ToList();
 				return userBanks;
@@ -49,7 +50,7 @@ namespace DataAccess.DAOs
 
 		internal int TotalUserLinkedBank(int userId)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var total = context.UserBank.Where(x => x.UserId == userId).Count();
 				return total;
@@ -58,7 +59,7 @@ namespace DataAccess.DAOs
 
 		internal void AddUserBank(UserBank userBank)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				context.UserBank.Add(userBank);
 				context.SaveChanges();
@@ -67,7 +68,7 @@ namespace DataAccess.DAOs
 
 		internal UserBank? GetUserBank(int userId)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var bank = context.UserBank.Include(x => x.Bank).FirstOrDefault(x => x.UserId == userId);
 				return bank;
@@ -76,7 +77,7 @@ namespace DataAccess.DAOs
 
 		internal void CreateDepositTransaction(DepositTransaction transaction)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				transaction.RequestDate = DateTime.Now;
 				transaction.PaidDate = null;
@@ -89,7 +90,7 @@ namespace DataAccess.DAOs
 
 		public void CheckingCreditTransactions(List<TransactionHistory> transactionHistoryCreditList)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
@@ -123,7 +124,7 @@ namespace DataAccess.DAOs
 
 		internal void UpdateUserBank(UserBank userBankUpdate)
 		{
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == userBankUpdate.UserId);
 				if (userBank == null) throw new Exception("User's bank account not existed!");
