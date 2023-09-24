@@ -140,5 +140,21 @@ namespace DataAccess.DAOs
 				return await context.User.FirstOrDefaultAsync(x => x.Username == username && x.Email == email && x.Fullname == fullname);
 			}
 		}
+
+		internal async Task UpdateUser(User user)
+		{
+			try
+			{
+				using (DatabaseContext context = new DatabaseContext())
+				{
+					context.User.Update(user);
+					await context.SaveChangesAsync();
+				}
+			}
+			catch (Exception e)
+			{
+				throw new Exception(e.Message);
+			}
+		}
 	}
 }

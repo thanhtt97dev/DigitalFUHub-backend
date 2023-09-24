@@ -1,6 +1,7 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
     "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DataAccess\\DataAccess.csproj": {}
   },
   "projects": {
@@ -12,13 +13,27 @@
         "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
         "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\obj\\",
+=======
+    "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj": {}
+  },
+  "projects": {
+    "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj",
+        "projectName": "BusinessObject",
+        "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj",
+        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+        "outputPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\obj\\",
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
+<<<<<<< HEAD
           "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+=======
+          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -85,6 +100,7 @@
               "privateAssets": "all"
             }
           },
+<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
@@ -97,13 +113,28 @@
         "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DataAccess\\DataAccess.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
         "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DataAccess\\obj\\",
+=======
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
+        "projectName": "DataAccess",
+        "projectPath": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
+        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+        "outputPath": "E:\\fpt\\fu-market-backend\\DataAccess\\obj\\",
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
+<<<<<<< HEAD
           "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+=======
+          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -117,11 +148,19 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
+<<<<<<< HEAD
               "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj": {
                 "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj"
               },
               "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj": {
                 "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj"
+=======
+              "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj"
+              },
+              "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj": {
+                "projectPath": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj"
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
               }
             }
           }
@@ -151,6 +190,7 @@
               "privateAssets": "all"
             }
           },
+<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
@@ -163,13 +203,28 @@
         "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
         "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\obj\\",
+=======
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj",
+        "projectName": "DTOs",
+        "projectPath": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj",
+        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+        "outputPath": "E:\\fpt\\fu-market-backend\\DTOs\\obj\\",
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
+<<<<<<< HEAD
           "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+=======
+          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -183,8 +238,13 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
+<<<<<<< HEAD
               "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj": {
                 "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj"
+=======
+              "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj"
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
               }
             }
           }
@@ -220,7 +280,11 @@
               "privateAssets": "all"
             }
           },
+<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+=======
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+>>>>>>> 891a51c3b355781ef7897d69d0ed80fa0a587937
         }
       }
     }

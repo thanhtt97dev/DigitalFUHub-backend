@@ -55,7 +55,7 @@
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
 		}
-		
+
 		#region SignIn
 		[HttpPost("SignIn")]
 		public async Task<IActionResult> SignInAsync(UserSignInRequestDTO userSignIn)
@@ -66,6 +66,7 @@
 
 				if (user == null) return NotFound("Username or Password not correct!");
 				if (!user.Status) return Conflict("Your account was baned!");
+				if (!user.IsConfirm) return Conflict("Your account not authenticate email!");
 				if (user.TwoFactorAuthentication)
 				{
 					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
@@ -149,12 +150,12 @@
 					CustomerBalance = 0,
 					SellerBalance = 0,
 					TwoFactorAuthentication = false,
+					IsConfirm = false,
 				};
 				await _userRepository.AddUser(userSignUp);
 
-				// send mail confirm to email
 				string token = _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
-				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Confirm signup account.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Click here to confirm email.</a>");
+				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
 			}
 			catch (Exception)
 			{
@@ -172,7 +173,7 @@
 			try
 			{
 				bool result = await _jwtTokenService.CheckTokenConfirmEmailAsync(token);
-				return result ? Ok() : BadRequest();
+				return result ? Ok("Y") : Ok("N");
 			}
 			catch (NullReferenceException)
 			{
@@ -182,7 +183,78 @@
 			{
 				return Conflict();
 			}
+			catch (Exception)
+			{
+				return Conflict();
+			}
 
+		}
+		#endregion
+
+		#region reset password
+		[HttpGet("ResetPassword/{email}")]
+		public async Task<IActionResult> ResetPassword(string email)
+		{
+			if (string.IsNullOrEmpty(email.Trim()))
+			{
+				return UnprocessableEntity();
+			}
+			else
+			{
+				try
+				{
+					User? user = await _userRepository.GetUserByEmail(email.Trim());
+					if (user == null)
+					{
+						return NotFound();
+					}
+					if (!user.IsConfirm)
+					{
+						return Conflict();
+					}
+					if (user.SignInGoogle)
+					{
+						return Conflict();
+					}
+					string newPassword = Util.Instance.RandomPassword8Chars();
+					string passwordHash = Util.Instance.Sha256Hash(newPassword);
+					user.Password = passwordHash;
+					await _userRepository.UpdateUser(user);
+					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Đặt lại mật khẩu.", $"<div>Mật khẩu mới: {newPassword}</div>");
+				}
+				catch (Exception)
+				{
+					return Conflict();
+				}
+			}
+			return Ok();
+
+
+		}
+		#endregion
+
+		#region Generate token confirm email
+		[HttpGet("GenerateTokenConfirmEmail/{email}")]
+		public async Task<IActionResult> GenerateTokenConfirmEmail(string email)
+		{
+			User? user = await _userRepository.GetUserByEmail(email);
+			if (user == null)
+			{
+				return NotFound();
+			}
+			else
+			{
+				if (user.IsConfirm)
+				{
+					return Conflict();
+				}
+				else
+				{
+					string token = _jwtTokenService.GenerateTokenConfirmEmail(user);
+					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
+				}
+			}
+			return Ok();
 		}
 		#endregion
 

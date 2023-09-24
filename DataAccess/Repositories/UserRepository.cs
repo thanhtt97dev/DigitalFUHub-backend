@@ -32,5 +32,7 @@ namespace DataAccess.Repositories
 		public async Task<bool> IsExistUsernameOrEmail(string username, string email) => await UserDAO.Instance.IsExistUsernameOrEmail(username, email);
 
 		public async Task<User?> GetUser(string email, string username, string fullname) => await UserDAO.Instance.GetUser(email, username, fullname);
+
+		public async Task UpdateUser(User user) => await UserDAO.Instance.UpdateUser(user);
 	}
 }
