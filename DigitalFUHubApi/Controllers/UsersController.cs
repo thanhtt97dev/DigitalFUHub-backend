@@ -55,7 +55,7 @@
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
 		}
-		
+
 		#region SignIn
 		[HttpPost("SignIn")]
 		public async Task<IActionResult> SignInAsync(UserSignInRequestDTO userSignIn)
@@ -154,7 +154,7 @@
 				};
 				await _userRepository.AddUser(userSignUp);
 
-				string token = await _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
+				string token = _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
 				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
 			}
 			catch (Exception)
@@ -183,25 +183,74 @@
 			{
 				return Conflict();
 			}
+			catch (Exception)
+			{
+				return Conflict();
+			}
 
 		}
 		#endregion
+
+		#region reset password
+		[HttpGet("ResetPassword/{email}")]
+		public async Task<IActionResult> ResetPassword(string email)
+		{
+			if (string.IsNullOrEmpty(email.Trim()))
+			{
+				return UnprocessableEntity();
+			}
+			else
+			{
+				try
+				{
+					User? user = await _userRepository.GetUserByEmail(email.Trim());
+					if (user == null)
+					{
+						return NotFound();
+					}
+					if (!user.IsConfirm)
+					{
+						return Conflict();
+					}
+					if (user.SignInGoogle)
+					{
+						return Conflict();
+					}
+					string newPassword = Util.Instance.RandomPassword8Chars();
+					string passwordHash = Util.Instance.Sha256Hash(newPassword);
+					user.Password = passwordHash;
+					await _userRepository.UpdateUser(user);
+					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Đặt lại mật khẩu.", $"<div>Mật khẩu mới: {newPassword}</div>");
+				}
+				catch (Exception)
+				{
+					return Conflict();
+				}
+			}
+			return Ok();
+
+
+		}
+		#endregion
+
 		#region Generate token confirm email
 		[HttpGet("GenerateTokenConfirmEmail/{email}")]
 		public async Task<IActionResult> GenerateTokenConfirmEmail(string email)
 		{
 			User? user = await _userRepository.GetUserByEmail(email);
-			if(user == null)
+			if (user == null)
 			{
 				return NotFound();
-			} else
+			}
+			else
 			{
 				if (user.IsConfirm)
 				{
 					return Conflict();
-				} else
+				}
+				else
 				{
-					string token = await _jwtTokenService.GenerateTokenConfirmEmail(user);
+					string token = _jwtTokenService.GenerateTokenConfirmEmail(user);
 					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
 				}
 			}

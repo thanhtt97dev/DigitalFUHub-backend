@@ -12,6 +12,7 @@ using System.Text;
 using BusinessObject.Entities;
 using DTOs.User;
 using Quartz.Util;
+using BusinessObject;
 
 namespace DigitalFUHubApi.Services
 {
@@ -122,7 +123,7 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Generate token confirm email
-		public async Task<string> GenerateTokenConfirmEmail(User user)
+		public string GenerateTokenConfirmEmail(User user)
 		{
 			JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 			byte[] secretKeyBytes = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
@@ -146,13 +147,6 @@ namespace DigitalFUHubApi.Services
 			SecurityToken securityToken = tokenHandler.CreateToken(tokenDescription);
 			string token = tokenHandler.WriteToken(securityToken);
 
-			using (ApiContext context = new ApiContext())
-			{
-				User userUp = context.User.First(x => x.Email == user.Email);
-				userUp.IsConfirm = true;
-				context.User.Update(userUp);
-				await context.SaveChangesAsync();
-			}
 			return token;
 		}
 		#endregion
@@ -239,7 +233,8 @@ namespace DigitalFUHubApi.Services
 
 			if (expireDate < DateTime.UtcNow) throw new ArgumentOutOfRangeException("expired");
 
-
+			user.IsConfirm = true;
+			await _userRepository.UpdateUser(user);
 			return true;
 		}
 		#endregion

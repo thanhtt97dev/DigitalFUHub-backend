@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 
 namespace DigitalFUHubApi.Comons
@@ -111,6 +112,7 @@ namespace DigitalFUHubApi.Comons
 			return true;
 		}
 		#endregion
+
 		#region Get Content Type File
 		public static string GetContentType(string filename)
 		{
@@ -141,6 +143,45 @@ namespace DigitalFUHubApi.Comons
 				contentType = "application/octet-stream";
 			}
 			return contentType;
+		}
+		#endregion
+
+		#region Sha256Hash
+		public string Sha256Hash(string input)
+		{
+			SHA256 sha256 = SHA256.Create();
+			byte[] sha256Bytes = Encoding.Default.GetBytes(input);
+			byte[] cryString = sha256.ComputeHash(sha256Bytes);
+			string sha256Str = Convert.ToHexString(cryString).ToLower();
+			return sha256Str;
+		}
+		#endregion
+
+		#region Generate random password
+		public string RandomPassword8Chars()
+		{
+			string password = string.Empty;
+			string numbers = "0123456789";
+			string letters = "qwertyuiopasdfghjklzxcvbnm";
+			Random rnd = new Random();
+			for (int i = 0;i < 8; i++)
+			{
+				int rndType = rnd.Next(1,4);
+				if(rndType == 1)
+				{
+					int rndIndex = rnd.Next(0,numbers.Length);
+					password += numbers[rndIndex];
+				} else if(rndType == 2)
+				{
+					int rndIndex = rnd.Next(0, letters.Length);
+					password += letters[rndIndex];
+				} else if (rndType == 3)
+				{
+					int rndIndex = rnd.Next(0, letters.Length);
+					password += (char)(letters[rndIndex] - 32);
+				}
+			}
+			return password;
 		}
 		#endregion
 	}
