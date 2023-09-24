@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class init : Migration
+    public partial class initdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -23,7 +23,20 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Conversation",
+                name: "Category",
+                columns: table => new
+                {
+                    CategoryId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Category", x => x.CategoryId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Conversations",
                 columns: table => new
                 {
                     ConversationId = table.Column<long>(type: "bigint", nullable: false)
@@ -33,7 +46,7 @@ namespace BusinessObject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Conversation", x => x.ConversationId);
+                    table.PrimaryKey("PK_Conversations", x => x.ConversationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,6 +60,21 @@ namespace BusinessObject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Role", x => x.RoleId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SenderConversations",
+                columns: table => new
+                {
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fullname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ConversationId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
                 });
 
             migrationBuilder.CreateTable(
@@ -65,7 +93,8 @@ namespace BusinessObject.Migrations
                     TwoFactorAuthentication = table.Column<bool>(type: "bit", nullable: false),
                     CustomerBalance = table.Column<long>(type: "bigint", nullable: false),
                     SellerBalance = table.Column<long>(type: "bigint", nullable: false),
-                    SignInGoogle = table.Column<bool>(type: "bit", nullable: false)
+                    SignInGoogle = table.Column<bool>(type: "bit", nullable: false),
+                    IsConfirm = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -126,7 +155,7 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Message",
+                name: "Messages",
                 columns: table => new
                 {
                     MessageId = table.Column<long>(type: "bigint", nullable: false)
@@ -134,21 +163,21 @@ namespace BusinessObject.Migrations
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     ConversationId = table.Column<long>(type: "bigint", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MessageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isImage = table.Column<bool>(type: "bit", nullable: false),
                     DateCreate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     isDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Message", x => x.MessageId);
+                    table.PrimaryKey("PK_Messages", x => x.MessageId);
                     table.ForeignKey(
-                        name: "FK_Message_Conversation_ConversationId",
+                        name: "FK_Messages_Conversations_ConversationId",
                         column: x => x.ConversationId,
-                        principalTable: "Conversation",
+                        principalTable: "Conversations",
                         principalColumn: "ConversationId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Message_User_UserId",
+                        name: "FK_Messages_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
@@ -174,6 +203,63 @@ namespace BusinessObject.Migrations
                     table.ForeignKey(
                         name: "FK_Notification_User_UserId",
                         column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Order",
+                columns: table => new
+                {
+                    OrderId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BuyerId = table.Column<long>(type: "bigint", nullable: false),
+                    TotalCost = table.Column<long>(type: "bigint", nullable: false),
+                    IsFeedback = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    DateOrder = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Order", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_Order_User_BuyerId",
+                        column: x => x.BuyerId,
+                        principalTable: "User",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Product",
+                columns: table => new
+                {
+                    ProductId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SellerId = table.Column<long>(type: "bigint", nullable: false),
+                    CategoryId = table.Column<long>(type: "bigint", nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Discount = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<long>(type: "bigint", nullable: false),
+                    Quantity = table.Column<long>(type: "bigint", nullable: false),
+                    Thumbnail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateCreate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Product", x => x.ProductId);
+                    table.ForeignKey(
+                        name: "FK_Product_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Product_User_SellerId",
+                        column: x => x.SellerId,
                         principalTable: "User",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
@@ -249,7 +335,10 @@ namespace BusinessObject.Migrations
                     UserBankId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    BankId = table.Column<long>(type: "bigint", nullable: false)
+                    BankId = table.Column<long>(type: "bigint", nullable: false),
+                    CreditAccount = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreditAccountName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -269,7 +358,7 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserConversation",
+                name: "UserConversations",
                 columns: table => new
                 {
                     UserConversationId = table.Column<long>(type: "bigint", nullable: false)
@@ -279,18 +368,134 @@ namespace BusinessObject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserConversation", x => x.UserConversationId);
+                    table.PrimaryKey("PK_UserConversations", x => x.UserConversationId);
                     table.ForeignKey(
-                        name: "FK_UserConversation_Conversation_ConversationId",
+                        name: "FK_UserConversations_Conversations_ConversationId",
                         column: x => x.ConversationId,
-                        principalTable: "Conversation",
+                        principalTable: "Conversations",
                         principalColumn: "ConversationId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserConversation_User_UserId",
+                        name: "FK_UserConversations_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Coupon",
+                columns: table => new
+                {
+                    CouponId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CouponCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProductId = table.Column<long>(type: "bigint", nullable: false),
+                    Quantity = table.Column<long>(type: "bigint", nullable: false),
+                    PriceDiscount = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Coupon", x => x.CouponId);
+                    table.ForeignKey(
+                        name: "FK_Coupon_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Feedback",
+                columns: table => new
+                {
+                    FeedbackId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<long>(type: "bigint", nullable: false),
+                    BuyerId = table.Column<long>(type: "bigint", nullable: false),
+                    FeedbackContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Rate = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Feedback", x => x.FeedbackId);
+                    table.ForeignKey(
+                        name: "FK_Feedback_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Feedback_User_BuyerId",
+                        column: x => x.BuyerId,
+                        principalTable: "User",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderDetail",
+                columns: table => new
+                {
+                    ProductId = table.Column<long>(type: "bigint", nullable: false),
+                    OrderId = table.Column<long>(type: "bigint", nullable: false),
+                    Quantity = table.Column<long>(type: "bigint", nullable: false),
+                    Price = table.Column<long>(type: "bigint", nullable: false),
+                    Discount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderDetail", x => new { x.OrderId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_OrderDetail_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderDetail_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "ProductId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductImage",
+                columns: table => new
+                {
+                    ProductImageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<long>(type: "bigint", nullable: false),
+                    ProductImageName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductImage", x => x.ProductImageId);
+                    table.ForeignKey(
+                        name: "FK_ProductImage_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductWarehouse",
+                columns: table => new
+                {
+                    ProductWarehouseId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<long>(type: "bigint", nullable: false),
+                    ProductWarehouseName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsSold = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductWarehouse", x => x.ProductWarehouseId);
+                    table.ForeignKey(
+                        name: "FK_ProductWarehouse_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -300,24 +505,69 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Coupon_ProductId",
+                table: "Coupon",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DepositTransaction_UserId",
                 table: "DepositTransaction",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_ConversationId",
-                table: "Message",
+                name: "IX_Feedback_BuyerId",
+                table: "Feedback",
+                column: "BuyerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Feedback_ProductId",
+                table: "Feedback",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_ConversationId",
+                table: "Messages",
                 column: "ConversationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_UserId",
-                table: "Message",
+                name: "IX_Messages_UserId",
+                table: "Messages",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notification_UserId",
                 table: "Notification",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_BuyerId",
+                table: "Order",
+                column: "BuyerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetail_ProductId",
+                table: "OrderDetail",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_CategoryId",
+                table: "Product",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_SellerId",
+                table: "Product",
+                column: "SellerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductImage_ProductId",
+                table: "ProductImage",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductWarehouse_ProductId",
+                table: "ProductWarehouse",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshToken_UserId",
@@ -350,13 +600,13 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserConversation_ConversationId",
-                table: "UserConversation",
+                name: "IX_UserConversations_ConversationId",
+                table: "UserConversations",
                 column: "ConversationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserConversation_UserId",
-                table: "UserConversation",
+                name: "IX_UserConversations_UserId",
+                table: "UserConversations",
                 column: "UserId");
         }
 
@@ -366,16 +616,34 @@ namespace BusinessObject.Migrations
                 name: "AccessToken");
 
             migrationBuilder.DropTable(
+                name: "Coupon");
+
+            migrationBuilder.DropTable(
                 name: "DepositTransaction");
 
             migrationBuilder.DropTable(
-                name: "Message");
+                name: "Feedback");
+
+            migrationBuilder.DropTable(
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Notification");
 
             migrationBuilder.DropTable(
+                name: "OrderDetail");
+
+            migrationBuilder.DropTable(
+                name: "ProductImage");
+
+            migrationBuilder.DropTable(
+                name: "ProductWarehouse");
+
+            migrationBuilder.DropTable(
                 name: "RefreshToken");
+
+            migrationBuilder.DropTable(
+                name: "SenderConversations");
 
             migrationBuilder.DropTable(
                 name: "Storage");
@@ -387,13 +655,22 @@ namespace BusinessObject.Migrations
                 name: "UserBank");
 
             migrationBuilder.DropTable(
-                name: "UserConversation");
+                name: "UserConversations");
+
+            migrationBuilder.DropTable(
+                name: "Order");
+
+            migrationBuilder.DropTable(
+                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "Bank");
 
             migrationBuilder.DropTable(
-                name: "Conversation");
+                name: "Conversations");
+
+            migrationBuilder.DropTable(
+                name: "Category");
 
             migrationBuilder.DropTable(
                 name: "User");
