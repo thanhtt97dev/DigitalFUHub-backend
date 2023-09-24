@@ -12,6 +12,7 @@ using System.Text;
 using BusinessObject.Entities;
 using DTOs.User;
 using Quartz.Util;
+using BusinessObject;
 
 namespace DigitalFUHubApi.Services
 {
@@ -146,7 +147,7 @@ namespace DigitalFUHubApi.Services
 			SecurityToken securityToken = tokenHandler.CreateToken(tokenDescription);
 			string token = tokenHandler.WriteToken(securityToken);
 
-			using (ApiContext context = new ApiContext())
+			using (DatabaseContext context = new DatabaseContext())
 			{
 				User userUp = context.User.First(x => x.Email == user.Email);
 				userUp.IsConfirm = true;
