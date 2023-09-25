@@ -37,12 +37,16 @@ namespace DataAccess.DAOs
                 using (DatabaseContext context = new DatabaseContext())
                 {
                     string sql = "EXECUTE dbo.GetSenderConversation @userId";
-                    List<SenderConversation> result = await context.SenderConversations.FromSqlRaw(sql,
-                            new SqlParameter("@userId", userId)
-                        ).ToListAsync();
-                    
+                //List<SenderConversation> result = await context.SenderConversations.FromSqlRaw(sql,
+                //        new SqlParameter("@userId", userId)
+                //    ).ToListAsync();
+                List <SenderConversation> result = await context.Set<SenderConversation>().FromSqlRaw(sql,
+                        new SqlParameter("@userId", userId)
+                    ).ToListAsync();
 
-                    return result;
+
+
+                return result;
                 }
        
         }

@@ -41,5 +41,6 @@ namespace BusinessObject.Entities
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<AssetInformation>? AssetInformation { get; set; }
         public virtual ICollection<Transaction>? Transactions { get; set; }
+        public virtual ICollection<WithdrawTransaction>? WithdrawTransactions { get; set; }
     }
 }

@@ -97,8 +97,6 @@
 
 				if (user == null)
 				{
-
-					string username = userSignIn.Email.Split("@")[0];
 					User newUser = new User
 					{
 						Email = userSignIn.Email,
@@ -107,7 +105,6 @@
 						SignInGoogle = true,
 						Status = true,
 						IsConfirm = true,
-						Username = username,
 						Fullname = userSignIn.Fullname
 					};
 					await _userRepository.AddUser(newUser);

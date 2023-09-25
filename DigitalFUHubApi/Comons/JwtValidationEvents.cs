@@ -38,13 +38,13 @@ namespace DigitalFUHubApi.Comons
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
 			}
-			var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.isRevoked == false);
+			var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.IsRevoked == false);
 
 			if (accessToken == null)
 			{
 				//Hanlde revoke all token of this user
 				var tokens = dbContext.AccessToken.Where(x => x.UserId == userId).ToList();
-				tokens.ForEach((token) => { token.isRevoked = true; });
+				tokens.ForEach((token) => { token.IsRevoked = true; });
 				dbContext.SaveChanges();
 
 				context.Fail("Unauthorized");
