@@ -15,7 +15,7 @@ namespace BusinessObject.Entities2
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long AssetInformationId { get; set; }
 		public long ProductTypeId { get; set; }
-		public long UserId { get; set; }
+		public long? UserId { get; set; }
 		public DateTime? CreateDate { get; set; }
 		public DateTime? UpdateDate { get; set; }
 		public string? Asset { get; set; }
