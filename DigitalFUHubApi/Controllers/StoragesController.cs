@@ -36,8 +36,8 @@ namespace DigitalFUHubApi.Controllers
 
 				_storageRepository.AddFile(new Media
 				{
-					FileName = filename,
-					UserId = request.UserId,
+					//FileName = filename,
+					//UserId = request.UserId,
 					IsPublic = request.IsPublic
 				});
 			}

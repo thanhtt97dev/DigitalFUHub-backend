@@ -22,5 +22,8 @@ namespace BusinessObject.Entities
 
 		[ForeignKey(nameof(WithdrawTransactionStatusId))]
 		public virtual WithdrawTransactionStatus? WithdrawTransactionStatus { get; set; }
-	}
+
+        [ForeignKey(nameof(UserId))]
+        public virtual User? User { get; set; }
+    }
 }

@@ -50,7 +50,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Media.FirstOrDefault(x => x.FileName == filename);
+				return context.Media.FirstOrDefault(x => x.Url == filename);
 			}
 		}
 
@@ -62,7 +62,7 @@ namespace DataAccess.DAOs
 			{
 				using (DatabaseContext context = new DatabaseContext())
 				{
-					context.Storage.Remove(file);
+					context.Media.Remove(file);
 					context.SaveChanges();
 				}
 			}

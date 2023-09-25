@@ -55,7 +55,7 @@ namespace DataAccess.DAOs
 			{
 				var token = context.AccessToken.FirstOrDefault(x => x.JwtId == jwtId);
 				if (token == null) throw new NullReferenceException("AccessToken is not existed!");
-				token.isRevoked = true;
+				token.IsRevoked = true;
 				context.SaveChanges();
 			}
 		}

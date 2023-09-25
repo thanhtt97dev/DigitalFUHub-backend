@@ -80,7 +80,7 @@ namespace DigitalFUHubApi.Services
 				JwtId = token.Id,
 				Token = accessToken,
 				ExpiredDate = accessTokenExpiredDate,
-				isRevoked = false,
+				IsRevoked = false,
 			};
 
 			await _accessTokenRepository.AddAccessTokenAsync(accessTokenModel);

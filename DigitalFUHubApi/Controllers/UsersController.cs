@@ -97,26 +97,15 @@
 
 				if (user == null)
 				{
-<<<<<<< HEAD
-					
-=======
-
-					string username = userSignIn.Email.Split("@")[0];
->>>>>>> 03412274a8c6f6b7a13c24673ec49c883d09710e
 					User newUser = new User
 					{
 						Email = userSignIn.Email,
 						TwoFactorAuthentication = false,
 						RoleId = 2,
 						SignInGoogle = true,
-<<<<<<< HEAD
-						Status = true
-=======
 						Status = true,
 						IsConfirm = true,
-						Username = username,
 						Fullname = userSignIn.Fullname
->>>>>>> 03412274a8c6f6b7a13c24673ec49c883d09710e
 					};
 					await _userRepository.AddUser(newUser);
 					user = await _userRepository.GetUserByEmail(userSignIn.Email);
