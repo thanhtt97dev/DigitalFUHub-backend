@@ -94,15 +94,13 @@
 				if (user == null)
 				{
 					
-					string username = userSignIn.Email.Split("@")[0];
 					User newUser = new User
 					{
 						Email = userSignIn.Email,
 						TwoFactorAuthentication = false,
 						RoleId = 2,
 						SignInGoogle = true,
-						Status = true,
-						Username = username
+						Status = true
 					};
 					await _userRepository.AddUser(newUser);
 					user = await _userRepository.GetUserByEmail(userSignIn.Email);
