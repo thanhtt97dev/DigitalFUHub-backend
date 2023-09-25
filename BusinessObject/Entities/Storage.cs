@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.Entities
 {
-    public class Storage
+    public class Media
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

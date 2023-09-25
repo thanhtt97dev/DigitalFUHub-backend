@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.Entities
 {
-    public class ProductImage
+    public class ProductType
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

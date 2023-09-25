@@ -9,8 +9,8 @@ namespace DataAccess.IRepositories
 {
     public interface IStorageRepository
 	{
-		void AddFile(Storage file);
-		Storage? GetFileByName(string filename);
+		void AddFile(Media file);
+		Media? GetFileByName(string filename);
 		void RemoveFile(string filename);
 	}
 }

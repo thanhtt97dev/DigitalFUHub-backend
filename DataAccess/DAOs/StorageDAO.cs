@@ -29,7 +29,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		public void AddFile(Storage file)
+		public void AddFile(Media file)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -46,7 +46,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Storage? GetFileByName(string filename)
+		internal Media? GetFileByName(string filename)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -57,7 +57,7 @@ namespace DataAccess.DAOs
 
 		internal void RemoveFile(string filename)
 		{
-			Storage? file = GetFileByName(filename);
+			Media? file = GetFileByName(filename);
 			if (file != null)
 			{
 				using (DatabaseContext context = new DatabaseContext())

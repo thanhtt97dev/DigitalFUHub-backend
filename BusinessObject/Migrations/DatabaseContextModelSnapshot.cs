@@ -22,43 +22,19 @@ namespace BusinessObject.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("BusinessObject.DataTransfer.SenderConversation", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.AccessToken", b =>
                 {
-                    b.Property<string>("Avatar")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("ConversationId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Fullname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("SenderConversations");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.AccessToken", b =>
-                {
-                    b.Property<long>("Id")
+                    b.Property<long>("AccessTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AccessTokenId"), 1L, 1);
 
                     b.Property<DateTime>("ExpiredDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
 
                     b.Property<string>("JwtId")
                         .HasColumnType("nvarchar(max)");
@@ -69,20 +45,55 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("isRevoked")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
+                    b.HasKey("AccessTokenId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("AccessToken");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Bank", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.AssetInformation", b =>
+                {
+                    b.Property<long>("AssetInformationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AssetInformationId"), 1L, 1);
+
+                    b.Property<string>("Asset")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("ProductTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AssetInformationId");
+
+                    b.HasIndex("ProductTypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AssetInformation");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Bank", b =>
                 {
                     b.Property<long>("BankId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("BankId"), 1L, 1);
 
                     b.Property<string>("BankName")
                         .IsRequired()
@@ -96,7 +107,25 @@ namespace BusinessObject.Migrations
                     b.ToTable("Bank");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Category", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Cart", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Quantity")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("UserId", "ProductTypeId");
+
+                    b.HasIndex("ProductTypeId");
+
+                    b.ToTable("Cart");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Category", b =>
                 {
                     b.Property<long>("CategoryId")
                         .ValueGeneratedOnAdd()
@@ -112,7 +141,7 @@ namespace BusinessObject.Migrations
                     b.ToTable("Category");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Conversation", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Conversation", b =>
                 {
                     b.Property<long>("ConversationId")
                         .ValueGeneratedOnAdd()
@@ -123,7 +152,7 @@ namespace BusinessObject.Migrations
                     b.Property<DateTime>("DateCreate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("isActivate")
+                    b.Property<bool>("IsActivate")
                         .HasColumnType("bit");
 
                     b.HasKey("ConversationId");
@@ -131,7 +160,7 @@ namespace BusinessObject.Migrations
                     b.ToTable("Conversations");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Coupon", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Coupon", b =>
                 {
                     b.Property<long>("CouponId")
                         .ValueGeneratedOnAdd()
@@ -139,32 +168,41 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CouponId"), 1L, 1);
 
-                    b.Property<string>("CouponCode")
+                    b.Property<string>("CouponName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("PriceDiscount")
-                        .HasColumnType("bigint");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long>("ProductId")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("PriceDiscount")
                         .HasColumnType("bigint");
 
                     b.Property<long>("Quantity")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("ShopId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("CouponId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ShopId");
 
                     b.ToTable("Coupon");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.DepositTransaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("DepositTransactionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("DepositTransactionId"), 1L, 1);
 
                     b.Property<long>("Amount")
                         .HasColumnType("bigint");
@@ -185,14 +223,14 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                    b.HasKey("DepositTransactionId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("DepositTransaction");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Feedback", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Feedback", b =>
                 {
                     b.Property<long>("FeedbackId")
                         .ValueGeneratedOnAdd()
@@ -200,28 +238,73 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("FeedbackId"), 1L, 1);
 
-                    b.Property<long>("BuyerId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("FeedbackContent")
+                    b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("ProductId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("Rate")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("FeedbackId");
 
-                    b.HasIndex("BuyerId");
-
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Feedback");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Message", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Media", b =>
+                {
+                    b.Property<long>("MediaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("MediaId"), 1L, 1);
+
+                    b.Property<long>("ForeignId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("MediaTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MediaId");
+
+                    b.HasIndex("ForeignId");
+
+                    b.HasIndex("MediaTypeId");
+
+                    b.ToTable("Media");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.MediaType", b =>
+                {
+                    b.Property<long>("MediaTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("MediaTypeId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MediaTypeId");
+
+                    b.ToTable("MediaType");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Message", b =>
                 {
                     b.Property<long>("MessageId")
                         .ValueGeneratedOnAdd()
@@ -239,14 +322,15 @@ namespace BusinessObject.Migrations
                     b.Property<DateTime>("DateCreate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MessageType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("isDelete")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("isImage")
-                        .HasColumnType("bit");
 
                     b.HasKey("MessageId");
 
@@ -257,7 +341,7 @@ namespace BusinessObject.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Notification", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Notification", b =>
                 {
                     b.Property<long>("NotificationId")
                         .ValueGeneratedOnAdd()
@@ -290,7 +374,7 @@ namespace BusinessObject.Migrations
                     b.ToTable("Notification");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Order", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Order", b =>
                 {
                     b.Property<long>("OrderId")
                         .ValueGeneratedOnAdd()
@@ -298,53 +382,101 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderId"), 1L, 1);
 
-                    b.Property<long>("BuyerId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("DateOrder")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsFeedback")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long>("TotalCost")
+                    b.Property<long>("OrderStatusId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("OrderId");
-
-                    b.HasIndex("BuyerId");
-
-                    b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
-                {
-                    b.Property<long>("OrderId")
+                    b.Property<long>("PlatformFeeId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("ProductId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Discount")
-                        .HasColumnType("int");
-
-                    b.Property<long>("Price")
+                    b.Property<long>("ProductTypeId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("Quantity")
                         .HasColumnType("bigint");
 
-                    b.HasKey("OrderId", "ProductId");
+                    b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint");
 
-                    b.HasIndex("ProductId");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
-                    b.ToTable("OrderDetail");
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("OrderStatusId");
+
+                    b.HasIndex("PlatformFeeId");
+
+                    b.HasIndex("ProductTypeId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Order");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Product", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.OrderCoupon", b =>
+                {
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("CouponId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UseDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("OrderId", "CouponId");
+
+                    b.HasIndex("CouponId");
+
+                    b.ToTable("OrderCoupon");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.OrderStatus", b =>
+                {
+                    b.Property<long>("OrderStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderStatusId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderStatusId");
+
+                    b.ToTable("OrderStatus");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.PlatformFee", b =>
+                {
+                    b.Property<long>("PlatformFeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("PlatformFeeId"), 1L, 1);
+
+                    b.Property<long>("Fee")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PlatformFeeId");
+
+                    b.ToTable("PlatformFee");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Product", b =>
                 {
                     b.Property<long>("ProductId")
                         .ValueGeneratedOnAdd()
@@ -355,94 +487,93 @@ namespace BusinessObject.Migrations
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("DateCreate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Discount")
                         .HasColumnType("int");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("Quantity")
+                    b.Property<long>("ProductStatusId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("SellerId")
+                    b.Property<long>("ShopId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Thumbnail")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("ProductId");
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("SellerId");
+                    b.HasIndex("ProductStatusId");
+
+                    b.HasIndex("ShopId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.ProductImage", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.ProductStatus", b =>
                 {
-                    b.Property<long>("ProductImageId")
+                    b.Property<long>("ProductStatusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductImageId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductStatusId"), 1L, 1);
 
                     b.Property<long>("ProductId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ProductImageName")
+                    b.Property<string>("ProductStatusName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ProductImageId");
+                    b.HasKey("ProductStatusId");
 
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductImage");
+                    b.ToTable("ProductStatus");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.ProductWarehouse", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.ProductType", b =>
                 {
-                    b.Property<long>("ProductWarehouseId")
+                    b.Property<long>("ProductTypeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductWarehouseId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductTypeId"), 1L, 1);
 
-                    b.Property<bool>("IsSold")
-                        .HasColumnType("bit");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("Price")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("ProductId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ProductWarehouseName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProductWarehouseId");
+                    b.HasKey("ProductTypeId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductWarehouse");
+                    b.ToTable("ProductType");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.RefreshToken", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.RefreshToken", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("RefreshTokenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("RefreshTokenId"), 1L, 1);
 
                     b.Property<DateTime>("ExpiredDate")
                         .HasColumnType("datetime2");
@@ -456,14 +587,14 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                    b.HasKey("RefreshTokenId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshToken");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Role", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Role", b =>
                 {
                     b.Property<long>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -479,37 +610,116 @@ namespace BusinessObject.Migrations
                     b.ToTable("Role");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Storage", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Shop", b =>
                 {
-                    b.Property<long>("ImageId")
+                    b.Property<long>("ShopId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ImageId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ShopId"), 1L, 1);
 
-                    b.Property<string>("FileName")
+                    b.Property<long>("Balance")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("DateCreate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsPublic")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ShopName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ShopId");
+
+                    b.ToTable("Shop");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Tag", b =>
+                {
+                    b.Property<long>("TagId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TagId"), 1L, 1);
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("TagName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TagId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Tag");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Transaction", b =>
+                {
+                    b.Property<long>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionId"), 1L, 1);
+
+                    b.Property<DateTime?>("DateCreate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PaymentAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TransactionTypeId")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("ImageId");
+                    b.HasKey("TransactionId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("TransactionTypeId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Storage");
+                    b.ToTable("Transaction");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.TwoFactorAuthentication", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.TransactionType", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("TransactionTypeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionTypeId"), 1L, 1);
+
+                    b.Property<long>("Name")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("TransactionTypeId");
+
+                    b.ToTable("TransactionType");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.TwoFactorAuthentication", b =>
+                {
+                    b.Property<long>("TwoFactorAuthenticationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TwoFactorAuthenticationId"), 1L, 1);
 
                     b.Property<string>("SecretKey")
                         .IsRequired()
@@ -518,20 +728,23 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                    b.HasKey("TwoFactorAuthenticationId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("TwoFactorAuthentication");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.User", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.User", b =>
                 {
                     b.Property<long>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("UserId"), 1L, 1);
+
+                    b.Property<long>("AccountBalance")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Avatar")
                         .IsRequired()
@@ -581,7 +794,7 @@ namespace BusinessObject.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.UserBank", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.UserBank", b =>
                 {
                     b.Property<long>("UserBankId")
                         .ValueGeneratedOnAdd()
@@ -615,7 +828,7 @@ namespace BusinessObject.Migrations
                     b.ToTable("UserBank");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.UserConversation", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.UserConversation", b =>
                 {
                     b.Property<long>("UserConversationId")
                         .ValueGeneratedOnAdd()
@@ -635,12 +848,61 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserConversations");
+                    b.ToTable("UserConversation");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.AccessToken", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.WithdrawTransaction", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.Property<long>("WithdrawTransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("WithdrawTransactionId"), 1L, 1);
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsPay")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("WithdrawTransactionStatusId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("WithdrawTransactionId");
+
+                    b.HasIndex("WithdrawTransactionStatusId");
+
+                    b.ToTable("WithdrawTransaction");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.WithdrawTransactionStatus", b =>
+                {
+                    b.Property<long>("WithdrawTransactionStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("WithdrawTransactionStatusId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WithdrawTransactionStatusId");
+
+                    b.ToTable("WithdrawTransactionStatus");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.AccessToken", b =>
+                {
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany("AccessTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -649,20 +911,58 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Coupon", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.AssetInformation", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Product", "Product")
-                        .WithMany("Coupons")
-                        .HasForeignKey("ProductId")
+                    b.HasOne("BusinessObject.Entities2.ProductType", "ProductType")
+                        .WithMany("AssetInformation")
+                        .HasForeignKey("ProductTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.HasOne("BusinessObject.Entities2.User", "User")
+                        .WithMany("AssetInformation")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductType");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Cart", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.HasOne("BusinessObject.Entities2.ProductType", "ProductType")
+                        .WithMany("Carts")
+                        .HasForeignKey("ProductTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Coupon", b =>
+                {
+                    b.HasOne("BusinessObject.Entities2.Shop", "Shop")
+                        .WithMany("Coupons")
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.DepositTransaction", b =>
+                {
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany("DepositTransactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -671,34 +971,61 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Feedback", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Feedback", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.User", "Buyer")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("BusinessObject.Entities.Product", "Product")
+                    b.HasOne("BusinessObject.Entities2.Product", "Product")
                         .WithMany("Feedbacks")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Buyer");
+                    b.HasOne("BusinessObject.Entities2.User", "User")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Media", b =>
+                {
+                    b.HasOne("BusinessObject.Entities2.Feedback", "Feedback")
+                        .WithMany("Medias")
+                        .HasForeignKey("ForeignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.Product", "Product")
+                        .WithMany("Medias")
+                        .HasForeignKey("ForeignId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.MediaType", "MediaType")
+                        .WithMany()
+                        .HasForeignKey("MediaTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Feedback");
+
+                    b.Navigation("MediaType");
 
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Message", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Message", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Conversation", "Conversation")
+                    b.HasOne("BusinessObject.Entities2.Conversation", "Conversation")
                         .WithMany("Messages")
                         .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -709,9 +1036,9 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Notification", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Notification", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -720,59 +1047,95 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Order", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Order", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.User", "Buyer")
+                    b.HasOne("BusinessObject.Entities2.OrderStatus", "OrderStatus")
                         .WithMany("Orders")
-                        .HasForeignKey("BuyerId")
+                        .HasForeignKey("OrderStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Buyer");
+                    b.HasOne("BusinessObject.Entities2.PlatformFee", "PlatformFee")
+                        .WithMany("Orders")
+                        .HasForeignKey("PlatformFeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.ProductType", "ProductType")
+                        .WithOne("Order")
+                        .HasForeignKey("BusinessObject.Entities2.Order", "ProductTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderStatus");
+
+                    b.Navigation("PlatformFee");
+
+                    b.Navigation("ProductType");
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.OrderCoupon", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Order", "Order")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("OrderId")
+                    b.HasOne("BusinessObject.Entities2.Coupon", "Coupon")
+                        .WithMany("OrderCoupons")
+                        .HasForeignKey("CouponId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.Product", "Product")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("ProductId")
+                    b.HasOne("BusinessObject.Entities2.Order", "Order")
+                        .WithMany("OrderCoupons")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("Coupon");
 
-                    b.Navigation("Product");
+                    b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Product", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Product", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Category", "Category")
+                    b.HasOne("BusinessObject.Entities2.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.User", "Seller")
+                    b.HasOne("BusinessObject.Entities2.ProductStatus", "ProductStatus")
                         .WithMany("Products")
-                        .HasForeignKey("SellerId")
+                        .HasForeignKey("ProductStatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.Shop", "Shop")
+                        .WithMany("Products")
+                        .HasForeignKey("ShopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.User", null)
+                        .WithMany("Products")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Category");
 
-                    b.Navigation("Seller");
+                    b.Navigation("ProductStatus");
+
+                    b.Navigation("Shop");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.ProductImage", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.ProductType", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Product", "Product")
-                        .WithMany("ProductImages")
+                    b.HasOne("BusinessObject.Entities2.Product", "Product")
+                        .WithMany("ProductTypes")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -780,10 +1143,21 @@ namespace BusinessObject.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.ProductWarehouse", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.RefreshToken", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Product", "Product")
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Tag", b =>
+                {
+                    b.HasOne("BusinessObject.Entities2.Product", "Product")
+                        .WithMany("Tags")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -791,9 +1165,36 @@ namespace BusinessObject.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.RefreshToken", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Transaction", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.HasOne("BusinessObject.Entities2.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.TransactionType", "TransactionType")
+                        .WithMany("Transactions")
+                        .HasForeignKey("TransactionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities2.User", "User")
+                        .WithMany("Transactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("TransactionType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.TwoFactorAuthentication", b =>
+                {
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -802,31 +1203,9 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Storage", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.User", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.TwoFactorAuthentication", b =>
-                {
-                    b.HasOne("BusinessObject.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.User", b =>
-                {
-                    b.HasOne("BusinessObject.Entities.Role", "Role")
+                    b.HasOne("BusinessObject.Entities2.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -835,15 +1214,15 @@ namespace BusinessObject.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.UserBank", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.UserBank", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Bank", "Bank")
-                        .WithMany()
+                    b.HasOne("BusinessObject.Entities2.Bank", "Bank")
+                        .WithMany("UserBanks")
                         .HasForeignKey("BankId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany("UserBanks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -854,15 +1233,15 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.UserConversation", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.UserConversation", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Conversation", "Conversation")
+                    b.HasOne("BusinessObject.Entities2.Conversation", "Conversation")
                         .WithMany("UserConversations")
                         .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.HasOne("BusinessObject.Entities2.User", "User")
                         .WithMany("UserConversations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -873,42 +1252,107 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Category", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.WithdrawTransaction", b =>
+                {
+                    b.HasOne("BusinessObject.Entities2.WithdrawTransactionStatus", "WithdrawTransactionStatus")
+                        .WithMany("WithdrawTransaction")
+                        .HasForeignKey("WithdrawTransactionStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WithdrawTransactionStatus");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Bank", b =>
+                {
+                    b.Navigation("UserBanks");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Category", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Conversation", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Conversation", b =>
                 {
                     b.Navigation("Messages");
 
                     b.Navigation("UserConversations");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Order", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Coupon", b =>
                 {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("OrderCoupons");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Product", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Feedback", b =>
                 {
-                    b.Navigation("Coupons");
+                    b.Navigation("Medias");
+                });
 
+            modelBuilder.Entity("BusinessObject.Entities2.Order", b =>
+                {
+                    b.Navigation("OrderCoupons");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.OrderStatus", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.PlatformFee", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Product", b =>
+                {
                     b.Navigation("Feedbacks");
 
-                    b.Navigation("OrderDetails");
+                    b.Navigation("Medias");
 
-                    b.Navigation("ProductImages");
+                    b.Navigation("ProductTypes");
+
+                    b.Navigation("Tags");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Role", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.ProductStatus", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.ProductType", b =>
+                {
+                    b.Navigation("AssetInformation");
+
+                    b.Navigation("Carts");
+
+                    b.Navigation("Order")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.User", b =>
+            modelBuilder.Entity("BusinessObject.Entities2.Shop", b =>
+                {
+                    b.Navigation("Coupons");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.TransactionType", b =>
+                {
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.User", b =>
                 {
                     b.Navigation("AccessTokens");
+
+                    b.Navigation("AssetInformation");
 
                     b.Navigation("DepositTransactions");
 
@@ -918,9 +1362,16 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("Products");
 
+                    b.Navigation("Transactions");
+
                     b.Navigation("UserBanks");
 
                     b.Navigation("UserConversations");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities2.WithdrawTransactionStatus", b =>
+                {
+                    b.Navigation("WithdrawTransaction");
                 });
 #pragma warning restore 612, 618
         }
