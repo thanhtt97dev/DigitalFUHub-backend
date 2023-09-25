@@ -12,16 +12,6 @@ namespace BusinessObject.Entities
 {
     public class User
     {
-        public User()
-        {
-            AccessTokens = new List<AccessToken>();
-            DepositTransactions = new List<DepositTransaction>();
-            UserConversations = new List<UserConversation>();
-            UserBanks = new List<UserBank>();
-            Orders = new List<Order>();
-            Products = new List<Product>();
-            Feedbacks = new List<Feedback>();
-        }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -36,6 +26,7 @@ namespace BusinessObject.Entities
         public bool TwoFactorAuthentication { get; set; }
         public long CustomerBalance { get; set; }
         public long SellerBalance { get; set; }
+        public long AccountBalance { get; set; }
         public bool SignInGoogle { get; set; }
         public bool IsConfirm { get; set; }
 
@@ -48,6 +39,7 @@ namespace BusinessObject.Entities
         public virtual ICollection<Order>? Orders { get; set; }
         public virtual ICollection<Product>? Products { get; set; }
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
-
+        public virtual ICollection<AssetInformation>? AssetInformation { get; set; }
+        public virtual ICollection<Transaction>? Transactions { get; set; }
     }
 }

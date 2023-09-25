@@ -6,15 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.Entities2
+namespace BusinessObject.Entities
 {
-	public class PlatformFee
+	public class MediaType
 	{
-		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public long PlatformFeeId { get; set; }
-		public long Fee { get; set; }
-		public DateTime StartDate { get; set; }
-		public virtual ICollection<Order>? Orders { get; set; }
+		[Key]
+		public long MediaTypeId { get; set; }
+		public string? Name { get; set; }
 	}
 }

@@ -14,12 +14,14 @@ namespace BusinessObject.Entities
         [Key]
         public long FeedbackId { get; set; }
         public long ProductId { get; set; }
-        public long BuyerId { get; set; }
-        public string? FeedbackContent { get; set; }
-        public int Rate { get; set; }
+        public long UserId { get; set; }
+        public string? Content { get; set; }
+        //public int Rate { get; set; }
+        public DateTime UpdateAt { get; set; }
         [ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; } = null!;
-        [ForeignKey(nameof(BuyerId))]
-        public virtual User Buyer { get; set; } = null!;
+        [ForeignKey(nameof(UserId))]
+        public virtual User User { get; set; } = null!;
+        public virtual ICollection<Media> Medias { get; set; } = null!;
     }
 }

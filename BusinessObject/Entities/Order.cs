@@ -10,22 +10,29 @@ namespace BusinessObject.Entities
 {
     public class Order
     {
-        public Order()
-        {
-            OrderDetails = new List<OrderDetail>();
-        }
+       
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long OrderId { get; set; }
-        public long BuyerId { get; set; }
-        public long TotalCost { get; set; }
+        public long UserId { get; set; }
+        public long ProductTypeId { get; set; }
+        public long PlatformFeeId { get; set; }
+        public long Quantity { get; set; }
+        public DateTime OrderDate { get; set; }
+        public long TotalAmount { get; set; }
         public bool IsFeedback { get; set; }
-        public bool Status { get; set; }
+        public long OrderStatusId { get; set; }
         public DateTime DateOrder { get; set; }
 
-        [ForeignKey(nameof(BuyerId))]
-        public virtual User Buyer { get; set; } = null!;
-        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public virtual User User { get; set; } = null!;
+        [ForeignKey(nameof(OrderStatusId))]
+        public virtual OrderStatus? OrderStatus { get; set; } = null!;
+        [ForeignKey(nameof(ProductTypeId))]
+        public virtual ProductType? ProductType { get; set; } = null!;
+        [ForeignKey(nameof(PlatformFeeId))]
+        public virtual PlatformFee? PlatformFee { get; set; } = null!;
+        public virtual List<OrderCoupon> OrderCoupons { get; set; } = null!;
     }
 }

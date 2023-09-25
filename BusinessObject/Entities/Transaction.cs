@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BusinessObject.Entities;
 
-namespace BusinessObject.Entities2
+namespace BusinessObject.Entities
 {
 	public class Transaction
 	{

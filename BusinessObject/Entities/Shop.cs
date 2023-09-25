@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.Entities2
+namespace BusinessObject.Entities
 {
 	public class Shop
 	{

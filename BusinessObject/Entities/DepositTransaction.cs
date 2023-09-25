@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.Entities
 {
-    //WithdrawalTransaction
     public class DepositTransaction
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long DepositTransactionId { get; set; }
         public long UserId { get; set; }
         public DateTime? RequestDate { get; set; }
         public DateTime? PaidDate { get; set; }

@@ -6,15 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.Entities2
+namespace BusinessObject.Entities
 {
-	public class WithdrawTransactionStatus
+	public class ProductStatus
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public long WithdrawTransactionStatusId { get; set; }
-		public string? Name { get; set; }
+		public long ProductStatusId { get; set; }
+		public long ProductId { get; set; }
+		public string? ProductStatusName { get; set; }
 
-		public virtual ICollection<WithdrawTransaction>? WithdrawTransaction { get; set; }
+		[ForeignKey(nameof(ProductId))]
+		public virtual ICollection< Product>? Products { get; set; }
 	}
 }
