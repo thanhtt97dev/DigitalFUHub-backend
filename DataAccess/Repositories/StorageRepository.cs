@@ -11,9 +11,9 @@ namespace DataAccess.Repositories
 {
     public class StorageRepository : IStorageRepository
 	{
-		public void AddFile(Storage file) => StorageDAO.Instance.AddFile(file);
+		public void AddFile(Media file) => StorageDAO.Instance.AddFile(file);
 
-		public Storage? GetFileByName(string filename) => StorageDAO.Instance.GetFileByName(filename);
+		public Media? GetFileByName(string filename) => StorageDAO.Instance.GetFileByName(filename);
 
 		public void RemoveFile(string filename) => StorageDAO.Instance.RemoveFile(filename);
 	}

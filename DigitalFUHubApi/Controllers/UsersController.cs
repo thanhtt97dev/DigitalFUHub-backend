@@ -84,36 +84,52 @@
 		#endregion
 
 		#region SignInGoogle
-		[HttpPost("SignInhGoogle")]
+		[HttpPost("SignInGoogle")]
 		public async Task<IActionResult> SignInGoogleAsync(UserSignInGoogleRequestDTO userSignIn)
 		{
+			if (!ModelState.IsValid)
+			{
+				return UnprocessableEntity();
+			}
 			try
 			{
 				User? user = await _userRepository.GetUserByEmail(userSignIn.Email);
 
 				if (user == null)
 				{
+<<<<<<< HEAD
 					
+=======
+
+					string username = userSignIn.Email.Split("@")[0];
+>>>>>>> 03412274a8c6f6b7a13c24673ec49c883d09710e
 					User newUser = new User
 					{
 						Email = userSignIn.Email,
 						TwoFactorAuthentication = false,
 						RoleId = 2,
 						SignInGoogle = true,
+<<<<<<< HEAD
 						Status = true
+=======
+						Status = true,
+						IsConfirm = true,
+						Username = username,
+						Fullname = userSignIn.Fullname
+>>>>>>> 03412274a8c6f6b7a13c24673ec49c883d09710e
 					};
 					await _userRepository.AddUser(newUser);
 					user = await _userRepository.GetUserByEmail(userSignIn.Email);
-					var tokenForNewUser = _jwtTokenService.GenerateTokenAsync(newUser);
-					return Ok(await tokenForNewUser);
+				}
+				else
+				{
+					if (!user.Status) return Conflict("Your account was baned!");
+					if (user.TwoFactorAuthentication)
+						return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
 				}
 
-				if (!user.Status) return Conflict("Your account was baned!");
-				if (user.TwoFactorAuthentication)
-					return StatusCode(StatusCodes.Status416RangeNotSatisfiable, user.UserId);
-
-				var token = _jwtTokenService.GenerateTokenAsync(user);
-				return Ok(await token);
+				var token = await _jwtTokenService.GenerateTokenAsync(user);
+				return Ok(token);
 			}
 			catch (Exception ex)
 			{
@@ -588,7 +604,7 @@
 		}
 		#endregion
 
-		#region Get Check Exist Email
+		#region Check Exist Email
 		[HttpGet("CheckExistEmail/{email}")]
 		public async Task<IActionResult> CheckExistEmail(string email)
 		{
@@ -601,7 +617,7 @@
 		}
 		#endregion
 
-		#region Get Check Exist Username
+		#region Check Exist Username
 		[HttpGet("CheckExistUsername/{username}")]
 		public async Task<IActionResult> CheckExistUsername(string username)
 		{

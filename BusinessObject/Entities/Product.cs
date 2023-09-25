@@ -13,7 +13,7 @@ namespace BusinessObject.Entities
     {
         public Product()
         {
-            ProductImages = new List<ProductImage>();
+            ProductImages = new List<ProductType>();
             Coupons = new List<Coupon>();
             Feedbacks = new List<Feedback>();
             OrderDetails = new List<OrderDetail>();
@@ -37,7 +37,7 @@ namespace BusinessObject.Entities
         public virtual User Seller { get; set; } = null!;
         [ForeignKey(nameof(CategoryId))]
         public virtual Category Category { get; set; } = null!;
-        public virtual ICollection<ProductImage> ProductImages { get; set; }
+        public virtual ICollection<ProductType> ProductImages { get; set; }
         public virtual ICollection<Coupon> Coupons { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
