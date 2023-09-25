@@ -32,12 +32,11 @@ namespace DigitalFUHubApi.Controllers
 			{
 				string fileExtension = request.FileUpload.FileName.Substring(request.FileUpload.FileName.LastIndexOf("."));
 				string filename = string.Concat(Guid.NewGuid().ToString(), fileExtension);
-				await _storageService.UploadFileToAzureAsync(request.FileUpload, filename);
+				string url = await _storageService.UploadFileToAzureAsync(request.FileUpload, filename);
 
 				_storageRepository.AddFile(new Media
 				{
-					FileName = filename,
-					UserId = request.UserId,
+					Url = url,
 					IsPublic = request.IsPublic
 				});
 			}
