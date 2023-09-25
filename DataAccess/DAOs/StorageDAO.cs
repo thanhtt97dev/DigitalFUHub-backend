@@ -35,7 +35,7 @@ namespace DataAccess.DAOs
 			{
 				try
 				{
-					context.Storage.Add(file);
+					context.Media.Add(file);
 					context.SaveChanges();
 				}
 				catch (Exception e)
@@ -50,7 +50,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Storage.FirstOrDefault(x => x.FileName == filename);
+				return context.Media.FirstOrDefault(x => x.FileName == filename);
 			}
 		}
 

@@ -12,7 +12,7 @@ namespace BusinessObject.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+        public long TwoFactorAuthenticationId { get; set; }
         public long UserId { get; set; }
         public string SecretKey { get; set; } = null!;
 

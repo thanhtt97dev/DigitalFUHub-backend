@@ -14,7 +14,7 @@ namespace BusinessObject.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ConversationId { get; set; }
         public DateTime DateCreate { get; set; }
-        public bool isActivate { get; set; }
+        public bool IsActivate { get; set; }
 
         public virtual ICollection<UserConversation>? UserConversations { get; set; }
         public virtual ICollection<Message>? Messages { get; set; }

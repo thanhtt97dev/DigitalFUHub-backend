@@ -6,15 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.Entities2
+namespace BusinessObject.Entities
 {
-	public class OrderStatus
+	public class TransactionType
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public long OrderStatusId { get; set; }
-		public string? Name { get; set; }
+		public long TransactionTypeId { get; set; }
+		public long Name { get; set; }
 
-		public virtual ICollection<Order>? Orders { get; set; } 
+		public virtual ICollection<Transaction>? Transactions { get; set;}
 	}
 }

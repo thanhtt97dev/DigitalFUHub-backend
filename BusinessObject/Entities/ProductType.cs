@@ -6,22 +6,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.Entities2
+namespace BusinessObject.Entities
 {
-    public class Feedback
+    public class ProductType
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public long FeedbackId { get; set; }
+        public long ProductTypeId { get; set; }
         public long ProductId { get; set; }
-        public long UserId { get; set; }
-        public string? Content { get; set; }
-        //public int Rate { get; set; }
-        public DateTime UpdateAt { get; set; }
+        public string? Name { get; set; }
+        public long? Price { get; set; }
         [ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; } = null!;
-        [ForeignKey(nameof(UserId))]
-        public virtual User User { get; set; } = null!;
-        public virtual ICollection<Media> Medias { get; set; } = null!;
+        public virtual Order Order { get; set; } = null!;
+        public virtual ICollection<Cart>? Carts { get; set; }
+        public virtual ICollection<AssetInformation>? AssetInformation { get; set; }
     }
 }

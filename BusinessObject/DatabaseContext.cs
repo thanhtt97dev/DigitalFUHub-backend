@@ -1,5 +1,5 @@
 ﻿using BusinessObject.DataTransfer;
-using BusinessObject.Entities2;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

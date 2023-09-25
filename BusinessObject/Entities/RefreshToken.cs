@@ -12,7 +12,7 @@ namespace BusinessObject.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+        public long RefreshTokenId { get; set; }
         public long UserId { get; set; }
         public string? TokenRefresh { get; set; }
         public DateTime ExpiredDate { get; set; }

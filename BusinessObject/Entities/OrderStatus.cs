@@ -6,13 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.Entities2
+namespace BusinessObject.Entities
 {
-	public class MediaType
+	public class OrderStatus
 	{
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		[Key]
-		public long MediaTypeId { get; set; }
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		public long OrderStatusId { get; set; }
 		public string? Name { get; set; }
+
+		public virtual ICollection<Order>? Orders { get; set; } 
 	}
 }
