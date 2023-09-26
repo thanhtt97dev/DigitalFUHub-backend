@@ -94,8 +94,9 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
             builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 			builder.Services.AddSingleton<IBankRepository, BankRepository>();
+			builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 
-            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
+			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();

@@ -23,9 +23,6 @@
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 		private readonly IAccessTokenRepository _accessTokenRepository;
 		private readonly IMapper _mapper;
-		private readonly IHubContext<NotificationHub> _notificationHubContext;
-		private readonly IConnectionManager _connectionManager;
-		private readonly INotificationRepositiory _notificationRepositiory;
 		private readonly ITwoFactorAuthenticationRepository _twoFactorAuthenticationRepository;
 
 		private readonly JwtTokenService _jwtTokenService;
@@ -35,8 +32,6 @@
 		public UsersController(IUserRepository userRepository, IMapper mapper,
 			IRefreshTokenRepository refreshTokenRepository,
 			IAccessTokenRepository accessTokenRepository,
-			IHubContext<NotificationHub> notificationHubContext, IConnectionManager connectionManager,
-			INotificationRepositiory notificationRepositiory,
 			ITwoFactorAuthenticationRepository twoFactorAuthenticationRepository,
 			JwtTokenService jwtTokenService,
 			TwoFactorAuthenticationService twoFactorAuthenticationService,
@@ -48,9 +43,6 @@
 			_refreshTokenRepository = refreshTokenRepository;
 			_accessTokenRepository = accessTokenRepository;
 			_jwtTokenService = jwtTokenService;
-			_notificationHubContext = notificationHubContext;
-			_connectionManager = connectionManager;
-			_notificationRepositiory = notificationRepositiory;
 			_twoFactorAuthenticationService = twoFactorAuthenticationService;
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
