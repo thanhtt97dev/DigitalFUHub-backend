@@ -552,25 +552,6 @@
 		}
 		#endregion
 
-		#region Get Seller Balance
-		[Authorize]
-		[HttpGet("GetSellerBalance/{id}")]
-		public IActionResult GetSellerBalanceById(int id)
-		{
-			if (id == 0) return BadRequest();
-			try
-			{
-				var user = _userRepository.GetUserById(id);
-				if (user == null) return NotFound();
-				return Ok(user.AccountBalance);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-			}
-		}
-		#endregion
-
 		#region Edit user info
 		[Authorize]
 		[HttpPut("EditUserInfo/{id}")]
