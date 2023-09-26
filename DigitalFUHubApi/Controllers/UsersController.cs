@@ -153,8 +153,7 @@
 					Status = true,
 					Username = request.Username,
 					Avatar = "",
-					CustomerBalance = 0,
-					SellerBalance = 0,
+					AccountBalance = 0,
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
 				};
@@ -544,26 +543,7 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-				return Ok(user.CustomerBalance);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-			}
-		}
-		#endregion
-
-		#region Get Seller Balance
-		[Authorize]
-		[HttpGet("GetSellerBalance/{id}")]
-		public IActionResult GetSellerBalanceById(int id)
-		{
-			if (id == 0) return BadRequest();
-			try
-			{
-				var user = _userRepository.GetUserById(id);
-				if (user == null) return NotFound();
-				return Ok(user.SellerBalance);
+				return Ok(user.AccountBalance);
 			}
 			catch (Exception ex)
 			{

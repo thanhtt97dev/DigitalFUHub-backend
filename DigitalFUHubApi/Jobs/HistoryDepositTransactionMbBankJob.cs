@@ -9,12 +9,12 @@ using DTOs.MbBank;
 
 namespace DigitalFUHubApi.Jobs
 {
-    public class HistoryTransactionMbBankJob : IJob
+    public class HistoryDepositTransactionMbBankJob : IJob
 	{
 		private readonly IConfiguration configuration;
 		private readonly MbBankService mbBankService;
 
-		public HistoryTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
+		public HistoryDepositTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
 		{
 			this.configuration = configuration;
 			this.mbBankService = mbBankService;
@@ -37,7 +37,7 @@ namespace DigitalFUHubApi.Jobs
 
 			if (data.result.responseCode == "00")// Get data success
 			{
-				string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreData"];
+				string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreDepositData"];
 				if (directoryPathStoreData == null) return;
 
 				string dataPreviousText = Util.ReadFile(directoryPathStoreData);

@@ -14,16 +14,13 @@ namespace BusinessObject.Entities
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long AssetInformationId { get; set; }
-		public long ProductTypeId { get; set; }
-		public long? UserId { get; set; }
+		public long ProductVariantId { get; set; }
 		public DateTime? CreateDate { get; set; }
 		public DateTime? UpdateDate { get; set; }
 		public string? Asset { get; set; }
 		public bool IsActive { get; set; }
 
-		[ForeignKey(nameof(UserId))]
-		public virtual User? User { get; set; }
-		[ForeignKey(nameof(ProductTypeId))]
-		public virtual ProductType? ProductType { get; set; }
+		[ForeignKey(nameof(ProductVariantId))]
+		public virtual ProductVariant? ProductVariant { get; set; }
 	}
 }

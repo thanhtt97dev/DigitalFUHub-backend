@@ -16,10 +16,11 @@ namespace BusinessObject.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long OrderId { get; set; }
         public long UserId { get; set; }
-        public long ProductTypeId { get; set; }
+        public long ProductVariantId { get; set; }
         public long PlatformFeeId { get; set; }
         public long Quantity { get; set; }
-        public DateTime OrderDate { get; set; }
+		public long Price { get; set; }
+		public DateTime OrderDate { get; set; }
         public long TotalAmount { get; set; }
         public bool IsFeedback { get; set; }
         public long OrderStatusId { get; set; }
@@ -29,8 +30,8 @@ namespace BusinessObject.Entities
         public virtual User User { get; set; } = null!;
         [ForeignKey(nameof(OrderStatusId))]
         public virtual OrderStatus? OrderStatus { get; set; } = null!;
-        [ForeignKey(nameof(ProductTypeId))]
-        public virtual ProductType? ProductType { get; set; } = null!;
+        [ForeignKey(nameof(ProductVariantId))]
+        public virtual ProductVariant? ProductVariant { get; set; } = null!;
         [ForeignKey(nameof(PlatformFeeId))]
         public virtual PlatformFee? PlatformFee { get; set; } = null!;
         public virtual List<OrderCoupon> OrderCoupons { get; set; } = null!;

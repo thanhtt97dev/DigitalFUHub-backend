@@ -127,7 +127,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddQuartz(q =>
 			{
 				var jobKeyGetHistoryTransaction = new JobKey("GetHistoryTransactionJob");
-				q.AddJob<HistoryTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyGetHistoryTransaction));
+				q.AddJob<HistoryDepositTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyGetHistoryTransaction));
 				q.AddTrigger(opts => opts
 					.ForJob(jobKeyGetHistoryTransaction)
 					.StartNow()

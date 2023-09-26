@@ -4,6 +4,7 @@ using BusinessObject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230926013440_version-1")]
+    partial class version1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,74 +196,6 @@ namespace BusinessObject.Migrations
                     b.HasIndex("ShopId");
 
                     b.ToTable("Coupon");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.DepositeTransactionBill", b =>
-                {
-                    b.Property<long>("DepositeTransactionBillId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("DepositeTransactionBillId"), 1L, 1);
-
-                    b.Property<int>("AvailableBalance")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BenAccountName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BenAccountNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BeneficiaryAccount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CreditAmount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DebitAmount")
-                        .HasColumnType("int");
-
-                    b.Property<long>("DepositTransactionId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DocId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PostingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RefNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TransactionType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ÁccountNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("DepositeTransactionBillId");
-
-                    b.HasIndex("DepositTransactionId");
-
-                    b.ToTable("DepositeTransactionBill");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
@@ -696,7 +630,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductVariant");
+                    b.ToTable("ProductType");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.RefreshToken", b =>
@@ -1030,74 +964,6 @@ namespace BusinessObject.Migrations
                     b.ToTable("WithdrawTransaction");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionBill", b =>
-                {
-                    b.Property<long>("WidrawTransactionBillId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("WidrawTransactionBillId"), 1L, 1);
-
-                    b.Property<string>("AccountNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AvailableBalance")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BenAccountName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BenAccountNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BeneficiaryAccount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CreditAmount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DebitAmount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DocId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PostingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RefNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TransactionType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("WithdrawTransactionId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("WidrawTransactionBillId");
-
-                    b.HasIndex("WithdrawTransactionId");
-
-                    b.ToTable("WithdrawTransactionBill");
-                });
-
             modelBuilder.Entity("BusinessObject.Entities.AccessToken", b =>
                 {
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1152,17 +1018,6 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.Navigation("Shop");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.DepositeTransactionBill", b =>
-                {
-                    b.HasOne("BusinessObject.Entities.DepositTransaction", "DepositTransaction")
-                        .WithMany()
-                        .HasForeignKey("DepositTransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DepositTransaction");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
@@ -1458,17 +1313,6 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionBill", b =>
-                {
-                    b.HasOne("BusinessObject.Entities.WithdrawTransaction", "WithdrawTransaction")
-                        .WithMany()
-                        .HasForeignKey("WithdrawTransactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WithdrawTransaction");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Bank", b =>

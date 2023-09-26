@@ -13,7 +13,7 @@ namespace BusinessObject.Entities
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long TransactionTypeId { get; set; }
-		public long Name { get; set; }
+		public string Name { get; set; } = null!;
 
 		public virtual ICollection<Transaction>? Transactions { get; set;}
 	}

@@ -13,10 +13,6 @@ namespace BusinessObject.Entities
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long ProductStatusId { get; set; }
-		public long ProductId { get; set; }
 		public string? ProductStatusName { get; set; }
-
-		[ForeignKey(nameof(ProductId))]
-		public virtual ICollection< Product>? Products { get; set; }
 	}
 }
