@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230925154050_update relationship")]
-    partial class updaterelationship
+    [Migration("20230926013209_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -71,7 +71,7 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<long>("ProductTypeId")
+                    b.Property<long>("ProductVariantId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("UpdateDate")
@@ -82,7 +82,7 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("AssetInformationId");
 
-                    b.HasIndex("ProductTypeId");
+                    b.HasIndex("ProductVariantId");
 
                     b.HasIndex("UserId");
 
@@ -272,9 +272,6 @@ namespace BusinessObject.Migrations
                     b.Property<long>("ForeignId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("IsPublic")
-                        .HasColumnType("bit");
-
                     b.Property<long>("MediaTypeId")
                         .HasColumnType("bigint");
 
@@ -304,6 +301,18 @@ namespace BusinessObject.Migrations
                     b.HasKey("MediaTypeId");
 
                     b.ToTable("MediaType");
+
+                    b.HasData(
+                        new
+                        {
+                            MediaTypeId = 1L,
+                            Name = "Product"
+                        },
+                        new
+                        {
+                            MediaTypeId = 2L,
+                            Name = "Feedback"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
@@ -399,7 +408,10 @@ namespace BusinessObject.Migrations
                     b.Property<long>("PlatformFeeId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("ProductTypeId")
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductVariantId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("Quantity")
@@ -417,7 +429,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("PlatformFeeId");
 
-                    b.HasIndex("ProductTypeId")
+                    b.HasIndex("ProductVariantId")
                         .IsUnique();
 
                     b.HasIndex("UserId");
@@ -457,6 +469,33 @@ namespace BusinessObject.Migrations
                     b.HasKey("OrderStatusId");
 
                     b.ToTable("OrderStatus");
+
+                    b.HasData(
+                        new
+                        {
+                            OrderStatusId = 1L,
+                            Name = "Wait for customer confirmation"
+                        },
+                        new
+                        {
+                            OrderStatusId = 2L,
+                            Name = "Confirmed"
+                        },
+                        new
+                        {
+                            OrderStatusId = 3L,
+                            Name = "Complaint"
+                        },
+                        new
+                        {
+                            OrderStatusId = 4L,
+                            Name = "Reject Complaint"
+                        },
+                        new
+                        {
+                            OrderStatusId = 5L,
+                            Name = "Accept Complaint"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.PlatformFee", b =>
@@ -534,24 +573,38 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductStatusId"), 1L, 1);
 
-                    b.Property<long>("ProductId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("ProductStatusName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductStatusId");
 
                     b.ToTable("ProductStatus");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductStatusId = 1L,
+                            ProductStatusName = "Active"
+                        },
+                        new
+                        {
+                            ProductStatusId = 2L,
+                            ProductStatusName = "Ban"
+                        },
+                        new
+                        {
+                            ProductStatusId = 3L,
+                            ProductStatusName = "Hide"
+                        });
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.ProductType", b =>
+            modelBuilder.Entity("BusinessObject.Entities.ProductVariant", b =>
                 {
-                    b.Property<long>("ProductTypeId")
+                    b.Property<long>("ProductVariantId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductTypeId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductVariantId"), 1L, 1);
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -562,7 +615,10 @@ namespace BusinessObject.Migrations
                     b.Property<long>("ProductId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("ProductTypeId");
+                    b.Property<bool>("isActivate")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ProductVariantId");
 
                     b.HasIndex("ProductId");
 
@@ -707,12 +763,35 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionTypeId"), 1L, 1);
 
-                    b.Property<long>("Name")
-                        .HasColumnType("bigint");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("TransactionTypeId");
 
                     b.ToTable("TransactionType");
+
+                    b.HasData(
+                        new
+                        {
+                            TransactionTypeId = 1L,
+                            Name = "Payment"
+                        },
+                        new
+                        {
+                            TransactionTypeId = 2L,
+                            Name = "Receive payment"
+                        },
+                        new
+                        {
+                            TransactionTypeId = 3L,
+                            Name = "Receive refund"
+                        },
+                        new
+                        {
+                            TransactionTypeId = 4L,
+                            Name = "Profit"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.TwoFactorAuthentication", b =>
@@ -752,9 +831,6 @@ namespace BusinessObject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("CustomerBalance")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -771,9 +847,6 @@ namespace BusinessObject.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("RoleId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SellerBalance")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("SignInGoogle")
@@ -876,32 +949,11 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("WithdrawTransactionStatusId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("WithdrawTransactionId");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("WithdrawTransactionStatusId");
-
                     b.ToTable("WithdrawTransaction");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionStatus", b =>
-                {
-                    b.Property<long>("WithdrawTransactionStatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("WithdrawTransactionStatusId"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("WithdrawTransactionStatusId");
-
-                    b.ToTable("WithdrawTransactionStatus");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.AccessToken", b =>
@@ -917,24 +969,22 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.AssetInformation", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.ProductType", "ProductType")
+                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
                         .WithMany("AssetInformation")
-                        .HasForeignKey("ProductTypeId")
+                        .HasForeignKey("ProductVariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.User", "User")
+                    b.HasOne("BusinessObject.Entities.User", null)
                         .WithMany("AssetInformation")
                         .HasForeignKey("UserId");
 
-                    b.Navigation("ProductType");
-
-                    b.Navigation("User");
+                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Cart", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.ProductType", "ProductType")
+                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
                         .WithMany("Carts")
                         .HasForeignKey("ProductTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -946,7 +996,7 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ProductType");
+                    b.Navigation("ProductVariant");
 
                     b.Navigation("User");
                 });
@@ -1063,9 +1113,9 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.ProductType", "ProductType")
+                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
                         .WithOne("Order")
-                        .HasForeignKey("BusinessObject.Entities.Order", "ProductTypeId")
+                        .HasForeignKey("BusinessObject.Entities.Order", "ProductVariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1079,7 +1129,7 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("PlatformFee");
 
-                    b.Navigation("ProductType");
+                    b.Navigation("ProductVariant");
 
                     b.Navigation("User");
                 });
@@ -1112,9 +1162,9 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.ProductStatus", "ProductStatus")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("ProductStatusId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.Shop", "Shop")
@@ -1134,10 +1184,10 @@ namespace BusinessObject.Migrations
                     b.Navigation("Shop");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.ProductType", b =>
+            modelBuilder.Entity("BusinessObject.Entities.ProductVariant", b =>
                 {
                     b.HasOne("BusinessObject.Entities.Product", "Product")
-                        .WithMany("ProductTypes")
+                        .WithMany("ProductVariants")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1262,15 +1312,7 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.WithdrawTransactionStatus", "WithdrawTransactionStatus")
-                        .WithMany("WithdrawTransaction")
-                        .HasForeignKey("WithdrawTransactionStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("User");
-
-                    b.Navigation("WithdrawTransactionStatus");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Bank", b =>
@@ -1321,17 +1363,12 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("Medias");
 
-                    b.Navigation("ProductTypes");
+                    b.Navigation("ProductVariants");
 
                     b.Navigation("Tags");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.ProductStatus", b =>
-                {
-                    b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.ProductType", b =>
+            modelBuilder.Entity("BusinessObject.Entities.ProductVariant", b =>
                 {
                     b.Navigation("AssetInformation");
 
@@ -1379,11 +1416,6 @@ namespace BusinessObject.Migrations
                     b.Navigation("UserConversations");
 
                     b.Navigation("WithdrawTransactions");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionStatus", b =>
-                {
-                    b.Navigation("WithdrawTransaction");
                 });
 #pragma warning restore 612, 618
         }

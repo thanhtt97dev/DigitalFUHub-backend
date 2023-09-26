@@ -153,8 +153,7 @@
 					Status = true,
 					Username = request.Username,
 					Avatar = "",
-					CustomerBalance = 0,
-					SellerBalance = 0,
+					AccountBalance = 0,
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
 				};
@@ -544,7 +543,7 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-				return Ok(user.CustomerBalance);
+				return Ok(user.AccountBalance);
 			}
 			catch (Exception ex)
 			{
@@ -563,7 +562,7 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-				return Ok(user.SellerBalance);
+				return Ok(user.AccountBalance);
 			}
 			catch (Exception ex)
 			{

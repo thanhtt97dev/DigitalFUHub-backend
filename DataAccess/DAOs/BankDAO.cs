@@ -108,7 +108,7 @@ namespace DataAccess.DAOs
 							deposit.PaidDate = System.DateTime.Now;
 							//update accout balace user
 							var user = context.User.First(x => x.UserId == deposit.UserId);
-							user.CustomerBalance = user.CustomerBalance + item.creditAmount;
+							user.AccountBalance = user.AccountBalance + item.creditAmount;
 						}
 					}
 					context.SaveChanges();

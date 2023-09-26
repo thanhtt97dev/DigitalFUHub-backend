@@ -17,12 +17,7 @@ namespace BusinessObject.Entities
         public long ForeignId { get; set; }
         public long MediaTypeId { get; set; }
         public string? Url { get; set; }
-        public bool IsPublic { get; set; }
 
-        [ForeignKey(nameof(ForeignId))]
-        public virtual Feedback Feedback { get; set; } = null!;
-        [ForeignKey(nameof(ForeignId))]
-        public virtual Product Product { get; set; } = null!;
         [ForeignKey(nameof(MediaTypeId))]
         public virtual MediaType MediaType { get; set; } = null!;
 

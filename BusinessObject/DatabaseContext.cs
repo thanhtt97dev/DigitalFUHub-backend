@@ -8,7 +8,7 @@ namespace BusinessObject
     public class DatabaseContext : DbContext
     {
 
-        public readonly string connectionString = "server=localhost; database=DBTest; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+        public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
         //public readonly string connectionString = "Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
 
         public DatabaseContext() { }
@@ -23,9 +23,10 @@ namespace BusinessObject
         public virtual DbSet<Notification> Notification { get; set; } = null!;
         public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
         public virtual DbSet<DepositTransaction> DepositTransaction { get; set; } = null!;
-        public virtual DbSet<WithdrawTransaction> WithdrawTransaction { get; set; } = null!;
-        public virtual DbSet<WithdrawTransactionStatus> WithdrawTransactionStatus { get; set; } = null!;
-        public virtual DbSet<Transaction> Transaction { get; set; } = null!;
+		public virtual DbSet<DepositeTransactionBill> DepositeTransactionBill { get; set; } = null!;
+		public virtual DbSet<WithdrawTransaction> WithdrawTransaction { get; set; } = null!;
+		public virtual DbSet<WithdrawTransactionBill> WithdrawTransactionBill { get; set; } = null!;
+		public virtual DbSet<Transaction> Transaction { get; set; } = null!;
         public virtual DbSet<TransactionType> TransactionType { get; set; } = null!;
         public virtual DbSet<UserConversation> UserConversation { get; set; } = null!;
         public virtual DbSet<Conversation> Conversations { get; set; } = null!;
@@ -33,7 +34,7 @@ namespace BusinessObject
         public virtual DbSet<Bank> Bank { get; set; } = null!;
         public virtual DbSet<UserBank> UserBank { get; set; } = null!;
         public virtual DbSet<Product> Product { get; set; } = null!;
-		public virtual DbSet<ProductType> ProductType { get; set; } = null!;
+		public virtual DbSet<ProductVariant> ProductVariant { get; set; } = null!;
 		public virtual DbSet<ProductStatus> ProductStatus { get; set; } = null!;
 		public virtual DbSet<Tag> Tag { get; set; } = null!;
 		public virtual DbSet<Shop> Shop { get; set; } = null!;
@@ -62,16 +63,6 @@ namespace BusinessObject
         {
             modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductTypeId });
             modelBuilder.Entity<OrderCoupon>().HasKey(x => new { x.OrderId, x.CouponId });
-			modelBuilder.Entity<Product>().
-                HasOne(x => x.ProductStatus)
-                .WithMany(x => x.Products)
-                .HasForeignKey(x => x.ProductStatusId)
-                .OnDelete(DeleteBehavior.NoAction);
-            modelBuilder.Entity<Media>().
-                HasOne(x => x.Product)
-                .WithMany(x => x.Medias)
-                .HasForeignKey(x => x.ForeignId)
-                .OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<OrderCoupon>().
                 HasOne(x => x.Order)
                 .WithMany(x => x.OrderCoupons)
@@ -82,6 +73,40 @@ namespace BusinessObject
                 .WithMany(x => x.Transactions)
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
-        }
-    }
+
+			modelBuilder.Entity<MediaType>().HasData(new MediaType[]
+			{
+                new MediaType{MediaTypeId = 1, Name = "Product"},
+				new MediaType{MediaTypeId = 2, Name = "Feedback"},
+			});
+
+			modelBuilder.Entity<TransactionType>().HasData(new TransactionType[]
+			{
+				new TransactionType{TransactionTypeId = 1, Name = "Payment"},
+				new TransactionType{TransactionTypeId = 2, Name = "Receive payment"},
+				new TransactionType{TransactionTypeId = 3, Name = "Receive refund"},
+				new TransactionType{TransactionTypeId = 4, Name = "Profit"},
+			});
+
+
+			modelBuilder.Entity<ProductStatus>().HasData(new ProductStatus[]
+			{
+				new ProductStatus{ProductStatusId = 1, ProductStatusName = "Active"},
+				new ProductStatus{ProductStatusId = 2, ProductStatusName = "Ban"},
+				new ProductStatus{ProductStatusId = 3, ProductStatusName = "Hide"},
+			});
+
+			modelBuilder.Entity<OrderStatus>().HasData(new OrderStatus[]
+			{
+				new OrderStatus{OrderStatusId = 1, Name = "Wait for customer confirmation"},
+				new OrderStatus{OrderStatusId = 2, Name = "Confirmed"},
+				new OrderStatus{OrderStatusId = 3, Name = "Complaint"},
+				new OrderStatus{OrderStatusId = 4, Name = "Reject Complaint"},
+				new OrderStatus{OrderStatusId = 5, Name = "Accept Complaint"},
+			});
+
+			
+		}
+
+	}
 }
