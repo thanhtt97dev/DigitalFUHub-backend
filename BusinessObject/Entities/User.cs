@@ -30,7 +30,7 @@ namespace BusinessObject.Entities
 
         [ForeignKey(nameof(RoleId))]
         public virtual Role Role { get; set; } = null!;
-        public virtual ICollection<AccessToken>? AccessTokens { get; set; }
+		public virtual ICollection<AccessToken>? AccessTokens { get; set; }
         public virtual ICollection<DepositTransaction>? DepositTransactions { get; set; }
         public virtual ICollection<UserConversation>? UserConversations { get; set; }
         public virtual ICollection<UserBank>? UserBanks { get; set; }
@@ -39,5 +39,6 @@ namespace BusinessObject.Entities
         public virtual ICollection<AssetInformation>? AssetInformation { get; set; }
         public virtual ICollection<Transaction>? Transactions { get; set; }
         public virtual ICollection<WithdrawTransaction>? WithdrawTransactions { get; set; }
-    }
+		public virtual ICollection<Cart>? Carts { get; set; }
+	}
 }

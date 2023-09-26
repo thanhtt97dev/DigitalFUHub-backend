@@ -31,9 +31,9 @@ namespace DigitalFUHubApi.Comons
 			int.TryParse(userIdStr, out userId);
 
 			var dbContext = context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
-			var userStatus = dbContext.User.First(x => x.UserId == userId).Status;
+			var user = dbContext.User.First(x => x.UserId == userId);
 
-			if (userStatus == false)
+			if (user != null && user.Status)
 			{
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);

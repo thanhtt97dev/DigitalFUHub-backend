@@ -11,8 +11,9 @@ namespace BusinessObject.Entities
 	public class Shop
 	{
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public long ShopId { get; set; }
+		public long UserId { get; set; }
+		[ForeignKey(nameof(UserId))]
+		public virtual User User { get; set; } = null!;
 		public string? ShopName { get; set; }
 		public DateTime DateCreate { get; set; }
 		public long Balance { get; set; }
