@@ -10,5 +10,6 @@ namespace DataAccess.IRepositories
 	public interface IProductRepository
 	{
 		List<ProductResponeDTO> GetAllProduct(int userId);
+		List<ProductVariantResponeDTO> GetProductVariants(int productId);	
 	}
 }

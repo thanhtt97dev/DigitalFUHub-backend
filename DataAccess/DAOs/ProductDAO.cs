@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using BusinessObject.Entities;
 using DTOs.MbBank;
 using DTOs.Seller;
 using System;
@@ -42,6 +43,7 @@ namespace DataAccess.DAOs
 					{
 						variants.Add(new ProductVariantResponeDTO()
 						{
+							ProductVariantId = variant.ProductVariantId,
 							Name = variant.Name,
 							Price = variant.Price,
 							Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
@@ -55,6 +57,26 @@ namespace DataAccess.DAOs
 						ProductVariants = variants
 					};
 					result.Add(productResponeDTO);
+				}
+				return result;
+			}
+		}
+
+		internal List<ProductVariantResponeDTO> GetProductVariants(int productId)
+		{
+			List<ProductVariantResponeDTO> result = new List<ProductVariantResponeDTO>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var variants = context.ProductVariant.Where(x => x.ProductId == productId && x.isActivate).ToList();
+				foreach (var variant in variants)
+				{
+					result.Add(new ProductVariantResponeDTO()
+					{
+						ProductVariantId = variant.ProductVariantId,	
+						Name = variant.Name,
+						Price = variant.Price,
+						Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
+					});
 				}
 				return result;
 			}

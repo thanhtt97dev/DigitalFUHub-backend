@@ -24,7 +24,7 @@ namespace DigitalFUHubApi.Controllers
 			this.mapper = mapper;
 		}
 
-		#region SignIn
+		#region Get All Product with shopId (userId)
 		//[Authorize("Seller")]
 		[HttpGet("GetAllProduct/{id}")]
 		public IActionResult GetAllProduct(int id)
@@ -33,6 +33,23 @@ namespace DigitalFUHubApi.Controllers
 			{
 				if(id == 0) return BadRequest();
 				var products = productRepository.GetAllProduct(id);
+				return Ok(products);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region SignIn
+		[HttpGet("GetProductVariants/{id}")]
+		public IActionResult GetProductVariants(int id)
+		{
+			try
+			{
+				if (id == 0) return BadRequest();
+				var products = productRepository.GetProductVariants(id);
 				return Ok(products);
 			}
 			catch (Exception ex)

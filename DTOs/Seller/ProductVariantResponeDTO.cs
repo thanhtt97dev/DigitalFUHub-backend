@@ -8,6 +8,7 @@ namespace DTOs.Seller
 {
 	public class ProductVariantResponeDTO
 	{
+		public long ProductVariantId { get; set; }
 		public string? Name { get; set; }
 		public long? Price { get; set; }
 		public long? Quantity { get; set; }
