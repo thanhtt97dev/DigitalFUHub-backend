@@ -37,7 +37,6 @@ namespace DigitalFUHubApi.Controllers
 				_storageRepository.AddFile(new Media
 				{
 					Url = url,
-					IsPublic = request.IsPublic
 				});
 			}
 			catch (Exception)
