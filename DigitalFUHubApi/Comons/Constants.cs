@@ -43,7 +43,8 @@ namespace DigitalFUHubApi.Comons
 		public static string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
 		public static string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
 
-
+		//Azure
+		public static string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
 
 	}
 }

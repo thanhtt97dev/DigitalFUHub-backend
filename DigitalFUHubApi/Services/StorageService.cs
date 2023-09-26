@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Azure.Storage.Blobs;
 using DataAccess.IRepositories;
+using DigitalFUHubApi.Comons;
 
 namespace DigitalFUHubApi.Services
 {
@@ -17,16 +18,16 @@ namespace DigitalFUHubApi.Services
 			containerName = _configuration["Azure:StorageContainerName"] ?? "";
 		}
 
-		public async Task UploadFileToAzureAsync(IFormFile fileUpload, string filename)
+		public async Task<string> UploadFileToAzureAsync(IFormFile fileUpload, string filename)
 		{
 			try
 			{
 				BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
 				await container.UploadBlobAsync(filename, fileUpload.OpenReadStream());
+				return string.Format("{0}/{1}/{2}", Constants.AZURE_ROOT_PATH,containerName,filename);
 			}
 			catch (Exception e)
 			{
-
 				throw new Exception(e.Message);
 			}
 		}

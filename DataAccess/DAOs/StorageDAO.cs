@@ -50,7 +50,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Media.FirstOrDefault(x => x.Url == filename);
+				return context.Media.FirstOrDefault(x => x.Url.Substring(x.Url.LastIndexOf("/") + 1) == filename);
 			}
 		}
 
