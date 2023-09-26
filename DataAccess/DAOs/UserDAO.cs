@@ -76,9 +76,11 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var user = await context.User.FirstAsync(x => x.UserId == id);
-				user.Avatar = userUpdate.Avatar;	
-				user.Fullname = userUpdate.Fullname;
-				await context.SaveChangesAsync();
+                    user.Avatar = userUpdate.Avatar ?? user.Avatar;
+					user.Fullname = userUpdate.Fullname ?? user.Fullname;
+					user.Username = userUpdate.Username ?? user.Username;
+					user.Password = userUpdate.Password ?? user.Password;
+                await context.SaveChangesAsync();
 			}
 		}
 

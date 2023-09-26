@@ -10,11 +10,11 @@ namespace BusinessObject.Entities
 	public class Cart
 	{
 		public long UserId { get; set; }
-		public long ProductTypeId { get; set; }
+		public long ProductVariantId { get; set; }
 		public long Quantity { get; set; }
 
-		[ForeignKey(nameof(ProductTypeId))]
-		public virtual ProductType? ProductType { get; set; }
+		[ForeignKey(nameof(ProductVariantId))]
+		public virtual ProductVariant? ProductVariant { get; set; }
 		[ForeignKey(nameof(UserId))]
 		public virtual User? User { get; set; }
 	}

@@ -94,8 +94,9 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
             builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 			builder.Services.AddSingleton<IBankRepository, BankRepository>();
+			builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 
-            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
+			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
@@ -127,7 +128,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddQuartz(q =>
 			{
 				var jobKeyGetHistoryTransaction = new JobKey("GetHistoryTransactionJob");
-				q.AddJob<HistoryTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyGetHistoryTransaction));
+				q.AddJob<HistoryDepositTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyGetHistoryTransaction));
 				q.AddTrigger(opts => opts
 					.ForJob(jobKeyGetHistoryTransaction)
 					.StartNow()

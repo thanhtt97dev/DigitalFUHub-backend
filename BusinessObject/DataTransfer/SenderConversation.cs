@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.DataTransfer
 {
-    [Keyless]
     public class SenderConversation
     {
         public long UserId { get; set; }

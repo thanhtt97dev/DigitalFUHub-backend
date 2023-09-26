@@ -23,9 +23,6 @@
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 		private readonly IAccessTokenRepository _accessTokenRepository;
 		private readonly IMapper _mapper;
-		private readonly IHubContext<NotificationHub> _notificationHubContext;
-		private readonly IConnectionManager _connectionManager;
-		private readonly INotificationRepositiory _notificationRepositiory;
 		private readonly ITwoFactorAuthenticationRepository _twoFactorAuthenticationRepository;
 
 		private readonly JwtTokenService _jwtTokenService;
@@ -35,8 +32,6 @@
 		public UsersController(IUserRepository userRepository, IMapper mapper,
 			IRefreshTokenRepository refreshTokenRepository,
 			IAccessTokenRepository accessTokenRepository,
-			IHubContext<NotificationHub> notificationHubContext, IConnectionManager connectionManager,
-			INotificationRepositiory notificationRepositiory,
 			ITwoFactorAuthenticationRepository twoFactorAuthenticationRepository,
 			JwtTokenService jwtTokenService,
 			TwoFactorAuthenticationService twoFactorAuthenticationService,
@@ -48,9 +43,6 @@
 			_refreshTokenRepository = refreshTokenRepository;
 			_accessTokenRepository = accessTokenRepository;
 			_jwtTokenService = jwtTokenService;
-			_notificationHubContext = notificationHubContext;
-			_connectionManager = connectionManager;
-			_notificationRepositiory = notificationRepositiory;
 			_twoFactorAuthenticationService = twoFactorAuthenticationService;
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
@@ -153,8 +145,7 @@
 					Status = true,
 					Username = request.Username,
 					Avatar = "",
-					CustomerBalance = 0,
-					SellerBalance = 0,
+					AccountBalance = 0,
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
 				};
@@ -525,7 +516,11 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-				return Ok(_mapper.Map<UserResponeDTO>(user));
+
+				string username = user.Email.Split('@')[0]; 
+                user.Email = Util.HideCharacters(user.Email, username.Length - 2);
+
+                return Ok(_mapper.Map<UserResponeDTO>(user));
 			}
 			catch (Exception ex)
 			{
@@ -544,26 +539,7 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-				return Ok(user.CustomerBalance);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-			}
-		}
-		#endregion
-
-		#region Get Seller Balance
-		[Authorize]
-		[HttpGet("GetSellerBalance/{id}")]
-		public IActionResult GetSellerBalanceById(int id)
-		{
-			if (id == 0) return BadRequest();
-			try
-			{
-				var user = _userRepository.GetUserById(id);
-				if (user == null) return NotFound();
-				return Ok(user.SellerBalance);
+				return Ok(user.AccountBalance);
 			}
 			catch (Exception ex)
 			{

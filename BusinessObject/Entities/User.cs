@@ -24,8 +24,6 @@ namespace BusinessObject.Entities
         public string Avatar { get; set; } = string.Empty;
         public bool Status { get; set; }
         public bool TwoFactorAuthentication { get; set; }
-        public long CustomerBalance { get; set; }
-        public long SellerBalance { get; set; }
         public long AccountBalance { get; set; }
         public bool SignInGoogle { get; set; }
         public bool IsConfirm { get; set; }
@@ -38,7 +36,6 @@ namespace BusinessObject.Entities
         public virtual ICollection<UserConversation>? UserConversations { get; set; }
         public virtual ICollection<UserBank>? UserBanks { get; set; }
         public virtual ICollection<Order>? Orders { get; set; }
-        public virtual ICollection<Product>? Products { get; set; }
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<AssetInformation>? AssetInformation { get; set; }
         public virtual ICollection<Transaction>? Transactions { get; set; }
