@@ -12,14 +12,14 @@ namespace BusinessObject.Entities
 	{
 		[Key]
 		public long UserId { get; set; }
-		[ForeignKey(nameof(UserId))]
-		public virtual User User { get; set; } = null!;
 		public string? ShopName { get; set; }
 		public DateTime DateCreate { get; set; }
 		public long Balance { get; set; }
 		public string? Description { get; set; }
 		public bool IsActive { get; set; }
 
+		[ForeignKey(nameof(UserId))]
+		public virtual User User { get; set; } = null!;
 		public virtual ICollection<Product>? Products { get; set; }
 		public virtual ICollection<Coupon>? Coupons { get; set; }
 	}

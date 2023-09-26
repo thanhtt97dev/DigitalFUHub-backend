@@ -82,20 +82,6 @@ E:\fpt\asp.net-api-configuration\BusinessObject\obj\Debug\net6.0\refint\Business
 E:\fpt\asp.net-api-configuration\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
 E:\fpt\asp.net-api-configuration\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
 E:\fpt\asp.net-api-configuration\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll
-E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.deps.json
-E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.runtimeconfig.json
-E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.dll
-E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.pdb
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.AssemblyReference.cache
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.GeneratedMSBuildEditorConfig.editorconfig
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfoInputs.cache
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfo.cs
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.CoreCompileInputs.cache
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.dll
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\refint\BusinessObject.dll
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
-E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll
 D:\FU\Capstone Project\Back-end\BusinessObject\bin\Debug\net6.0\BusinessObject.deps.json
 D:\FU\Capstone Project\Back-end\BusinessObject\bin\Debug\net6.0\BusinessObject.runtimeconfig.json
 D:\FU\Capstone Project\Back-end\BusinessObject\bin\Debug\net6.0\BusinessObject.dll
@@ -138,3 +124,17 @@ D:\fu-workspace\Semester 9\SEP490\src-final\be-1\BusinessObject\obj\Debug\net6.0
 D:\fu-workspace\Semester 9\SEP490\src-final\be-1\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
 D:\fu-workspace\Semester 9\SEP490\src-final\be-1\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
 D:\fu-workspace\Semester 9\SEP490\src-final\be-1\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.AssemblyReference.cache
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.GeneratedMSBuildEditorConfig.editorconfig
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfoInputs.cache
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfo.cs
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.CoreCompileInputs.cache
+E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.deps.json
+E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.runtimeconfig.json
+E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.dll
+E:\fpt\fu-market-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.pdb
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.dll
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\refint\BusinessObject.dll
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
+E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll

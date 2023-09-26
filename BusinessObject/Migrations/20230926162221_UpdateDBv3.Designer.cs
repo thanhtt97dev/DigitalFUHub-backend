@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230926061423_init")]
-    partial class init
+    [Migration("20230926162221_UpdateDBv3")]
+    partial class UpdateDBv3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,33 @@ namespace BusinessObject.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("BusinessObject.DataTransfer.SenderConversation", b =>
+                {
+                    b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ConversationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Fullname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToView(null);
+                });
 
             modelBuilder.Entity("BusinessObject.Entities.AccessToken", b =>
                 {
@@ -344,16 +371,10 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("MediaId"), 1L, 1);
 
-                    b.Property<long?>("FeedbackId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("ForeignId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("MediaTypeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ProductId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Url")
@@ -361,11 +382,9 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("MediaId");
 
-                    b.HasIndex("FeedbackId");
+                    b.HasIndex("ForeignId");
 
                     b.HasIndex("MediaTypeId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Media");
                 });
@@ -1215,9 +1234,17 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Media", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Feedback", null)
+                    b.HasOne("BusinessObject.Entities.Feedback", "Feedback")
                         .WithMany("Medias")
-                        .HasForeignKey("FeedbackId");
+                        .HasForeignKey("ForeignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.Product", "Product")
+                        .WithMany("Medias")
+                        .HasForeignKey("ForeignId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.MediaType", "MediaType")
                         .WithMany()
@@ -1225,11 +1252,11 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.Product", null)
-                        .WithMany("Medias")
-                        .HasForeignKey("ProductId");
+                    b.Navigation("Feedback");
 
                     b.Navigation("MediaType");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
@@ -1368,8 +1395,8 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Entities.Shop", b =>
                 {
                     b.HasOne("BusinessObject.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne("Shop")
+                        .HasForeignKey("BusinessObject.Entities.Shop", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1589,6 +1616,9 @@ namespace BusinessObject.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("Shop")
+                        .IsRequired();
 
                     b.Navigation("Transactions");
 

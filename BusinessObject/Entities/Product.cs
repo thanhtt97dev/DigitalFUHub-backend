@@ -17,6 +17,7 @@ namespace BusinessObject.Entities
         public long ShopId { get; set; }
         public long CategoryId { get; set; }
         public string? ProductName { get; set; }
+        [DataType(DataType.Text)]
         public string? Description { get; set; }
         public int Discount { get; set; }
         public string? Thumbnail { get; set; }

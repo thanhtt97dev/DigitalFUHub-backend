@@ -68,7 +68,6 @@ namespace BusinessObject
 			modelBuilder.Entity<SenderConversation>()
 				.HasNoKey()
 				.ToView(null);
-			//
             modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductVariantId });
 			modelBuilder.Entity<OrderCoupon>().HasKey(x => new { x.OrderId, x.CouponId });
 			modelBuilder.Entity<OrderCoupon>().
@@ -143,5 +142,5 @@ namespace BusinessObject
 
 		}
 
-	}
+    }
 }

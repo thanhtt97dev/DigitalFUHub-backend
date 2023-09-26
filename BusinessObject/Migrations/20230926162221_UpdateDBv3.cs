@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class init : Migration
+    public partial class UpdateDBv3 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -611,18 +611,17 @@ namespace BusinessObject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ForeignId = table.Column<long>(type: "bigint", nullable: false),
                     MediaTypeId = table.Column<long>(type: "bigint", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FeedbackId = table.Column<long>(type: "bigint", nullable: true),
-                    ProductId = table.Column<long>(type: "bigint", nullable: true)
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Media", x => x.MediaId);
                     table.ForeignKey(
-                        name: "FK_Media_Feedback_FeedbackId",
-                        column: x => x.FeedbackId,
+                        name: "FK_Media_Feedback_ForeignId",
+                        column: x => x.ForeignId,
                         principalTable: "Feedback",
-                        principalColumn: "FeedbackId");
+                        principalColumn: "FeedbackId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Media_MediaType_MediaTypeId",
                         column: x => x.MediaTypeId,
@@ -630,8 +629,8 @@ namespace BusinessObject.Migrations
                         principalColumn: "MediaTypeId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Media_Product_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_Media_Product_ForeignId",
+                        column: x => x.ForeignId,
                         principalTable: "Product",
                         principalColumn: "ProductId");
                 });
@@ -896,19 +895,14 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Media_FeedbackId",
+                name: "IX_Media_ForeignId",
                 table: "Media",
-                column: "FeedbackId");
+                column: "ForeignId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Media_MediaTypeId",
                 table: "Media",
                 column: "MediaTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Media_ProductId",
-                table: "Media",
-                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",
