@@ -84,6 +84,11 @@ namespace BusinessObject
 				new Role{RoleId = 3, RoleName = "Seller"},
 			});
 
+			modelBuilder.Entity<Category>().HasData(new Category[]
+			{
+				new Category{CategoryId = 1, CategoryName = "Account"}
+			});
+
 			modelBuilder.Entity<MediaType>().HasData(new MediaType[]
 			{
                 new MediaType{MediaTypeId = 1, Name = "Product"},
