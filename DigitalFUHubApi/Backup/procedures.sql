@@ -19,7 +19,7 @@ BEGIN
 	WHERE m.ConversationId IN (
 	SELECT 
 		ConversationId
-	FROM UserConversations WHERE UserId = @userId)
+	FROM UserConversation WHERE UserId = @userId)
 	AND u.UserId != @userId
 	ORDER BY m.ConversationId DESC
 END;
@@ -49,7 +49,7 @@ GO;
 
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage
-	@conversationId INT, @senderId INT, @recipientId INT, @content NVARCHAR(MAX), @dateCreate DATETIME, @isImage BIT
+	@conversationId INT, @senderId INT, @recipientId INT, @content NVARCHAR(MAX), @dateCreate DATETIME, @messageType VARCHAR(1)
 AS
 BEGIN
 	-- SET NOCOUNT ON;
@@ -63,18 +63,18 @@ BEGIN
 
 					SELECT @conversationIdCur = IDENT_CURRENT(N'dbo.Conversations')
 
-					INSERT INTO [UserConversations] (UserId, ConversationId)
+					INSERT INTO [UserConversation] (UserId, ConversationId)
 					VALUES (@senderId, @conversationIdCur),
 							(@recipientId, @conversationIdCur)
 
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], isImage, DateCreate, isDelete)
-					VALUES (@senderId, @conversationIdCur, @content, @isImage, @dateCreate, '0')
+					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+					VALUES (@senderId, @conversationIdCur, @content, @messageType, @dateCreate, '0')
 				END;
 			ELSE 
 				BEGIN
 					BEGIN TRANSACTION
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], isImage, DateCreate, isDelete)
-					VALUES (@senderId, @conversationId, @content, @isImage, @dateCreate, '0');
+					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+					VALUES (@senderId, @conversationId, @content, @messageType, @dateCreate, '0');
 				END
 			COMMIT;
 	END TRY

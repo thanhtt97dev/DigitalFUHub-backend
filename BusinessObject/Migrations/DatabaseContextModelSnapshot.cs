@@ -740,6 +740,23 @@ namespace BusinessObject.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1L,
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            RoleName = "Customer"
+                        },
+                        new
+                        {
+                            RoleId = 3L,
+                            RoleName = "Seller"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Shop", b =>

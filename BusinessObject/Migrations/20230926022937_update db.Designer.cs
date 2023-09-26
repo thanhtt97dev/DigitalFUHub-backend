@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230926013931_version-2")]
-    partial class version2
+    [Migration("20230926022937_update db")]
+    partial class updatedb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -742,6 +742,23 @@ namespace BusinessObject.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1L,
+                            RoleName = "Admin"
+                        },
+                        new
+                        {
+                            RoleId = 2L,
+                            RoleName = "Customer"
+                        },
+                        new
+                        {
+                            RoleId = 3L,
+                            RoleName = "Seller"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Shop", b =>

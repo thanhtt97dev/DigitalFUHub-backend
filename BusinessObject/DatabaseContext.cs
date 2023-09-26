@@ -62,6 +62,7 @@ namespace BusinessObject
 			optionsBuilder.UseSqlServer(connectionString);
 		}
 
+<<<<<<< HEAD
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductVariantId });
@@ -91,6 +92,25 @@ namespace BusinessObject
 				.WithMany(x => x.Orders)
 				.HasForeignKey(x => x.UserId)
 				.OnDelete(DeleteBehavior.NoAction);
+=======
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SenderConversation>()
+                .HasNoKey()
+                .ToView(null);
+            modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductTypeId });
+            modelBuilder.Entity<OrderCoupon>().HasKey(x => new { x.OrderId, x.CouponId });
+            modelBuilder.Entity<OrderCoupon>().
+                HasOne(x => x.Order)
+                .WithMany(x => x.OrderCoupons)
+                .HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Transaction>().
+                HasOne(x => x.User)
+                .WithMany(x => x.Transactions)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+>>>>>>> f156d1ee3b4fc6263030bcfbd121dc044f8ceedd
 
 			modelBuilder.Entity<Role>().HasData(new Role[]
 			{
