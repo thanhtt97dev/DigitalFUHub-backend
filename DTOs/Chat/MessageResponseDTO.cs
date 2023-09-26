@@ -12,6 +12,6 @@ namespace DTOs.Chat
         public long ConversationId { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime DateCreate { get; set; }
-        public bool isImage { get; set; }
+        public string MessageType { get; set; } = string.Empty;
     }
 }

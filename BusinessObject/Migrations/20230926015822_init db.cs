@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class init : Migration
+    public partial class initdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -466,6 +466,41 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DepositeTransactionBill",
+                columns: table => new
+                {
+                    DepositeTransactionBillId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DepositTransactionId = table.Column<long>(type: "bigint", nullable: false),
+                    PostingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ÁccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreditAmount = table.Column<int>(type: "int", nullable: false),
+                    DebitAmount = table.Column<int>(type: "int", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvailableBalance = table.Column<int>(type: "int", nullable: false),
+                    BeneficiaryAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BenAccountName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BenAccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DocId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepositeTransactionBill", x => x.DepositeTransactionBillId);
+                    table.ForeignKey(
+                        name: "FK_DepositeTransactionBill_DepositTransaction_DepositTransactionId",
+                        column: x => x.DepositTransactionId,
+                        principalTable: "DepositTransaction",
+                        principalColumn: "DepositTransactionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Feedback",
                 columns: table => new
                 {
@@ -494,7 +529,7 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductType",
+                name: "ProductVariant",
                 columns: table => new
                 {
                     ProductVariantId = table.Column<long>(type: "bigint", nullable: false)
@@ -506,9 +541,9 @@ namespace BusinessObject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductType", x => x.ProductVariantId);
+                    table.PrimaryKey("PK_ProductVariant", x => x.ProductVariantId);
                     table.ForeignKey(
-                        name: "FK_ProductType_Product_ProductId",
+                        name: "FK_ProductVariant_Product_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Product",
                         principalColumn: "ProductId",
@@ -536,6 +571,41 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WithdrawTransactionBill",
+                columns: table => new
+                {
+                    WidrawTransactionBillId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WithdrawTransactionId = table.Column<long>(type: "bigint", nullable: false),
+                    PostingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreditAmount = table.Column<int>(type: "int", nullable: false),
+                    DebitAmount = table.Column<int>(type: "int", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvailableBalance = table.Column<int>(type: "int", nullable: false),
+                    BeneficiaryAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BenAccountName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BenAccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DocId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WithdrawTransactionBill", x => x.WidrawTransactionBillId);
+                    table.ForeignKey(
+                        name: "FK_WithdrawTransactionBill_WithdrawTransaction_WithdrawTransactionId",
+                        column: x => x.WithdrawTransactionId,
+                        principalTable: "WithdrawTransaction",
+                        principalColumn: "WithdrawTransactionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Media",
                 columns: table => new
                 {
@@ -543,17 +613,18 @@ namespace BusinessObject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ForeignId = table.Column<long>(type: "bigint", nullable: false),
                     MediaTypeId = table.Column<long>(type: "bigint", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FeedbackId = table.Column<long>(type: "bigint", nullable: true),
+                    ProductId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Media", x => x.MediaId);
                     table.ForeignKey(
-                        name: "FK_Media_Feedback_ForeignId",
-                        column: x => x.ForeignId,
+                        name: "FK_Media_Feedback_FeedbackId",
+                        column: x => x.FeedbackId,
                         principalTable: "Feedback",
-                        principalColumn: "FeedbackId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "FeedbackId");
                     table.ForeignKey(
                         name: "FK_Media_MediaType_MediaTypeId",
                         column: x => x.MediaTypeId,
@@ -561,8 +632,8 @@ namespace BusinessObject.Migrations
                         principalColumn: "MediaTypeId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Media_Product_ForeignId",
-                        column: x => x.ForeignId,
+                        name: "FK_Media_Product_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Product",
                         principalColumn: "ProductId");
                 });
@@ -584,9 +655,9 @@ namespace BusinessObject.Migrations
                 {
                     table.PrimaryKey("PK_AssetInformation", x => x.AssetInformationId);
                     table.ForeignKey(
-                        name: "FK_AssetInformation_ProductType_ProductVariantId",
+                        name: "FK_AssetInformation_ProductVariant_ProductVariantId",
                         column: x => x.ProductVariantId,
-                        principalTable: "ProductType",
+                        principalTable: "ProductVariant",
                         principalColumn: "ProductVariantId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -608,9 +679,9 @@ namespace BusinessObject.Migrations
                 {
                     table.PrimaryKey("PK_Cart", x => new { x.UserId, x.ProductTypeId });
                     table.ForeignKey(
-                        name: "FK_Cart_ProductType_ProductTypeId",
+                        name: "FK_Cart_ProductVariant_ProductTypeId",
                         column: x => x.ProductTypeId,
-                        principalTable: "ProductType",
+                        principalTable: "ProductVariant",
                         principalColumn: "ProductVariantId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -654,9 +725,9 @@ namespace BusinessObject.Migrations
                         principalColumn: "PlatformFeeId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_ProductType_ProductVariantId",
+                        name: "FK_Order_ProductVariant_ProductVariantId",
                         column: x => x.ProductVariantId,
-                        principalTable: "ProductType",
+                        principalTable: "ProductVariant",
                         principalColumn: "ProductVariantId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -794,6 +865,11 @@ namespace BusinessObject.Migrations
                 column: "ShopId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DepositeTransactionBill_DepositTransactionId",
+                table: "DepositeTransactionBill",
+                column: "DepositTransactionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DepositTransaction_UserId",
                 table: "DepositTransaction",
                 column: "UserId");
@@ -809,14 +885,19 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Media_ForeignId",
+                name: "IX_Media_FeedbackId",
                 table: "Media",
-                column: "ForeignId");
+                column: "FeedbackId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Media_MediaTypeId",
                 table: "Media",
                 column: "MediaTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Media_ProductId",
+                table: "Media",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",
@@ -880,8 +961,8 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductType_ProductId",
-                table: "ProductType",
+                name: "IX_ProductVariant_ProductId",
+                table: "ProductVariant",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -943,6 +1024,11 @@ namespace BusinessObject.Migrations
                 name: "IX_WithdrawTransaction_UserId",
                 table: "WithdrawTransaction",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WithdrawTransactionBill_WithdrawTransactionId",
+                table: "WithdrawTransactionBill",
+                column: "WithdrawTransactionId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -957,7 +1043,7 @@ namespace BusinessObject.Migrations
                 name: "Cart");
 
             migrationBuilder.DropTable(
-                name: "DepositTransaction");
+                name: "DepositeTransactionBill");
 
             migrationBuilder.DropTable(
                 name: "Media");
@@ -990,7 +1076,10 @@ namespace BusinessObject.Migrations
                 name: "UserConversation");
 
             migrationBuilder.DropTable(
-                name: "WithdrawTransaction");
+                name: "WithdrawTransactionBill");
+
+            migrationBuilder.DropTable(
+                name: "DepositTransaction");
 
             migrationBuilder.DropTable(
                 name: "Feedback");
@@ -1014,13 +1103,16 @@ namespace BusinessObject.Migrations
                 name: "Conversations");
 
             migrationBuilder.DropTable(
+                name: "WithdrawTransaction");
+
+            migrationBuilder.DropTable(
                 name: "OrderStatus");
 
             migrationBuilder.DropTable(
                 name: "PlatformFee");
 
             migrationBuilder.DropTable(
-                name: "ProductType");
+                name: "ProductVariant");
 
             migrationBuilder.DropTable(
                 name: "Product");

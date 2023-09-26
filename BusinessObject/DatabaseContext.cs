@@ -61,6 +61,9 @@ namespace BusinessObject
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SenderConversation>()
+                .HasNoKey()
+                .ToView(null);
             modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductTypeId });
             modelBuilder.Entity<OrderCoupon>().HasKey(x => new { x.OrderId, x.CouponId });
             modelBuilder.Entity<OrderCoupon>().
