@@ -35,7 +35,6 @@ namespace BusinessObject.Entities
         public virtual ICollection<UserConversation>? UserConversations { get; set; }
         public virtual ICollection<UserBank>? UserBanks { get; set; }
         public virtual ICollection<Order>? Orders { get; set; }
-        public virtual ICollection<Product>? Products { get; set; }
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<AssetInformation>? AssetInformation { get; set; }
         public virtual ICollection<Transaction>? Transactions { get; set; }
