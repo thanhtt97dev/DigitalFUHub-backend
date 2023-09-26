@@ -74,6 +74,13 @@ namespace BusinessObject
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+			modelBuilder.Entity<Role>().HasData(new Role[]
+			{
+				new Role{RoleId = 1, RoleName = "Admin"},
+				new Role{RoleId = 2, RoleName = "Customer"},
+				new Role{RoleId = 3, RoleName = "Seller"},
+			});
+
 			modelBuilder.Entity<MediaType>().HasData(new MediaType[]
 			{
                 new MediaType{MediaTypeId = 1, Name = "Product"},
