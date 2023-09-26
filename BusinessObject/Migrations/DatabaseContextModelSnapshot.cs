@@ -612,11 +612,8 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Shop", b =>
                 {
-                    b.Property<long>("ShopId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ShopId"), 1L, 1);
 
                     b.Property<long>("Balance")
                         .HasColumnType("bigint");
@@ -633,7 +630,7 @@ namespace BusinessObject.Migrations
                     b.Property<string>("ShopName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ShopId");
+                    b.HasKey("UserId");
 
                     b.ToTable("Shop");
                 });
@@ -939,9 +936,9 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Carts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ProductType");
@@ -982,7 +979,7 @@ namespace BusinessObject.Migrations
                     b.HasOne("BusinessObject.Entities.User", "User")
                         .WithMany("Feedbacks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Product");
@@ -1070,7 +1067,7 @@ namespace BusinessObject.Migrations
                     b.HasOne("BusinessObject.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("OrderStatus");
@@ -1148,6 +1145,17 @@ namespace BusinessObject.Migrations
                     b.HasOne("BusinessObject.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.Shop", b =>
+                {
+                    b.HasOne("BusinessObject.Entities.User", "User")
+                        .WithOne("Shop")
+                        .HasForeignKey("BusinessObject.Entities.Shop", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1362,6 +1370,8 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("AssetInformation");
 
+                    b.Navigation("Carts");
+
                     b.Navigation("DepositTransactions");
 
                     b.Navigation("Feedbacks");
@@ -1369,6 +1379,9 @@ namespace BusinessObject.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("Products");
+
+                    b.Navigation("Shop")
+                        .IsRequired();
 
                     b.Navigation("Transactions");
 

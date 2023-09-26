@@ -81,6 +81,21 @@ namespace BusinessObject
                 HasOne(x => x.User)
                 .WithMany(x => x.Transactions)
                 .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.NoAction); 
+            modelBuilder.Entity<Feedback>().
+                HasOne(x => x.User)
+                .WithMany(x => x.Feedbacks)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Cart>().
+                HasOne(x => x.User)
+                .WithMany(x => x.Carts)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Order>().
+                HasOne(x => x.User)
+                .WithMany(x => x.Orders)
+                .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }
