@@ -22,6 +22,6 @@ namespace BusinessObject.Entities
         public virtual Product Product { get; set; } = null!;
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
-        public virtual ICollection<Media> Medias { get; set; } = null!;
+        public virtual ICollection<FeedbackMedia> FeedbackMedias { get; set; } = null!;
     }
 }
