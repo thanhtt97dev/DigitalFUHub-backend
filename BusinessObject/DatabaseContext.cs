@@ -40,8 +40,8 @@ namespace BusinessObject
 		public virtual DbSet<ProductStatus> ProductStatus { get; set; } = null!;
 		public virtual DbSet<Tag> Tag { get; set; } = null!;
 		public virtual DbSet<Shop> Shop { get; set; } = null!;
-		public virtual DbSet<Media> Media { get; set; } = null!;
-		public virtual DbSet<MediaType> MediaType { get; set; } = null!;
+		public virtual DbSet<FeedbackMedia> FeedbackMedia { get; set; } = null!;
+		public virtual DbSet<ProductMedia> ProductMedia { get; set; } = null!;
 		public virtual DbSet<Coupon> Coupon { get; set; } = null!;
 		public virtual DbSet<Order> Order { get; set; } = null!;
 		public virtual DbSet<OrderStatus> OrderStatus { get; set; } = null!;
@@ -104,13 +104,9 @@ namespace BusinessObject
 
 			modelBuilder.Entity<Category>().HasData(new Category[]
 			{
-				new Category{CategoryId = 1, CategoryName = "Account"}
-			});
-
-			modelBuilder.Entity<MediaType>().HasData(new MediaType[]
-			{
-				new MediaType{MediaTypeId = 1, Name = "Product"},
-				new MediaType{MediaTypeId = 2, Name = "Feedback"},
+				new Category{CategoryId = 1, CategoryName = "Mạng xã hội"},
+				new Category{CategoryId = 2, CategoryName = "VPS"},
+				new Category{CategoryId = 3, CategoryName = "Khác"},
 			});
 
 			modelBuilder.Entity<TransactionType>().HasData(new TransactionType[]

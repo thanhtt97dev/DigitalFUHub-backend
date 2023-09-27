@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Services;
+using DTOs.Seller;
 using DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +43,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region SignIn
+		#region Get Product Variants
 		[HttpGet("GetProductVariants/{id}")]
 		public IActionResult GetProductVariants(int id)
 		{
@@ -56,6 +57,14 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
+		}
+		#endregion
+
+		#region Add new product
+		[HttpPost("Product/New")]
+		public IActionResult AddProduct([FromForm] AddProductRequestDTO request)
+		{
+			return Ok();
 		}
 		#endregion
 	}
