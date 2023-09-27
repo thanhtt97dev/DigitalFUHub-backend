@@ -89,7 +89,6 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
-			builder.Services.AddSingleton<IStorageRepository, StorageRepository>();
             builder.Services.AddSingleton<IReportRepository, ReportRepository>();
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
             builder.Services.AddSingleton<IChatRepository, ChatRepository>();

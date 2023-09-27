@@ -1,4 +1,5 @@
-﻿using DTOs.Seller;
+﻿using DTOs.Product;
+using DTOs.Seller;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace DataAccess.IRepositories
 	public interface IProductRepository
 	{
 		List<ProductResponeDTO> GetAllProduct(int userId);
-		List<ProductVariantResponeDTO> GetProductVariants(int productId);	
-	}
+		List<ProductVariantResponeDTO> GetProductVariants(int productId);
+        ProductDetailResponseDTO GetProductById(long productId);
+    }
 }
