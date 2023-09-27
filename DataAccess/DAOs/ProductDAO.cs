@@ -145,8 +145,29 @@ namespace DataAccess.DAOs
                 return productDetailResponse;
             }
         }
-    }
-}
+
+		internal async Task AddProductAsync(Product product)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				using (var transaction = await context.Database.BeginTransactionAsync())
+				{
+					try
+					{
+						context.Product.Add(product);
+						await context.SaveChangesAsync();
+						await transaction.CommitAsync();
+					}
+					catch (Exception e)
+					{
+						await transaction.RollbackAsync();
+						throw new Exception(e.Message);
+					}
+				}
+			}
+		}
+	}
+}	
 
 
 

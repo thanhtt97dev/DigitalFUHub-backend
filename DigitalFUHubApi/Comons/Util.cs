@@ -1,51 +1,53 @@
-﻿using System.Security.Cryptography;
+﻿using BusinessObject.Entities;
+using OfficeOpenXml;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
 namespace DigitalFUHubApi.Comons
 {
-    public class Util
-    {
+	public class Util
+	{
 
-        private static Util? instance;
-        private static readonly object instanceLock = new object();
+		private static Util? instance;
+		private static readonly object instanceLock = new object();
 
-        public static Util Instance
-        {
-            get
-            {
-                lock (instanceLock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new Util();
-                    }
-                }
-                return instance;
-            }
-        }
+		public static Util Instance
+		{
+			get
+			{
+				lock (instanceLock)
+				{
+					if (instance == null)
+					{
+						instance = new Util();
+					}
+				}
+				return instance;
+			}
+		}
 
-        #region Convert unit date to DateTime
-        public DateTime ConvertUnitTimeToDateTime(long? utcExpireDate)
-        {
-            var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dateTimeInterval = dateTimeInterval.AddSeconds(utcExpireDate ?? 0).ToUniversalTime();
-            return dateTimeInterval;
-        }
-        #endregion
+		#region Convert unit date to DateTime
+		public DateTime ConvertUnitTimeToDateTime(long? utcExpireDate)
+		{
+			var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+			dateTimeInterval = dateTimeInterval.AddSeconds(utcExpireDate ?? 0).ToUniversalTime();
+			return dateTimeInterval;
+		}
+		#endregion
 
-        #region Get access token from httpContext
-        public string GetAccessToken(HttpContext httpContext)
-        {
-            string token = string.Empty;
-            string authorization = httpContext.Request.Headers["Authorization"].ToString();
-            string tokenType = "Bearer ";
-            if (authorization.Contains(tokenType))
-            {
-                token = authorization.Substring(tokenType.Length);
-            }
-            return token;
-        }
+		#region Get access token from httpContext
+		public string GetAccessToken(HttpContext httpContext)
+		{
+			string token = string.Empty;
+			string authorization = httpContext.Request.Headers["Authorization"].ToString();
+			string tokenType = "Bearer ";
+			if (authorization.Contains(tokenType))
+			{
+				token = authorization.Substring(tokenType.Length);
+			}
+			return token;
+		}
 		#endregion
 
 		#region Read file
@@ -105,10 +107,10 @@ namespace DigitalFUHubApi.Comons
 		#region Compare Date Equal Greater Than Days Condition
 		public static bool CompareDateEqualGreaterThanDaysCondition(DateTime start, int days)
 		{
-			if (days < 0 ) return false;
+			if (days < 0) return false;
 			DateTime end = start.AddDays(days);
 			DateTime today = DateTime.Now;
-			if(end >= today) return false;
+			if (end >= today) return false;
 			return true;
 		}
 		#endregion
@@ -164,24 +166,53 @@ namespace DigitalFUHubApi.Comons
 			string numbers = "0123456789";
 			string letters = "qwertyuiopasdfghjklzxcvbnm";
 			Random rnd = new Random();
-			for (int i = 0;i < 8; i++)
+			for (int i = 0; i < 8; i++)
 			{
-				int rndType = rnd.Next(1,4);
-				if(rndType == 1)
+				int rndType = rnd.Next(1, 4);
+				if (rndType == 1)
 				{
-					int rndIndex = rnd.Next(0,numbers.Length);
+					int rndIndex = rnd.Next(0, numbers.Length);
 					password += numbers[rndIndex];
-				} else if(rndType == 2)
+				}
+				else if (rndType == 2)
 				{
 					int rndIndex = rnd.Next(0, letters.Length);
 					password += letters[rndIndex];
-				} else if (rndType == 3)
+				}
+				else if (rndType == 3)
 				{
 					int rndIndex = rnd.Next(0, letters.Length);
 					password += (char)(letters[rndIndex] - 32);
 				}
 			}
 			return password;
+		}
+		#endregion
+
+		#region Read Data File Excel Product Variant
+		public List<AssetInformation> ReadDataFileExcelProductVariant(IFormFile file)
+		{
+			List<AssetInformation> result = new List<AssetInformation>();
+			using (ExcelPackage excelPackage = new ExcelPackage(file.OpenReadStream()))
+			{
+				foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
+				{
+					for (int i = worksheet.Dimension.Start.Row; i <= worksheet.Dimension.End.Row; i++)
+					{
+						if (worksheet.Cells[i, 1].Value != null && i != 1)
+						{
+							string value = worksheet.Cells[i, 1].Value.ToString()??"";
+							result.Add(new AssetInformation
+							{
+								CreateDate = DateTime.Now,
+								Asset = value,
+								IsActive = true,
+							});
+						}
+					}
+				}
+			}
+			return result;
 		}
 		#endregion
 	}
