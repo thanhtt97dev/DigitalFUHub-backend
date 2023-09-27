@@ -1,7 +1,9 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
 using DTOs.MbBank;
+using DTOs.Product;
 using DTOs.Seller;
+using DTOs.Tag;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -84,17 +86,15 @@ namespace DataAccess.DAOs
 		}
 
 
-        internal ProductResponeDTO GetProductById(long productId)
+        internal ProductDetailResponseDTO GetProductById(long productId)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                var product = context.Product
-                        .Include(_ => _.ProductStatus)
-                        .Include(_ => _.Shop)
-                        .Include(_ => _.Category)
-                        .FirstOrDefault(x => x.ProductId == productId);
+                var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
                 if (product == null) throw new ArgumentException("Not found Product hav id = " + productId);
-                var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
+                List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
+                List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
+                List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
                 List<ProductVariantResponeDTO> variants = new List<ProductVariantResponeDTO>();
                 foreach (var variant in productVariants)
                 {
@@ -107,23 +107,46 @@ namespace DataAccess.DAOs
                     });
                 }
 
-                ProductResponeDTO productResponeDTO = new ProductResponeDTO()
+				List<ProductMediaResponseDTO> medias = new List<ProductMediaResponseDTO>();
+                foreach (var media in productMedias)
+                {
+                    medias.Add(new ProductMediaResponseDTO()
+                    {
+                        ProductMediaId = media.ProductMediaId,
+                        Url = media.Url
+                    });
+                }
+
+                List<TagResponseDTO> tags = new List<TagResponseDTO>();
+                foreach (var tag in productTags)
+                {
+                    tags.Add(new TagResponseDTO()
+                    {
+                        TagId = tag.TagId,
+                        TagName = tag.TagName,
+                    });
+                }
+
+
+                ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
                 {
                     ProductId = product.ProductId,
                     ProductName = product.ProductName,
                     Thumbnail = product.Thumbnail,
                     Description = product.Description,
                     Discount = product.Discount,
-                    ProductStatus = product.ProductStatus,
-                    Category = product.Category,
-                    Shop = product.Shop,
-                    ProductVariants = variants
+                    ShopId = product.ShopId,
+                    CategoryId = product.CategoryId,
+                    ProductVariants = variants,
+                    ProductMedias = medias,
+                    Tags = tags
                 };
 
-                return productResponeDTO;
+                return productDetailResponse;
             }
         }
     }
 }
-	
+
+
 
