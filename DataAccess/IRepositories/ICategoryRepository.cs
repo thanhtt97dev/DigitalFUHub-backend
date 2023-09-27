@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepositories
 {
-    public interface IStorageRepository
+	public interface ICategoryRepository
 	{
-		//void AddFile(Media file);
-		//Media? GetFileByName(string filename);
-		//void RemoveFile(string filename);
+		Task<List<Category>> GetAllAsync();
 	}
 }

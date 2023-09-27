@@ -81,6 +81,71 @@ namespace DataAccess.DAOs
 				return result;
 			}
 		}
+
+		internal async Task AddProductAsync(Product product)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				using (var transaction = await context.Database.BeginTransactionAsync())
+				{
+					try
+					{
+						context.Product.Add(product);
+						await context.SaveChangesAsync();
+						//foreach (var tag in product.Tags.ToList())
+						//{
+						//	Tag tagAdded = new Tag
+						//	{
+						//		ProductId = product.ProductId,
+						//		TagName = tag.TagName
+						//	};
+						//	context.Tag.Add(tagAdded);
+						//	await context.SaveChangesAsync();
+						//}
+						//foreach (var prdMedia in product.ProductMedias.ToList())
+						//{
+						//	ProductMedia productMediaAdded = new ProductMedia
+						//	{
+						//		ProductId = product.ProductId,
+						//		Url = prdMedia.Url
+						//	};
+						//	context.ProductMedia.Add(productMediaAdded);
+						//	await context.SaveChangesAsync();
+						//}
+						//foreach (var prdVar in product.ProductVariants.ToList())
+						//{
+						//	ProductVariant productVariantAdded = new ProductVariant
+						//	{
+						//		ProductId = product.ProductId,
+						//		Price = prdVar.Price,
+						//		isActivate = true,
+						//		Name = prdVar.Name,
+						//	};
+						//	context.ProductVariant.Add(productVariantAdded);
+						//	await context.SaveChangesAsync();
+						//	foreach (var assetInfo in prdVar.AssetInformation.ToList())
+						//	{
+						//		AssetInformation assetInformation = new AssetInformation
+						//		{
+						//			ProductVariantId = productVariantAdded.ProductVariantId,
+						//			CreateDate = assetInfo.CreateDate,
+						//			Asset = assetInfo.Asset,
+						//			IsActive = assetInfo.IsActive,
+						//		};
+						//		context.AssetInformation.Add(assetInformation);
+						//		await context.SaveChangesAsync();
+						//	}
+						//}
+						await transaction.CommitAsync();
+					}
+					catch (Exception e)
+					{
+						await transaction.RollbackAsync();
+						throw new Exception(e.Message);
+					}
+				}
+			}
+		}
 	}
 }	
 

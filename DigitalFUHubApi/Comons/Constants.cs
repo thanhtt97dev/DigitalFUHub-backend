@@ -47,5 +47,11 @@ namespace DigitalFUHubApi.Comons
 		//Azure
 		public static string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
 
+		// Product Status
+		public static int PRODUCT_ACTIVE = 1;
+		public static int PRODUCT_BAN = 2;
+		public static int PRODUCT_HIDE = 3;
+
+
 	}
 }

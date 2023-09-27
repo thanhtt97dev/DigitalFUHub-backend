@@ -12,60 +12,60 @@ namespace DataAccess.DAOs
 {
     internal class StorageDAO
 	{
-		private static StorageDAO? instance;
-		private static readonly object instanceLock = new object();
-		public static StorageDAO Instance
-		{
-			get
-			{
-				lock (instanceLock)
-				{
-					if (instance == null)
-					{
-						instance = new StorageDAO();
-					}
-				}
-				return instance;
-			}
-		}
+		//private static StorageDAO? instance;
+		//private static readonly object instanceLock = new object();
+		//public static StorageDAO Instance
+		//{
+		//	get
+		//	{
+		//		lock (instanceLock)
+		//		{
+		//			if (instance == null)
+		//			{
+		//				instance = new StorageDAO();
+		//			}
+		//		}
+		//		return instance;
+		//	}
+		//}
 
-		public void AddFile(Media file)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				try
-				{
-					context.Media.Add(file);
-					context.SaveChanges();
-				}
-				catch (Exception e)
-				{
+		//public void AddFile(Media file)
+		//{
+		//	using (DatabaseContext context = new DatabaseContext())
+		//	{
+		//		try
+		//		{
+		//			context.Media.Add(file);
+		//			context.SaveChanges();
+		//		}
+		//		catch (Exception e)
+		//		{
 
-					throw new Exception(e.Message);
-				}
-			}
-		}
+		//			throw new Exception(e.Message);
+		//		}
+		//	}
+		//}
 
-		internal Media? GetFileByName(string filename)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				return context.Media.FirstOrDefault(x => x.Url.Substring(x.Url.LastIndexOf("/") + 1) == filename);
-			}
-		}
+		//internal Media? GetFileByName(string filename)
+		//{
+		//	using (DatabaseContext context = new DatabaseContext())
+		//	{
+		//		return context.Media.FirstOrDefault(x => x.Url.Substring(x.Url.LastIndexOf("/") + 1) == filename);
+		//	}
+		//}
 
 
-		internal void RemoveFile(string filename)
-		{
-			Media? file = GetFileByName(filename);
-			if (file != null)
-			{
-				using (DatabaseContext context = new DatabaseContext())
-				{
-					context.Media.Remove(file);
-					context.SaveChanges();
-				}
-			}
-		}
+		//internal void RemoveFile(string filename)
+		//{
+		//	Media? file = GetFileByName(filename);
+		//	if (file != null)
+		//	{
+		//		using (DatabaseContext context = new DatabaseContext())
+		//		{
+		//			context.Media.Remove(file);
+		//			context.SaveChanges();
+		//		}
+		//	}
+		//}
 	}
 }
