@@ -13,7 +13,7 @@ using DTOs.MbBank;
 
 namespace DigitalFUHubApi.Controllers
 {
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class BanksController : ControllerBase
 	{
@@ -31,7 +31,7 @@ namespace DigitalFUHubApi.Controllers
 			this.mbBankService = mbBankService;
 		}
 
-		
+
 
 		#region Get all bank info
 		[HttpGet("getAll")]
@@ -57,7 +57,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				if (id == 0) return BadRequest();
-				
+
 				var user = userRepository.GetUserById(id);
 				if (user == null) return BadRequest();
 
@@ -81,14 +81,14 @@ namespace DigitalFUHubApi.Controllers
 			Status status = new Status();
 			try
 			{
-				if (inquiryAccountNameRequestDTO == null || 
-					string.IsNullOrEmpty(inquiryAccountNameRequestDTO.BankId) || 
+				if (inquiryAccountNameRequestDTO == null ||
+					string.IsNullOrEmpty(inquiryAccountNameRequestDTO.BankId) ||
 					string.IsNullOrEmpty(inquiryAccountNameRequestDTO.CreditAccount))
 				{
 					return BadRequest();
 				}
 				MbBankResponse? mbBankResponse = await mbBankService.InquiryAccountName(inquiryAccountNameRequestDTO);
-				if (mbBankResponse == null) 
+				if (mbBankResponse == null)
 					return StatusCode(StatusCodes.Status500InternalServerError, "Server err!");
 
 				if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SAME_URI_IN_SAME_TIME)
@@ -97,7 +97,8 @@ namespace DigitalFUHubApi.Controllers
 					status.Ok = false;
 					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 					responseData.Status = status;
-				}else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SESSION_INVALID)
+				}
+				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SESSION_INVALID)
 				{
 					status.Message = "Third-party's session invalid";
 					status.Ok = false;
@@ -185,7 +186,7 @@ namespace DigitalFUHubApi.Controllers
 				};
 
 				var mbBank = await mbBankService.InquiryAccountName(bankInquiryAccount);
-				
+
 				if (mbBank == null || mbBank.Result == null) //RULE 2
 				{
 					status.Message = "Third-party's server err";
@@ -222,7 +223,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
-					UpdateAt = DateTime.UtcNow,	
+					UpdateAt = DateTime.UtcNow,
 				};
 
 				bankRepository.AddUserBank(userBank);
@@ -274,7 +275,7 @@ namespace DigitalFUHubApi.Controllers
 				var userBankAccount = bankRepository.GetUserBank(bankLinkAccountRequestDTO.UserId);
 				if (userBankAccount == null) return Conflict("User not have bank account to update!");
 
-				
+
 				bool acceptUpdate = Util.CompareDateEqualGreaterThanDaysCondition(userBankAccount.UpdateAt, Constants.NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT);
 				if (!acceptUpdate) //RULE 1
 				{
@@ -328,7 +329,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
-					UpdateAt = DateTime.UtcNow,	
+					UpdateAt = DateTime.UtcNow,
 				};
 
 				bankRepository.UpdateUserBank(userBank);
@@ -373,14 +374,63 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get history deposit transaction
-		[HttpGet("HistoryDeposit/{id}")]
-		public IActionResult GetHistoryDepositTransaction(int id)
+		[HttpPost("HistoryDeposit/{id}")]
+		public IActionResult GetHistoryDepositTransaction(int id, HistoryDepositRequestDTO historyDepositRequestDTO)
 		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0) return BadRequest();
-				var deposits = bankRepository.GetDepositTransaction(id);	
-				return Ok(deposits);
+				if (id == 0 || historyDepositRequestDTO == null ||
+					historyDepositRequestDTO.FromDate == null ||
+					historyDepositRequestDTO.ToDate == null) return BadRequest();
+
+				DateTime fromDate;
+				DateTime toDate;
+				try
+				{
+					fromDate = DateTime.ParseExact(historyDepositRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(historyDepositRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				long depositTransactionId;
+				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
+
+				// 0 : All, 1: paid, 2: unpay
+				if(historyDepositRequestDTO.Status != 0 && historyDepositRequestDTO.Status != 1 && 
+					historyDepositRequestDTO.Status != 2){
+					status.Message = "Invalid transaction's status";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, historyDepositRequestDTO.Status);
+
+				status.Message = "Add bank account success!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = deposits;
+				return Ok(responseData);
 			}
 			catch (Exception ex)
 			{

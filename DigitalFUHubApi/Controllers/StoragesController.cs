@@ -17,10 +17,8 @@ namespace DigitalFUHubApi.Controllers
 	public class StoragesController : ControllerBase
 	{
 		private readonly StorageService _storageService;
-		private readonly IStorageRepository _storageRepository;
-		public StoragesController(StorageService storageService, IStorageRepository storageRepository)
+		public StoragesController(StorageService storageService)
 		{
-			_storageRepository = storageRepository;
 			_storageService = storageService;
 		}
 

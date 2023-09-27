@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-    public class BankDAO
+	public class BankDAO
 	{
 		private static BankDAO? instance;
 		private static readonly object instanceLock = new object();
@@ -34,7 +34,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var banks = context.Bank.Where(x => x.isActivate).ToList();	
+				var banks = context.Bank.Where(x => x.isActivate).ToList();
 				return banks;
 			}
 		}
@@ -99,7 +99,7 @@ namespace DataAccess.DAOs
 					foreach (var item in transactionHistoryCreditList)
 					{
 						var deposit = context.DepositTransaction
-								.FirstOrDefault(x => string.Equals(x.Code.ToLower(), item.description.ToLower()) && 
+								.FirstOrDefault(x => string.Equals(x.Code.ToLower(), item.description.ToLower()) &&
 								x.Amount == item.creditAmount);
 						if (deposit != null)
 						{
@@ -187,20 +187,32 @@ namespace DataAccess.DAOs
 			{
 				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == userBankUpdate.UserId);
 				if (userBank == null) throw new Exception("User's bank account not existed!");
-				userBank.BankId = userBankUpdate.BankId;	
+				userBank.BankId = userBankUpdate.BankId;
 				userBank.CreditAccount = userBankUpdate.CreditAccount;
-				userBank.CreditAccountName = userBankUpdate.CreditAccountName;	
+				userBank.CreditAccountName = userBankUpdate.CreditAccountName;
 				userBank.UpdateAt = DateTime.Now;
 				context.SaveChanges();
 			}
 		}
 
-		internal List<DepositTransaction> GetDepositTransaction(int userId)
+		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status)
 		{
-			List <DepositTransaction> deposits = new List<DepositTransaction>();
+			List<DepositTransaction> deposits = new List<DepositTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				deposits = context.DepositTransaction.Where(x => x.UserId == userId).ToList();
+				deposits = context.DepositTransaction
+							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
+							.OrderByDescending(x => x.RequestDate).ToList();
+
+				if (depositTransactionId != 0)
+				{
+					deposits = deposits.Where(x => x.DepositTransactionId == depositTransactionId).ToList();
+				}
+				if(status != 0) 
+				{
+					deposits = deposits.Where(x => x.IsPay == (status == 1)).ToList();
+				}
+
 			}
 			return deposits;
 		}

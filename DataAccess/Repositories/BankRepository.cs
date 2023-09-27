@@ -24,7 +24,8 @@ namespace DataAccess.Repositories
 
 		public void UpdateUserBank(UserBank userBank) => BankDAO.Instance.UpdateUserBank(userBank);
 
-		public List<DepositTransaction> GetDepositTransaction(int userId) => BankDAO.Instance.GetDepositTransaction(userId);
+		public List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetDepositTransaction(userId, depositTransactionId, fromDate, toDate, status);
+
 
 	}
 }

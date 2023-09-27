@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessObject.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,6 @@ namespace DTOs.Seller
 		public long ProductId { get; set; }
 		public string? ProductName { get; set; }
 		public string? Thumbnail { get; set; }
-		public List<ProductVariantResponeDTO>? ProductVariants { get; set; }
+        public List<ProductVariantResponeDTO>? ProductVariants { get; set; }
 	}
 }

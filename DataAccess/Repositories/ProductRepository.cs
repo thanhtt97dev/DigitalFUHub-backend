@@ -1,6 +1,7 @@
 ﻿using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
+using DTOs.Product;
 using DTOs.Seller;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,11 @@ namespace DataAccess.Repositories
 
 		public List<ProductVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
 
-	}
+        public ProductDetailResponseDTO GetProductById(long productId)
+        {
+            if (productId == 0) throw new ArgumentException("productId cannot eq 0 (at getProductById)");
+            return ProductDAO.Instance.GetProductById(productId);
+        }
+
+    }
 }
