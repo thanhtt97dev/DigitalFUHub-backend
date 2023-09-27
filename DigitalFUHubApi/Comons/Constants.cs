@@ -18,6 +18,7 @@ namespace DigitalFUHubApi.Comons
 		//MB bank config
 		public static string BANK_ID_MB_BANK = "970422";
 		public static int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 15;
+		public static string BANK_TRANSACTION_CODE_KEY = "FU";
 
 		public static string MB_BANK_RESPONE_CODE_SUCCESS = "00";
 		public static string MB_BANK_RESPONE_CODE_SESSION_INVALID = "GW200";

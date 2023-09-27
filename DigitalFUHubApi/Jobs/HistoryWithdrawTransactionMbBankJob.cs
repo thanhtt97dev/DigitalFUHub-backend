@@ -1,20 +1,17 @@
-﻿using DigitalFUHubApi.Comons;
-using Quartz;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using System.Text;
-using DataAccess.DAOs;
+﻿using DataAccess.DAOs;
+using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.MbBank;
+using Quartz;
+using System.Text.Json;
 
 namespace DigitalFUHubApi.Jobs
 {
-    public class HistoryDepositTransactionMbBankJob : IJob
+	public class HistoryWithdrawTransactionMbBankJob : IJob
 	{
 		private readonly IConfiguration configuration;
 		private readonly MbBankService mbBankService;
-
-		public HistoryDepositTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
+		public HistoryWithdrawTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
 		{
 			this.configuration = configuration;
 			this.mbBankService = mbBankService;
@@ -24,22 +21,21 @@ namespace DigitalFUHubApi.Jobs
 		{
 			return;
 			var data = await mbBankService.GetHistoryTransaction();
-
 			if (data == null) return;
 			if (data.result.responseCode != "00") return;
 
-			List<TransactionHistory> transactionHistoryCreditList = new List<TransactionHistory>();
-
+			List<TransactionHistory> transactionHistoryDebitList = new List<TransactionHistory>();
 			if (data.transactionHistoryList != null)
 			{
-				transactionHistoryCreditList = data.transactionHistoryList
-					.Where(x => x.creditAmount != 0 && x.description.Contains(Constants.BANK_TRANSACTION_CODE_KEY)).ToList();
+				transactionHistoryDebitList = data.transactionHistoryList
+					.Where(x => x.debitAmount != 0 && x.description.Contains(Constants.BANK_TRANSACTION_CODE_KEY)).ToList();
 			}
 
-			string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreDepositData"];
+			string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreWithdrawData"];
 			if (directoryPathStoreData == null) return;
 
 			string dataPreviousText = Util.ReadFile(directoryPathStoreData);
+
 			List<TransactionHistory>? dataPrevious = new List<TransactionHistory>();
 			if (!string.IsNullOrEmpty(dataPreviousText))
 			{
@@ -47,20 +43,20 @@ namespace DigitalFUHubApi.Jobs
 			}
 
 			// Compare previous data with current data
-
 			bool isSame = true;
 			if (dataPrevious != null)
 			{
-				isSame = dataPrevious.SequenceEqual(transactionHistoryCreditList,
+				isSame = dataPrevious.SequenceEqual(transactionHistoryDebitList,
 					new MbBankResponeHistoryTransactionDataEqualityComparer());
 			}
 			if (isSame) return;
-			//Have new recharge info
-			// Save new data into file
-			Util.WriteFile(directoryPathStoreData, transactionHistoryCreditList);
-			//Update DB
-			BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
 
+			//Have new debit info
+			// Save new data into file
+			Util.WriteFile(directoryPathStoreData, transactionHistoryDebitList);
+
+			//Update DB
+			BankDAO.Instance.CheckingDebitTransactions(transactionHistoryDebitList);
 		}
 	}
 }

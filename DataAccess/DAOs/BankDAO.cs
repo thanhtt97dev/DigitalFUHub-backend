@@ -88,6 +88,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
+		#region Checking Credit Transactions
 		public void CheckingCreditTransactions(List<TransactionHistory> transactionHistoryCreditList)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -121,6 +122,64 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+		#endregion
+
+		#region Checking debit transactions
+		/// <summary>
+		///	 This function this use for adding bill's info when transaction has been withdrawn
+		/// </summary>
+		/// <param name="transactionHistoryDebitList"></param>
+		/// <exception cref="Exception"></exception>
+		public void CheckingDebitTransactions(List<TransactionHistory> transactionHistoryDebitList)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					foreach (var item in transactionHistoryDebitList)
+					{
+						var withdraw = context.WithdrawTransaction
+								.FirstOrDefault(x => string.Equals(x.Code.ToLower(), item.description.ToLower()) &&
+								x.Amount == item.debitAmount);
+						if (withdraw != null)
+						{
+							if (withdraw.IsPay == true) continue;
+							// add bill info
+							WithdrawTransactionBill withdrawTransactionBill = new WithdrawTransactionBill()
+							{
+								WithdrawTransactionId = withdraw.WithdrawTransactionId,
+								PostingDate = item.postingDate,
+								TransactionDate = item.transactionDate,
+								AccountNo = item.accountNo,
+								CreditAmount = item.creditAmount,
+								DebitAmount = item.creditAmount,
+								Currency = item.currency,
+								Description = item.description,
+								AvailableBalance = item.availableBalance,
+								BeneficiaryAccount = item.beneficiaryAccount,
+								RefNo = item.refNo,
+								BenAccountNo = item.benAccountNo,
+								BenAccountName = item.benAccountName,
+								BankName = item.bankName,
+								DueDate = item.dueDate,
+								DocId = item.docId,
+								TransactionType = item.transactionType,
+							};
+							context.WithdrawTransactionBill.Add(withdrawTransactionBill);
+						}
+					}
+					context.SaveChanges();
+					transaction.Commit();
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+			}
+		}
+		#endregion
 
 		internal void UpdateUserBank(UserBank userBankUpdate)
 		{
@@ -134,6 +193,16 @@ namespace DataAccess.DAOs
 				userBank.UpdateAt = DateTime.Now;
 				context.SaveChanges();
 			}
+		}
+
+		internal List<DepositTransaction> GetDepositTransaction(int userId)
+		{
+			List <DepositTransaction> deposits = new List<DepositTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				deposits = context.DepositTransaction.Where(x => x.UserId == userId).ToList();
+			}
+			return deposits;
 		}
 	}
 }
