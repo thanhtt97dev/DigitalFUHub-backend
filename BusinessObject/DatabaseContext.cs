@@ -26,7 +26,6 @@ namespace BusinessObject
 		public virtual DbSet<Notification> Notification { get; set; } = null!;
 		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
 		public virtual DbSet<DepositTransaction> DepositTransaction { get; set; } = null!;
-		public virtual DbSet<DepositeTransactionBill> DepositeTransactionBill { get; set; } = null!;
 		public virtual DbSet<WithdrawTransaction> WithdrawTransaction { get; set; } = null!;
 		public virtual DbSet<WithdrawTransactionBill> WithdrawTransactionBill { get; set; } = null!;
 		public virtual DbSet<Transaction> Transaction { get; set; } = null!;
