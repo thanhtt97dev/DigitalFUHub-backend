@@ -355,7 +355,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				var transaction = mapper.Map<DepositTransaction>(depositTransactionDTO);
-				transaction.Code = Util.GetRandomString(10) + depositTransactionDTO.UserId + "FU";
+				transaction.Code = Util.GetRandomString(10) + depositTransactionDTO.UserId + Constants.BANK_TRANSACTION_CODE_KEY;
 				bankRepository.CreateDepositTransaction(transaction);
 				var result = new DepositTransactionResponeDTO()
 				{
@@ -369,6 +369,24 @@ namespace DigitalFUHubApi.Controllers
 				return Conflict("Some things went wrong!");
 			}
 
+		}
+		#endregion
+
+		#region Get history deposit transaction
+		[HttpGet("HistoryDeposit/{id}")]
+		public IActionResult GetHistoryDepositTransaction(int userId)
+		{
+			try
+			{
+				if (userId == 0) return BadRequest();
+
+				
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
 		}
 		#endregion
 

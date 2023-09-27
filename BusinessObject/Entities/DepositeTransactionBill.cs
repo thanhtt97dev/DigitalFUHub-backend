@@ -21,7 +21,7 @@ namespace BusinessObject.Entities
 
 		public DateTime? PostingDate { get; set; }
 		public DateTime? TransactionDate { get; set; }
-		public string? ÁccountNo { get; set; }
+		public string? AccountNo { get; set; }
 		public int CreditAmount { get; set; }
 		public int DebitAmount { get; set; }
 		public string? Currency { get; set; }
