@@ -15,7 +15,7 @@ namespace BusinessObject.Entities
 		public long WithdrawTransactionId { get; set; }
 		public long UserId { get; set; }
 		public DateTime RequestDate { get; set; }
-		public DateTime PaidDate { get; set; }
+		public DateTime? PaidDate { get; set; }
 		public string Code { get; set; } = null!;
 		public long Amount { get; set; }
 		public bool IsPay { get; set; }

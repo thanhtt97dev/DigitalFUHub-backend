@@ -21,11 +21,11 @@ namespace DataAccess.Repositories
 		public int TotalUserLinkedBank(int userId) => BankDAO.Instance.TotalUserLinkedBank(userId);
 
 		public void CreateDepositTransaction(DepositTransaction transaction) => BankDAO.Instance.CreateDepositTransaction(transaction);
-
+		public void CreateWithdrawTransaction(WithdrawTransaction transaction) => BankDAO.Instance.CreateWithdrawTransaction(transaction);
 		public void UpdateUserBank(UserBank userBank) => BankDAO.Instance.UpdateUserBank(userBank);
 
 		public List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetDepositTransaction(userId, depositTransactionId, fromDate, toDate, status);
 
-
+		
 	}
 }

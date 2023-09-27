@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.Bank
 {
-    public class DepositTransactionRequestDTO
+    public class CreateTransactionRequestDTO
     {
         public long UserId { get; set; }
         public long Amount { get; set; }

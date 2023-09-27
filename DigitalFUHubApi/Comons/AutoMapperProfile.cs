@@ -21,7 +21,8 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<User, UserUpdateRequestDTO>().ReverseMap();
             CreateMap<Role, RoleDTO>().ReverseMap();
             CreateMap<Notification, NotificationRespone>().ReverseMap();
-			CreateMap<DepositTransaction, DepositTransactionRequestDTO>().ReverseMap();
+			CreateMap<DepositTransaction, CreateTransactionRequestDTO>().ReverseMap();
+			CreateMap<WithdrawTransaction, CreateTransactionRequestDTO>().ReverseMap();
 			CreateMap<Bank, BankResponeDTO>().ReverseMap();
 			CreateMap<UserBank, BankAccountResponeDTO>()
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.Bank.BankName))

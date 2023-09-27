@@ -88,6 +88,23 @@ namespace DataAccess.DAOs
 			}
 		}
 
+		internal void CreateWithdrawTransaction(WithdrawTransaction transaction)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				// add request withdraw
+				transaction.RequestDate = DateTime.Now;
+				transaction.PaidDate = null;
+				transaction.IsPay = false;
+				transaction.UserId = transaction.UserId;
+				context.WithdrawTransaction.Add(transaction);
+				// update account balance
+				var user = context.User.First(x => x.UserId == transaction.UserId);
+				user.AccountBalance = user.AccountBalance - transaction.Amount;
+				context.SaveChanges();
+			}
+		}
+
 		#region Checking Credit Transactions
 		public void CheckingCreditTransactions(List<TransactionHistory> transactionHistoryCreditList)
 		{
@@ -216,5 +233,7 @@ namespace DataAccess.DAOs
 			}
 			return deposits;
 		}
+
+		
 	}
 }

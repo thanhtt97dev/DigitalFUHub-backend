@@ -16,6 +16,7 @@ namespace DataAccess.IRepositories
 		void UpdateUserBank(UserBank userBank);
 		UserBank? GetUserBank(int userId);
 		void CreateDepositTransaction(DepositTransaction transaction);
+		void CreateWithdrawTransaction(WithdrawTransaction transaction);
 		List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status);
 	}
 }
