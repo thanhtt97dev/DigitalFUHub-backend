@@ -16,7 +16,7 @@ namespace BusinessObject.Entities
         public long ProductId { get; set; }
         public long UserId { get; set; }
         public string? Content { get; set; }
-        //public int Rate { get; set; }
+        public int Rate { get; set; }
         public DateTime UpdateAt { get; set; }
         [ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; } = null!;

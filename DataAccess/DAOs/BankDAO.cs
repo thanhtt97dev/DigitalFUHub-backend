@@ -104,28 +104,6 @@ namespace DataAccess.DAOs
 						if (deposit != null)
 						{
 							if (deposit.IsPay == true) continue;
-							// add bill info
-							DepositeTransactionBill depositeTransactionBill = new DepositeTransactionBill()
-							{
-								DepositTransactionId = deposit.DepositTransactionId,
-								PostingDate = item.postingDate,
-								TransactionDate = item.transactionDate,
-								AccountNo = item.accountNo,	
-								CreditAmount = item.creditAmount,	
-								DebitAmount = item.creditAmount,
-								Currency = item.currency,
-								Description = item.description,	
-								AvailableBalance = item.availableBalance,
-								BeneficiaryAccount = item.beneficiaryAccount,
-								RefNo = item.refNo,
-								BenAccountNo = item.benAccountNo,
-								BenAccountName = item.benAccountName,
-								BankName = item.bankName,	
-								DueDate = item.dueDate,	
-								DocId = item.docId,	
-								TransactionType = item.transactionType,	
-							};
-							context.DepositeTransactionBill.Add(depositeTransactionBill);
 							//update sataus recharge
 							deposit.IsPay = true;
 							deposit.PaidDate = System.DateTime.Now;
@@ -217,6 +195,14 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		
+		internal List<DepositTransaction> GetDepositTransaction(int userId)
+		{
+			List <DepositTransaction> deposits = new List<DepositTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				deposits = context.DepositTransaction.Where(x => x.UserId == userId).ToList();
+			}
+			return deposits;
+		}
 	}
 }

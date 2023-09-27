@@ -374,14 +374,13 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get history deposit transaction
 		[HttpGet("HistoryDeposit/{id}")]
-		public IActionResult GetHistoryDepositTransaction(int userId)
+		public IActionResult GetHistoryDepositTransaction(int id)
 		{
 			try
 			{
-				if (userId == 0) return BadRequest();
-
-				
-				return Ok();
+				if (id == 0) return BadRequest();
+				var deposits = bankRepository.GetDepositTransaction(id);	
+				return Ok(deposits);
 			}
 			catch (Exception ex)
 			{
