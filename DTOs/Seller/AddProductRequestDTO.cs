@@ -17,7 +17,7 @@ namespace DTOs.Seller
 			Category = category;
 			Thumbnail = thumbnail;
 			Images = images;
-			ProductVariant = productVariant;
+			ProductVariants = productVariant;
 			Tags = tags;
 		}
 

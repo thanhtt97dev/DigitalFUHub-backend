@@ -17,10 +17,8 @@ namespace DigitalFUHubApi.Controllers
 	public class StoragesController : ControllerBase
 	{
 		private readonly StorageService _storageService;
-		private readonly IStorageRepository _storageRepository;
-		public StoragesController(StorageService storageService, IStorageRepository storageRepository)
+		public StoragesController(StorageService storageService)
 		{
-			_storageRepository = storageRepository;
 			_storageService = storageService;
 		}
 
@@ -34,10 +32,10 @@ namespace DigitalFUHubApi.Controllers
 				string filename = string.Concat(Guid.NewGuid().ToString(), fileExtension);
 				string url = await _storageService.UploadFileToAzureAsync(request.FileUpload, filename);
 
-				_storageRepository.AddFile(new Media
-				{
-					Url = url,
-				});
+				//_storageRepository.AddFile(new Media
+				//{
+				//	Url = url,
+				//});
 			}
 			catch (Exception)
 			{
@@ -79,7 +77,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return NotFound();
 				}
-				_storageRepository.RemoveFile(filename);
+				//_storageRepository.RemoveFile(filename);
 			}
 			catch (Exception)
 			{

@@ -11,6 +11,6 @@ namespace DataAccess.IRepositories
 	{
 		List<ProductResponeDTO> GetAllProduct(int userId);
 		List<ProductVariantResponeDTO> GetProductVariants(int productId);
-		ProductResponeDTO GetProductById(long productId);
-	}
+        ProductResponeDTO GetProductById(long productId);
+    }
 }

@@ -83,44 +83,47 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal ProductResponeDTO GetProductById (long productId)
-		{
+
+        internal ProductResponeDTO GetProductById(long productId)
+        {
             using (DatabaseContext context = new DatabaseContext())
             {
                 var product = context.Product
-						.Include(_ => _.ProductStatus)
+                        .Include(_ => _.ProductStatus)
                         .Include(_ => _.Shop)
                         .Include(_ => _.Category)
                         .FirstOrDefault(x => x.ProductId == productId);
-				if (product == null) throw new ArgumentException("Not found Product hav id = " + productId);
+                if (product == null) throw new ArgumentException("Not found Product hav id = " + productId);
                 var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
-                    List<ProductVariantResponeDTO> variants = new List<ProductVariantResponeDTO>();
-                    foreach (var variant in productVariants)
+                List<ProductVariantResponeDTO> variants = new List<ProductVariantResponeDTO>();
+                foreach (var variant in productVariants)
+                {
+                    variants.Add(new ProductVariantResponeDTO()
                     {
-                        variants.Add(new ProductVariantResponeDTO()
-                        {
-                            ProductVariantId = variant.ProductVariantId,
-                            Name = variant.Name,
-                            Price = variant.Price,
-                            Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
-                        });
-                    }
+                        ProductVariantId = variant.ProductVariantId,
+                        Name = variant.Name,
+                        Price = variant.Price,
+                        Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
+                    });
+                }
 
-                    ProductResponeDTO productResponeDTO = new ProductResponeDTO()
-                    {
-                        ProductId = product.ProductId,
-                        ProductName = product.ProductName,
-                        Thumbnail = product.Thumbnail,
-                        Description = product.Description,
-                        Discount = product.Discount,
-						ProductStatus = product.ProductStatus,
-						Category = product.Category,
-						Shop = product.Shop,
-                        ProductVariants = variants
-                    };
+                ProductResponeDTO productResponeDTO = new ProductResponeDTO()
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.ProductName,
+                    Thumbnail = product.Thumbnail,
+                    Description = product.Description,
+                    Discount = product.Discount,
+                    ProductStatus = product.ProductStatus,
+                    Category = product.Category,
+                    Shop = product.Shop,
+                    ProductVariants = variants
+                };
 
                 return productResponeDTO;
             }
-		}
-	}
+        }
+    }
 }
+	
+

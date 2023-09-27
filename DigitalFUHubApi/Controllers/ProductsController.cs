@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DataAccess.IRepositories;
-using DataAccess.Repositories;
-using DigitalFUHubApi.Comons;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,7 +30,7 @@ namespace DigitalFUHubApi.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { Message = ex.Message});
+                return BadRequest(new { Message = ex.Message });
             }
         }
 

@@ -369,16 +369,10 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("MediaId"), 1L, 1);
 
-                    b.Property<long?>("FeedbackId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("ForeignId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("MediaTypeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ProductId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Url")
@@ -386,11 +380,9 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("MediaId");
 
-                    b.HasIndex("FeedbackId");
+                    b.HasIndex("ForeignId");
 
                     b.HasIndex("MediaTypeId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Media");
                 });
@@ -1240,9 +1232,17 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Media", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Feedback", null)
+                    b.HasOne("BusinessObject.Entities.Feedback", "Feedback")
                         .WithMany("Medias")
-                        .HasForeignKey("FeedbackId");
+                        .HasForeignKey("ForeignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.Product", "Product")
+                        .WithMany("Medias")
+                        .HasForeignKey("ForeignId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.MediaType", "MediaType")
                         .WithMany()
@@ -1250,11 +1250,11 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.Product", null)
-                        .WithMany("Medias")
-                        .HasForeignKey("ProductId");
+                    b.Navigation("Feedback");
 
                     b.Navigation("MediaType");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
