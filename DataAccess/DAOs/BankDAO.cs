@@ -195,32 +195,22 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<DepositTransaction> GetDepositTransaction(int userId)
+		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status)
 		{
 			List<DepositTransaction> deposits = new List<DepositTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				deposits = context.DepositTransaction.Where(x => x.UserId == userId).OrderByDescending(x => x.RequestDate).ToList();
-			}
-			return deposits;
-		}
+				deposits = context.DepositTransaction
+							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
+							.OrderByDescending(x => x.RequestDate).ToList();
 
-		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate)
-		{
-			List<DepositTransaction> deposits = new List<DepositTransaction>();
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				if (depositTransactionId == 0)
+				if (depositTransactionId != 0)
 				{
-					deposits = context.DepositTransaction
-							.Where(x => x.UserId == userId && fromDate <= x.PaidDate && toDate >= x.PaidDate && x.IsPay)
-							.OrderByDescending(x => x.RequestDate).ToList();
+					deposits = deposits.Where(x => x.DepositTransactionId == depositTransactionId).ToList();
 				}
-				else
+				if(status != 0) 
 				{
-					deposits = context.DepositTransaction
-							.Where(x => x.UserId == userId && x.DepositTransactionId == depositTransactionId && fromDate <= x.PaidDate && toDate >= x.PaidDate && x.IsPay)
-							.OrderByDescending(x => x.RequestDate).ToList();
+					deposits = deposits.Where(x => x.IsPay == (status == 1)).ToList();
 				}
 
 			}

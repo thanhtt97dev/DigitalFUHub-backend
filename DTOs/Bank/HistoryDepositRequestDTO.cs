@@ -8,8 +8,9 @@ namespace DTOs.Bank
 {
 	public class HistoryDepositRequestDTO
 	{
-		public string? depositTransactionId {  get; set; }	
-		public string? fromDate { get; set; }
-		public string? toDate { get; set; }
+		public string? DepositTransactionId {  get; set; }	
+		public string? FromDate { get; set; }
+		public string? ToDate { get; set; }
+		public int Status { get; set; }
 	}
 }

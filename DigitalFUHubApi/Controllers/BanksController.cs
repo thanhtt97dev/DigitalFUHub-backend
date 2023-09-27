@@ -383,15 +383,15 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				if (id == 0 || historyDepositRequestDTO == null ||
-					historyDepositRequestDTO.fromDate == null ||
-					historyDepositRequestDTO.toDate == null) return BadRequest();
+					historyDepositRequestDTO.FromDate == null ||
+					historyDepositRequestDTO.ToDate == null) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
 				try
 				{
-					fromDate = DateTime.ParseExact(historyDepositRequestDTO.fromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(historyDepositRequestDTO.toDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					fromDate = DateTime.ParseExact(historyDepositRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(historyDepositRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
 					if (fromDate > toDate)
 					{
 						status.Message = "From date must be less than to date";
@@ -411,9 +411,19 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				long depositTransactionId;
-				long.TryParse(historyDepositRequestDTO.depositTransactionId, out depositTransactionId);
+				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
 
-				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate);
+				// 0 : All, 1: paid, 2: unpay
+				if(historyDepositRequestDTO.Status != 0 && historyDepositRequestDTO.Status != 1 && 
+					historyDepositRequestDTO.Status != 2){
+					status.Message = "Invalid transaction's status";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, historyDepositRequestDTO.Status);
 
 				status.Message = "Add bank account success!";
 				status.Ok = false;
