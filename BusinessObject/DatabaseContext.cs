@@ -104,7 +104,9 @@ namespace BusinessObject
 
 			modelBuilder.Entity<Category>().HasData(new Category[]
 			{
-				new Category{CategoryId = 1, CategoryName = "Account"}
+				new Category{CategoryId = 1, CategoryName = "Mạng xã hội"},
+				new Category{CategoryId = 2, CategoryName = "VPS"},
+				new Category{CategoryId = 3, CategoryName = "Khác"},
 			});
 
 			modelBuilder.Entity<TransactionType>().HasData(new TransactionType[]
