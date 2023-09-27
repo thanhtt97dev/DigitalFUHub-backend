@@ -20,6 +20,5 @@ namespace BusinessObject.Entities
 
         [ForeignKey(nameof(MediaTypeId))]
         public virtual MediaType MediaType { get; set; } = null!;
-
 	}
 }

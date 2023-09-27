@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class UpdateDBv3 : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -127,6 +127,27 @@ namespace BusinessObject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TransactionType", x => x.TransactionTypeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Media",
+                columns: table => new
+                {
+                    MediaId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ForeignId = table.Column<long>(type: "bigint", nullable: false),
+                    MediaTypeId = table.Column<long>(type: "bigint", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Media", x => x.MediaId);
+                    table.ForeignKey(
+                        name: "FK_Media_MediaType_MediaTypeId",
+                        column: x => x.MediaTypeId,
+                        principalTable: "MediaType",
+                        principalColumn: "MediaTypeId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -387,6 +408,7 @@ namespace BusinessObject.Migrations
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaidDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Amount = table.Column<long>(type: "bigint", nullable: false),
                     IsPay = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -410,7 +432,7 @@ namespace BusinessObject.Migrations
                     DepositTransactionId = table.Column<long>(type: "bigint", nullable: false),
                     PostingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ÁccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreditAmount = table.Column<int>(type: "int", nullable: false),
                     DebitAmount = table.Column<int>(type: "int", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -601,38 +623,6 @@ namespace BusinessObject.Migrations
                         principalTable: "Product",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Media",
-                columns: table => new
-                {
-                    MediaId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ForeignId = table.Column<long>(type: "bigint", nullable: false),
-                    MediaTypeId = table.Column<long>(type: "bigint", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Media", x => x.MediaId);
-                    table.ForeignKey(
-                        name: "FK_Media_Feedback_ForeignId",
-                        column: x => x.ForeignId,
-                        principalTable: "Feedback",
-                        principalColumn: "FeedbackId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Media_MediaType_MediaTypeId",
-                        column: x => x.MediaTypeId,
-                        principalTable: "MediaType",
-                        principalColumn: "MediaTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Media_Product_ForeignId",
-                        column: x => x.ForeignId,
-                        principalTable: "Product",
-                        principalColumn: "ProductId");
                 });
 
             migrationBuilder.CreateTable(
@@ -895,11 +885,6 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Media_ForeignId",
-                table: "Media",
-                column: "ForeignId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Media_MediaTypeId",
                 table: "Media",
                 column: "MediaTypeId");
@@ -1046,6 +1031,9 @@ namespace BusinessObject.Migrations
                 name: "DepositeTransactionBill");
 
             migrationBuilder.DropTable(
+                name: "Feedback");
+
+            migrationBuilder.DropTable(
                 name: "Media");
 
             migrationBuilder.DropTable(
@@ -1080,9 +1068,6 @@ namespace BusinessObject.Migrations
 
             migrationBuilder.DropTable(
                 name: "DepositTransaction");
-
-            migrationBuilder.DropTable(
-                name: "Feedback");
 
             migrationBuilder.DropTable(
                 name: "MediaType");

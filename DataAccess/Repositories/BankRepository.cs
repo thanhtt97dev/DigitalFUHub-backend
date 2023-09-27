@@ -23,5 +23,8 @@ namespace DataAccess.Repositories
 		public void CreateDepositTransaction(DepositTransaction transaction) => BankDAO.Instance.CreateDepositTransaction(transaction);
 
 		public void UpdateUserBank(UserBank userBank) => BankDAO.Instance.UpdateUserBank(userBank);
+
+		public List<DepositTransaction> GetDepositTransaction(int userId) => BankDAO.Instance.GetDepositTransaction(userId);
+
 	}
 }

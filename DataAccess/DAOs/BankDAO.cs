@@ -217,6 +217,14 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		
+		internal List<DepositTransaction> GetDepositTransaction(int userId)
+		{
+			List <DepositTransaction> deposits = new List<DepositTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				deposits = context.DepositTransaction.Where(x => x.UserId == userId && x.IsPay).ToList();
+			}
+			return deposits;
+		}
 	}
 }

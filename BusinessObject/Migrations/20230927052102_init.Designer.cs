@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230926162221_UpdateDBv3")]
-    partial class UpdateDBv3
+    [Migration("20230927052102_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -240,6 +240,9 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("DepositeTransactionBillId"), 1L, 1);
 
+                    b.Property<string>("AccountNo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("AvailableBalance")
                         .HasColumnType("int");
 
@@ -288,9 +291,6 @@ namespace BusinessObject.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ÁccountNo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("DepositeTransactionBillId");
@@ -381,8 +381,6 @@ namespace BusinessObject.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MediaId");
-
-                    b.HasIndex("ForeignId");
 
                     b.HasIndex("MediaTypeId");
 
@@ -1048,6 +1046,10 @@ namespace BusinessObject.Migrations
                     b.Property<long>("Amount")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsPay")
                         .HasColumnType("bit");
 
@@ -1234,29 +1236,13 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Media", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Feedback", "Feedback")
-                        .WithMany("Medias")
-                        .HasForeignKey("ForeignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BusinessObject.Entities.Product", "Product")
-                        .WithMany("Medias")
-                        .HasForeignKey("ForeignId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("BusinessObject.Entities.MediaType", "MediaType")
                         .WithMany()
                         .HasForeignKey("MediaTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Feedback");
-
                     b.Navigation("MediaType");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
@@ -1545,11 +1531,6 @@ namespace BusinessObject.Migrations
                     b.Navigation("OrderCoupons");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Feedback", b =>
-                {
-                    b.Navigation("Medias");
-                });
-
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
                     b.Navigation("OrderCoupons");
@@ -1568,8 +1549,6 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Entities.Product", b =>
                 {
                     b.Navigation("Feedbacks");
-
-                    b.Navigation("Medias");
 
                     b.Navigation("ProductVariants");
 
