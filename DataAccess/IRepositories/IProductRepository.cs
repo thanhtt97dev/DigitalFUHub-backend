@@ -10,6 +10,7 @@ namespace DataAccess.IRepositories
 	public interface IProductRepository
 	{
 		List<ProductResponeDTO> GetAllProduct(int userId);
-		List<ProductVariantResponeDTO> GetProductVariants(int productId);	
+		List<ProductVariantResponeDTO> GetProductVariants(int productId);
+		ProductResponeDTO GetProductById(long productId);
 	}
 }
