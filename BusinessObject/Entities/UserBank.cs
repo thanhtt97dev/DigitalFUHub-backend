@@ -24,5 +24,6 @@ namespace BusinessObject.Entities
 
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
-    }
+		public virtual ICollection<WithdrawTransaction>? WithdrawTransactions { get; set; }
+	}
 }

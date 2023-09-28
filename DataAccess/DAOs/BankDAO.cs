@@ -259,5 +259,23 @@ namespace DataAccess.DAOs
 			}
 			return withdraws;
 		}
+
+		internal WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
+				return transaction;
+			}
+		}
+
+		internal WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var bill = context.WithdrawTransactionBill.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
+				return bill;
+			}
+		}
 	}
 }

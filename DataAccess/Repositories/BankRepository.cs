@@ -28,5 +28,9 @@ namespace DataAccess.Repositories
 
 		public List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetWithdrawTransaction(userId, withdrawTransactionId, fromDate, toDate, status);
 
+		public WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransaction(withdrawTransactionId);
+
+		public WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransactionBill(withdrawTransactionId);
+
 	}
 }

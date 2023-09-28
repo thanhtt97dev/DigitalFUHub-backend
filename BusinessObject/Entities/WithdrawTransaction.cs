@@ -13,6 +13,7 @@ namespace BusinessObject.Entities
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long WithdrawTransactionId { get; set; }
+		public long UserBankId { get; set; }
 		public long UserId { get; set; }
 		public DateTime RequestDate { get; set; }
 		public DateTime? PaidDate { get; set; }
@@ -22,5 +23,7 @@ namespace BusinessObject.Entities
 
         [ForeignKey(nameof(UserId))]
         public virtual User? User { get; set; }
-    }
+		[ForeignKey(nameof(UserBankId))]
+		public virtual UserBank? UserBank { get; set; }
+	}
 }

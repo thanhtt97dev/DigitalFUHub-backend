@@ -513,10 +513,62 @@ namespace DigitalFUHubApi.Controllers
 				var deposits = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
 
 				status.Message = "Success!";
-				status.Ok = false;
+				status.Ok = true;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
 				responseData.Result = deposits;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get withdraw transaction bill
+		[HttpGet("WithdrawTransactionBill/{id}")]
+		public IActionResult GetWithdrawTransactionBill(int id)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
+			{
+				if (id == 0) return BadRequest();
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(id);
+				if(withdrawTransaction == null)
+				{
+					status.Message = "Withdraw bill not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				if (!withdrawTransaction.IsPay)
+				{
+					status.Message = "Withdraw transaction hasn't paid!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var bill = bankRepository.GetWithdrawTransactionBill(id);
+				if(bill == null)
+				{
+					status.Message = "Withdraw bill not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var result = mapper.Map<WithdrawTransactionBillDTO>(bill);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

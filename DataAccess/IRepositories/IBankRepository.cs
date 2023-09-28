@@ -19,5 +19,7 @@ namespace DataAccess.IRepositories
 		void CreateWithdrawTransaction(WithdrawTransaction transaction);
 		List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status);
 		List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status);
+		WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId);
+		WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId);
 	}
 }
