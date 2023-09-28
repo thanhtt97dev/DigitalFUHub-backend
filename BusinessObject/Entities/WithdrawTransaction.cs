@@ -24,6 +24,6 @@ namespace BusinessObject.Entities
         [ForeignKey(nameof(UserId))]
         public virtual User? User { get; set; }
 		[ForeignKey(nameof(UserBankId))]
-		public virtual UserBank? UserBank { get; set; }
+		public virtual UserBank UserBank { get; set; } = null!;
 	}
 }

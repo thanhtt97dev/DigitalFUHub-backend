@@ -52,8 +52,10 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get user bank account
 		[HttpGet("user/{id}")]
-		public IActionResult CheckUserBankAccount(int id)
+		public IActionResult GetUserBankAccount(int id)
 		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
 			try
 			{
 				if (id == 0) return BadRequest();
@@ -62,9 +64,22 @@ namespace DigitalFUHubApi.Controllers
 				if (user == null) return BadRequest();
 
 				var bank = bankRepository.GetUserBank(id);
-				if (bank == null) return Ok(null);
+				if (bank == null)
+				{
+					status.Message = "Not found user's bank account!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
 				var result = mapper.Map<BankAccountResponeDTO>(bank);
-				return Ok(result);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
 			}
 			catch (Exception ex)
 			{
@@ -515,11 +530,13 @@ namespace DigitalFUHubApi.Controllers
 
 				var deposits = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
 
+				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
+
 				status.Message = "Success!";
 				status.Ok = true;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
-				responseData.Result = deposits;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

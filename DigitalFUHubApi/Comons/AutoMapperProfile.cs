@@ -30,6 +30,11 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
             CreateMap<Message, MessageResponseDTO>().ReverseMap();
 			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
+			CreateMap<WithdrawTransaction, HistoryWithdrawResponsetDTO>()
+				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
+				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => src.UserBank.CreditAccount))
+				.ForMember(des => des.CreditAccountName, atc => atc.MapFrom(src => src.UserBank.CreditAccountName))
+				.ReverseMap();	
 		}
     }
 }
