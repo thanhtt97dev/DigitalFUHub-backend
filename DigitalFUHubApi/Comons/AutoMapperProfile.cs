@@ -29,6 +29,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => Util.HideCharacters(src.CreditAccount,5)))
 				.ReverseMap();
             CreateMap<Message, MessageResponseDTO>().ReverseMap();
-        }
+			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
+		}
     }
 }

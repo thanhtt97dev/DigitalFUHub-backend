@@ -13,11 +13,13 @@ namespace DataAccess.IRepositories
 		List<UserBank> GetAllBankInfoUserLinked(int userId);
 		int TotalUserLinkedBank(int userId);
 		void AddUserBank(UserBank userBank);
-		void UpdateUserBank(UserBank userBank);
+		void UpdateUserBankStatus(UserBank userBank);
 		UserBank? GetUserBank(int userId);
 		void CreateDepositTransaction(DepositTransaction transaction);
 		void CreateWithdrawTransaction(WithdrawTransaction transaction);
 		List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status);
 		List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status);
+		WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId);
+		WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId);
 	}
 }

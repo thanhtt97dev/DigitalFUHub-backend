@@ -94,6 +94,11 @@ namespace BusinessObject
 				.WithMany(x => x.Orders)
 				.HasForeignKey(x => x.UserId)
 				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<WithdrawTransaction>()
+				.HasOne(x => x.UserBank)
+				.WithMany(x => x.WithdrawTransactions)
+				.HasForeignKey(x => x.UserBankId)
+				.OnDelete(DeleteBehavior.NoAction);
 
 			modelBuilder.Entity<Role>().HasData(new Role[]
 			{
