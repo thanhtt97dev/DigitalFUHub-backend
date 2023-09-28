@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj": {}
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj": {}
   },
   "projects": {
-    "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj",
-        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\obj\\",
+        "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -81,21 +85,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj": {
+    "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj",
+        "projectUniqueName": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj",
         "projectName": "DTOs",
-        "projectPath": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj",
-        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "E:\\fpt\\fu-market-backend\\DTOs\\obj\\",
+        "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -109,8 +117,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj"
+              "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj"
               }
             }
           }
@@ -146,7 +154,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     }
