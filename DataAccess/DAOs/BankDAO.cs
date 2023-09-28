@@ -52,7 +52,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var total = context.UserBank.Where(x => x.UserId == userId).Count();
+				var total = context.UserBank.Where(x => x.UserId == userId && x.isActivate).Count();
 				return total;
 			}
 		}
@@ -70,7 +70,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var bank = context.UserBank.Include(x => x.Bank).FirstOrDefault(x => x.UserId == userId);
+				var bank = context.UserBank.Include(x => x.Bank).FirstOrDefault(x => x.UserId == userId && x.isActivate);
 				return bank;
 			}
 		}
@@ -92,7 +92,11 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
+				// get user bank account
+				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == transaction.UserId && x.isActivate);
+				if (userBank == null) throw new Exception();
 				// add request withdraw
+				transaction.UserBankId = userBank.UserBankId;
 				transaction.RequestDate = DateTime.Now;
 				transaction.PaidDate = null;
 				transaction.IsPay = false;
@@ -157,11 +161,15 @@ namespace DataAccess.DAOs
 					foreach (var item in transactionHistoryDebitList)
 					{
 						var withdraw = context.WithdrawTransaction
-								.FirstOrDefault(x => string.Equals(x.Code.ToLower(), item.description.ToLower()) &&
+								.FirstOrDefault(x => item.description.ToLower().Contains(x.Code.ToLower()) &&
 								x.Amount == item.debitAmount);
+
 						if (withdraw != null)
 						{
 							if (withdraw.IsPay == true) continue;
+							// set status is paid
+							withdraw.IsPay = true;
+							withdraw.PaidDate = item.transactionDate;
 							// add bill info
 							WithdrawTransactionBill withdrawTransactionBill = new WithdrawTransactionBill()
 							{
@@ -198,16 +206,14 @@ namespace DataAccess.DAOs
 		}
 		#endregion
 
-		internal void UpdateUserBank(UserBank userBankUpdate)
+		internal void UpdateUserBankStatus(UserBank userBankUpdate)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == userBankUpdate.UserId);
 				if (userBank == null) throw new Exception("User's bank account not existed!");
-				userBank.BankId = userBankUpdate.BankId;
-				userBank.CreditAccount = userBankUpdate.CreditAccount;
-				userBank.CreditAccountName = userBankUpdate.CreditAccountName;
 				userBank.UpdateAt = DateTime.Now;
+				userBank.isActivate = false;
 				context.SaveChanges();
 			}
 		}
@@ -234,6 +240,46 @@ namespace DataAccess.DAOs
 			return deposits;
 		}
 
-		
+		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status)
+		{
+			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				withdraws = context.WithdrawTransaction
+							.Include(x => x.UserBank)
+							.ThenInclude(x => x.Bank)
+							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
+							.OrderByDescending(x => x.RequestDate).ToList();
+
+				if (withdrawTransactionId != 0)
+				{
+					withdraws = withdraws.Where(x => x.WithdrawTransactionId == withdrawTransactionId).ToList();
+				}
+				if (status != 0)
+				{
+					withdraws = withdraws.Where(x => x.IsPay == (status == 1)).ToList();
+				}
+
+			}
+			return withdraws;
+		}
+
+		internal WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
+				return transaction;
+			}
+		}
+
+		internal WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var bill = context.WithdrawTransactionBill.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
+				return bill;
+			}
+		}
 	}
 }

@@ -60,7 +60,7 @@ namespace DataAccess.DAOs
                         new SqlParameter("@conversationId", sendChatMessageRequest.ConversationId),
                         new SqlParameter("@senderId", sendChatMessageRequest.SenderId),
                         new SqlParameter("@recipientId", sendChatMessageRequest.RecipientId),
-                        new SqlParameter("@content", sendChatMessageRequest.Content),
+                        new SqlParameter("@content", sendChatMessageRequest.Content ?? ""),
                         new SqlParameter("@dateCreate", sendChatMessageRequest.DateCreate),
                         new SqlParameter("@messageType", sendChatMessageRequest.MessageType)
                     );
@@ -76,6 +76,19 @@ namespace DataAccess.DAOs
                 List<Message> result = await context.Messages
                     .Where(m => m.ConversationId == conversationId)
                     .ToListAsync();
+
+                return result;
+            }
+
+        }
+
+        internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                List<UserConversation> result = context.UserConversation
+                    .Where(u => u.UserId == senderId || u.UserId == recipientId)
+                    .ToList();
 
                 return result;
             }

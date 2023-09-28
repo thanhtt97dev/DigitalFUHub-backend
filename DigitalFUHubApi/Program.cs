@@ -128,10 +128,21 @@ namespace DigitalFUHubApi
 			// add job scheduler get history transaction bank
 			builder.Services.AddQuartz(q =>
 			{
-				var jobKeyGetHistoryTransaction = new JobKey("GetHistoryTransactionJob");
-				q.AddJob<HistoryDepositTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyGetHistoryTransaction));
+				var jobKeyHistoryDepositTransactionMbBankJob = new JobKey("HistoryDepositTransactionMbBankJob");
+				q.AddJob<HistoryDepositTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyHistoryDepositTransactionMbBankJob));
 				q.AddTrigger(opts => opts
-					.ForJob(jobKeyGetHistoryTransaction)
+					.ForJob(jobKeyHistoryDepositTransactionMbBankJob)
+					.StartNow()
+					.WithSimpleSchedule(x =>
+						x.WithIntervalInMinutes(1)
+						.RepeatForever()
+						)
+					);
+
+				var jobKeyHistoryWithdrawTransactionMbBankJob = new JobKey("HistoryWithdrawTransactionMbBankJob");
+				q.AddJob<HistoryWithdrawTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyHistoryWithdrawTransactionMbBankJob));
+				q.AddTrigger(opts => opts
+					.ForJob(jobKeyHistoryWithdrawTransactionMbBankJob)
 					.StartNow()
 					.WithSimpleSchedule(x =>
 						x.WithIntervalInMinutes(1)

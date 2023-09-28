@@ -29,7 +29,7 @@ namespace BusinessObject.Entities
 		public string RefNo { get; set; } = null!;
 		public string? BenAccountName { get; set; }
 		public string? BankName { get; set; }
-		public string? BenAccountNo { get; set; }
+		public string BenAccountNo { get; set; } = string.Empty;
 		public DateTime? DueDate { get; set; }
 		public string? DocId { get; set; }
 		public string? TransactionType { get; set; }

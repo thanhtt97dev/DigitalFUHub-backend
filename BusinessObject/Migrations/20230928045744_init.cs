@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class initdb : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -320,7 +320,8 @@ namespace BusinessObject.Migrations
                     BankId = table.Column<long>(type: "bigint", nullable: false),
                     CreditAccount = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreditAccountName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    isActivate = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -359,30 +360,6 @@ namespace BusinessObject.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserConversation_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WithdrawTransaction",
-                columns: table => new
-                {
-                    WithdrawTransactionId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
-                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Amount = table.Column<long>(type: "bigint", nullable: false),
-                    IsPay = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WithdrawTransaction", x => x.WithdrawTransactionId);
-                    table.ForeignKey(
-                        name: "FK_WithdrawTransaction_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId",
@@ -453,38 +430,33 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WithdrawTransactionBill",
+                name: "WithdrawTransaction",
                 columns: table => new
                 {
-                    WidrawTransactionBillId = table.Column<long>(type: "bigint", nullable: false)
+                    WithdrawTransactionId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    WithdrawTransactionId = table.Column<long>(type: "bigint", nullable: false),
-                    PostingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreditAmount = table.Column<int>(type: "int", nullable: false),
-                    DebitAmount = table.Column<int>(type: "int", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AvailableBalance = table.Column<int>(type: "int", nullable: false),
-                    BeneficiaryAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RefNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BenAccountName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BenAccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DocId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UserBankId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<long>(type: "bigint", nullable: false),
+                    IsPay = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WithdrawTransactionBill", x => x.WidrawTransactionBillId);
+                    table.PrimaryKey("PK_WithdrawTransaction", x => x.WithdrawTransactionId);
                     table.ForeignKey(
-                        name: "FK_WithdrawTransactionBill_WithdrawTransaction_WithdrawTransactionId",
-                        column: x => x.WithdrawTransactionId,
-                        principalTable: "WithdrawTransaction",
-                        principalColumn: "WithdrawTransactionId",
+                        name: "FK_WithdrawTransaction_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WithdrawTransaction_UserBank_UserBankId",
+                        column: x => x.UserBankId,
+                        principalTable: "UserBank",
+                        principalColumn: "UserBankId");
                 });
 
             migrationBuilder.CreateTable(
@@ -574,6 +546,41 @@ namespace BusinessObject.Migrations
                         column: x => x.ProductId,
                         principalTable: "Product",
                         principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WithdrawTransactionBill",
+                columns: table => new
+                {
+                    WidrawTransactionBillId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WithdrawTransactionId = table.Column<long>(type: "bigint", nullable: false),
+                    PostingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AccountNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreditAmount = table.Column<int>(type: "int", nullable: false),
+                    DebitAmount = table.Column<int>(type: "int", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvailableBalance = table.Column<int>(type: "int", nullable: false),
+                    BeneficiaryAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BenAccountName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BenAccountNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DocId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WithdrawTransactionBill", x => x.WidrawTransactionBillId);
+                    table.ForeignKey(
+                        name: "FK_WithdrawTransactionBill_WithdrawTransaction_WithdrawTransactionId",
+                        column: x => x.WithdrawTransactionId,
+                        principalTable: "WithdrawTransaction",
+                        principalColumn: "WithdrawTransactionId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -974,6 +981,11 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_WithdrawTransaction_UserBankId",
+                table: "WithdrawTransaction",
+                column: "UserBankId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WithdrawTransaction_UserId",
                 table: "WithdrawTransaction",
                 column: "UserId");
@@ -1026,9 +1038,6 @@ namespace BusinessObject.Migrations
                 name: "TwoFactorAuthentication");
 
             migrationBuilder.DropTable(
-                name: "UserBank");
-
-            migrationBuilder.DropTable(
                 name: "UserConversation");
 
             migrationBuilder.DropTable(
@@ -1047,9 +1056,6 @@ namespace BusinessObject.Migrations
                 name: "TransactionType");
 
             migrationBuilder.DropTable(
-                name: "Bank");
-
-            migrationBuilder.DropTable(
                 name: "Conversations");
 
             migrationBuilder.DropTable(
@@ -1065,7 +1071,13 @@ namespace BusinessObject.Migrations
                 name: "ProductVariant");
 
             migrationBuilder.DropTable(
+                name: "UserBank");
+
+            migrationBuilder.DropTable(
                 name: "Product");
+
+            migrationBuilder.DropTable(
+                name: "Bank");
 
             migrationBuilder.DropTable(
                 name: "Category");

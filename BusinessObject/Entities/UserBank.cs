@@ -18,11 +18,13 @@ namespace BusinessObject.Entities
         public string CreditAccount { get; set; } = null!;
         public string CreditAccountName { get; set; } = null!;
         public DateTime UpdateAt { get; set; }
+		public bool isActivate { get; set; }
 
-        [ForeignKey(nameof(BankId))]
+		[ForeignKey(nameof(BankId))]
         public virtual Bank Bank { get; set; } = null!;
 
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
-    }
+		public virtual ICollection<WithdrawTransaction>? WithdrawTransactions { get; set; }
+	}
 }

@@ -1,16 +1,13 @@
 ﻿using AutoMapper;
-using DataAccess.IRepositories;
-using DataAccess.Repositories;
 using DigitalFUHubApi.Hubs;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Managers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using BusinessObject.DataTransfer;
 using DTOs.Chat;
+using DataAccess.IRepositories;
+using BusinessObject.DataTransfer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -37,27 +34,30 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-                int recipientId = unchecked((int)sendChatMessageRequest.RecipientId);
-                HashSet<string>? connections = _connectionManager
-                    .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
+                if (!string.IsNullOrEmpty(sendChatMessageRequest.Content))
+                {
+                    int recipientId = unchecked((int)sendChatMessageRequest.RecipientId);
+                    HashSet<string>? connections = _connectionManager
+                        .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
 
-                MessageResponseDTO messageResponse = new MessageResponseDTO
-                {
-                    UserId = sendChatMessageRequest.SenderId,
-                    ConversationId = sendChatMessageRequest.ConversationId,
-                    Content = sendChatMessageRequest.Content,
-                    DateCreate = sendChatMessageRequest.DateCreate,
-                    MessageType = sendChatMessageRequest.MessageType
-                };
-                if (connections != null)
-                {
-                    foreach (var connection in connections)
+                    MessageResponseDTO messageResponse = new MessageResponseDTO
                     {
-                        await _hubContext.Clients.Clients(connection)
-                            .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, messageResponse);
+                        UserId = sendChatMessageRequest.SenderId,
+                        ConversationId = sendChatMessageRequest.ConversationId,
+                        Content = sendChatMessageRequest.Content,
+                        DateCreate = sendChatMessageRequest.DateCreate,
+                        MessageType = sendChatMessageRequest.MessageType
+                    };
+                    if (connections != null)
+                    {
+                        foreach (var connection in connections)
+                        {
+                            await _hubContext.Clients.Clients(connection)
+                                .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, messageResponse);
+                        }
                     }
                 }
-
+               
                 await _chatRepository.SendChatMessage(sendChatMessageRequest);
                 return Ok();
             }
@@ -96,5 +96,20 @@ namespace DigitalFUHubApi.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
+
+        [HttpGet("existUserConversation")]
+        public IActionResult ExistUserConversation(long senderId, long recipientId)
+        {
+            try
+            {
+                return Ok(_chatRepository.GetUserConversation(senderId, recipientId));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
     }
 }

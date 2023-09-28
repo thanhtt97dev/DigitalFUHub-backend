@@ -7,22 +7,19 @@ GO;
 
 -- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
 CREATE PROCEDURE dbo.GetSenderConversation
-	@userId INT
-AS
-BEGIN
-	
-	SELECT DISTINCT
-	u.*,
-	m.ConversationId
-	FROM [User] as u
-	INNER JOIN [Messages] as m ON u.UserId = m.UserId
-	WHERE m.ConversationId IN (
-	SELECT 
-		ConversationId
-	FROM UserConversation WHERE UserId = @userId)
-	AND u.UserId != @userId
-	ORDER BY m.ConversationId DESC
-END;
+        @userId INT
+    AS
+    BEGIN
+        SELECT 
+        u.*, 
+        r.ConversationId 
+        FROM [User] as u,
+        (SELECT UserId, ConversationId FROM UserConversation as u WHERE ConversationId IN (
+        SELECT ConversationId FROM UserConversation WHERE UserId = @userId)) as r
+        WHERE u.UserId = r.userId
+        AND u.UserId != @userId
+		ORDER BY r.ConversationId DESC
+    END;
 GO;
 
 -- EXEC
@@ -35,17 +32,6 @@ GO;
 /*
 	DROP PROCEDURE dbo.GetSenderConversation
 */
-
--- Lấy danh sách tin nhắn theo cuộc trò chuyện
-/*
-	SELECT 
-	*
-	FROM [Message]
-	WHERE ConversationId = 2
-	ORDER BY DateCreate ASC;
-	GO;
-*/
-
 
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage
@@ -66,15 +52,20 @@ BEGIN
 					INSERT INTO [UserConversation] (UserId, ConversationId)
 					VALUES (@senderId, @conversationIdCur),
 							(@recipientId, @conversationIdCur)
-
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationIdCur, @content, @messageType, @dateCreate, '0')
+					IF (LEN(@content) > 0)
+					BEGIN
+						INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+						VALUES (@senderId, @conversationIdCur, @content, @messageType, @dateCreate, '0')
+					END;		
 				END;
 			ELSE 
 				BEGIN
 					BEGIN TRANSACTION
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationId, @content, @messageType, @dateCreate, '0');
+					IF (LEN(@content) > 0)
+					BEGIN
+						INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+						VALUES (@senderId, @conversationId, @content, @messageType, @dateCreate, '0')
+					END;
 				END
 			COMMIT;
 	END TRY
@@ -90,7 +81,6 @@ END;
 GO;
 
 
-
 -- EXEC
 /*
 	EXEC dbo.SendChatMessage 1, 1, 2, 'Test isImage', '2023-09-16', 0;
@@ -101,22 +91,3 @@ GO;
 	DROP PROCEDURE dbo.SendChatMessage;
 */
 
-
--- Report Errors
-/*
-	CREATE PROCEDURE dbo.UspReportErrorSql
-	AS
-		SELECT   
-			ERROR_NUMBER() AS ErrorNumber  
-			,ERROR_SEVERITY() AS ErrorSeverity  
-			,ERROR_STATE() AS ErrorState  
-			,ERROR_LINE () AS ErrorLine  
-			,ERROR_PROCEDURE() AS ErrorProcedure  
-			,ERROR_MESSAGE() AS ErrorMessage;  
-	GO;
-*/
-
--- DROP 
-/*
-	DROP PROCEDURE dbo.UspReportErrorSql;
-*/

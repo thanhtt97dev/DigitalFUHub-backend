@@ -52,8 +52,10 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get user bank account
 		[HttpGet("user/{id}")]
-		public IActionResult CheckUserBankAccount(int id)
+		public IActionResult GetUserBankAccount(int id)
 		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
 			try
 			{
 				if (id == 0) return BadRequest();
@@ -62,9 +64,22 @@ namespace DigitalFUHubApi.Controllers
 				if (user == null) return BadRequest();
 
 				var bank = bankRepository.GetUserBank(id);
-				if (bank == null) return Ok(null);
+				if (bank == null)
+				{
+					status.Message = "Not found user's bank account!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
 				var result = mapper.Map<BankAccountResponeDTO>(bank);
-				return Ok(result);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
 			}
 			catch (Exception ex)
 			{
@@ -224,6 +239,7 @@ namespace DigitalFUHubApi.Controllers
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
 					UpdateAt = DateTime.UtcNow,
+					isActivate = true
 				};
 
 				bankRepository.AddUserBank(userBank);
@@ -330,9 +346,11 @@ namespace DigitalFUHubApi.Controllers
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
 					UpdateAt = DateTime.UtcNow,
+					isActivate = true,
 				};
 
-				bankRepository.UpdateUserBank(userBank);
+				bankRepository.UpdateUserBankStatus(userBankAccount);
+				bankRepository.AddUserBank(userBank);
 
 				status.Message = "Update user's bank account success!";
 				status.Ok = true;
@@ -445,7 +463,7 @@ namespace DigitalFUHubApi.Controllers
 
 				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, historyDepositRequestDTO.Status);
 
-				status.Message = "Add bank account success!";
+				status.Message = "Success!";
 				status.Ok = false;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
@@ -457,26 +475,27 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-
 		#endregion
+
+		#region Get history withdraw transaction
 		[HttpPost("HistoryWithdraw/{id}")]
-		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryDepositRequestDTO historyDepositRequestDTO)
+		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0 || historyDepositRequestDTO == null ||
-					historyDepositRequestDTO.FromDate == null ||
-					historyDepositRequestDTO.ToDate == null) return BadRequest();
+				if (id == 0 || historyWithdrawRequestDTO == null ||
+					historyWithdrawRequestDTO.FromDate == null ||
+					historyWithdrawRequestDTO.ToDate == null) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
 				try
 				{
-					fromDate = DateTime.ParseExact(historyDepositRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(historyDepositRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					fromDate = DateTime.ParseExact(historyWithdrawRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(historyWithdrawRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
 					if (fromDate > toDate)
 					{
 						status.Message = "From date must be less than to date";
@@ -495,12 +514,12 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				long depositTransactionId;
-				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
+				long withdrawTransactionId;
+				long.TryParse(historyWithdrawRequestDTO.WithdrawTransactionId, out withdrawTransactionId);
 
-				// 0 : All, 1: paid, 2: unpay
-				if (historyDepositRequestDTO.Status != 0 && historyDepositRequestDTO.Status != 1 &&
-					historyDepositRequestDTO.Status != 2)
+				// 0 : All, 1: paid, 2: in process
+				if (historyWithdrawRequestDTO.Status != 0 && historyWithdrawRequestDTO.Status != 1 &&
+					historyWithdrawRequestDTO.Status != 2)
 				{
 					status.Message = "Invalid transaction's status";
 					status.Ok = false;
@@ -509,13 +528,15 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, historyDepositRequestDTO.Status);
+				var deposits = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
 
-				status.Message = "Add bank account success!";
-				status.Ok = false;
+				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
+
+				status.Message = "Success!";
+				status.Ok = true;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
-				responseData.Result = deposits;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)
@@ -523,8 +544,58 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#region Get history withdraw transaction
+		#endregion
 
+		#region Get withdraw transaction bill
+		[HttpGet("WithdrawTransactionBill/{id}")]
+		public IActionResult GetWithdrawTransactionBill(int id)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
+			{
+				if (id == 0) return BadRequest();
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(id);
+				if(withdrawTransaction == null)
+				{
+					status.Message = "Withdraw bill not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				if (!withdrawTransaction.IsPay)
+				{
+					status.Message = "Withdraw transaction hasn't paid!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var bill = bankRepository.GetWithdrawTransactionBill(id);
+				if(bill == null)
+				{
+					status.Message = "Withdraw bill not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var result = mapper.Map<WithdrawTransactionBillDTO>(bill);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 		#endregion
 
 	}
