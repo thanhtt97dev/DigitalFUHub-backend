@@ -224,6 +224,7 @@ namespace DigitalFUHubApi.Controllers
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
 					UpdateAt = DateTime.UtcNow,
+					isActivate = true
 				};
 
 				bankRepository.AddUserBank(userBank);
@@ -330,9 +331,11 @@ namespace DigitalFUHubApi.Controllers
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
 					UpdateAt = DateTime.UtcNow,
+					isActivate = true,
 				};
 
-				bankRepository.UpdateUserBank(userBank);
+				bankRepository.UpdateUserBankStatus(userBankAccount);
+				bankRepository.AddUserBank(userBank);
 
 				status.Message = "Update user's bank account success!";
 				status.Ok = true;

@@ -938,6 +938,9 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("isActivate")
+                        .HasColumnType("bit");
+
                     b.HasKey("UserBankId");
 
                     b.HasIndex("BankId");
@@ -1433,7 +1436,7 @@ namespace BusinessObject.Migrations
                     b.HasOne("BusinessObject.Entities.UserBank", "UserBank")
                         .WithMany("WithdrawTransactions")
                         .HasForeignKey("UserBankId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")

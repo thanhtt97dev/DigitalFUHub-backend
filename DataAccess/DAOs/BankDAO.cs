@@ -52,7 +52,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var total = context.UserBank.Where(x => x.UserId == userId).Count();
+				var total = context.UserBank.Where(x => x.UserId == userId && x.isActivate).Count();
 				return total;
 			}
 		}
@@ -70,7 +70,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var bank = context.UserBank.Include(x => x.Bank).FirstOrDefault(x => x.UserId == userId);
+				var bank = context.UserBank.Include(x => x.Bank).FirstOrDefault(x => x.UserId == userId && x.isActivate);
 				return bank;
 			}
 		}
@@ -92,7 +92,11 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
+				// get user bank account
+				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == transaction.UserId && x.isActivate);
+				if (userBank == null) throw new Exception();
 				// add request withdraw
+				transaction.UserBankId = userBank.UserBankId;
 				transaction.RequestDate = DateTime.Now;
 				transaction.PaidDate = null;
 				transaction.IsPay = false;
@@ -202,16 +206,14 @@ namespace DataAccess.DAOs
 		}
 		#endregion
 
-		internal void UpdateUserBank(UserBank userBankUpdate)
+		internal void UpdateUserBankStatus(UserBank userBankUpdate)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == userBankUpdate.UserId);
 				if (userBank == null) throw new Exception("User's bank account not existed!");
-				userBank.BankId = userBankUpdate.BankId;
-				userBank.CreditAccount = userBankUpdate.CreditAccount;
-				userBank.CreditAccountName = userBankUpdate.CreditAccountName;
 				userBank.UpdateAt = DateTime.Now;
+				userBank.isActivate = false;
 				context.SaveChanges();
 			}
 		}
@@ -244,6 +246,8 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				withdraws = context.WithdrawTransaction
+							.Include(x => x.UserBank)
+							.ThenInclude(x => x.Bank)
 							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
 							.OrderByDescending(x => x.RequestDate).ToList();
 

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230928011902_init")]
+    [Migration("20230928045744_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -940,6 +940,9 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("isActivate")
+                        .HasColumnType("bit");
+
                     b.HasKey("UserBankId");
 
                     b.HasIndex("BankId");
@@ -996,10 +999,15 @@ namespace BusinessObject.Migrations
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<long>("UserBankId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("WithdrawTransactionId");
+
+                    b.HasIndex("UserBankId");
 
                     b.HasIndex("UserId");
 
@@ -1027,6 +1035,7 @@ namespace BusinessObject.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BenAccountNo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BeneficiaryAccount")
@@ -1426,6 +1435,12 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.WithdrawTransaction", b =>
                 {
+                    b.HasOne("BusinessObject.Entities.UserBank", "UserBank")
+                        .WithMany("WithdrawTransactions")
+                        .HasForeignKey("UserBankId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("BusinessObject.Entities.User", "User")
                         .WithMany("WithdrawTransactions")
                         .HasForeignKey("UserId")
@@ -1433,6 +1448,8 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+
+                    b.Navigation("UserBank");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionBill", b =>
@@ -1549,6 +1566,11 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("UserConversations");
 
+                    b.Navigation("WithdrawTransactions");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.UserBank", b =>
+                {
                     b.Navigation("WithdrawTransactions");
                 });
 #pragma warning restore 612, 618
