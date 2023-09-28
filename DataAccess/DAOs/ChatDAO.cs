@@ -60,7 +60,7 @@ namespace DataAccess.DAOs
                         new SqlParameter("@conversationId", sendChatMessageRequest.ConversationId),
                         new SqlParameter("@senderId", sendChatMessageRequest.SenderId),
                         new SqlParameter("@recipientId", sendChatMessageRequest.RecipientId),
-                        new SqlParameter("@content", sendChatMessageRequest.Content),
+                        new SqlParameter("@content", sendChatMessageRequest.Content ?? ""),
                         new SqlParameter("@dateCreate", sendChatMessageRequest.DateCreate),
                         new SqlParameter("@messageType", sendChatMessageRequest.MessageType)
                     );

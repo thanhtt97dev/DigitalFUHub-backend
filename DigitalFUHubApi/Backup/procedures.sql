@@ -6,7 +6,7 @@ USE [DBTest]
 GO;
 
 -- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
-    CREATE PROCEDURE dbo.GetSenderConversation
+CREATE PROCEDURE dbo.GetSenderConversation
         @userId INT
     AS
     BEGIN
@@ -33,17 +33,6 @@ GO;
 	DROP PROCEDURE dbo.GetSenderConversation
 */
 
--- Lấy danh sách tin nhắn theo cuộc trò chuyện
-/*
-	SELECT 
-	*
-	FROM [Message]
-	WHERE ConversationId = 2
-	ORDER BY DateCreate ASC;
-	GO;
-*/
-
-
 -- Tạo cuộc trò chuyện/gửi tin nhắn
 CREATE PROCEDURE dbo.SendChatMessage
 	@conversationId INT, @senderId INT, @recipientId INT, @content NVARCHAR(MAX), @dateCreate DATETIME, @messageType VARCHAR(1)
@@ -63,15 +52,20 @@ BEGIN
 					INSERT INTO [UserConversation] (UserId, ConversationId)
 					VALUES (@senderId, @conversationIdCur),
 							(@recipientId, @conversationIdCur)
-
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationIdCur, @content, @messageType, @dateCreate, '0')
+					IF (LEN(@content) > 0)
+					BEGIN
+						INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+						VALUES (@senderId, @conversationIdCur, @content, @messageType, @dateCreate, '0')
+					END;		
 				END;
 			ELSE 
 				BEGIN
 					BEGIN TRANSACTION
-					INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
-					VALUES (@senderId, @conversationId, @content, @messageType, @dateCreate, '0');
+					IF (LEN(@content) > 0)
+					BEGIN
+						INSERT INTO [Messages] (UserId, ConversationId, [Content], MessageType, DateCreate, isDelete)
+						VALUES (@senderId, @conversationId, @content, @messageType, @dateCreate, '0')
+					END;
 				END
 			COMMIT;
 	END TRY
@@ -87,7 +81,6 @@ END;
 GO;
 
 
-
 -- EXEC
 /*
 	EXEC dbo.SendChatMessage 1, 1, 2, 'Test isImage', '2023-09-16', 0;
@@ -98,22 +91,3 @@ GO;
 	DROP PROCEDURE dbo.SendChatMessage;
 */
 
-
--- Report Errors
-/*
-	CREATE PROCEDURE dbo.UspReportErrorSql
-	AS
-		SELECT   
-			ERROR_NUMBER() AS ErrorNumber  
-			,ERROR_SEVERITY() AS ErrorSeverity  
-			,ERROR_STATE() AS ErrorState  
-			,ERROR_LINE () AS ErrorLine  
-			,ERROR_PROCEDURE() AS ErrorProcedure  
-			,ERROR_MESSAGE() AS ErrorMessage;  
-	GO;
-*/
-
--- DROP 
-/*
-	DROP PROCEDURE dbo.UspReportErrorSql;
-*/
