@@ -36,5 +36,13 @@ namespace DataAccess.DAOs
 				return context.Role.ToList();
 			}
 		}
+
+		internal Role GetAllRole(long id)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Role.First(x => x.RoleId == id);
+			}
+		}
 	}
 }

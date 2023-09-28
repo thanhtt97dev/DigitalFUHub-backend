@@ -17,7 +17,7 @@ namespace DataAccess.IRepositories
 
 		List<User> GetUsers(UserRequestDTO user);
 
-		User? GetUserById(int id);
+		User? GetUserById(long id);
 
 		Task EditUserInfo(int id, User user);
 

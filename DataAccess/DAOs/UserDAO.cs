@@ -63,7 +63,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal User? GetUserById(int id)
+		internal User? GetUserById(long id)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{

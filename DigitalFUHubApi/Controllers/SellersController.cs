@@ -5,6 +5,7 @@ using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.Seller;
+using DTOs.Shop;
 using DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,16 +20,23 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IConfiguration _configuration;
 		private readonly IProductRepository _productRepository;
 		private readonly StorageService _storageService;
+		private readonly IShopRepository _shopRepository;
+		private readonly IUserRepository _userRepository;
+		private readonly IRoleRepository _roleRepository;
+		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 
-		public SellersController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IMapper mapper)
+		public SellersController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IShopRepository shopRepository, IUserRepository userRepository, IRoleRepository roleRepository, JwtTokenService jwtTokenService, IMapper mapper)
 		{
 			_configuration = configuration;
 			_productRepository = productRepository;
 			_storageService = storageService;
+			_shopRepository = shopRepository;
+			_userRepository = userRepository;
+			_roleRepository = roleRepository;
+			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 		}
-
 
 
 		#region Get All Product with shopId (userId)
@@ -129,11 +137,11 @@ namespace DigitalFUHubApi.Controllers
 					});
 				}
 				List<ProductMedia> productMedias = new List<ProductMedia>();
-				
+
 				foreach (var file in request.Images)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond,now.Second, now.Minute, now.Hour);
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour);
 					string url = await _storageService.UploadFileToAzureAsync(file, filename);
 					productMedias.Add(new ProductMedia
 					{
@@ -172,6 +180,49 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
+			return response;
+		}
+		#endregion
+
+		#region register seller
+		/// <summary>
+		///	
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns>response</returns>
+		[HttpPost("Register")]
+		public async Task<ActionResult<ResponseData>> Register(RegisterShopRequestDTO request)
+		{
+			ResponseData response = new ResponseData();
+			if (!ModelState.IsValid)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				response.Status.Message = "Vui lòng kiểm tra lại dữ liệu.";
+				response.Status.Ok = false;
+				return response;
+			}
+			User? user;
+			try
+			{
+				await _shopRepository.CreateShopAsync(request);
+				user = _userRepository.GetUserById(request.UserId);
+				if (user == null) throw new Exception("Người dùng không khả dụng.");
+				user.RoleId = Constants.SELLER_ROLE;
+				user.Role = null!;
+				await _userRepository.UpdateUser(user);
+			}
+			catch (Exception e)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Message = e.Message;
+				response.Status.Ok = false;
+				return response;
+			}
+
+
+			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+			response.Status.Message = "Đăng ký cửa hàng thành công.";
+			response.Status.Ok = true;
 			return response;
 		}
 		#endregion

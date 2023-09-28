@@ -10,5 +10,6 @@ namespace DataAccess.IRepositories
     public interface IRoleRepository
 	{
 		List<Role> GetAllRole();
+		Role GetRole(long id);
 	}
 }

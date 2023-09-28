@@ -17,7 +17,7 @@ namespace DataAccess.Repositories
 		public User? GetUserByRefreshToken(string? refreshTokenId) => UserDAO.Instance.GetUserByRefreshToken(refreshTokenId);
 
 		public List<User> GetUsers(UserRequestDTO userDTO) => UserDAO.Instance.GetUsers(userDTO);
-		public User? GetUserById(int id) => UserDAO.Instance.GetUserById(id);
+		public User? GetUserById(long id) => UserDAO.Instance.GetUserById(id);
 
 		public Task EditUserInfo(int id, User user) => UserDAO.Instance.EditUserInfo(id,user);
 

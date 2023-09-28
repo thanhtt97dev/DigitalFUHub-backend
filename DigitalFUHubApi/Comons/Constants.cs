@@ -28,6 +28,8 @@ namespace DigitalFUHubApi.Comons
 
 		//User config
 		public static int ADMIN_ROLE = 1;
+		public static int CUSTOMER_ROLE = 2;
+		public static int SELLER_ROLE = 3;
 
 		//Respone code
 		public static string RESPONSE_CODE_SUCCESS = "00";

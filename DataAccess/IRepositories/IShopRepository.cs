@@ -1,4 +1,5 @@
 ﻿using BusinessObject.Entities;
+using DTOs.Shop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepositories
 {
-    public interface IStorageRepository
+	public interface IShopRepository
 	{
-		//void AddFile(Media file);
-		//Media? GetFileByName(string filename);
-		//void RemoveFile(string filename);
+		Task CreateShopAsync(RegisterShopRequestDTO request);
 	}
 }

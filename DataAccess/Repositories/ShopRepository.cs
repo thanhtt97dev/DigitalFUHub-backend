@@ -1,6 +1,7 @@
 ﻿using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
+using DTOs.Shop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-	public class RoleRepository : IRoleRepository
+	public class ShopRepository : IShopRepository
 	{
-		public List<Role> GetAllRole() => RoleDAO.Instance.GetAllRole();
-
-		public Role GetRole(long id) => RoleDAO.Instance.GetAllRole(id);
+		public async Task CreateShopAsync(RegisterShopRequestDTO request) => await ShopDAO.Instance.CreateShopAsync(request);
 	}
 }
