@@ -157,11 +157,15 @@ namespace DataAccess.DAOs
 					foreach (var item in transactionHistoryDebitList)
 					{
 						var withdraw = context.WithdrawTransaction
-								.FirstOrDefault(x => string.Equals(x.Code.ToLower(), item.description.ToLower()) &&
+								.FirstOrDefault(x => item.description.ToLower().Contains(x.Code.ToLower()) &&
 								x.Amount == item.debitAmount);
+
 						if (withdraw != null)
 						{
 							if (withdraw.IsPay == true) continue;
+							// set status is paid
+							withdraw.IsPay = true;
+							withdraw.PaidDate = item.transactionDate;
 							// add bill info
 							WithdrawTransactionBill withdrawTransactionBill = new WithdrawTransactionBill()
 							{
@@ -234,6 +238,26 @@ namespace DataAccess.DAOs
 			return deposits;
 		}
 
-		
+		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status)
+		{
+			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				withdraws = context.WithdrawTransaction
+							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
+							.OrderByDescending(x => x.RequestDate).ToList();
+
+				if (withdrawTransactionId != 0)
+				{
+					withdraws = withdraws.Where(x => x.WithdrawTransactionId == withdrawTransactionId).ToList();
+				}
+				if (status != 0)
+				{
+					withdraws = withdraws.Where(x => x.IsPay == (status == 1)).ToList();
+				}
+
+			}
+			return withdraws;
+		}
 	}
 }

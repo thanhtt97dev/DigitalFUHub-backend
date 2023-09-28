@@ -1,0 +1,20 @@
+[
+  {
+    "postingDate": "2023-09-27T13:50:00",
+    "transactionDate": "2023-09-27T13:50:00",
+    "accountNo": "0336687454",
+    "creditAmount": 0,
+    "debitAmount": 30000,
+    "currency": "VND",
+    "description": "CUSTOMER HeheheFU. DEN: PHI MINH TIEN",
+    "availableBalance": 56596,
+    "beneficiaryAccount": null,
+    "refNo": "FT23270883044079",
+    "benAccountName": "PHI MINH TIEN",
+    "bankName": "MB",
+    "benAccountNo": "688811112001",
+    "dueDate": null,
+    "docId": null,
+    "transactionType": "ACIB"
+  }
+]

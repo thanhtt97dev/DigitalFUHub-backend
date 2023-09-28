@@ -445,7 +445,7 @@ namespace DigitalFUHubApi.Controllers
 
 				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, historyDepositRequestDTO.Status);
 
-				status.Message = "Add bank account success!";
+				status.Message = "Success!";
 				status.Ok = false;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
@@ -457,26 +457,27 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-
 		#endregion
+
+		#region Get history withdraw transaction
 		[HttpPost("HistoryWithdraw/{id}")]
-		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryDepositRequestDTO historyDepositRequestDTO)
+		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0 || historyDepositRequestDTO == null ||
-					historyDepositRequestDTO.FromDate == null ||
-					historyDepositRequestDTO.ToDate == null) return BadRequest();
+				if (id == 0 || historyWithdrawRequestDTO == null ||
+					historyWithdrawRequestDTO.FromDate == null ||
+					historyWithdrawRequestDTO.ToDate == null) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
 				try
 				{
-					fromDate = DateTime.ParseExact(historyDepositRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(historyDepositRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					fromDate = DateTime.ParseExact(historyWithdrawRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(historyWithdrawRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
 					if (fromDate > toDate)
 					{
 						status.Message = "From date must be less than to date";
@@ -495,12 +496,12 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				long depositTransactionId;
-				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
+				long withdrawTransactionId;
+				long.TryParse(historyWithdrawRequestDTO.WithdrawTransactionId, out withdrawTransactionId);
 
-				// 0 : All, 1: paid, 2: unpay
-				if (historyDepositRequestDTO.Status != 0 && historyDepositRequestDTO.Status != 1 &&
-					historyDepositRequestDTO.Status != 2)
+				// 0 : All, 1: paid, 2: in process
+				if (historyWithdrawRequestDTO.Status != 0 && historyWithdrawRequestDTO.Status != 1 &&
+					historyWithdrawRequestDTO.Status != 2)
 				{
 					status.Message = "Invalid transaction's status";
 					status.Ok = false;
@@ -509,9 +510,9 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, historyDepositRequestDTO.Status);
+				var deposits = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
 
-				status.Message = "Add bank account success!";
+				status.Message = "Success!";
 				status.Ok = false;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
@@ -523,8 +524,6 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#region Get history withdraw transaction
-
 		#endregion
 
 	}
