@@ -6,23 +6,20 @@ USE [DBTest]
 GO;
 
 -- Lấy danh sách những người gửi đang tham gia vào cuộc trò chuyện
-CREATE PROCEDURE dbo.GetSenderConversation
-	@userId INT
-AS
-BEGIN
-	
-	SELECT DISTINCT
-	u.*,
-	m.ConversationId
-	FROM [User] as u
-	INNER JOIN [Messages] as m ON u.UserId = m.UserId
-	WHERE m.ConversationId IN (
-	SELECT 
-		ConversationId
-	FROM UserConversation WHERE UserId = @userId)
-	AND u.UserId != @userId
-	ORDER BY m.ConversationId DESC
-END;
+    CREATE PROCEDURE dbo.GetSenderConversation
+        @userId INT
+    AS
+    BEGIN
+        SELECT 
+        u.*, 
+        r.ConversationId 
+        FROM [User] as u,
+        (SELECT UserId, ConversationId FROM UserConversation as u WHERE ConversationId IN (
+        SELECT ConversationId FROM UserConversation WHERE UserId = @userId)) as r
+        WHERE u.UserId = r.userId
+        AND u.UserId != @userId
+		ORDER BY r.ConversationId DESC
+    END;
 GO;
 
 -- EXEC
