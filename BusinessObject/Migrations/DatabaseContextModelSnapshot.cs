@@ -988,7 +988,7 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsPay")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("PaidDate")
+                    b.Property<DateTime?>("PaidDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("RequestDate")

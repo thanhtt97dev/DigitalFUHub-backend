@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230927091931_UpdateDBv4")]
-    partial class UpdateDBv4
+    [Migration("20230928011902_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -990,7 +990,7 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsPay")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("PaidDate")
+                    b.Property<DateTime?>("PaidDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("RequestDate")
