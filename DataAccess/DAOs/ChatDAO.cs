@@ -81,5 +81,18 @@ namespace DataAccess.DAOs
             }
 
         }
+
+        internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                List<UserConversation> result = context.UserConversation
+                    .Where(u => u.UserId == senderId || u.UserId == recipientId)
+                    .ToList();
+
+                return result;
+            }
+
+        }
     }
 }

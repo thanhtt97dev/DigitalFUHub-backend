@@ -33,6 +33,22 @@ namespace DataAccess.Repositories
             return await ChatDAO.Instance.GetSenderConversations(userId);
         }
 
+        public bool GetUserConversation(long senderId, long recipientId)
+        {
+            if (senderId == 0 || recipientId == 0)
+            {
+                throw new ArgumentException("senderId or recipientId invalid");
+            }
+            bool result = false;
+            List<UserConversation> userConversations = ChatDAO.Instance.GetUserConversation(senderId, recipientId);
+            if (userConversations.Count == 2)
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
         public async Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest)
         {
             if (sendChatMessageRequest == null)

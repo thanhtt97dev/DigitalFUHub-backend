@@ -1,16 +1,9 @@
 ﻿using AutoMapper;
-using DataAccess.IRepositories;
-using DataAccess.Repositories;
 using DigitalFUHubApi.Hubs;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Managers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using BusinessObject.DataTransfer;
-using DTOs.Chat;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -90,6 +83,20 @@ namespace DigitalFUHubApi.Controllers
                 List<MessageResponseDTO> messages = _mapper
                     .Map<List<MessageResponseDTO>>(await _chatRepository.GetListMessage(conversationId));
                 return Ok(messages);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("existUserConversation")]
+        public IActionResult ExistUserConversation(long senderId, long recipientId)
+        {
+            try
+            {
+                return Ok(_chatRepository.GetUserConversation(senderId, recipientId));
             }
             catch (ArgumentException ex)
             {
