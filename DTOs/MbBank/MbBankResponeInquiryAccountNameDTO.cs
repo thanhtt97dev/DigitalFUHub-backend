@@ -10,8 +10,8 @@ namespace DTOs.MbBank
     {
         public string? refNo { get; set; }
         public Result result { get; set; } = null!;
-        public string? benName { get; set; }
-        public string? category { get; set; }
+        public string benName { get; set; } = null!;
+		public string? category { get; set; }
     }
 
 }

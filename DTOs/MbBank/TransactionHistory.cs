@@ -20,7 +20,7 @@ namespace DTOs.MbBank
 		public string refNo { get; set; } = null!;
 		public string? benAccountName { get; set; }
 		public string? bankName { get; set; }
-		public string? benAccountNo { get; set; }
+		public string benAccountNo { get; set; } = string.Empty;
 		public DateTime? dueDate { get; set; }
 		public string? docId { get; set; }
 		public string? transactionType { get; set; }
