@@ -411,7 +411,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get history deposit transaction
+		#region Get history deposit transaction of a user
 		[HttpPost("HistoryDeposit/{id}")]
 		public IActionResult GetHistoryDepositTransaction(int id, HistoryDepositRequestDTO historyDepositRequestDTO)
 		{
@@ -477,7 +477,64 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get history withdraw transaction
+		#region Get history deposit transaction sucess for admin
+		[Authorize(Roles = "Admin")]
+		[HttpPost("HistoryDeposit")]
+		public IActionResult GetHistoryDepositTransactionSuccess(HistoryDepositForAdminRequestDTO historyDepositRequestDTO)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			string format = "M/d/yyyy";
+			try
+			{
+				if (historyDepositRequestDTO == null ||
+					historyDepositRequestDTO.FromDate == null ||
+					historyDepositRequestDTO.ToDate == null) return BadRequest();
+
+				DateTime fromDate;
+				DateTime toDate;
+				try
+				{
+					fromDate = DateTime.ParseExact(historyDepositRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(historyDepositRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				long depositTransactionId;
+				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
+
+				var deposits = bankRepository.GetDepositTransactionSucess(depositTransactionId, fromDate, toDate);
+
+				status.Message = "Success!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = deposits;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get history withdraw transaction of a user
 		[HttpPost("HistoryWithdraw/{id}")]
 		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
 		{
@@ -545,6 +602,79 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
+
+
+		#region Get history withdraw transaction of admin
+		[Authorize(Roles ="Admin")]
+		[HttpPost("HistoryWithdrawAll")]
+		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			string format = "M/d/yyyy";
+			try
+			{
+				if (historyWithdrawRequestDTO == null ||
+					historyWithdrawRequestDTO.FromDate == null ||
+					historyWithdrawRequestDTO.ToDate == null) return BadRequest();
+
+				DateTime fromDate;
+				DateTime toDate;
+				try
+				{
+					fromDate = DateTime.ParseExact(historyWithdrawRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(historyWithdrawRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				long withdrawTransactionId;
+				long.TryParse(historyWithdrawRequestDTO.WithdrawTransactionId, out withdrawTransactionId);
+
+				// 0 : All, 1: paid, 2: in process
+				if (historyWithdrawRequestDTO.Status != 0 && historyWithdrawRequestDTO.Status != 1 &&
+					historyWithdrawRequestDTO.Status != 2)
+				{
+					status.Message = "Invalid transaction's status";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
+
+				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+
 
 		#region Get withdraw transaction bill
 		[HttpGet("WithdrawTransactionBill/{id}")]
