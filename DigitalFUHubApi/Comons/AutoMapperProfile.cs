@@ -7,6 +7,8 @@ using DTOs.Bank;
 using DTOs.User;
 using DTOs.Notification;
 using DTOs.Chat;
+using DTOs.Product;
+using DTOs.Tag;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -34,7 +36,13 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
 				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => src.UserBank.CreditAccount))
 				.ForMember(des => des.CreditAccountName, atc => atc.MapFrom(src => src.UserBank.CreditAccountName))
-				.ReverseMap();	
+				.ReverseMap();
+
+			CreateMap<Product, ProductResponseDTO>().ReverseMap(); ;
+			CreateMap<ProductVariant, ProductVariantResponseDTO>().ReverseMap(); ;
+			CreateMap<ProductMedia, ProductMediaResponseDTO>().ReverseMap(); ;
+			CreateMap<Tag, TagResponseDTO>().ReverseMap(); ;
+			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
 		}
     }
 }

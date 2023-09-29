@@ -62,5 +62,44 @@ namespace DataAccess.DAOs
 				
 			}
 		}
+
+		internal async Task<bool> UserHasShopAsync(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return await context.Shop.AnyAsync(x => x.UserId == userId);
+			}
+		}
+
+		internal async Task<bool> ShopHasProductAsync(long userId, long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return await context.Shop.Include(i => i.Products)
+					.AnyAsync(x => x.UserId == userId && x.Products.Any(x => x.ProductId == productId));
+			}
+		}
+
+		internal async Task<Product> GetProductByIdAsync(long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Product product = await context.Product.Where(x => x.ProductId == productId)
+						.Select(x => new Product
+						{
+							ProductId = productId,
+							CategoryId = x.CategoryId,
+							Description = x.Description,
+							Discount = x.Discount,
+							ProductMedias = x.ProductMedias,
+							ProductName = x.ProductName,
+							ProductStatusId = x.ProductStatusId,
+							Tags = x.Tags,
+							Thumbnail = x.Thumbnail,
+							ProductVariants = context.ProductVariant.Include(i => i.AssetInformation.Where(x => x.IsActive == true)).Where(x => x.ProductId == productId && x.isActivate == true).ToList(),
+						}).FirstAsync();
+				return product;
+			}
+		}
 	}
 }

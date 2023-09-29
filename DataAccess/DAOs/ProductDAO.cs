@@ -32,19 +32,19 @@ namespace DataAccess.DAOs
 				return instance;
 			}
 		}
-		internal List<ProductResponeDTO> GetAllProduct(int shopId)
+		internal List<SellerProductResponeDTO> GetAllProduct(int shopId)
 		{
-			List<ProductResponeDTO> result = new List<ProductResponeDTO>();
+			List<SellerProductResponeDTO> result = new List<SellerProductResponeDTO>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var products = context.Product.Where(x => x.ShopId == shopId).ToList();
 				foreach (var product in products)
 				{
 					var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
-					List<ProductVariantResponeDTO> variants = new List<ProductVariantResponeDTO>();
+					List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
 					foreach (var variant in productVariants)
 					{
-						variants.Add(new ProductVariantResponeDTO()
+						variants.Add(new ProductDetailVariantResponeDTO()
 						{
 							ProductVariantId = variant.ProductVariantId,
 							Name = variant.Name,
@@ -52,7 +52,7 @@ namespace DataAccess.DAOs
 							Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
 						});
 					}
-					ProductResponeDTO productResponeDTO = new ProductResponeDTO()
+					SellerProductResponeDTO productResponeDTO = new SellerProductResponeDTO()
 					{
 						ProductId = product.ProductId,
 						ProductName = product.ProductName,
@@ -65,15 +65,15 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<ProductVariantResponeDTO> GetProductVariants(int productId)
+		internal List<ProductDetailVariantResponeDTO> GetProductVariants(int productId)
 		{
-			List<ProductVariantResponeDTO> result = new List<ProductVariantResponeDTO>();
+			List<ProductDetailVariantResponeDTO> result = new List<ProductDetailVariantResponeDTO>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var variants = context.ProductVariant.Where(x => x.ProductId == productId && x.isActivate).ToList();
 				foreach (var variant in variants)
 				{
-					result.Add(new ProductVariantResponeDTO()
+					result.Add(new ProductDetailVariantResponeDTO()
 					{
 						ProductVariantId = variant.ProductVariantId,	
 						Name = variant.Name,
@@ -95,10 +95,10 @@ namespace DataAccess.DAOs
                 List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
                 List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
                 List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
-                List<ProductVariantResponeDTO> variants = new List<ProductVariantResponeDTO>();
+                List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
                 foreach (var variant in productVariants)
                 {
-                    variants.Add(new ProductVariantResponeDTO()
+                    variants.Add(new ProductDetailVariantResponeDTO()
                     {
                         ProductVariantId = variant.ProductVariantId,
                         Name = variant.Name,

@@ -4,6 +4,7 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.Product;
 using DTOs.Seller;
 using DTOs.Shop;
 using DTOs.User;
@@ -57,20 +58,61 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get Product Variants
-		[HttpGet("GetProductVariants/{id}")]
-		public IActionResult GetProductVariants(int id)
+		#region Get Product Of Seller
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="userId"></param>
+		/// <param name="productId"></param>
+		/// <returns></returns>
+		[HttpGet("{userId}/GetProduct/{productId}")]
+		public async Task<ActionResult<ResponseData>> GetProductVariants(long userId, long productId)
 		{
-			try
+			ResponseData response = new ResponseData();
+			// check user have shop
+			bool existShop = await _shopRepository.UserHasShopAsync(userId);
+			if (!existShop)
 			{
-				if (id == 0) return BadRequest();
-				var products = _productRepository.GetProductVariants(id);
-				return Ok(products);
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				response.Status.Ok = false;
+				response.Status.Message = "Cửa hàng không tồn tại.";
 			}
-			catch (Exception ex)
+			else
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+				// check shop have product
+				bool existProduct = await _shopRepository.ShopHasProductAsync(userId, productId);
+				if (!existProduct)
+				{
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					response.Status.Ok = false;
+					response.Status.Message = "Cửa hàng không tồn tại sản phẩm này.";
+				}
+				else
+				{
+					// get product
+					Product product = await _shopRepository.GetProductByIdAsync(productId);
+					if (product.ProductStatusId == Constants.PRODUCT_BAN)
+					{
+						response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+						response.Status.Ok = false;
+						response.Status.Message = "Sản phẩm đã vi phạm chính sách của sàn.";
+					}
+					else if (product.ProductStatusId == Constants.PRODUCT_HIDE)
+					{
+						response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+						response.Status.Ok = false;
+						response.Status.Message = "Sản phẩm đã bị xóa.";
+					}
+					else
+					{
+						response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+						response.Status.Ok = true;
+						response.Status.Message = "";
+						response.Result = _mapper.Map<ProductResponseDTO>(product);
+					}
+				}
 			}
+			return response;
 		}
 		#endregion
 
@@ -138,10 +180,10 @@ namespace DigitalFUHubApi.Controllers
 				}
 				List<ProductMedia> productMedias = new List<ProductMedia>();
 
-				foreach (var file in request.Images)
+				foreach (IFormFile file in request.Images)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour);
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,file.FileName.Substring(file.FileName.LastIndexOf(".")));
 					string url = await _storageService.UploadFileToAzureAsync(file, filename);
 					productMedias.Add(new ProductMedia
 					{
@@ -150,7 +192,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				now = DateTime.Now;
-				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour);
+				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf(".")));
 				string urlThumbnail = await _storageService.UploadFileToAzureAsync(request.Thumbnail, filename);
 				Product product = new Product()
 				{

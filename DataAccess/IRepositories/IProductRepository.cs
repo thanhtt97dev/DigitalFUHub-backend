@@ -12,8 +12,8 @@ namespace DataAccess.IRepositories
 	public interface IProductRepository
 	{
 		Task AddProductAsync(Product product);
-		List<ProductResponeDTO> GetAllProduct(int userId);
-		List<ProductVariantResponeDTO> GetProductVariants(int productId);
+		List<SellerProductResponeDTO> GetAllProduct(int userId);
+		List<ProductDetailVariantResponeDTO> GetProductVariants(int productId);
         ProductDetailResponseDTO GetProductById(long productId);
     }
 }

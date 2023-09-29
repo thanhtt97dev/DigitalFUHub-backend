@@ -19,7 +19,7 @@ namespace DTOs.Product
         public int Discount { get; set; }
         public long ShopId { get; set; }
         public long CategoryId { get; set; }
-        public List<ProductVariantResponeDTO>? ProductVariants { get; set; }
+        public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }
         public List<ProductMediaResponseDTO>? ProductMedias { get; set; }
         public List<TagResponseDTO>? Tags { get; set; }
     }
