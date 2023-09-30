@@ -91,6 +91,7 @@ namespace DataAccess.DAOs
             using (DatabaseContext context = new DatabaseContext())
             {
                 var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
+				long productQuantity = 0;
                 if (product == null) throw new ArgumentException("Not found Product hav id = " + productId);
                 List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
                 List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
@@ -98,13 +99,16 @@ namespace DataAccess.DAOs
                 List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
                 foreach (var variant in productVariants)
                 {
-                    variants.Add(new ProductDetailVariantResponeDTO()
-                    {
-                        ProductVariantId = variant.ProductVariantId,
-                        Name = variant.Name,
-                        Price = variant.Price,
-                        Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
-                    });
+                    ProductDetailVariantResponeDTO productVariantResp = new ProductDetailVariantResponeDTO()
+					{
+						ProductVariantId = variant.ProductVariantId,
+						Name = variant.Name,
+						Price = variant.Price,
+						Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
+					};
+
+                    variants.Add(productVariantResp);
+					productQuantity += productVariantResp?.Quantity ?? 0;
                 }
 
 				List<ProductMediaResponseDTO> medias = new List<ProductMediaResponseDTO>();
@@ -137,6 +141,7 @@ namespace DataAccess.DAOs
                     Discount = product.Discount,
                     ShopId = product.ShopId,
                     CategoryId = product.CategoryId,
+                    Quantity = productQuantity,
                     ProductVariants = variants,
                     ProductMedias = medias,
                     Tags = tags
