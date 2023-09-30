@@ -63,7 +63,7 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return NotFound();
 			}
-			var contentType = Util.GetContentType(filename);
+			var contentType = Util.Instance.GetContentType(filename);
 			return File(streamContent, contentType);
 		}
 		[HttpDelete]
