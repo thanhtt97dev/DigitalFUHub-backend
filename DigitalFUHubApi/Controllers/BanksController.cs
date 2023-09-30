@@ -697,7 +697,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					status.Message = "Withdraw transaction hasn't paid!";
 					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
@@ -705,9 +705,9 @@ namespace DigitalFUHubApi.Controllers
 				var bill = bankRepository.GetWithdrawTransactionBill(id);
 				if(bill == null)
 				{
-					status.Message = "Withdraw bill not found!";
+					status.Message = "Withdraw bill has been in process in partner bank!";
 					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
