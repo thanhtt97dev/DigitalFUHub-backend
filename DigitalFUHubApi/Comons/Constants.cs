@@ -36,6 +36,7 @@ namespace DigitalFUHubApi.Comons
 		public static string RESPONSE_CODE_NOT_ACCEPT = "01";
 		public static string RESPONSE_CODE_DATA_NOT_FOUND = "02";
 		public static string RESPONSE_CODE_FAILD = "03";
+		public static string RESPONSE_CODE_UN_AUTHORIZE = "04";
 
 		public static string RESPONSE_CODE_BANK_WITHDRAW_PAID = "BANK_01";
 		public static string RESPONSE_CODE_BANK_WITHDRAW_UNPAY = "BANK_02";

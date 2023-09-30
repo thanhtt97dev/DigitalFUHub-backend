@@ -264,6 +264,7 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				withdraws = context.WithdrawTransaction
+							.Include(x => x.User)	
 							.Include(x => x.UserBank)
 							.ThenInclude(x => x.Bank)
 							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
