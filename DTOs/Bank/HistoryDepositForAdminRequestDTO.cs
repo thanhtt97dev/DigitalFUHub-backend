@@ -9,6 +9,7 @@ namespace DTOs.Bank
 	public class HistoryDepositForAdminRequestDTO
 	{
 		public string? DepositTransactionId { get; set; }
+		public string? Email { get; set; }
 		public string? FromDate { get; set; }
 		public string? ToDate { get; set; }
 	}

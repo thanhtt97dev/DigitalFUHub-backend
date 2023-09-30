@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using BusinessObject.Entities;
 using DTOs.Bank;
 using DTOs.MbBank;
+using System.Security.Cryptography.Xml;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -487,9 +488,8 @@ namespace DigitalFUHubApi.Controllers
 			string format = "M/d/yyyy";
 			try
 			{
-				if (historyDepositRequestDTO == null ||
-					historyDepositRequestDTO.FromDate == null ||
-					historyDepositRequestDTO.ToDate == null) return BadRequest();
+				if (historyDepositRequestDTO == null || historyDepositRequestDTO.Email == null ||
+					historyDepositRequestDTO.FromDate == null || historyDepositRequestDTO.ToDate == null) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
@@ -518,13 +518,14 @@ namespace DigitalFUHubApi.Controllers
 				long depositTransactionId;
 				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
 
-				var deposits = bankRepository.GetDepositTransactionSucess(depositTransactionId, fromDate, toDate);
+				var deposits = bankRepository.GetDepositTransactionSucess(depositTransactionId, historyDepositRequestDTO.Email, fromDate, toDate);
+				var result = mapper.Map<List<HistoryDepositResponeDTO>>(deposits);
 
 				status.Message = "Success!";
 				status.Ok = false;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
-				responseData.Result = deposits;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)
@@ -585,9 +586,9 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var deposits = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
+				var withdraws = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
 
-				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
+				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(withdraws);
 
 				status.Message = "Success!";
 				status.Ok = true;
@@ -603,8 +604,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-
-		#region Get history withdraw transaction of admin
+		#region Get history withdraw transaction for admin
 		[Authorize(Roles ="Admin")]
 		[HttpPost("HistoryWithdrawAll")]
 		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
@@ -615,6 +615,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				if (historyWithdrawRequestDTO == null ||
+					historyWithdrawRequestDTO.Email == null ||
 					historyWithdrawRequestDTO.FromDate == null ||
 					historyWithdrawRequestDTO.ToDate == null) return BadRequest();
 
@@ -656,7 +657,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
+				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, historyWithdrawRequestDTO.Email, fromDate, toDate, historyWithdrawRequestDTO.Status);
 
 				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
 
@@ -674,18 +675,18 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-
-
-		#region Get withdraw transaction bill
-		[HttpGet("WithdrawTransactionBill/{id}")]
-		public IActionResult GetWithdrawTransactionBill(int id)
+		#region Get withdraw transaction bill for user
+		[Authorize]
+		[HttpPost("WithdrawTransactionBill")]
+		public IActionResult GetWithdrawTransactionBill(WithdrawTransactionBillRequestDTO requestDTO)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			try
 			{
-				if (id == 0) return BadRequest();
-				var withdrawTransaction = bankRepository.GetWithdrawTransaction(id);
+				if (requestDTO.UserId == 0 || requestDTO.WithdrawTransactionId == 0) return BadRequest();
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(requestDTO.WithdrawTransactionId);
+
 				if(withdrawTransaction == null)
 				{
 					status.Message = "Withdraw bill not found!";
@@ -694,21 +695,22 @@ namespace DigitalFUHubApi.Controllers
 					responseData.Status = status;
 					return Ok(responseData);
 				}
+
 				if (!withdrawTransaction.IsPay)
 				{
 					status.Message = "Withdraw transaction hasn't paid!";
 					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
 
-				var bill = bankRepository.GetWithdrawTransactionBill(id);
+				var bill = bankRepository.GetWithdrawTransactionBill(requestDTO.WithdrawTransactionId);
 				if(bill == null)
 				{
-					status.Message = "Withdraw bill not found!";
+					status.Message = "Withdraw bill has been in process in partner bank!";
 					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
@@ -719,6 +721,113 @@ namespace DigitalFUHubApi.Controllers
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
 				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
+		#endregion
+
+		#region Get withdraw transaction bill for admin
+		[Authorize(Roles ="Admin")]
+		[HttpPost("WithdrawTransactionBillAdmin")]
+		public IActionResult GetWithdrawTransactionBillForAdmin(WithdrawTransactionBillRequestDTO requestDTO)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
+			{
+				if (requestDTO.UserId == 0 || requestDTO.WithdrawTransactionId == 0) return BadRequest();
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(requestDTO.WithdrawTransactionId);
+
+				if (withdrawTransaction == null)
+				{
+					status.Message = "Withdraw bill not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (withdrawTransaction.UserId != requestDTO.UserId)
+				{
+					status.Message = "You not have permitsion to view this data!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (!withdrawTransaction.IsPay)
+				{
+					status.Message = "Withdraw transaction hasn't paid!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var bill = bankRepository.GetWithdrawTransactionBill(requestDTO.WithdrawTransactionId);
+				if (bill == null)
+				{
+					status.Message = "Withdraw bill has been in process in partner bank!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var result = mapper.Map<WithdrawTransactionBillDTO>(bill);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
+		#endregion
+
+		#region Confirm transfer withdraw success
+		[HttpPost("ConfirmTransfer")]
+		public IActionResult ConfirmTransferWithdrawSuccess(ConfirmTransferWithdrawSuccessRequestDTO requestDTO)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
+			{
+				if (requestDTO.Id == 0) return BadRequest();
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(requestDTO.Id);
+				if (withdrawTransaction == null)
+				{
+					status.Message = "Withdraw bill not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				if (withdrawTransaction.IsPay)
+				{
+					status.Message = "Withdraw transaction has been paid!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				bankRepository.UpdateWithdrawTransactionPaid(requestDTO.Id);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

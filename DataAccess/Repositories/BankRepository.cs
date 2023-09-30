@@ -25,13 +25,15 @@ namespace DataAccess.Repositories
 		public void UpdateUserBankStatus(UserBank userBank) => BankDAO.Instance.UpdateUserBankStatus(userBank);
 
 		public List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetDepositTransaction(userId, depositTransactionId, fromDate, toDate, status);
-		public List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, DateTime fromDate, DateTime toDate) => BankDAO.Instance.GetDepositTransactionSucess(depositTransactionId, fromDate, toDate);
+		public List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string email, DateTime fromDate, DateTime toDate) => BankDAO.Instance.GetDepositTransactionSucess(depositTransactionId, email, fromDate, toDate);
 
 		public List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetWithdrawTransaction(userId, withdrawTransactionId, fromDate, toDate, status);
 
-		public List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetAllWithdrawTransaction(withdrawTransactionId, fromDate, toDate, status);
+		public List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetAllWithdrawTransaction(withdrawTransactionId, email, fromDate, toDate, status);
 		public WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransaction(withdrawTransactionId);
 		public WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransactionBill(withdrawTransactionId);
+
+		public void UpdateWithdrawTransactionPaid(long transactionId) => BankDAO.Instance.UpdateWithdrawTransaction(transactionId);
 
 	}
 }

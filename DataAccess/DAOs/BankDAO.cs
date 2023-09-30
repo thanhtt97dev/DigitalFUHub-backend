@@ -240,13 +240,14 @@ namespace DataAccess.DAOs
 			return deposits;
 		}
 
-		internal List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, DateTime fromDate, DateTime toDate)
+		internal List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string email, DateTime fromDate, DateTime toDate)
 		{
 			List<DepositTransaction> deposits = new List<DepositTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				deposits = context.DepositTransaction
-							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate && x.IsPay)
+							.Include(x => x.User)
+							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate && x.User.Email.Contains(email) && x.IsPay)
 							.OrderByDescending(x => x.RequestDate).ToList();
 
 				if (depositTransactionId != 0)
@@ -263,6 +264,7 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				withdraws = context.WithdrawTransaction
+							.Include(x => x.User)	
 							.Include(x => x.UserBank)
 							.ThenInclude(x => x.Bank)
 							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
@@ -281,15 +283,16 @@ namespace DataAccess.DAOs
 			return withdraws;
 		}
 
-		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status)
+		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId,string email, DateTime fromDate, DateTime toDate, int status)
 		{
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				withdraws = context.WithdrawTransaction
+							.Include(x => x.User)
 							.Include(x => x.UserBank)
 							.ThenInclude(x => x.Bank)
-							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate)
+							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate && x.User.Email.Contains(email))
 							.OrderByDescending(x => x.RequestDate).ToList();
 
 				if (withdrawTransactionId != 0)
@@ -323,6 +326,16 @@ namespace DataAccess.DAOs
 			}
 		}
 
-
+		internal void UpdateWithdrawTransaction(long transactionId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
+				if (withDrawTransaction == null) throw new Exception();
+				withDrawTransaction.IsPay = true;
+				withDrawTransaction.PaidDate = DateTime.Now;
+				context.SaveChanges();
+			}
+		}
 	}
 }
