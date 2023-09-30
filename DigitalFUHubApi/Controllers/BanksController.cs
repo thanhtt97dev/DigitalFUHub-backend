@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using BusinessObject.Entities;
 using DTOs.Bank;
 using DTOs.MbBank;
+using System.Security.Cryptography.Xml;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -487,9 +488,8 @@ namespace DigitalFUHubApi.Controllers
 			string format = "M/d/yyyy";
 			try
 			{
-				if (historyDepositRequestDTO == null ||
-					historyDepositRequestDTO.FromDate == null ||
-					historyDepositRequestDTO.ToDate == null) return BadRequest();
+				if (historyDepositRequestDTO == null || historyDepositRequestDTO.Email == null ||
+					historyDepositRequestDTO.FromDate == null || historyDepositRequestDTO.ToDate == null) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
@@ -518,13 +518,14 @@ namespace DigitalFUHubApi.Controllers
 				long depositTransactionId;
 				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
 
-				var deposits = bankRepository.GetDepositTransactionSucess(depositTransactionId, fromDate, toDate);
+				var deposits = bankRepository.GetDepositTransactionSucess(depositTransactionId, historyDepositRequestDTO.Email, fromDate, toDate);
+				var result = mapper.Map<List<HistoryDepositResponeDTO>>(deposits);
 
 				status.Message = "Success!";
 				status.Ok = false;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
-				responseData.Result = deposits;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)
@@ -603,7 +604,6 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-
 		#region Get history withdraw transaction of admin
 		[Authorize(Roles ="Admin")]
 		[HttpPost("HistoryWithdrawAll")]
@@ -615,6 +615,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				if (historyWithdrawRequestDTO == null ||
+					historyWithdrawRequestDTO.Email == null ||
 					historyWithdrawRequestDTO.FromDate == null ||
 					historyWithdrawRequestDTO.ToDate == null) return BadRequest();
 
@@ -656,7 +657,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
+				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, historyWithdrawRequestDTO.Email, fromDate, toDate, historyWithdrawRequestDTO.Status);
 
 				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
 
@@ -673,8 +674,6 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
-
-
 
 		#region Get withdraw transaction bill
 		[HttpGet("WithdrawTransactionBill/{id}")]
@@ -719,6 +718,48 @@ namespace DigitalFUHubApi.Controllers
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
 				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
+		#endregion
+
+		#region Confirm transfer withdraw success
+		[HttpPost("ConfirmTransfer")]
+		public IActionResult ConfirmTransferWithdrawSuccess(ConfirmTransferWithdrawSuccessRequestDTO requestDTO)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
+			{
+				if (requestDTO.Id == 0) return BadRequest();
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(requestDTO.Id);
+				if (withdrawTransaction == null)
+				{
+					status.Message = "Withdraw bill not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				if (withdrawTransaction.IsPay)
+				{
+					status.Message = "Withdraw transaction has been paid!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				bankRepository.UpdateWithdrawTransactionPaid(requestDTO.Id);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

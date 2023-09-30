@@ -22,7 +22,7 @@ namespace BusinessObject.Entities
 		public bool IsPay { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User? User { get; set; }
+        public virtual User User { get; set; }
 		[ForeignKey(nameof(UserBankId))]
 		public virtual UserBank UserBank { get; set; } = null!;
 	}

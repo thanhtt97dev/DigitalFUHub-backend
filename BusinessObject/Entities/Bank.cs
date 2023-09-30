@@ -14,7 +14,8 @@ namespace BusinessObject.Entities
         [Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long BankId { get; set; }
-        public string BankName { get; set; } = string.Empty;
+        public string BankCode { get; set; } = null!;
+		public string BankName { get; set; } = string.Empty;
         public bool isActivate { get; set; }
 		public virtual ICollection<UserBank>? UserBanks { get; set; }
 	}
