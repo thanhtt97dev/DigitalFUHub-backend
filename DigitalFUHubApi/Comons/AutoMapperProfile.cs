@@ -7,6 +7,8 @@ using DTOs.Bank;
 using DTOs.User;
 using DTOs.Notification;
 using DTOs.Chat;
+using DTOs.Product;
+using DTOs.Tag;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -32,9 +34,23 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, HistoryWithdrawResponsetDTO>()
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
-				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => src.UserBank.CreditAccount))
-				.ForMember(des => des.CreditAccountName, atc => atc.MapFrom(src => src.UserBank.CreditAccountName))
-				.ReverseMap();	
+				.ForMember(des => des.CreditAccountName, act => act.MapFrom(src => src.UserBank.CreditAccountName))
+				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
+				//.ForMember(des => des.CreditAccount, atc => atc.MapFrom(src => Util.HideCharacters(src.UserBank.CreditAccount, 5)))
+				.ForMember(des => des.CreditAccount, atc => atc.MapFrom(src => src.UserBank.CreditAccount))
+				.ForMember(des => des.BankCode, atc => atc.MapFrom(src => src.UserBank.Bank.BankCode))
+				.ReverseMap();
+			CreateMap<DepositTransaction, HistoryDepositResponeDTO>()
+				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
+				.ReverseMap();
+
+			CreateMap<Product, ProductResponseDTO>().ReverseMap(); ;
+			CreateMap<ProductVariant, ProductVariantResponseDTO>().ReverseMap(); ;
+			CreateMap<ProductMedia, ProductMediaResponseDTO>().ReverseMap(); ;
+			CreateMap<Tag, TagResponseDTO>().ReverseMap(); ;
+			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
+				
 		}
     }
 }

@@ -12,6 +12,7 @@ namespace DTOs.Bank
 		public DateTime? PostingDate { get; set; }
 		public int DebitAmount { get; set; }
 		public string Description { get; set; } = null!;
+		public string RefNo { get; set; } = null!;
 		public string? BenAccountName { get; set; }
 		public string? BankName { get; set; }
 		public string? BenAccountNo { get; set; }

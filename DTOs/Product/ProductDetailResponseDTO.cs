@@ -20,7 +20,7 @@ namespace DTOs.Product
         public long ShopId { get; set; }
         public long CategoryId { get; set; }
         public long Quantity { get; set; } = 0;
-        public List<ProductVariantResponeDTO>? ProductVariants { get; set; }
+        public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }
         public List<ProductMediaResponseDTO>? ProductMedias { get; set; }
         public List<TagResponseDTO>? Tags { get; set; }
     }

@@ -9,6 +9,6 @@ namespace DTOs.MbBank
     public class MbBankResponse
     {
         public string? Code { get; set; }
-        public object? Result { get; set; }
+        public object Result { get; set; } = null!;
     }
 }

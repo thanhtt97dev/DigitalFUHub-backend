@@ -37,6 +37,11 @@ namespace DigitalFUHubApi.Comons
 		public static string RESPONSE_CODE_DATA_NOT_FOUND = "02";
 		public static string RESPONSE_CODE_FAILD = "03";
 
+		public static string RESPONSE_CODE_BANK_WITHDRAW_PAID = "BANK_01";
+		public static string RESPONSE_CODE_BANK_WITHDRAW_UNPAY = "BANK_02";
+		public static string RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND = "BANK_03";
+
+
 		//SignalR
 		public static string SIGNAL_R_CHAT_HUB = "chat";
 		public static string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";

@@ -240,6 +240,24 @@ namespace DataAccess.DAOs
 			return deposits;
 		}
 
+		internal List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string email, DateTime fromDate, DateTime toDate)
+		{
+			List<DepositTransaction> deposits = new List<DepositTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				deposits = context.DepositTransaction
+							.Include(x => x.User)
+							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate && x.User.Email.Contains(email) && x.IsPay)
+							.OrderByDescending(x => x.RequestDate).ToList();
+
+				if (depositTransactionId != 0)
+				{
+					deposits = deposits.Where(x => x.DepositTransactionId == depositTransactionId).ToList();
+				}
+			}
+			return deposits;
+		}
+
 		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status)
 		{
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
@@ -249,6 +267,31 @@ namespace DataAccess.DAOs
 							.Include(x => x.UserBank)
 							.ThenInclude(x => x.Bank)
 							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
+							.OrderByDescending(x => x.RequestDate).ToList();
+
+				if (withdrawTransactionId != 0)
+				{
+					withdraws = withdraws.Where(x => x.WithdrawTransactionId == withdrawTransactionId).ToList();
+				}
+				if (status != 0)
+				{
+					withdraws = withdraws.Where(x => x.IsPay == (status == 1)).ToList();
+				}
+
+			}
+			return withdraws;
+		}
+
+		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId,string email, DateTime fromDate, DateTime toDate, int status)
+		{
+			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				withdraws = context.WithdrawTransaction
+							.Include(x => x.User)
+							.Include(x => x.UserBank)
+							.ThenInclude(x => x.Bank)
+							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate && x.User.Email.Contains(email))
 							.OrderByDescending(x => x.RequestDate).ToList();
 
 				if (withdrawTransactionId != 0)
@@ -279,6 +322,18 @@ namespace DataAccess.DAOs
 			{
 				var bill = context.WithdrawTransactionBill.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
 				return bill;
+			}
+		}
+
+		internal void UpdateWithdrawTransaction(long transactionId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
+				if (withDrawTransaction == null) throw new Exception();
+				withDrawTransaction.IsPay = true;
+				withDrawTransaction.PaidDate = DateTime.Now;
+				context.SaveChanges();
 			}
 		}
 	}

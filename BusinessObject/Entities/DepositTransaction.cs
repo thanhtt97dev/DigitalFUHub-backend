@@ -21,6 +21,6 @@ namespace BusinessObject.Entities
         public bool IsPay { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User? User { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
     }
 }

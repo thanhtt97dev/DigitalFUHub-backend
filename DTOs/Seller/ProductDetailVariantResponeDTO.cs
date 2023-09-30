@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.Seller
 {
-	public class ProductVariantResponeDTO
+	public class ProductDetailVariantResponeDTO
 	{
 		public long ProductVariantId { get; set; }
 		public string? Name { get; set; }

@@ -15,9 +15,9 @@ namespace DataAccess.Repositories
 	{
 		public async Task AddProductAsync(Product product) => await ProductDAO.Instance.AddProductAsync(product);
 
-		public List<ProductResponeDTO> GetAllProduct(int userId) => ProductDAO.Instance.GetAllProduct(userId);
+		public List<SellerProductResponeDTO> GetAllProduct(int userId) => ProductDAO.Instance.GetAllProduct(userId);
 
-		public List<ProductVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
+		public List<ProductDetailVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
 
         public ProductDetailResponseDTO GetProductById(long productId)
         {
