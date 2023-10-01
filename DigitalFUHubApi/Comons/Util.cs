@@ -116,7 +116,7 @@ namespace DigitalFUHubApi.Comons
 		#endregion
 
 		#region Get Content Type File
-		public static string GetContentType(string filename)
+		public string GetContentType(string filename)
 		{
 			var contentType = "";
 			string fileExtension = filename.Substring(filename.LastIndexOf("."));
@@ -128,18 +128,18 @@ namespace DigitalFUHubApi.Comons
 			{
 				contentType = "image/png";
 			}
-			else if (fileExtension.Contains(".gif"))
-			{
-				contentType = "image/gif";
-			}
-			else if (fileExtension.Contains(".txt"))
-			{
-				contentType = "text/xml";
-			}
-			else if (fileExtension.Contains(".mp3") || fileExtension.Contains(".mp4"))
-			{
-				contentType = "audio/mpeg";
-			}
+			//else if (fileExtension.Contains(".gif"))
+			//{
+			//	contentType = "image/gif";
+			//}
+			//else if (fileExtension.Contains(".txt"))
+			//{
+			//	contentType = "text/xml";
+			//}
+			//else if (fileExtension.Contains(".mp3") || fileExtension.Contains(".mp4"))
+			//{
+			//	contentType = "audio/mpeg";
+			//}
 			else
 			{
 				contentType = "application/octet-stream";

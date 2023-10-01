@@ -1,14 +1,8 @@
 {
   "version": 2,
-<<<<<<< HEAD
-  "dgSpecHash": "G8a2qDXcI6v0xCiRcB5UhpmPo8fbRLEWzZFS6SDy+Cuwal7nP+0086UNG3QVbx9xVRBoNtrfcSX/+xxu43ujlA==",
-  "success": true,
-  "projectFilePath": "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj",
-=======
   "dgSpecHash": "lQTf+79Re9txTKEiSQkh059OEy5F8tqS7cly5CRv7PSIpkIK6VoIl03STHqHOwJs3ve2wQ291OqErpt45AbjPw==",
   "success": true,
   "projectFilePath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj",
->>>>>>> 4a418d2e7b7ef19109d09c1c999ca0916f5ab12e
   "expectedPackageFiles": [
     "C:\\Users\\ASUS\\.nuget\\packages\\epplus\\6.2.6\\epplus.6.2.6.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\epplus.interfaces\\6.1.1\\epplus.interfaces.6.1.1.nupkg.sha512",

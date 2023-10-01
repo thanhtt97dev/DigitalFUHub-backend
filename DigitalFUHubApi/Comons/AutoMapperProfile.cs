@@ -9,6 +9,7 @@ using DTOs.Notification;
 using DTOs.Chat;
 using DTOs.Product;
 using DTOs.Tag;
+using DTOs.Cart;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -50,7 +51,8 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<ProductMedia, ProductMediaResponseDTO>().ReverseMap(); ;
 			CreateMap<Tag, TagResponseDTO>().ReverseMap(); ;
 			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
-				
-		}
+            CreateMap<Cart, CartDTO>().ReverseMap();
+
+        }
     }
 }

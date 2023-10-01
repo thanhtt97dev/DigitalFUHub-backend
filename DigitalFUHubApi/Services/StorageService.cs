@@ -1,7 +1,10 @@
 ﻿using Azure.Core;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using DataAccess.IRepositories;
 using DigitalFUHubApi.Comons;
+using System.Net.Http.Headers;
 
 namespace DigitalFUHubApi.Services
 {
@@ -23,7 +26,9 @@ namespace DigitalFUHubApi.Services
 			try
 			{
 				BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
-				await container.UploadBlobAsync(filename, fileUpload.OpenReadStream());
+				var blobClient = container.GetBlobClient(filename);
+				var blobHttpHeader = new BlobHttpHeaders { ContentType = Util.Instance.GetContentType(filename) };
+				await blobClient.UploadAsync(fileUpload.OpenReadStream(), new BlobUploadOptions { HttpHeaders = blobHttpHeader });
 				return string.Format("{0}/{1}/{2}", Constants.AZURE_ROOT_PATH,containerName,filename);
 			}
 			catch (Exception e)
