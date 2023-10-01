@@ -65,5 +65,19 @@ namespace DigitalFUHubApi.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
+        [HttpGet("GetCartsByUserId/{userId}")]
+        [Authorize]
+        public async Task<IActionResult> GetCartsByUserId(long userId)
+        {
+            try
+            {
+                return Ok(await _cartRepository.GetCartsByUserId(userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }

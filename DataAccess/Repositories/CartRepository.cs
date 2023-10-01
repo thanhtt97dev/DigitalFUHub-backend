@@ -40,5 +40,15 @@ namespace DataAccess.Repositories
             return cart;
 
         }
+
+        public async Task<List<CartDTO>> GetCartsByUserId(long userId)
+        {
+            if (userId == 0)
+            {
+                throw new ArgumentException(nameof(userId), "UserId must be difference from 0");
+            }
+
+            return await CartDAO.Instance.GetCartsByUserId(userId);
+        }
     }
 }

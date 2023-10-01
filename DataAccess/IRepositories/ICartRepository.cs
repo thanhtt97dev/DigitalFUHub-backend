@@ -14,5 +14,7 @@ namespace DataAccess.IRepositories
         Task AddProductToCart(CartDTO addProductRequest);
 
         Task<Cart?> GetCart(long userId, long productVariantId);
+
+        Task<List<CartDTO>> GetCartsByUserId(long userId);
     }
 }

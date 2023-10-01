@@ -70,5 +70,35 @@ namespace DataAccess.DAOs
                 return cart;
             }
         }
+
+        internal async Task<List<CartDTO>> GetCartsByUserId(long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                List<CartDTO> cartDTOs = new List<CartDTO>();
+                var carts = await context.Cart.Where(c => c.UserId == userId).ToListAsync();
+                foreach (var cart in carts)
+                {
+                    var productVariant = await context.ProductVariant.FirstOrDefaultAsync(p => p.ProductVariantId == cart.ProductVariantId);
+                    if (productVariant == null) throw new ArgumentNullException("Not found product variant");
+                    var product = await context.Product.Include(_ => _.Shop).FirstOrDefaultAsync(p => p.ProductId == productVariant.ProductId);
+                    CartDTO cartDTO = new CartDTO()
+                    {
+                        ProductVariantId = cart.ProductVariantId,
+                        ProductVariantName = productVariant.Name,
+                        UserId = cart.UserId,
+                        Quantity = cart.Quantity,
+                        Thumbnail = product?.Thumbnail ?? "",
+                        ProductName = product?.ProductName ?? "",
+                        Price = (productVariant.Price * cart.Quantity),
+                        ShopName = product?.Shop.ShopName ?? ""
+                    };
+                    cartDTOs.Add(cartDTO);
+                }
+              
+                return cartDTOs.OrderBy(c => c.ProductVariantName).ToList();
+            }
+        }
     }
 }
+
