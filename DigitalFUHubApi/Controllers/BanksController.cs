@@ -797,6 +797,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Confirm transfer withdraw success
+		[Authorize(Roles ="Admin")]		
 		[HttpPost("ConfirmTransfer")]
 		public IActionResult ConfirmTransferWithdrawSuccess(ConfirmTransferWithdrawSuccessRequestDTO requestDTO)
 		{
@@ -824,6 +825,58 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				bankRepository.UpdateWithdrawTransactionPaid(requestDTO.Id);
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Confirm transfer list withdraw success
+		[Authorize(Roles = "Admin")]
+		[HttpPost("ConfirmListTransfer")]
+		public IActionResult ConfirmTransferListWithdrawSuccess(ConfirmTransferListWithdrawSuccessRequestDTO requestDTO)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
+			{
+				if (requestDTO.Ids.Count == 0) return BadRequest();
+				
+				var responeCode = bankRepository.UpdateListWithdrawTransactionPaid(requestDTO.Ids);
+
+				if(responeCode == Constants.RESPONSE_CODE_DATA_NOT_FOUND) 
+				{
+					status.Message = "A withdraw transaction not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				if (responeCode == Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID)
+				{
+					status.Message = "A withdraw has been paid!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (responeCode == Constants.RESPONSE_CODE_FAILD)
+				{
+					status.Message = "Sever err!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
 				status.Message = "Success!";
 				status.Ok = true;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;

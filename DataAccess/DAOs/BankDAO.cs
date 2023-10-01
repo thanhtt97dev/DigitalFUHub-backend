@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -231,7 +232,7 @@ namespace DataAccess.DAOs
 				{
 					deposits = deposits.Where(x => x.DepositTransactionId == depositTransactionId).ToList();
 				}
-				if(status != 0) 
+				if (status != 0)
 				{
 					deposits = deposits.Where(x => x.IsPay == (status == 1)).ToList();
 				}
@@ -264,7 +265,7 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				withdraws = context.WithdrawTransaction
-							.Include(x => x.User)	
+							.Include(x => x.User)
 							.Include(x => x.UserBank)
 							.ThenInclude(x => x.Bank)
 							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
@@ -283,7 +284,7 @@ namespace DataAccess.DAOs
 			return withdraws;
 		}
 
-		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId,string email, DateTime fromDate, DateTime toDate, int status)
+		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, int status)
 		{
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -336,6 +337,47 @@ namespace DataAccess.DAOs
 				withDrawTransaction.PaidDate = DateTime.Now;
 				context.SaveChanges();
 			}
+		}
+
+		internal string UpdateListWithdrawTransactionPaid(List<long> transactionIds)
+		{
+			string RESPONSE_CODE_SUCCESS = "00";
+			string RESPONSE_CODE_FAILD = "03";
+			string RESPONSE_CODE_DATA_NOT_FOUND = "02";
+			string RESPONSE_CODE_BANK_WITHDRAW_PAID = "BANK_01";
+
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					foreach (var transactionId in transactionIds)
+					{
+						var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
+						if (withDrawTransaction == null)
+						{
+							transaction.Rollback();
+							return RESPONSE_CODE_DATA_NOT_FOUND;
+						}
+						if (withDrawTransaction.IsPay)
+						{
+							transaction.Rollback();
+							return RESPONSE_CODE_BANK_WITHDRAW_PAID;
+						}
+						withDrawTransaction.IsPay = true;
+						withDrawTransaction.PaidDate = DateTime.Now;
+					}
+					transaction.Commit();
+					context.SaveChanges();
+					return RESPONSE_CODE_SUCCESS;
+				}
+				catch (Exception)
+				{
+					transaction.Rollback();
+					return RESPONSE_CODE_FAILD;
+				}
+			}
+
 		}
 	}
 }

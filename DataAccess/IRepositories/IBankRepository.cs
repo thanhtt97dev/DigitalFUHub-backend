@@ -24,5 +24,6 @@ namespace DataAccess.IRepositories
 		WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId);
 		WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId);
 		void UpdateWithdrawTransactionPaid(long transactionId);
+		string UpdateListWithdrawTransactionPaid(List<long> transactionIds);
 	}
 }
