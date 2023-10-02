@@ -36,6 +36,7 @@ namespace DigitalFUHubApi.Controllers
 
 
 		#region Get all bank info
+		[Authorize]		
 		[HttpGet("getAll")]
 		public IActionResult GetAll()
 		{
@@ -53,6 +54,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get user bank account
+		[Authorize]		
 		[HttpGet("user/{id}")]
 		public IActionResult GetUserBankAccount(int id)
 		{
@@ -91,6 +93,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Inquiry bank account name
+		[Authorize]
 		[HttpPost("InquiryAccountName")]
 		public async Task<IActionResult> InquiryAccountName(BankInquiryAccountNameRequestDTO inquiryAccountNameRequestDTO)
 		{
@@ -166,6 +169,7 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="UserId"></param>
 		/// <param name="BankId"></param>
 		/// <param name="CreditAccount"></param>
+		[Authorize]
 		[HttpPost("AddBankAccount")]
 		public async Task<IActionResult> AddBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
@@ -271,6 +275,7 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="UserId"></param>
 		/// <param name="BankId"></param>
 		/// <param name="CreditAccount"></param>
+		[Authorize]
 		[HttpPost("UpdateBankAccount")]
 		public async Task<IActionResult> UpdateBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
@@ -414,6 +419,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get history deposit transaction of a user
+		[Authorize]
 		[HttpPost("HistoryDeposit/{id}")]
 		public IActionResult GetHistoryDepositTransaction(int id, HistoryDepositRequestDTO historyDepositRequestDTO)
 		{
@@ -537,6 +543,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get history withdraw transaction of a user
+		[Authorize]
 		[HttpPost("HistoryWithdraw/{id}")]
 		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
 		{
@@ -693,6 +700,15 @@ namespace DigitalFUHubApi.Controllers
 					status.Message = "Withdraw bill not found!";
 					status.Ok = false;
 					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (withdrawTransaction.UserId != requestDTO.UserId)
+				{
+					status.Message = "You not have permitsion to view this data!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
