@@ -79,5 +79,34 @@ namespace DigitalFUHubApi.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
+        [HttpDelete("DeleteCart")]
+        [Authorize]
+        public async Task<IActionResult> DeleteCart([FromBody] DeleteCartRequestDTO deleteCartRequest)
+        {
+            try
+            {
+                await _cartRepository.DeleteCart(deleteCartRequest.UserId, deleteCartRequest.ProductVariantId);
+                return Ok(new Status
+                {
+                    Message = "Delete Cart Successfully"
+                    ,
+                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS
+                    ,
+                    Ok = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Status
+                {
+                    Message = ex.Message
+                    ,
+                    ResponseCode = Constants.RESPONSE_CODE_FAILD
+                    ,
+                    Ok = false
+                });
+            }
+        }
     }
 }
