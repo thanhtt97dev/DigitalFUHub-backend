@@ -11,6 +11,7 @@ using BusinessObject.Entities;
 using DTOs.Bank;
 using DTOs.MbBank;
 using System.Security.Cryptography.Xml;
+using Microsoft.Data.SqlClient.Server;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -35,6 +36,7 @@ namespace DigitalFUHubApi.Controllers
 
 
 		#region Get all bank info
+		[Authorize]		
 		[HttpGet("getAll")]
 		public IActionResult GetAll()
 		{
@@ -52,6 +54,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get user bank account
+		[Authorize]		
 		[HttpGet("user/{id}")]
 		public IActionResult GetUserBankAccount(int id)
 		{
@@ -90,6 +93,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Inquiry bank account name
+		[Authorize]
 		[HttpPost("InquiryAccountName")]
 		public async Task<IActionResult> InquiryAccountName(BankInquiryAccountNameRequestDTO inquiryAccountNameRequestDTO)
 		{
@@ -165,6 +169,7 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="UserId"></param>
 		/// <param name="BankId"></param>
 		/// <param name="CreditAccount"></param>
+		[Authorize]
 		[HttpPost("AddBankAccount")]
 		public async Task<IActionResult> AddBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
@@ -270,6 +275,7 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="UserId"></param>
 		/// <param name="BankId"></param>
 		/// <param name="CreditAccount"></param>
+		[Authorize]
 		[HttpPost("UpdateBankAccount")]
 		public async Task<IActionResult> UpdateBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
@@ -413,6 +419,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get history deposit transaction of a user
+		[Authorize]
 		[HttpPost("HistoryDeposit/{id}")]
 		public IActionResult GetHistoryDepositTransaction(int id, HistoryDepositRequestDTO historyDepositRequestDTO)
 		{
@@ -536,6 +543,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get history withdraw transaction of a user
+		[Authorize]
 		[HttpPost("HistoryWithdraw/{id}")]
 		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
 		{
@@ -692,6 +700,15 @@ namespace DigitalFUHubApi.Controllers
 					status.Message = "Withdraw bill not found!";
 					status.Ok = false;
 					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (withdrawTransaction.UserId != requestDTO.UserId)
+				{
+					status.Message = "You not have permitsion to view this data!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
@@ -881,6 +898,77 @@ namespace DigitalFUHubApi.Controllers
 				status.Ok = true;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get History transaction of internal 
+		[Authorize(Roles = "Admin")]
+		[HttpPost("HistoryTransactionInternal")]
+		public IActionResult GetHistoryTransactionInternal(HistoryTransactionInternalRequestDTO requestDTO)
+		{
+			if (requestDTO == null || requestDTO.OrderId == null ||
+				requestDTO.Email == null || requestDTO.ToDate == null ||
+				requestDTO.FromDate == null) return BadRequest();
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			int[] acceptedTransactionType = new int[] { 0, 1, 2, 3, 4 };
+			if (!acceptedTransactionType.Contains(requestDTO.TransactionTypeId))
+			{
+				status.Message = "Invalid transaction type id!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+	
+			try
+			{
+
+				DateTime fromDate;
+				DateTime toDate;
+				string format = "M/d/yyyy";
+				try
+				{
+					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				long orderId;
+				long.TryParse(requestDTO.OrderId, out orderId);
+
+				var transactions = bankRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionTypeId);
+
+				var result = mapper.Map<List<HistoryTransactionInternalResponseDTO>>(transactions);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)
