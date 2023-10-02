@@ -11,6 +11,7 @@ using BusinessObject.Entities;
 using DTOs.Bank;
 using DTOs.MbBank;
 using System.Security.Cryptography.Xml;
+using Microsoft.Data.SqlClient.Server;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -881,6 +882,77 @@ namespace DigitalFUHubApi.Controllers
 				status.Ok = true;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get History transaction of internal 
+		[Authorize(Roles = "Admin")]
+		[HttpPost("HistoryTransactionInternal")]
+		public IActionResult GetHistoryTransactionInternal(HistoryTransactionInternalRequestDTO requestDTO)
+		{
+			if (requestDTO == null || requestDTO.OrderId == null ||
+				requestDTO.Email == null || requestDTO.ToDate == null ||
+				requestDTO.FromDate == null) return BadRequest();
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			int[] acceptedTransactionType = new int[] { 0, 1, 2, 3, 4 };
+			if (!acceptedTransactionType.Contains(requestDTO.TransactionTypeId))
+			{
+				status.Message = "Invalid transaction type id!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+	
+			try
+			{
+
+				DateTime fromDate;
+				DateTime toDate;
+				string format = "M/d/yyyy";
+				try
+				{
+					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				long orderId;
+				long.TryParse(requestDTO.OrderId, out orderId);
+
+				var transactions = bankRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionTypeId);
+
+				var result = mapper.Map<List<HistoryTransactionInternalResponseDTO>>(transactions);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

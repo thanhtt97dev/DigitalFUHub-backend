@@ -379,5 +379,29 @@ namespace DataAccess.DAOs
 			}
 
 		}
+
+		internal List<Transaction> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId)
+		{
+			List<Transaction> transactions = new List<Transaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				transactions = context.Transaction
+								.Include(x => x.User)
+								//.Include(x => x.Order)	
+								.Where(x => fromDate <= x.DateCreate && toDate >= x.DateCreate && x.User.Email.Contains(email))
+								.OrderByDescending(x => x.DateCreate).ToList();
+
+				if (orderId != 0)
+				{
+					transactions = transactions.Where(x => x.OrderId == orderId).ToList();
+				}
+				if (transactionTypeId != 0)
+				{
+					transactions = transactions.Where(x => x.TransactionTypeId == transactionTypeId).ToList();
+				}
+
+			}
+			return transactions;
+		}
 	}
 }
