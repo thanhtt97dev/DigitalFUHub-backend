@@ -21,6 +21,6 @@ namespace BusinessObject.Entities
 		public bool IsActive { get; set; }
 
 		[ForeignKey(nameof(ProductVariantId))]
-		public virtual ProductVariant ProductVariant { get; set; }
+		public virtual ProductVariant ProductVariant { get; set; } = null!;
 	}
 }
