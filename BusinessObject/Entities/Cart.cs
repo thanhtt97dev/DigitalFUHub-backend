@@ -14,8 +14,8 @@ namespace BusinessObject.Entities
 		public long Quantity { get; set; }
 
 		[ForeignKey(nameof(ProductVariantId))]
-		public virtual ProductVariant? ProductVariant { get; set; }
+		public virtual ProductVariant ProductVariant { get; set; } = null!;
 		[ForeignKey(nameof(UserId))]
-		public virtual User? User { get; set; }
+		public virtual User User { get; set; } = null!;
 	}
 }
