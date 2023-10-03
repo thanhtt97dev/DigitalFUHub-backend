@@ -23,6 +23,6 @@ namespace BusinessObject.Entities
 
         [ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
-        public virtual List<OrderCoupon>? OrderCoupons { get; set; };
+        public virtual List<OrderCoupon>? OrderCoupons { get; set; }
 	}
 }

@@ -34,6 +34,6 @@ namespace BusinessObject.Entities
         public virtual ProductVariant? ProductVariant { get; set; } = null!;
         [ForeignKey(nameof(PlatformFeeId))]
         public virtual PlatformFee? PlatformFee { get; set; } = null!;
-        public virtual List<OrderCoupon>? OrderCoupons { get; set; };
+        public virtual List<OrderCoupon>? OrderCoupons { get; set; }
     }
 }
