@@ -21,7 +21,7 @@ namespace BusinessObject.Entities
 		[ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; } = null!;
         public virtual Order Order { get; set; } = null!;
-        public virtual ICollection<Cart>? Carts { get; set; }
-        public virtual ICollection<AssetInformation>? AssetInformation { get; set; }
-    }
+        public virtual ICollection<Cart> Carts { get; set; } = null!;
+		public virtual ICollection<AssetInformation> AssetInformation { get; set; } = null!;
+	}
 }

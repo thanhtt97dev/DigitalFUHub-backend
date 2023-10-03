@@ -20,7 +20,7 @@ namespace BusinessObject.Entities
 
 		[ForeignKey(nameof(UserId))]
 		public virtual User User { get; set; } = null!;
-		public virtual ICollection<Product>? Products { get; set; }
-		public virtual ICollection<Coupon>? Coupons { get; set; }
+		public virtual ICollection<Product> Products { get; set; } = null!;
+		public virtual ICollection<Coupon> Coupons { get; set; } = null!;
 	}
 }

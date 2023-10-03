@@ -60,6 +60,11 @@ namespace DigitalFUHubApi.Comons
 		public static int PRODUCT_BAN = 2;
 		public static int PRODUCT_HIDE = 3;
 
-
+		//Order Status
+		public static int ORDER_WAIT_CONFIRMATION = 1;
+		public static int ORDER_CONFIRMED = 2;
+		public static int ORDER_COMPLAINT = 3;
+		public static int ORDER_REJECT_COMPLAINT = 4;
+		public static int ORDER_ACCEPT_COMPLAINT = 5;
 	}
 }

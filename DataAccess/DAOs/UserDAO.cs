@@ -99,6 +99,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
+				if (email == null) return null;
 				return await context.User.Include(x => x.Role).FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
 			}
 		}
