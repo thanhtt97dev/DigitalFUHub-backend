@@ -118,7 +118,7 @@ namespace DigitalFUHubApi.Comons
 		#region Get Content Type File
 		public string GetContentType(string filename)
 		{
-			var contentType = "";
+			string contentType;
 			string fileExtension = filename.Substring(filename.LastIndexOf("."));
 			if (fileExtension.Contains(".jpg") || fileExtension.Contains(".jpeg"))
 			{

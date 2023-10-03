@@ -98,6 +98,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<IShopRepository, ShopRepository>();
 			builder.Services.AddSingleton<IFeedbackRepository, FeedbackRepository>();
 			builder.Services.AddSingleton<ICartRepository, CartRepository>();
+			builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
@@ -157,6 +158,17 @@ namespace DigitalFUHubApi
 					.StartNow()
 					.WithSimpleSchedule(x =>
 						x.WithIntervalInMinutes(1)
+						.RepeatForever()
+						)
+					);
+
+				var jobKeyOrderStatusJob = new JobKey("OrderStatusJob");
+				q.AddJob<OrderStatusJob>(opts => opts.WithIdentity(jobKeyOrderStatusJob));
+				q.AddTrigger(opts => opts
+					.ForJob(jobKeyOrderStatusJob)
+					.StartNow()
+					.WithSimpleSchedule(x =>
+						x.WithIntervalInMinutes(30)
 						.RepeatForever()
 						)
 					);

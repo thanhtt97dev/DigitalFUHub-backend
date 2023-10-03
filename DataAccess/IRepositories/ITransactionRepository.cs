@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepositories
 {
-	public interface IOrderRepository
+	public interface ITransactionRepository
 	{
-		List<Order> GetAllOrderWaitToConfirm(int days);
-		void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders);
+		void AddTransactionsForOrderConfirmed(Order order);
 	}
 }

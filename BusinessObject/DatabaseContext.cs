@@ -63,7 +63,6 @@ namespace BusinessObject
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-
 			modelBuilder.Entity<SenderConversation>()
 				.HasNoKey()
 				.ToView(null);
@@ -137,6 +136,34 @@ namespace BusinessObject
 				new OrderStatus{OrderStatusId = 3, Name = "Complaint"},
 				new OrderStatus{OrderStatusId = 4, Name = "Reject Complaint"},
 				new OrderStatus{OrderStatusId = 5, Name = "Accept Complaint"},
+			});
+
+			modelBuilder.Entity<User>().HasData(new User[]
+			{
+				new User(){UserId = 1, RoleId = 1, Username = "admin", Password = "123", Fullname="Admin", Avatar =  "", Status = true, TwoFactorAuthentication = false, AccountBalance = 0, SignInGoogle = false, IsConfirm = true }
+			});
+
+			modelBuilder.Entity<Bank>().HasData(new Bank[] 
+			{
+				new Bank(){BankId = 458761, BankName = "TNHH MTV HSBC Việt Nam (HSBC)", BankCode = "HSBC", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Sacombank (STB)", BankCode = "STB", isActivate = true},
+				new Bank(){BankId = 970405, BankName = "Nông nghiệp và Phát triển nông thôn (VBA)", BankCode = "VBA", isActivate = true},
+				new Bank(){BankId = 970407, BankName = "Kỹ Thương (TCB)", BankCode = "TCB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Công Thương Việt Nam (VIETINBANK)", BankCode = "VIETINBANK", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Đầu tư và phát triển (BIDV)", BankCode = "BIDV", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Quân đội (MB)", BankCode = "MB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Tiên Phong (TPB)", BankCode = "TPB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Hàng hải (MSB)", BankCode = "MSB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Việt Nam Thinh Vượng (VPB)", BankCode = "VPB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Ngoại thương Việt Nam (VCB)", BankCode = "VCB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Quốc tế (VIB)", BankCode = "VIB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Sài Gòn Hà Nội (SHB)", BankCode = "SHB", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Bưu điện Liên Việt (LPB)", BankCode = "LPB", isActivate = true},
+			});
+
+			modelBuilder.Entity<PlatformFee>().HasData(new PlatformFee[]
+			{
+				new PlatformFee() {PlatformFeeId = 1, Fee = 5, StartDate = DateTime.Now},
 			});
 
 
