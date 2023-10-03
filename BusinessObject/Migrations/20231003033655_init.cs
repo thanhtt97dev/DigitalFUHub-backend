@@ -808,7 +808,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "PlatformFee",
                 columns: new[] { "PlatformFeeId", "Fee", "StartDate" },
-                values: new object[] { 1L, 5L, new DateTime(2023, 10, 3, 10, 28, 22, 728, DateTimeKind.Local).AddTicks(8224) });
+                values: new object[] { 1L, 5L, new DateTime(2023, 10, 3, 10, 36, 55, 333, DateTimeKind.Local).AddTicks(289) });
 
             migrationBuilder.InsertData(
                 table: "ProductStatus",

@@ -83,3 +83,5 @@ D:\FU\Capstone Project\Back-end\DataAccess\obj\Release\net6.0\DataAccess.dll
 D:\FU\Capstone Project\Back-end\DataAccess\obj\Release\net6.0\refint\DataAccess.dll
 D:\FU\Capstone Project\Back-end\DataAccess\obj\Release\net6.0\DataAccess.pdb
 D:\FU\Capstone Project\Back-end\DataAccess\obj\Release\net6.0\ref\DataAccess.dll
+D:\FU\Capstone Project\Back-end\DataAccess\bin\Release\net6.0\Comons.dll
+D:\FU\Capstone Project\Back-end\DataAccess\bin\Release\net6.0\Comons.pdb

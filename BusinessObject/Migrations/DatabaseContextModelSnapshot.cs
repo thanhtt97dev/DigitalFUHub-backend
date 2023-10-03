@@ -638,7 +638,7 @@ namespace BusinessObject.Migrations
                         {
                             PlatformFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 3, 10, 28, 22, 728, DateTimeKind.Local).AddTicks(8224)
+                            StartDate = new DateTime(2023, 10, 3, 10, 36, 55, 333, DateTimeKind.Local).AddTicks(289)
                         });
                 });
 
