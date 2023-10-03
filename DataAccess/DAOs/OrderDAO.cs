@@ -70,7 +70,7 @@ namespace DataAccess.DAOs
 						Transaction transactionSeller = new Transaction()
 						{
 							UserId = sellerId,
-							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
 							OrderId = order.OrderId,	
 							PaymentAmount =  sellerProfit,
 							Note="",
