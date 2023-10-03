@@ -82,23 +82,50 @@ namespace DataAccess.DAOs
                     var productVariant = await context.ProductVariant.FirstOrDefaultAsync(p => p.ProductVariantId == cart.ProductVariantId);
                     if (productVariant == null) throw new ArgumentNullException("Not found product variant");
                     var product = await context.Product.Include(_ => _.Shop).FirstOrDefaultAsync(p => p.ProductId == productVariant.ProductId);
+                    long price = productVariant.Price * cart.Quantity ?? 0;
                     CartDTO cartDTO = new CartDTO()
                     {
                         ProductVariantId = cart.ProductVariantId,
-                        ProductVariantName = productVariant.Name,
                         UserId = cart.UserId,
                         Quantity = cart.Quantity,
-                        Thumbnail = product?.Thumbnail ?? "",
-                        ProductName = product?.ProductName ?? "",
-                        Price = (productVariant.Price * cart.Quantity),
+                        Product = new ProductCartResponseDTO
+                        {
+                            ProductId = product?.ProductId ?? 0,
+                            Thumbnail = product?.Thumbnail ?? "",
+                            ProductName = product?.ProductName ?? "",
+                            Discount = product?.Discount ?? 0,
+                        },
+                        ProductVariant = new ProductVariantCartResponseDTO
+                        {
+                            ProductVariantName = productVariant.Name,
+                            Price = price,
+                            PriceDiscount = price - (price * (product?.Discount ?? 1) / 100),
+                            Quantity = context.AssetInformation.Count(x => x.ProductVariantId == cart.ProductVariantId)
+                        },
                         ShopName = product?.Shop.ShopName ?? ""
                     };
                     cartDTOs.Add(cartDTO);
                 }
               
-                return cartDTOs.OrderBy(c => c.ProductVariantName).ToList();
+                return cartDTOs.OrderBy(c => c.ShopName).ToList();
             }
         }
+
+
+        internal async Task DeleteCart(long userId, long productVariantId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var cart = await context.Cart.FirstOrDefaultAsync(
+                        c => c.UserId == userId && c.ProductVariantId == productVariantId
+                    );
+                if (cart == null) throw new ArgumentNullException("Not found cart");
+                context.Cart.Remove(cart);
+                context.SaveChanges();
+            }
+        }
+
+
     }
 }
 
