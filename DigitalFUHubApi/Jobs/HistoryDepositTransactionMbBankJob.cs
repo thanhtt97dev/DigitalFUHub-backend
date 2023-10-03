@@ -6,6 +6,7 @@ using System.Text;
 using DataAccess.DAOs;
 using DigitalFUHubApi.Services;
 using DTOs.MbBank;
+using Comons;
 
 namespace DigitalFUHubApi.Jobs
 {

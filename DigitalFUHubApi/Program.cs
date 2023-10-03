@@ -16,7 +16,7 @@ using BusinessObject;
 
 namespace DigitalFUHubApi
 {
-    public class Program
+	public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -89,24 +89,24 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<IAccessTokenRepository, AccessTokenRepository>();
 			builder.Services.AddSingleton<IRoleRepository, RoleRepository>();
 			builder.Services.AddSingleton<INotificationRepositiory, NotificationRepositiory>();
-            builder.Services.AddSingleton<IReportRepository, ReportRepository>();
+			builder.Services.AddSingleton<IReportRepository, ReportRepository>();
 			builder.Services.AddSingleton<ITwoFactorAuthenticationRepository, TwoFactorAuthenticationRepository>();
-            builder.Services.AddSingleton<IChatRepository, ChatRepository>();
+			builder.Services.AddSingleton<IChatRepository, ChatRepository>();
 			builder.Services.AddSingleton<IBankRepository, BankRepository>();
 			builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 			builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 			builder.Services.AddSingleton<IShopRepository, ShopRepository>();
-            builder.Services.AddSingleton<IFeedbackRepository, FeedbackRepository>();
-            builder.Services.AddSingleton<ICartRepository, CartRepository>();
+			builder.Services.AddSingleton<IFeedbackRepository, FeedbackRepository>();
+			builder.Services.AddSingleton<ICartRepository, CartRepository>();
 
-            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();	
+			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 			builder.Services.AddSingleton<MailService>();
-			builder.Services.AddSingleton<MbBankService>();	
-			builder.Services.AddSingleton<StorageService>();	
+			builder.Services.AddSingleton<MbBankService>();
+			builder.Services.AddSingleton<StorageService>();
 
 			//Add SignalR
 			builder.Services.AddSignalR();
@@ -119,7 +119,16 @@ namespace DigitalFUHubApi
 				options.HttpStatusCode = 429;
 				options.RealIpHeader = "X-Real-IP";
 				options.ClientIdHeader = "X-ClientId";
-				options.GeneralRules = Constants.RateLimitRules;
+				options.GeneralRules =
+					new List<RateLimitRule>()
+					{
+						new RateLimitRule
+						{
+							Endpoint = "*",
+							Period = "10s",
+							Limit = 10,
+						}
+					};
 			});
 			builder.Services.AddMemoryCache();
 			builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
@@ -157,8 +166,8 @@ namespace DigitalFUHubApi
 
 			var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+			// Configure the HTTP request pipeline.
+			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
@@ -179,8 +188,8 @@ namespace DigitalFUHubApi
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapHub<NotificationHub>("/notificationHub");
-                endpoints.MapHub<ChatHub>("/chatHub");
-            });
+				endpoints.MapHub<ChatHub>("/chatHub");
+			});
 
 			// Add https
 			//app.UseHttpsRedirection();

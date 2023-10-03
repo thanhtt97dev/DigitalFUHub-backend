@@ -4,6 +4,7 @@ using DigitalFUHubApi.Services;
 using DTOs.MbBank;
 using Quartz;
 using System.Text.Json;
+using Comons;
 
 namespace DigitalFUHubApi.Jobs
 {

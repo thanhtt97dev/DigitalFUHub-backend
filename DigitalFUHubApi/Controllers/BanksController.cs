@@ -12,6 +12,7 @@ using DTOs.Bank;
 using DTOs.MbBank;
 using System.Security.Cryptography.Xml;
 using Microsoft.Data.SqlClient.Server;
+using Comons;
 
 namespace DigitalFUHubApi.Controllers
 {

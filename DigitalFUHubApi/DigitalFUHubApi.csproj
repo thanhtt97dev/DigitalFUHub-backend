@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusinessObject\BusinessObject.csproj" />
+    <ProjectReference Include="..\Comons\Comons.csproj" />
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
     <ProjectReference Include="..\DTOs\DTOs.csproj" />
   </ItemGroup>
