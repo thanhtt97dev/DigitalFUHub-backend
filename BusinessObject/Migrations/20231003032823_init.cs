@@ -15,6 +15,7 @@ namespace BusinessObject.Migrations
                 {
                     BankId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    BankCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     isActivate = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -762,6 +763,27 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Bank",
+                columns: new[] { "BankId", "BankCode", "BankName", "isActivate" },
+                values: new object[,]
+                {
+                    { 458761L, "HSBC", "TNHH MTV HSBC Việt Nam (HSBC)", true },
+                    { 970403L, "STB", "Sacombank (STB)", true },
+                    { 970405L, "VBA", "Nông nghiệp và Phát triển nông thôn (VBA)", true },
+                    { 970407L, "TCB", "Kỹ Thương (TCB)", true },
+                    { 970415L, "VIETINBANK", "Công Thương Việt Nam (VIETINBANK)", true },
+                    { 970418L, "BIDV", "Đầu tư và phát triển (BIDV)", true },
+                    { 970422L, "MB", "Quân đội (MB)", true },
+                    { 970423L, "TPB", "Tiên Phong (TPB)", true },
+                    { 970426L, "MSB", "Hàng hải (MSB)", true },
+                    { 970432L, "VPB", "Việt Nam Thinh Vượng (VPB)", true },
+                    { 970436L, "VCB", "Ngoại thương Việt Nam (VCB)", true },
+                    { 970441L, "VIB", "Quốc tế (VIB)", true },
+                    { 970443L, "SHB", "Sài Gòn Hà Nội (SHB)", true },
+                    { 970449L, "LPB", "Bưu điện Liên Việt (LPB)", true }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Category",
                 columns: new[] { "CategoryId", "CategoryName" },
                 values: new object[,]
@@ -782,6 +804,11 @@ namespace BusinessObject.Migrations
                     { 4L, "Reject Complaint" },
                     { 5L, "Accept Complaint" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "PlatformFee",
+                columns: new[] { "PlatformFeeId", "Fee", "StartDate" },
+                values: new object[] { 1L, 5L, new DateTime(2023, 10, 3, 10, 28, 22, 728, DateTimeKind.Local).AddTicks(8224) });
 
             migrationBuilder.InsertData(
                 table: "ProductStatus",
@@ -813,6 +840,11 @@ namespace BusinessObject.Migrations
                     { 3L, "Receive refund" },
                     { 4L, "Profit" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "UserId", "AccountBalance", "Avatar", "Email", "Fullname", "IsConfirm", "Password", "RoleId", "SignInGoogle", "Status", "TwoFactorAuthentication", "Username" },
+                values: new object[] { 1L, 0L, "", "", "Admin", true, "123", 1L, false, true, false, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccessToken_UserId",

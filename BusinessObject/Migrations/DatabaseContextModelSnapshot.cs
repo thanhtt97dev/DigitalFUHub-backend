@@ -136,6 +136,106 @@ namespace BusinessObject.Migrations
                     b.HasKey("BankId");
 
                     b.ToTable("Bank");
+
+                    b.HasData(
+                        new
+                        {
+                            BankId = 458761L,
+                            BankCode = "HSBC",
+                            BankName = "TNHH MTV HSBC Việt Nam (HSBC)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970403L,
+                            BankCode = "STB",
+                            BankName = "Sacombank (STB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970405L,
+                            BankCode = "VBA",
+                            BankName = "Nông nghiệp và Phát triển nông thôn (VBA)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970407L,
+                            BankCode = "TCB",
+                            BankName = "Kỹ Thương (TCB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970415L,
+                            BankCode = "VIETINBANK",
+                            BankName = "Công Thương Việt Nam (VIETINBANK)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970418L,
+                            BankCode = "BIDV",
+                            BankName = "Đầu tư và phát triển (BIDV)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970422L,
+                            BankCode = "MB",
+                            BankName = "Quân đội (MB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970423L,
+                            BankCode = "TPB",
+                            BankName = "Tiên Phong (TPB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970426L,
+                            BankCode = "MSB",
+                            BankName = "Hàng hải (MSB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970432L,
+                            BankCode = "VPB",
+                            BankName = "Việt Nam Thinh Vượng (VPB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970436L,
+                            BankCode = "VCB",
+                            BankName = "Ngoại thương Việt Nam (VCB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970441L,
+                            BankCode = "VIB",
+                            BankName = "Quốc tế (VIB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970443L,
+                            BankCode = "SHB",
+                            BankName = "Sài Gòn Hà Nội (SHB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970449L,
+                            BankCode = "LPB",
+                            BankName = "Bưu điện Liên Việt (LPB)",
+                            isActivate = true
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Cart", b =>
@@ -532,6 +632,14 @@ namespace BusinessObject.Migrations
                     b.HasKey("PlatformFeeId");
 
                     b.ToTable("PlatformFee");
+
+                    b.HasData(
+                        new
+                        {
+                            PlatformFeeId = 1L,
+                            Fee = 5L,
+                            StartDate = new DateTime(2023, 10, 3, 10, 28, 22, 728, DateTimeKind.Local).AddTicks(8224)
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Product", b =>
@@ -915,6 +1023,23 @@ namespace BusinessObject.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1L,
+                            AccountBalance = 0L,
+                            Avatar = "",
+                            Email = "",
+                            Fullname = "Admin",
+                            IsConfirm = true,
+                            Password = "123",
+                            RoleId = 1L,
+                            SignInGoogle = false,
+                            Status = true,
+                            TwoFactorAuthentication = false,
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.UserBank", b =>

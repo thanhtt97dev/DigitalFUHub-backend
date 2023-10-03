@@ -1043,6 +1043,20 @@
           "bin/placeholder/BusinessObject.dll": {}
         }
       },
+      "Comons/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "BusinessObject": "1.0.0",
+          "DTOs": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Comons.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Comons.dll": {}
+        }
+      },
       "DTOs/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
@@ -2664,6 +2678,11 @@
       "path": "../BusinessObject/BusinessObject.csproj",
       "msbuildProject": "../BusinessObject/BusinessObject.csproj"
     },
+    "Comons/1.0.0": {
+      "type": "project",
+      "path": "../Comons/Comons.csproj",
+      "msbuildProject": "../Comons/Comons.csproj"
+    },
     "DTOs/1.0.0": {
       "type": "project",
       "path": "../DTOs/DTOs.csproj",
@@ -2673,6 +2692,7 @@
   "projectFileDependencyGroups": {
     "net6.0": [
       "BusinessObject >= 1.0.0",
+      "Comons >= 1.0.0",
       "DTOs >= 1.0.0"
     ]
   },
@@ -2710,6 +2730,9 @@
           "projectReferences": {
             "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj": {
               "projectPath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj"
+            },
+            "D:\\FU\\Capstone Project\\Back-end\\Comons\\Comons.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\Comons\\Comons.csproj"
             },
             "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj": {
               "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj"
