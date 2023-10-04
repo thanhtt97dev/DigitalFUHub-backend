@@ -77,7 +77,7 @@ namespace DigitalFUHubApi.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return BadRequest(new { ex.Message });
             }
         }
 
