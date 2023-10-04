@@ -64,7 +64,11 @@ namespace DataAccess.DAOs
 
 						// update seller's balance
 						var seller = context.User.First(x => x.UserId == sellerId);
-						seller.AccountBalance = seller.AccountBalance + sellerProfit;	
+						seller.AccountBalance = seller.AccountBalance + sellerProfit;
+
+						// update admin's balance
+						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+						admin.AccountBalance = admin.AccountBalance + adminProfit;
 
 						// add transaction for refund money to seller
 						Transaction transactionSeller = new Transaction()

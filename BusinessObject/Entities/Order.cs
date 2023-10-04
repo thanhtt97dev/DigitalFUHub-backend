@@ -18,7 +18,8 @@ namespace BusinessObject.Entities
         public long UserId { get; set; }
         public long ProductVariantId { get; set; }
         public long PlatformFeeId { get; set; }
-        public long Quantity { get; set; }
+		public long AssetInformationId { get; set; }
+		public long Quantity { get; set; }
 		public long Price { get; set; }
 		public DateTime OrderDate { get; set; }
         public long TotalAmount { get; set; }
@@ -32,8 +33,11 @@ namespace BusinessObject.Entities
         public virtual OrderStatus? OrderStatus { get; set; } = null!;
         [ForeignKey(nameof(ProductVariantId))]
         public virtual ProductVariant? ProductVariant { get; set; } = null!;
-        [ForeignKey(nameof(PlatformFeeId))]
-        public virtual PlatformFee? PlatformFee { get; set; } = null!;
-        public virtual List<OrderCoupon>? OrderCoupons { get; set; }
+
+		[ForeignKey(nameof(PlatformFeeId))]
+		public virtual PlatformFee? PlatformFee { get; set; } = null!;
+		[ForeignKey(nameof(AssetInformationId))]
+		public virtual AssetInformation AssetInformation { get; set; } = null!;
+		public virtual List<OrderCoupon>? OrderCoupons { get; set; }
     }
 }
