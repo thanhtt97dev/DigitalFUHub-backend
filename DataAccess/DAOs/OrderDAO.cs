@@ -156,6 +156,7 @@ namespace DataAccess.DAOs
                         foreach (var asset in assetInformations)
                         {
                             asset.OrderId = order.OrderId;
+							asset.IsActive = true;
                         }
 
                         context.AssetInformation.UpdateRange(assetInformations);
