@@ -31,7 +31,7 @@ namespace BusinessObject.Entities
         [ForeignKey(nameof(OrderStatusId))]
         public virtual OrderStatus? OrderStatus { get; set; } = null!;
         [ForeignKey(nameof(ProductVariantId))]
-        public virtual ProductVariant? ProductVariant { get; set; } = null!;
+        public virtual ProductVariant ProductVariant { get; set; } = null!;
 
 		[ForeignKey(nameof(BusinessFeeId))]
 		public virtual BusinessFee BusinessFee { get; set; } = null!;

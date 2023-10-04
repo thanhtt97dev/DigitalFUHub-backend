@@ -51,11 +51,14 @@
 
 		//Order Status
 		public const int NUMBER_DAYS_AUTO_CONFIRM_ORDER = 3;
+		public const int ORDER_ALL = 0;
 		public const int ORDER_WAIT_CONFIRMATION = 1;
 		public const int ORDER_CONFIRMED = 2;
 		public const int ORDER_COMPLAINT = 3;
-		public const int ORDER_REJECT_COMPLAINT = 4;
-		public const int ORDER_ACCEPT_COMPLAINT = 5;
+		public const int ORDER_DISPUTE = 4;
+		public const int ORDER_REJECT_COMPLAINT = 5;
+		public const int ORDER_SELLER_VIOLATES = 6;
+		public static int[] ORDER_STATUS = new int[] { ORDER_WAIT_CONFIRMATION, ORDER_CONFIRMED, ORDER_COMPLAINT, ORDER_DISPUTE, ORDER_REJECT_COMPLAINT, ORDER_SELLER_VIOLATES };
 
 		//Transaction Type
 		public const int TRANSACTION_TYPE_INTERNAL_PAYMENT = 1;

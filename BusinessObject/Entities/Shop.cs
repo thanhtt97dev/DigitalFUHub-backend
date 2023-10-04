@@ -12,7 +12,7 @@ namespace BusinessObject.Entities
 	{
 		[Key]
 		public long UserId { get; set; }
-		public string? ShopName { get; set; }
+		public string ShopName { get; set; } = null!;
 		public DateTime DateCreate { get; set; }
 		public long Balance { get; set; }
 		public string? Description { get; set; }

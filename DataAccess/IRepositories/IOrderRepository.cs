@@ -10,6 +10,7 @@ namespace DataAccess.IRepositories
 	public interface IOrderRepository
 	{
 		List<Order> GetAllOrderWaitToConfirm(int days);
+		List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status);
 		void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders);
 	}
 }

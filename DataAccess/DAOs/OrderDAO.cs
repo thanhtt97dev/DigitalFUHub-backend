@@ -1,6 +1,7 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
 using Comons;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.DAOs
 {
@@ -102,6 +103,36 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
+		}
+
+		internal List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status)
+		{
+			List<Order> orders = new List<Order>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				orders = context.Order
+							.Include(x => x.User)
+							.Include(x => x.ProductVariant)
+							.ThenInclude(x => x.Product)
+							.ThenInclude(x => x.Shop)
+							.Where(x => 
+								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
+								x.User.Email.Contains(customerEmail) &&
+								x.ProductVariant.Product.Shop.ShopName.Contains(shopName)
+							)
+							.OrderByDescending(x => x.OrderDate).ToList();
+				if(orderId != 0)
+				{
+					orders = orders.Where(x => x.OrderId == orderId).ToList();	
+				}
+				
+				if (status != 0)
+				{
+					orders = orders.Where(x => x.OrderStatusId == status).ToList();
+				}
+
+			}
+			return orders;
 		}
 	}
 }

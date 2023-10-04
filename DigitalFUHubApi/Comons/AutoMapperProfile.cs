@@ -10,6 +10,7 @@ using DTOs.Chat;
 using DTOs.Product;
 using DTOs.Tag;
 using DTOs.Cart;
+using DTOs.Admin;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -44,6 +45,12 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 			CreateMap<DepositTransaction, HistoryDepositResponeDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
+				.ReverseMap();
+			CreateMap<Order, OrdersResponseDTO>()
+				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
+				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.ProductVariant.Product.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
 				.ReverseMap();
 
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
