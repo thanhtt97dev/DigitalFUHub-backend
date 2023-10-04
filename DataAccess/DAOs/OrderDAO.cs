@@ -59,7 +59,7 @@ namespace DataAccess.DAOs
 						var sellerId = context.Product.First(x => x.ProductId == productId).ShopId;
 
 						//get profit
-						var adminProfit = order.TotalAmount * fee % 100;
+						var adminProfit = order.TotalAmount * fee / 100;
 						var sellerProfit = order.TotalAmount - adminProfit;
 
 						// update seller's balance
