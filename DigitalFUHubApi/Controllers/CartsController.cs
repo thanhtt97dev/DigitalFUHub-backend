@@ -81,7 +81,7 @@ namespace DigitalFUHubApi.Controllers
             }
         }
 
-        [HttpDelete("DeleteCart")]
+        [HttpPost("DeleteCart")]
         [Authorize]
         public async Task<IActionResult> DeleteCart([FromBody] DeleteCartRequestDTO deleteCartRequest)
         {
