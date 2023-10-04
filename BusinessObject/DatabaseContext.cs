@@ -50,7 +50,7 @@ namespace BusinessObject
 		public virtual DbSet<Category> Category { get; set; } = null!;
 		public virtual DbSet<Cart> Cart { get; set; } = null!;
 		public virtual DbSet<AssetInformation> AssetInformation { get; set; } = null!;
-		public virtual DbSet<PlatformFee> PlatformFee { get; set; } = null!;
+		public virtual DbSet<BusinessFee> BusinessFee { get; set; } = null!;
 
 		#endregion
 
@@ -161,9 +161,9 @@ namespace BusinessObject
 				new Bank(){BankId = 970449, BankName = "Bưu điện Liên Việt (LPB)", BankCode = "LPB", isActivate = true},
 			});
 
-			modelBuilder.Entity<PlatformFee>().HasData(new PlatformFee[]
+			modelBuilder.Entity<BusinessFee>().HasData(new BusinessFee[]
 			{
-				new PlatformFee() {PlatformFeeId = 1, Fee = 5, StartDate = DateTime.Now},
+				new BusinessFee() {BusinessFeeId = 1, Fee = 5, StartDate = DateTime.Now},
 			});
 
 

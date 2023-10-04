@@ -53,7 +53,7 @@ namespace DataAccess.DAOs
 						orderUpdate.OrderStatusId = Constants.ORDER_CONFIRMED;
 
 						//get platform fee
-						var fee = context.PlatformFee.First(x => x.PlatformFeeId == order.PlatformFeeId).Fee;
+						var fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
 						//get sellerId
 						var productId = context.ProductVariant.First(x => x.ProductVariantId == order.ProductVariantId).ProductId;
 						var sellerId = context.Product.First(x => x.ProductId == productId).ShopId;
