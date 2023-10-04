@@ -14,7 +14,7 @@ namespace DataAccess.IRepositories
 		List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status);
 		void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders);
 
-		void AddOrder(Order order);
+		void AddOrder(List<Order> orders);
 
     }
 }

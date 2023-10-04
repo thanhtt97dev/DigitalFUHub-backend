@@ -21,16 +21,19 @@ namespace DataAccess.Repositories
 
 		public void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders) => OrderDAO.Instance.ConfirmOrdersWithWaitToConfirmStatus(orders);
 
-        public void AddOrder(Order order)
+        public void AddOrder(List<Order> orders)
         {
-            if (order == null)
+            if (orders == null || orders.Count == 0)
             {
-                throw new ArgumentNullException(nameof(order), "The order request object must not be null");
+                throw new ArgumentNullException(nameof(orders), "The order request object must not be data");
             }
 
-            order.OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION;
+            foreach (var order in orders)
+            {
+                order.OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION;
+            }
 
-            OrderDAO.Instance.AddOrder(order);
+            OrderDAO.Instance.AddOrder(orders);
         }
     }
 }

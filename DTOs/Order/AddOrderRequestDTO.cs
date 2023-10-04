@@ -11,7 +11,6 @@ namespace DTOs.Order
         public long UserId { get; set; }
         public long ProductVariantId { get; set; }
         public long BusinessFeeId { get; set; }
-        public long AssetInformationId { get; set; }
         public long Quantity { get; set; }
         public long Price { get; set; }
         public DateTime OrderDate { get; set; }

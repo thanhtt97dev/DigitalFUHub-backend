@@ -18,7 +18,7 @@ namespace BusinessObject.Entities
         public long UserId { get; set; }
         public long ProductVariantId { get; set; }
         public long BusinessFeeId { get; set; }
-		public long Quantity { get; set; }
+		public int Quantity { get; set; }
 		public long Price { get; set; }
 		public DateTime OrderDate { get; set; }
         public long TotalAmount { get; set; }

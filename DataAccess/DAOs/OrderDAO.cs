@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.Style;
 
 namespace DataAccess.DAOs
 {
@@ -136,28 +137,51 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-        internal void AddOrder(Order order)
+        internal void AddOrder(List<Order> orders)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                context.Order.Add(order);
-				context.SaveChanges();
+
+                var transaction = context.Database.BeginTransaction();
+                try
+                {
+					foreach (var order in orders)
+					{
+                        context.Order.Add(order);
+                        context.SaveChanges();
+
+                        var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == false).Take(order.Quantity).ToList();
 
 
-                // add new transaction
-                Transaction newTransaction = new Transaction
-				{
-					UserId = order.UserId,
-					TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
-					OrderId = order.OrderId,
-					PaymentAmount = order.TotalAmount,
-					Note = "Thanh toan",
-					DateCreate = new DateTime()
-				};
+                        foreach (var asset in assetInformations)
+                        {
+                            asset.OrderId = order.OrderId;
+                        }
 
-				context.Transaction.Add(newTransaction);
-				context.SaveChanges();
+                        context.AssetInformation.UpdateRange(assetInformations);
 
+                        // add new transaction
+                        Transaction newTransaction = new Transaction
+                        {
+                            UserId = order.UserId,
+                            TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
+                            OrderId = order.OrderId,
+                            PaymentAmount = order.TotalAmount,
+                            Note = "Thanh toan",
+                            DateCreate = new DateTime()
+                        };
+
+                        context.Transaction.Add(newTransaction);
+                    }
+                    
+                    context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception(ex.Message);
+                }
             }
         }
     }

@@ -96,6 +96,9 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<long?>("OrderId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("ProductVariantId")
                         .HasColumnType("bigint");
 
@@ -106,6 +109,8 @@ namespace BusinessObject.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("AssetInformationId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductVariantId");
 
@@ -261,7 +266,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 4, 17, 21, 15, 502, DateTimeKind.Local).AddTicks(254)
+                            StartDate = new DateTime(2023, 10, 4, 22, 6, 29, 238, DateTimeKind.Local).AddTicks(4635)
                         });
                 });
 
@@ -537,9 +542,6 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderId"), 1L, 1);
 
-                    b.Property<long>("AssetInformationId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("BusinessFeeId")
                         .HasColumnType("bigint");
 
@@ -568,8 +570,6 @@ namespace BusinessObject.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("AssetInformationId");
 
                     b.HasIndex("BusinessFeeId");
 
@@ -1230,6 +1230,10 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.AssetInformation", b =>
                 {
+                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                        .WithMany("AssetInformation")
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
                         .WithMany("AssetInformation")
                         .HasForeignKey("ProductVariantId")
@@ -1239,6 +1243,8 @@ namespace BusinessObject.Migrations
                     b.HasOne("BusinessObject.Entities.User", null)
                         .WithMany("AssetInformation")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Order");
 
                     b.Navigation("ProductVariant");
                 });
@@ -1346,12 +1352,6 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.AssetInformation", "AssetInformation")
-                        .WithMany()
-                        .HasForeignKey("AssetInformationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BusinessObject.Entities.BusinessFee", "BusinessFee")
                         .WithMany("Orders")
                         .HasForeignKey("BusinessFeeId")
@@ -1375,8 +1375,6 @@ namespace BusinessObject.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("AssetInformation");
 
                     b.Navigation("BusinessFee");
 
@@ -1639,6 +1637,8 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
+                    b.Navigation("AssetInformation");
+
                     b.Navigation("OrderCoupons");
                 });
 

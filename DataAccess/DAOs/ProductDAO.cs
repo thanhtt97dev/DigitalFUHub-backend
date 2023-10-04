@@ -104,7 +104,7 @@ namespace DataAccess.DAOs
 						ProductVariantId = variant.ProductVariantId,
 						Name = variant.Name,
 						Price = variant.Price,
-						Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId && x.IsActive == true)
+						Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId && x.IsActive == false)
 					};
 
                     variants.Add(productVariantResp);

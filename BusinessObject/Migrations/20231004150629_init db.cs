@@ -606,35 +606,6 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AssetInformation",
-                columns: table => new
-                {
-                    AssetInformationId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductVariantId = table.Column<long>(type: "bigint", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Asset = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<long>(type: "bigint", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AssetInformation", x => x.AssetInformationId);
-                    table.ForeignKey(
-                        name: "FK_AssetInformation_ProductVariant_ProductVariantId",
-                        column: x => x.ProductVariantId,
-                        principalTable: "ProductVariant",
-                        principalColumn: "ProductVariantId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AssetInformation_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "UserId");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Cart",
                 columns: table => new
                 {
@@ -667,7 +638,6 @@ namespace BusinessObject.Migrations
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     ProductVariantId = table.Column<long>(type: "bigint", nullable: false),
                     BusinessFeeId = table.Column<long>(type: "bigint", nullable: false),
-                    AssetInformationId = table.Column<long>(type: "bigint", nullable: false),
                     Quantity = table.Column<long>(type: "bigint", nullable: false),
                     Price = table.Column<long>(type: "bigint", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -678,12 +648,6 @@ namespace BusinessObject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Order", x => x.OrderId);
-                    table.ForeignKey(
-                        name: "FK_Order_AssetInformation_AssetInformationId",
-                        column: x => x.AssetInformationId,
-                        principalTable: "AssetInformation",
-                        principalColumn: "AssetInformationId",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Order_BusinessFee_BusinessFeeId",
                         column: x => x.BusinessFeeId,
@@ -703,6 +667,41 @@ namespace BusinessObject.Migrations
                         principalColumn: "ProductVariantId");
                     table.ForeignKey(
                         name: "FK_Order_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AssetInformation",
+                columns: table => new
+                {
+                    AssetInformationId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductVariantId = table.Column<long>(type: "bigint", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Asset = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrderId = table.Column<long>(type: "bigint", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssetInformation", x => x.AssetInformationId);
+                    table.ForeignKey(
+                        name: "FK_AssetInformation_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "OrderId");
+                    table.ForeignKey(
+                        name: "FK_AssetInformation_ProductVariant_ProductVariantId",
+                        column: x => x.ProductVariantId,
+                        principalTable: "ProductVariant",
+                        principalColumn: "ProductVariantId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AssetInformation_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "UserId");
@@ -791,7 +790,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "BusinessFee",
                 columns: new[] { "BusinessFeeId", "Fee", "StartDate" },
-                values: new object[] { 1L, 5L, new DateTime(2023, 10, 4, 17, 21, 15, 502, DateTimeKind.Local).AddTicks(254) });
+                values: new object[] { 1L, 5L, new DateTime(2023, 10, 4, 22, 6, 29, 238, DateTimeKind.Local).AddTicks(4635) });
 
             migrationBuilder.InsertData(
                 table: "Category",
@@ -858,6 +857,11 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AssetInformation_OrderId",
+                table: "AssetInformation",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AssetInformation_ProductVariantId",
                 table: "AssetInformation",
                 column: "ProductVariantId");
@@ -911,11 +915,6 @@ namespace BusinessObject.Migrations
                 name: "IX_Notification_UserId",
                 table: "Notification",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Order_AssetInformationId",
-                table: "Order",
-                column: "AssetInformationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_BusinessFeeId",
@@ -1044,6 +1043,9 @@ namespace BusinessObject.Migrations
                 name: "AccessToken");
 
             migrationBuilder.DropTable(
+                name: "AssetInformation");
+
+            migrationBuilder.DropTable(
                 name: "Cart");
 
             migrationBuilder.DropTable(
@@ -1101,25 +1103,22 @@ namespace BusinessObject.Migrations
                 name: "WithdrawTransaction");
 
             migrationBuilder.DropTable(
-                name: "AssetInformation");
-
-            migrationBuilder.DropTable(
                 name: "BusinessFee");
 
             migrationBuilder.DropTable(
                 name: "OrderStatus");
 
             migrationBuilder.DropTable(
-                name: "UserBank");
-
-            migrationBuilder.DropTable(
                 name: "ProductVariant");
 
             migrationBuilder.DropTable(
-                name: "Bank");
+                name: "UserBank");
 
             migrationBuilder.DropTable(
                 name: "Product");
+
+            migrationBuilder.DropTable(
+                name: "Bank");
 
             migrationBuilder.DropTable(
                 name: "Category");

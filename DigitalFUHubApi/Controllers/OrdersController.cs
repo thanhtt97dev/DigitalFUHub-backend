@@ -27,12 +27,12 @@ namespace DigitalFUHubApi.Controllers
 
         [HttpPost("AddOrder")]
         //[Authorize]
-        public IActionResult AddOrder([FromBody] AddOrderRequestDTO addOrderRequest)
+        public IActionResult AddOrder([FromBody] List<AddOrderRequestDTO> addOrderRequest)
         {
             try
             {
-                Order order = _mapper.Map<Order>(addOrderRequest);
-                _repository.AddOrder(order);
+                List<Order> orders = _mapper.Map<List<Order>>(addOrderRequest);
+                _repository.AddOrder(orders);
                 return Ok(new Status
                 {
                     Message = "Add Order Successfully"
