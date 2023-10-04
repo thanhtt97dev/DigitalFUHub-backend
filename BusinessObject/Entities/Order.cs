@@ -25,7 +25,6 @@ namespace BusinessObject.Entities
         public long TotalAmount { get; set; }
         public bool IsFeedback { get; set; }
         public long OrderStatusId { get; set; }
-        public DateTime DateOrder { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
