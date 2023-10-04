@@ -19,7 +19,7 @@ namespace BusinessObject.Entities
         public DateTime ExpiredDate { get; set; }
         public bool IsRevoked { get; set; }
 
-        [ForeignKey(nameof(UserId))]
+		[ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
     }
 }
