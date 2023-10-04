@@ -13,6 +13,7 @@ using DTOs.MbBank;
 using System.Security.Cryptography.Xml;
 using Microsoft.Data.SqlClient.Server;
 using Comons;
+using System.Transactions;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -920,8 +921,9 @@ namespace DigitalFUHubApi.Controllers
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 
-			int[] acceptedTransactionType = new int[] { 0, 1, 2, 3, 4 };
-			if (!acceptedTransactionType.Contains(requestDTO.TransactionTypeId))
+			const int TRANSACTION_TYPE_ALL = 0;
+			int[] transactionTypes = Constants.TRANSACTION_STATUS;
+			if (!transactionTypes.Contains(requestDTO.TransactionTypeId) && requestDTO.TransactionTypeId != TRANSACTION_TYPE_ALL)
 			{
 				status.Message = "Invalid transaction type id!";
 				status.Ok = false;

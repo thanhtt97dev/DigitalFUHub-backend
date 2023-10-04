@@ -18,7 +18,10 @@ namespace BusinessObject.Entities
 		public DateTime? CreateDate { get; set; }
 		public DateTime? UpdateDate { get; set; }
 		public string? Asset { get; set; }
+		public long? OrderId { get; set; }
 		public bool IsActive { get; set; }
+		[ForeignKey(nameof(OrderId))]
+		public virtual Order? Order { get; set; } = null!;
 
 		[ForeignKey(nameof(ProductVariantId))]
 		public virtual ProductVariant ProductVariant { get; set; } = null!;
