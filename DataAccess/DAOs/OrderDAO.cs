@@ -150,26 +150,36 @@ namespace DataAccess.DAOs
                         context.Order.Add(order);
                         context.SaveChanges();
 
-                        var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == false).Take(order.Quantity).ToList();
-
+                        var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
+						if (assetInformations.Count < order.Quantity) throw new Exception();
 
                         foreach (var asset in assetInformations)
                         {
                             asset.OrderId = order.OrderId;
-							asset.IsActive = true;
+							asset.IsActive = false;
                         }
 
                         context.AssetInformation.UpdateRange(assetInformations);
 
-                        // add new transaction
-                        Transaction newTransaction = new Transaction
+						//update customer account balance
+						var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
+						if (customer == null) throw new NullReferenceException();
+						if (customer.AccountBalance < order.TotalAmount) throw new Exception();
+						customer.AccountBalance = customer.AccountBalance - order.TotalAmount;
+
+						//update admin account balance
+						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+						admin.AccountBalance = admin.AccountBalance + order.TotalAmount;
+
+						// add new transaction
+						Transaction newTransaction = new Transaction
                         {
                             UserId = order.UserId,
                             TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
                             OrderId = order.OrderId,
                             PaymentAmount = order.TotalAmount,
                             Note = "Thanh toan",
-                            DateCreate = new DateTime()
+                            DateCreate = DateTime.Now
                         };
 
                         context.Transaction.Add(newTransaction);
