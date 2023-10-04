@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class init : Migration
+    public partial class initdb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -22,6 +22,20 @@ namespace BusinessObject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Bank", x => x.BankId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BusinessFee",
+                columns: table => new
+                {
+                    BusinessFeeId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fee = table.Column<long>(type: "bigint", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusinessFee", x => x.BusinessFeeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -62,20 +76,6 @@ namespace BusinessObject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrderStatus", x => x.OrderStatusId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PlatformFee",
-                columns: table => new
-                {
-                    PlatformFeeId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Fee = table.Column<long>(type: "bigint", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PlatformFee", x => x.PlatformFeeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -274,7 +274,7 @@ namespace BusinessObject.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    ShopName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShopName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Balance = table.Column<long>(type: "bigint", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -666,18 +666,30 @@ namespace BusinessObject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     ProductVariantId = table.Column<long>(type: "bigint", nullable: false),
-                    PlatformFeeId = table.Column<long>(type: "bigint", nullable: false),
+                    BusinessFeeId = table.Column<long>(type: "bigint", nullable: false),
+                    AssetInformationId = table.Column<long>(type: "bigint", nullable: false),
                     Quantity = table.Column<long>(type: "bigint", nullable: false),
                     Price = table.Column<long>(type: "bigint", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<long>(type: "bigint", nullable: false),
                     IsFeedback = table.Column<bool>(type: "bit", nullable: false),
-                    OrderStatusId = table.Column<long>(type: "bigint", nullable: false),
-                    DateOrder = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    OrderStatusId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Order", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_Order_AssetInformation_AssetInformationId",
+                        column: x => x.AssetInformationId,
+                        principalTable: "AssetInformation",
+                        principalColumn: "AssetInformationId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Order_BusinessFee_BusinessFeeId",
+                        column: x => x.BusinessFeeId,
+                        principalTable: "BusinessFee",
+                        principalColumn: "BusinessFeeId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Order_OrderStatus_OrderStatusId",
                         column: x => x.OrderStatusId,
@@ -685,17 +697,10 @@ namespace BusinessObject.Migrations
                         principalColumn: "OrderStatusId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Order_PlatformFee_PlatformFeeId",
-                        column: x => x.PlatformFeeId,
-                        principalTable: "PlatformFee",
-                        principalColumn: "PlatformFeeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Order_ProductVariant_ProductVariantId",
                         column: x => x.ProductVariantId,
                         principalTable: "ProductVariant",
-                        principalColumn: "ProductVariantId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ProductVariantId");
                     table.ForeignKey(
                         name: "FK_Order_User_UserId",
                         column: x => x.UserId,
@@ -784,6 +789,11 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "BusinessFee",
+                columns: new[] { "BusinessFeeId", "Fee", "StartDate" },
+                values: new object[] { 1L, 5L, new DateTime(2023, 10, 4, 17, 21, 15, 502, DateTimeKind.Local).AddTicks(254) });
+
+            migrationBuilder.InsertData(
                 table: "Category",
                 columns: new[] { "CategoryId", "CategoryName" },
                 values: new object[,]
@@ -801,14 +811,10 @@ namespace BusinessObject.Migrations
                     { 1L, "Wait for customer confirmation" },
                     { 2L, "Confirmed" },
                     { 3L, "Complaint" },
-                    { 4L, "Reject Complaint" },
-                    { 5L, "Accept Complaint" }
+                    { 4L, "Dispute" },
+                    { 5L, "Reject Complaint" },
+                    { 6L, "Seller violates" }
                 });
-
-            migrationBuilder.InsertData(
-                table: "PlatformFee",
-                columns: new[] { "PlatformFeeId", "Fee", "StartDate" },
-                values: new object[] { 1L, 5L, new DateTime(2023, 10, 3, 10, 36, 55, 333, DateTimeKind.Local).AddTicks(289) });
 
             migrationBuilder.InsertData(
                 table: "ProductStatus",
@@ -907,20 +913,24 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Order_AssetInformationId",
+                table: "Order",
+                column: "AssetInformationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_BusinessFeeId",
+                table: "Order",
+                column: "BusinessFeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Order_OrderStatusId",
                 table: "Order",
                 column: "OrderStatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_PlatformFeeId",
-                table: "Order",
-                column: "PlatformFeeId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Order_ProductVariantId",
                 table: "Order",
-                column: "ProductVariantId",
-                unique: true);
+                column: "ProductVariantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_UserId",
@@ -1034,9 +1044,6 @@ namespace BusinessObject.Migrations
                 name: "AccessToken");
 
             migrationBuilder.DropTable(
-                name: "AssetInformation");
-
-            migrationBuilder.DropTable(
                 name: "Cart");
 
             migrationBuilder.DropTable(
@@ -1094,22 +1101,25 @@ namespace BusinessObject.Migrations
                 name: "WithdrawTransaction");
 
             migrationBuilder.DropTable(
+                name: "AssetInformation");
+
+            migrationBuilder.DropTable(
+                name: "BusinessFee");
+
+            migrationBuilder.DropTable(
                 name: "OrderStatus");
-
-            migrationBuilder.DropTable(
-                name: "PlatformFee");
-
-            migrationBuilder.DropTable(
-                name: "ProductVariant");
 
             migrationBuilder.DropTable(
                 name: "UserBank");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "ProductVariant");
 
             migrationBuilder.DropTable(
                 name: "Bank");
+
+            migrationBuilder.DropTable(
+                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "Category");

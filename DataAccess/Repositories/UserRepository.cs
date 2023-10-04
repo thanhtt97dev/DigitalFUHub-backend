@@ -34,5 +34,16 @@ namespace DataAccess.Repositories
 		public async Task<User?> GetUser(string email, string username, string fullname) => await UserDAO.Instance.GetUser(email, username, fullname);
 
 		public async Task UpdateUser(User user) => await UserDAO.Instance.UpdateUser(user);
-	}
+
+        public void UpdateBalance(long id, long newAccountBalance)
+        {
+			var user = UserDAO.Instance.GetUserById(id);
+			if (user == null) {
+				throw new NullReferenceException("Could not find user with ID = " + id);
+			}
+			user.AccountBalance = newAccountBalance;
+
+            _ = UserDAO.Instance.UpdateUser(user);
+        }
+    }
 }

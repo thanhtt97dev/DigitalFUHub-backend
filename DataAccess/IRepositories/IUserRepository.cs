@@ -28,5 +28,6 @@ namespace DataAccess.IRepositories
 		Task<bool> IsExistUsernameOrEmail(string username, string email);
 		Task<User?> GetUser(string email, string username, string fullname);
 		Task UpdateUser(User user);
+		void UpdateBalance (long id, long balance);
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
 using Comons;
+using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.DAOs
@@ -134,5 +135,31 @@ namespace DataAccess.DAOs
 			}
 			return orders;
 		}
-	}
+
+        internal void AddOrder(Order order)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                context.Order.Add(order);
+				context.SaveChanges();
+
+
+                // add new transaction
+                Transaction newTransaction = new Transaction
+				{
+					UserId = order.UserId,
+					TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
+					OrderId = order.OrderId,
+					PaymentAmount = order.TotalAmount,
+					Note = "Thanh toan",
+					DateCreate = new DateTime()
+				};
+
+				context.Transaction.Add(newTransaction);
+				context.SaveChanges();
+
+            }
+        }
+    }
 }
+

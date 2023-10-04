@@ -14,8 +14,9 @@
 	using BusinessObject.Entities;
 	using DTOs.User;
 	using System.Net;
+    using global::Comons;
 
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -569,8 +570,37 @@
 		}
 		#endregion
 
-		#region Check Exist Email
-		[HttpGet("CheckExistEmail/{email}")]
+
+		#region Update balance
+		//[Authorize]
+		[HttpPut("UpdateBalance/{id}")]
+        public IActionResult UpdateBalance(long id, UpdateAccountBalanceRequestDTO updateAccountBalanceRequest)
+        {
+            try
+            {
+                _userRepository.UpdateBalance(id, updateAccountBalanceRequest.AccountBalance);
+                return Ok(new Status
+                {
+                    Message = "Update Account Balance Successfully",
+                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
+                    Ok = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Status
+                {
+                    Message = ex.Message,
+                    ResponseCode = Constants.RESPONSE_CODE_FAILD,
+                    Ok = false
+                });
+            }
+        }
+        #endregion
+
+
+        #region Check Exist Email
+        [HttpGet("CheckExistEmail/{email}")]
 		public async Task<IActionResult> CheckExistEmail(string email)
 		{
 			User? user = await _userRepository.GetUserByEmail(email);
