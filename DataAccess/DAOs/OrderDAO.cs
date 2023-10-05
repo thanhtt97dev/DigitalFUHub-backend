@@ -200,42 +200,87 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				Order? order = context.Order
-					.Include(order => order.BusinessFee)
-					.Include(order => order.ProductVariant)
-					.FirstOrDefault(x => x.OrderId == orderId);
-
-				if (order == null) return null;
-				var customer = context.User.First(x => x.UserId == order.UserId);
-
-				var sellerId = context.Product.First(x => x.ProductId == order.ProductVariant.ProductId).ShopId;
-				var shop = context.Shop
-						.Select(shop => new Shop
-						{
-							UserId = shop.UserId,
-							ShopName = shop.ShopName,
-						})
-						.First(x => x.UserId == sellerId);
-				var productMedias = context.ProductMedia.Where(x => x.ProductId == order.ProductVariant.ProductId).ToList();
-				var assetInfomations = context.AssetInformation
-					.Select(asset => new AssetInformation
-					{
-						AssetInformationId = asset.AssetInformationId,
-						OrderId = orderId,
-						Asset = asset.Asset
-					})
-					.Where(x => x.OrderId == orderId)
-					.ToList();
-				var orderCoupons = context.OrderCoupon
-					.Include(x => x.Coupon)
-					.Where(x => x.OrderId == orderId)
-					.ToList();
-
-				order.AssetInformations = assetInfomations;
-				order.OrderCoupons = orderCoupons;
-				order.ProductVariant.Product.Shop = shop;
-				order.ProductVariant.Product.ProductMedias = productMedias;
-				order.User = customer;
+				Order? order = (from o in context.Order
+								join user in context.User
+									on o.UserId equals user.UserId
+								join businessFee in context.BusinessFee
+									on o.BusinessFeeId equals businessFee.BusinessFeeId
+								join productVariant in context.ProductVariant
+									on o.ProductVariantId equals productVariant.ProductVariantId
+								join product in context.Product
+									on productVariant.ProductId equals product.ProductId
+								join shop in context.Shop
+									on product.ShopId equals shop.UserId
+								join category in context.Category
+									on product.CategoryId equals category.CategoryId
+								where o.OrderId == orderId
+								select new Order
+								{
+									OrderId = orderId,
+									UserId = o.UserId,
+									ProductVariantId = o.ProductVariantId,
+									BusinessFeeId = o.BusinessFeeId,
+									Quantity = o.Quantity,
+									OrderDate = o.OrderDate,
+									TotalAmount = o.TotalAmount,
+									IsFeedback = o.IsFeedback,
+									OrderStatusId = o.OrderStatusId,
+									User = new User
+									{
+										UserId = o.UserId,
+										Email = user.Email,
+									},
+									ProductVariant = new ProductVariant
+									{
+										ProductVariantId = productVariant.ProductVariantId,
+										ProductId = productVariant.ProductId,
+										Product = new Product
+										{
+											ProductId = productVariant.ProductId,
+											ProductName = product.ProductName,
+											Thumbnail = product.Thumbnail,
+											Category = new Category 
+											{
+												CategoryId = category.CategoryId,
+												CategoryName = category.CategoryName 
+											},
+											Shop = new Shop
+											{
+												UserId = shop.UserId,
+												ShopName = shop.ShopName,
+											},
+											ProductMedias = (from productMedia in context.ProductMedia
+															where productMedia.ProductId == productMedia.ProductId	
+															select new ProductMedia { Url = productMedia.Url}
+															).ToList()
+										}
+									},
+									BusinessFee = new BusinessFee
+									{
+										BusinessFeeId = businessFee.BusinessFeeId,
+										Fee = businessFee.Fee,
+									},
+									AssetInformations = (from assetInformation in context.AssetInformation
+														 where assetInformation.OrderId == orderId
+														 select new AssetInformation { Asset = assetInformation.Asset}
+														).ToList(),
+									OrderCoupons = (from orderCoupon in context.OrderCoupon
+													join coupon in context.Coupon
+														on orderCoupon.CouponId equals coupon.CouponId
+													where orderCoupon.OrderId == orderId
+													select new OrderCoupon
+													{
+														PriceDiscount = orderCoupon.PriceDiscount,
+														UseDate = orderCoupon.UseDate,
+														Coupon = new Coupon 
+														{ 
+															CouponId = coupon.CouponId,	
+															CouponName = coupon.CouponName,
+														} 
+													}
+													).ToList(),
+								})
+							   .FirstOrDefault();
 
 				return order;
 			}

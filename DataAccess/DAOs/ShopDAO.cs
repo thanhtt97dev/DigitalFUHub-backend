@@ -96,7 +96,7 @@ namespace DataAccess.DAOs
 							ProductStatusId = x.ProductStatusId,
 							Tags = x.Tags,
 							Thumbnail = x.Thumbnail,
-							ProductVariants = context.ProductVariant.Include(i => i.AssetInformation.Where(x => x.IsActive == true)).Where(x => x.ProductId == productId && x.isActivate == true).ToList(),
+							ProductVariants = context.ProductVariant.Include(i => i.AssetInformations.Where(x => x.IsActive == true)).Where(x => x.ProductId == productId && x.isActivate == true).ToList(),
 						}).First();
 				return product;
 			}

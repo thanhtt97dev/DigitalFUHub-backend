@@ -2697,19 +2697,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dell\\.nuget\\packages\\": {}
+    "C:\\Users\\dell\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
+      "projectUniqueName": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
       "projectName": "DataAccess",
-      "projectPath": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
+      "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
       "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-      "outputPath": "E:\\fpt\\fu-market-backend\\DataAccess\\obj\\",
+      "outputPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2723,14 +2728,14 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
-              "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj"
             },
-            "E:\\fpt\\fu-market-backend\\Comons\\Comons.csproj": {
-              "projectPath": "E:\\fpt\\fu-market-backend\\Comons\\Comons.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\Comons\\Comons.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\Comons\\Comons.csproj"
             },
-            "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj": {
-              "projectPath": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj"
             }
           }
         }
@@ -2760,16 +2765,8 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file E:\\fpt\\fu-market-backend\\DataAccess\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  }
 }

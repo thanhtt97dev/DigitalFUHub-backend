@@ -175,7 +175,7 @@ namespace DigitalFUHubApi.Controllers
 					{
 						Name = request.NameVariants[i],
 						Price = request.PriceVariants[i],
-						AssetInformation = assetInformation,
+						AssetInformations = assetInformation,
 						isActivate = true,
 					});
 				}
@@ -280,7 +280,7 @@ namespace DigitalFUHubApi.Controllers
 						Price = request.ProductVariantPriceUpdate[i],
 						ProductId = request.ProductId,
 						ProductVariantId = request.ProductVariantIdUpdate[i],
-						AssetInformation = request.ProductVariantFileUpdate.Count == 0 || request.ProductVariantFileUpdate[i] == null ? null : Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileUpdate[i]),
+						AssetInformations = request.ProductVariantFileUpdate.Count == 0 || request.ProductVariantFileUpdate[i] == null ? null : Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileUpdate[i]),
 					});
 				}
 				List<ProductVariant> productVariantsNew = new List<ProductVariant>();
@@ -288,7 +288,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					productVariantsNew.Add(new ProductVariant
 					{
-						AssetInformation = Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileNew[i]),
+						AssetInformations = Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileNew[i]),
 						isActivate = true,
 						Name = request.ProductVariantNameNew[i],
 						Price = request.ProductVariantPriceNew[i],

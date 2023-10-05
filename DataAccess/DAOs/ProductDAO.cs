@@ -223,7 +223,7 @@ namespace DataAccess.DAOs
 							if (productVariant != null)
 							{
 								// delete old data and add new data
-								if (item.AssetInformation != null || item.AssetInformation?.Count > 0)
+								if (item.AssetInformations != null || item.AssetInformations?.Count > 0)
 								{
 									IQueryable<AssetInformation> assetInformations = context.AssetInformation.Where(x => x.IsActive == true && x.ProductVariantId == item.ProductVariantId);
 									context.AssetInformation.RemoveRange(assetInformations);
@@ -238,7 +238,7 @@ namespace DataAccess.DAOs
 									//		IsActive = true
 									//	});
 									//}
-									productVariant.AssetInformation = item.AssetInformation;
+									productVariant.AssetInformations = item.AssetInformations;
 								}
 								productVariant.Name = item.Name;
 								productVariant.Price = item.Price;
@@ -250,7 +250,7 @@ namespace DataAccess.DAOs
 							context.ProductVariant.Add(new ProductVariant
 							{
 								isActivate = true,
-								AssetInformation = item.AssetInformation,
+								AssetInformations = item.AssetInformations,
 								Price = item.Price,
 								Name = item.Name,
 								ProductId = productE.ProductId,
