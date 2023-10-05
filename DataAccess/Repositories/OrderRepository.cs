@@ -35,5 +35,8 @@ namespace DataAccess.Repositories
 
             OrderDAO.Instance.AddOrder(orders);
         }
-    }
+
+		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
+
+	}
 }
