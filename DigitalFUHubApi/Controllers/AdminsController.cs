@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalFUHubApi.Controllers
 {
-	[Authorize(Roles ="Admin")]
+	//[Authorize(Roles ="Admin")]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class AdminsController : ControllerBase
@@ -79,6 +79,43 @@ namespace DigitalFUHubApi.Controllers
 
 				var orders = orderRepository.GetOrders(orderId, requestDTO.CustomerEmail, requestDTO.ShopName, fromDate, toDate, requestDTO.Status);
 				var result = mapper.Map<List<OrdersResponseDTO>>(orders);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get order
+		[HttpPost("GetOrder/{id}")]
+		public IActionResult GetOrders(int id)
+		{
+			if (id == 0) return BadRequest();
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			
+			try
+			{
+
+				var order = orderRepository.GetOrder(id);
+				if(order == null)
+				{
+					status.Message = "Order not existed!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var result = mapper.Map<OrderDetailResponseDTO>(order);	
 
 				status.Message = "Success!";
 				status.Ok = true;
