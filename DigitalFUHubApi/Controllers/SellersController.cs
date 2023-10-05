@@ -233,14 +233,15 @@ namespace DigitalFUHubApi.Controllers
 		public async Task<ActionResult<ResponseData>> EditProduct(long productId, [FromForm] EditProductRequestDTO request)
 		{
 			ResponseData response = new ResponseData();
-			//if (!ModelState.IsValid)
-			//{
-			//	response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-			//	response.Status.Ok = false;
-			//	response.Status.Message = "Vui lòng kiểm tra lại dữ liệu.";
-			//	return response;
-			//}
 			if (productId != request.ProductId)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				response.Status.Ok = false;
+				response.Status.Message = "Sản phẩm không hợp lệ.";
+				return response;
+			}
+			bool isHasProduct = _shopRepository.ShopHasProduct(request.UserId, request.ProductId);
+			if (!isHasProduct)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
 				response.Status.Ok = false;
@@ -302,7 +303,7 @@ namespace DigitalFUHubApi.Controllers
 					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.ProductThumbnail.FileName.Substring(request.ProductThumbnail.FileName.LastIndexOf(".")));
 					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnail, filename);
 				}
-				
+
 				Product product = new Product
 				{
 					ProductId = request.ProductId,
@@ -351,7 +352,7 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="request"></param>
 		/// <returns>response</returns>
 		[HttpPost("Register")]
-		public  ActionResult<ResponseData> Register(RegisterShopRequestDTO request)
+		public ActionResult<ResponseData> Register(RegisterShopRequestDTO request)
 		{
 			ResponseData response = new ResponseData();
 			if (!ModelState.IsValid)
@@ -364,12 +365,12 @@ namespace DigitalFUHubApi.Controllers
 			User? user;
 			try
 			{
-				 _shopRepository.CreateShop(request);
+				_shopRepository.CreateShop(request);
 				user = _userRepository.GetUserById(request.UserId);
 				if (user == null) throw new Exception("Người dùng không khả dụng.");
 				user.RoleId = Constants.SELLER_ROLE;
 				user.Role = null!;
-				 _userRepository.UpdateUser(user);
+				_userRepository.UpdateUser(user);
 			}
 			catch (Exception e)
 			{
