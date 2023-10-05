@@ -196,7 +196,7 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Check token confirm email
-		internal async Task<bool> CheckTokenConfirmEmailAsync(string token)
+		internal bool CheckTokenConfirmEmail(string token)
 		{
 
 			JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
@@ -225,7 +225,7 @@ namespace DigitalFUHubApi.Services
 			string? email = tokenVerification.Claims.First(x => x.Type == ClaimTypes.Email).Value;
 			string? fullname = tokenVerification.Claims.First(x => x.Type == ClaimTypes.GivenName).Value;
 			if (fullname == null || username == null || email == null) throw new NullReferenceException("invalid");
-			User? user = await _userRepository.GetUser(email, username, fullname);
+			User? user = _userRepository.GetUser(email, username, fullname);
 			if (user == null) throw new NullReferenceException("invalid");
 			if (user.IsConfirm) return false;
 			long utcExpireDate = long.Parse(tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -235,7 +235,7 @@ namespace DigitalFUHubApi.Services
 			if (expireDate < DateTime.UtcNow) throw new ArgumentOutOfRangeException("expired");
 
 			user.IsConfirm = true;
-			await _userRepository.UpdateUser(user);
+			_userRepository.UpdateUser(user);
 			return true;
 		}
 		#endregion

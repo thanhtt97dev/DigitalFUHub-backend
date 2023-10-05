@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-    internal class UserDAO
+	internal class UserDAO
 	{
 		private static UserDAO? instance;
 		private static readonly object instanceLock = new object();
@@ -71,16 +71,16 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal async Task EditUserInfo(int id, User userUpdate)
+		internal void EditUserInfo(int id, User userUpdate)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var user = await context.User.FirstAsync(x => x.UserId == id);
-                    user.Avatar = userUpdate.Avatar ?? user.Avatar;
-					user.Fullname = userUpdate.Fullname ?? user.Fullname;
-					user.Username = userUpdate.Username ?? user.Username;
-					user.Password = userUpdate.Password ?? user.Password;
-                await context.SaveChangesAsync();
+				var user = context.User.First(x => x.UserId == id);
+				user.Avatar = userUpdate.Avatar ?? user.Avatar;
+				user.Fullname = userUpdate.Fullname ?? user.Fullname;
+				user.Username = userUpdate.Username ?? user.Username;
+				user.Password = userUpdate.Password ?? user.Password;
+				context.SaveChanges();
 			}
 		}
 
@@ -95,23 +95,22 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal async Task<User?> GetUserByEmail(string? email)
+		internal User? GetUserByEmail(string? email)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				if (email == null) return null;
-				return await context.User.Include(x => x.Role).FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
+				return context.User.Include(x => x.Role).FirstOrDefault(x => x.Email.ToLower() == email.ToLower());
 			}
 		}
 
-		internal async Task AddUser(User user)
+		internal void AddUser(User user)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				try
 				{
-					await context.User.AddAsync(user);
-					await context.SaveChangesAsync();
+					context.User.Add(user);
+					context.SaveChanges();
 				}
 				catch (Exception e)
 				{
@@ -120,38 +119,38 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal async Task<User?> GetUserByUsername(string username)
+		internal User? GetUserByUsername(string username)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return await context.User.Include(x => x.Role).FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
+				return context.User.Include(x => x.Role).FirstOrDefault(x => x.Username.ToLower() == username.ToLower());
 			}
 		}
 
-		internal async Task<bool> IsExistUsernameOrEmail(string username, string email)
+		internal bool IsExistUsernameOrEmail(string username, string email)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return await context.User.AnyAsync(x=> x.Username.ToLower() == username.ToLower() || x.Email.ToLower() == email.ToLower());
+				return context.User.Any(x => x.Username.ToLower() == username.ToLower() || x.Email.ToLower() == email.ToLower());
 			}
 		}
 
-		internal async Task<User?> GetUser(string email, string username, string fullname)
+		internal User? GetUser(string email, string username, string fullname)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return await context.User.FirstOrDefaultAsync(x => x.Username == username && x.Email == email && x.Fullname == fullname);
+				return context.User.FirstOrDefault(x => x.Username == username && x.Email == email && x.Fullname == fullname);
 			}
 		}
 
-		internal async Task UpdateUser(User user)
+		internal void UpdateUser(User user)
 		{
 			try
 			{
 				using (DatabaseContext context = new DatabaseContext())
 				{
 					context.User.Update(user);
-					await context.SaveChangesAsync();
+					context.SaveChanges();
 				}
 			}
 			catch (Exception e)

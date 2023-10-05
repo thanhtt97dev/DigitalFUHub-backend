@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-    internal class ShopDAO
+	internal class ShopDAO
 	{
 		private static ShopDAO? instance;
 		private static readonly object instanceLock = new object();
@@ -32,15 +32,15 @@ namespace DataAccess.DAOs
 			}
 		}
 
-	
 
-		internal async Task CreateShopAsync(RegisterShopRequestDTO request)
+
+		internal void CreateShop(RegisterShopRequestDTO request)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				try
 				{
-					bool userShopExist = await context.Shop.AnyAsync(x => x.UserId == request.UserId);
+					bool userShopExist = context.Shop.Any(x => x.UserId == request.UserId);
 					if (userShopExist) throw new Exception("Đã tồn tại cửa hàng không thể tạo thêm.");
 					Shop shop = new Shop()
 					{
@@ -52,39 +52,39 @@ namespace DataAccess.DAOs
 						UserId = request.UserId,
 					};
 					context.Shop.Add(shop);
-					await context.SaveChangesAsync();
+					context.SaveChanges();
 				}
 				catch (Exception e)
 				{
 
 					throw new Exception(e.Message);
 				}
-				
+
 			}
 		}
 
-		internal async Task<bool> UserHasShopAsync(long userId)
+		internal bool UserHasShop(long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return await context.Shop.AnyAsync(x => x.UserId == userId);
+				return context.Shop.Any(x => x.UserId == userId);
 			}
 		}
 
-		internal async Task<bool> ShopHasProductAsync(long userId, long productId)
+		internal bool ShopHasProduct(long userId, long productId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return await context.Shop.Include(i => i.Products)
-					.AnyAsync(x => x.UserId == userId && x.Products.Any(x => x.ProductId == productId));
+				return context.Shop.Include(i => i.Products)
+					.Any(x => x.UserId == userId && x.Products.Any(x => x.ProductId == productId));
 			}
 		}
 
-		internal async Task<Product> GetProductByIdAsync(long productId)
+		internal Product GetProductById(long productId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				Product product = await context.Product.Where(x => x.ProductId == productId)
+				Product product = context.Product.Where(x => x.ProductId == productId)
 						.Select(x => new Product
 						{
 							ProductId = productId,
@@ -97,7 +97,7 @@ namespace DataAccess.DAOs
 							Tags = x.Tags,
 							Thumbnail = x.Thumbnail,
 							ProductVariants = context.ProductVariant.Include(i => i.AssetInformation.Where(x => x.IsActive == true)).Where(x => x.ProductId == productId && x.isActivate == true).ToList(),
-						}).FirstAsync();
+						}).First();
 				return product;
 			}
 		}

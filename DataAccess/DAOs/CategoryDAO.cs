@@ -28,15 +28,15 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal async Task<List<Category>> GetAllAsync()
+		internal List<Category> GetAll()
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return await context.Category.Select(x => new Category
+				return context.Category.Select(x => new Category
 				{
 					CategoryId = x.CategoryId,
 					CategoryName = x.CategoryName,
-				}).ToListAsync();
+				}).ToList();
 			}
 		}
 	}

@@ -19,23 +19,22 @@ namespace DataAccess.Repositories
 		public List<User> GetUsers(UserRequestDTO userDTO) => UserDAO.Instance.GetUsers(userDTO);
 		public User? GetUserById(long id) => UserDAO.Instance.GetUserById(id);
 
-		public Task EditUserInfo(int id, User user) => UserDAO.Instance.EditUserInfo(id,user);
+		public void EditUserInfo(int id, User user) => UserDAO.Instance.EditUserInfo(id,user);
 
 		public void Update2FA(int id) => UserDAO.Instance.Update2FA(id);
 
-		public async Task<User?> GetUserByEmail(string? email) => await UserDAO.Instance.GetUserByEmail(email);
+		public User? GetUserByEmail(string? email) =>  UserDAO.Instance.GetUserByEmail(email);
 
-		public async Task AddUser(User user) => await UserDAO.Instance.AddUser(user);
+		public void AddUser(User user) =>  UserDAO.Instance.AddUser(user);
 
-		public async Task<User?> GetUserByUsername(string username) => await UserDAO.Instance.GetUserByUsername(username);
+		public User? GetUserByUsername(string username) =>  UserDAO.Instance.GetUserByUsername(username);
 
-		public async Task<bool> IsExistUsernameOrEmail(string username, string email) => await UserDAO.Instance.IsExistUsernameOrEmail(username, email);
+		public bool IsExistUsernameOrEmail(string username, string email) =>  UserDAO.Instance.IsExistUsernameOrEmail(username, email);
 
-		public async Task<User?> GetUser(string email, string username, string fullname) => await UserDAO.Instance.GetUser(email, username, fullname);
+		public User? GetUser(string email, string username, string fullname) =>  UserDAO.Instance.GetUser(email, username, fullname);
 
-		public async Task UpdateUser(User user) => await UserDAO.Instance.UpdateUser(user);
-
-        public void UpdateBalance(long id, long newAccountBalance)
+		public void UpdateUser(User user) => UserDAO.Instance.UpdateUser(user);
+		public void UpdateBalance(long id, long newAccountBalance)
         {
 			var user = UserDAO.Instance.GetUserById(id);
 			if (user == null) {
@@ -43,7 +42,8 @@ namespace DataAccess.Repositories
 			}
 			user.AccountBalance = newAccountBalance;
 
-            _ = UserDAO.Instance.UpdateUser(user);
+             UserDAO.Instance.UpdateUser(user);
         }
-    }
+		
+	}
 }

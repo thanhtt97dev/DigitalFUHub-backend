@@ -17,9 +17,9 @@ namespace DigitalFUHubApi.Controllers
 			_categoryRepository = categoryRepository;
 		}
 		[HttpGet("GetAll")]
-		public async Task< ActionResult<ResponseData>> GetAll()
+		public ActionResult<ResponseData> GetAll()
 		{
-			List<Category> categories = await _categoryRepository.GetAllAsync();
+			List<Category> categories = _categoryRepository.GetAll();
 			return new ResponseData
 			{
 				Status = new Status

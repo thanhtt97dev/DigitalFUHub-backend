@@ -78,7 +78,7 @@
 
 		#region SignInGoogle
 		[HttpPost("SignInGoogle")]
-		public async Task<IActionResult> SignInGoogleAsync(UserSignInGoogleRequestDTO userSignIn)
+		public async Task<IActionResult> SignInGoogle(UserSignInGoogleRequestDTO userSignIn)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -86,7 +86,7 @@
 			}
 			try
 			{
-				User? user = await _userRepository.GetUserByEmail(userSignIn.Email);
+				User? user = _userRepository.GetUserByEmail(userSignIn.Email);
 
 				if (user == null)
 				{
@@ -100,8 +100,8 @@
 						IsConfirm = true,
 						Fullname = userSignIn.Fullname
 					};
-					await _userRepository.AddUser(newUser);
-					user = await _userRepository.GetUserByEmail(userSignIn.Email);
+					_userRepository.AddUser(newUser);
+					user = _userRepository.GetUserByEmail(userSignIn.Email);
 				}
 				else
 				{
@@ -131,7 +131,7 @@
 			}
 			try
 			{
-				bool isExistUsernameOrEmail = await _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
+				bool isExistUsernameOrEmail = _userRepository.IsExistUsernameOrEmail(request.Username.ToLower(), request.Email.ToLower());
 				if (isExistUsernameOrEmail)
 				{
 					return Conflict();
@@ -150,7 +150,7 @@
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
 				};
-				await _userRepository.AddUser(userSignUp);
+				_userRepository.AddUser(userSignUp);
 
 				string token = _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
 				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
@@ -166,11 +166,11 @@
 
 		#region Confirm Email
 		[HttpGet("ConfirmEmail/{token}")]
-		public async Task<IActionResult> ConfirmEmail(string token)
+		public IActionResult ConfirmEmail(string token)
 		{
 			try
 			{
-				bool result = await _jwtTokenService.CheckTokenConfirmEmailAsync(token);
+				bool result = _jwtTokenService.CheckTokenConfirmEmail(token);
 				return result ? Ok("Y") : Ok("N");
 			}
 			catch (NullReferenceException)
@@ -201,7 +201,7 @@
 			{
 				try
 				{
-					User? user = await _userRepository.GetUserByEmail(email.Trim());
+					User? user = _userRepository.GetUserByEmail(email.Trim());
 					if (user == null)
 					{
 						return NotFound();
@@ -217,7 +217,7 @@
 					string newPassword = Util.Instance.RandomPassword8Chars();
 					string passwordHash = Util.Instance.Sha256Hash(newPassword);
 					user.Password = passwordHash;
-					await _userRepository.UpdateUser(user);
+					_userRepository.UpdateUser(user);
 					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Đặt lại mật khẩu.", $"<div>Mật khẩu mới: {newPassword}</div>");
 				}
 				catch (Exception)
@@ -235,7 +235,7 @@
 		[HttpGet("GenerateTokenConfirmEmail/{email}")]
 		public async Task<IActionResult> GenerateTokenConfirmEmail(string email)
 		{
-			User? user = await _userRepository.GetUserByEmail(email);
+			User? user = _userRepository.GetUserByEmail(email);
 			if (user == null)
 			{
 				return NotFound();
@@ -518,10 +518,10 @@
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
 
-				string username = user.Email.Split('@')[0]; 
-                user.Email = Util.HideCharacters(user.Email, username.Length - 2);
+				string username = user.Email.Split('@')[0];
+				user.Email = Util.HideCharacters(user.Email, username.Length - 2);
 
-                return Ok(_mapper.Map<UserResponeDTO>(user));
+				return Ok(_mapper.Map<UserResponeDTO>(user));
 			}
 			catch (Exception ex)
 			{
@@ -552,7 +552,7 @@
 		#region Edit user info
 		[Authorize]
 		[HttpPut("EditUserInfo/{id}")]
-		public async Task<IActionResult> EditUserInfo(int id, UserUpdateRequestDTO userUpdateRequestDTO)
+		public IActionResult EditUserInfo(int id, UserUpdateRequestDTO userUpdateRequestDTO)
 		{
 			if (userUpdateRequestDTO == null) return BadRequest();
 			try
@@ -560,7 +560,7 @@
 				User? user = _userRepository.GetUserById(id);
 				if (user == null) return Conflict();
 				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);
-				await _userRepository.EditUserInfo(id, userUpdate);
+				_userRepository.EditUserInfo(id, userUpdate);
 				return NoContent();
 			}
 			catch (Exception ex)
@@ -598,12 +598,11 @@
         }
         #endregion
 
-
-        #region Check Exist Email
-        [HttpGet("CheckExistEmail/{email}")]
-		public async Task<IActionResult> CheckExistEmail(string email)
+		#region Check Exist Email
+		[HttpGet("CheckExistEmail/{email}")]
+		public IActionResult CheckExistEmail(string email)
 		{
-			User? user = await _userRepository.GetUserByEmail(email);
+			User? user = _userRepository.GetUserByEmail(email);
 			if (user == null)
 			{
 				return Ok("N");
@@ -614,9 +613,9 @@
 
 		#region Check Exist Username
 		[HttpGet("CheckExistUsername/{username}")]
-		public async Task<IActionResult> CheckExistUsername(string username)
+		public IActionResult CheckExistUsername(string username)
 		{
-			User? user = await _userRepository.GetUserByUsername(username);
+			User? user = _userRepository.GetUserByUsername(username);
 			if (user == null)
 			{
 				return Ok("N");

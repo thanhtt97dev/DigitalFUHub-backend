@@ -172,3 +172,5 @@ D:\FU\Capstone Project\Back-end\DataAccess\bin\Debug\net6.0\Comons.dll
 D:\FU\Capstone Project\Back-end\DataAccess\bin\Debug\net6.0\Comons.pdb
 D:\fu-workspace\Semester 9\SEP490\src-final\be-1\DataAccess\bin\Debug\net6.0\Comons.dll
 D:\fu-workspace\Semester 9\SEP490\src-final\be-1\DataAccess\bin\Debug\net6.0\Comons.pdb
+E:\fpt\fu-market-backend\DataAccess\bin\Debug\net6.0\Comons.dll
+E:\fpt\fu-market-backend\DataAccess\bin\Debug\net6.0\Comons.pdb
