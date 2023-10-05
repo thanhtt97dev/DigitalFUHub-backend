@@ -11,7 +11,7 @@ namespace DataAccess.IRepositories
     public interface IUserRepository
 	{
 		User? GetUserByUsernameAndPassword(string? email, string? password);
-		Task<User?> GetUserByEmail(string? email);
+		User? GetUserByEmail(string? email);
 
 		User? GetUserByRefreshToken(string? refreshTokenId);
 
@@ -19,14 +19,14 @@ namespace DataAccess.IRepositories
 
 		User? GetUserById(long id);
 
-		Task EditUserInfo(int id, User user);
+		void EditUserInfo(int id, User user);
 
 		void Update2FA(int id);
 
-		Task AddUser(User user);
-		Task<User?> GetUserByUsername(string username);
-		Task<bool> IsExistUsernameOrEmail(string username, string email);
-		Task<User?> GetUser(string email, string username, string fullname);
-		Task UpdateUser(User user);
+		void AddUser(User user);
+		User? GetUserByUsername(string username);
+		bool IsExistUsernameOrEmail(string username, string email);
+		User? GetUser(string email, string username, string fullname);
+		void UpdateUser(User user);
 	}
 }

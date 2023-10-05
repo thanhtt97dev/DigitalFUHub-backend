@@ -13,7 +13,7 @@ namespace DataAccess.Repositories
 {
 	public class ProductRepository : IProductRepository
 	{
-		public async Task AddProductAsync(Product product) => await ProductDAO.Instance.AddProductAsync(product);
+		public void AddProduct(Product product) =>  ProductDAO.Instance.AddProduct(product);
 
 		public List<SellerProductResponeDTO> GetAllProduct(int userId) => ProductDAO.Instance.GetAllProduct(userId);
 
@@ -25,5 +25,11 @@ namespace DataAccess.Repositories
             return ProductDAO.Instance.GetProductById(productId);
         }
 
-    }
+		public void EditProduct(Product product, List<ProductVariant> productVariantsNew, List<ProductVariant> productVariantsUpdate, List<Tag> tags, List<ProductMedia> productMediaNew, List<string> productImagesOld)
+		=> ProductDAO.Instance.EditProduct( product,  productVariantsNew, productVariantsUpdate, tags, productMediaNew, productImagesOld);
+
+		public string GetProductThumbnail(long productId) => ProductDAO.Instance.GetProductThumbnail(productId);
+
+		public List<ProductMedia> GetAllProductMediaById(long productId) => ProductDAO.Instance.GetAllProductMediaById(productId);
+	}
 }

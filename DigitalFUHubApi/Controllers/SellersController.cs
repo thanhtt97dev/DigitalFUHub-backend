@@ -66,11 +66,11 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="productId"></param>
 		/// <returns></returns>
 		[HttpGet("{userId}/GetProduct/{productId}")]
-		public async Task<ActionResult<ResponseData>> GetProductVariants(long userId, long productId)
+		public ActionResult<ResponseData> GetProductVariants(long userId, long productId)
 		{
 			ResponseData response = new ResponseData();
 			// check user have shop
-			bool existShop = await _shopRepository.UserHasShopAsync(userId);
+			bool existShop = _shopRepository.UserHasShop(userId);
 			if (!existShop)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
@@ -80,7 +80,7 @@ namespace DigitalFUHubApi.Controllers
 			else
 			{
 				// check shop have product
-				bool existProduct = await _shopRepository.ShopHasProductAsync(userId, productId);
+				bool existProduct = _shopRepository.ShopHasProduct(userId, productId);
 				if (!existProduct)
 				{
 					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
@@ -90,7 +90,7 @@ namespace DigitalFUHubApi.Controllers
 				else
 				{
 					// get product
-					Product product = await _shopRepository.GetProductByIdAsync(productId);
+					Product product = _shopRepository.GetProductById(productId);
 					if (product.ProductStatusId == Constants.PRODUCT_BAN)
 					{
 						response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
@@ -183,7 +183,7 @@ namespace DigitalFUHubApi.Controllers
 				foreach (IFormFile file in request.Images)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,file.FileName.Substring(file.FileName.LastIndexOf(".")));
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 					string url = await _storageService.UploadFileToAzureAsync(file, filename);
 					productMedias.Add(new ProductMedia
 					{
@@ -209,7 +209,7 @@ namespace DigitalFUHubApi.Controllers
 					UpdateDate = DateTime.Now,
 				};
 
-				await _productRepository.AddProductAsync(product);
+				_productRepository.AddProduct(product);
 				response.Status = new Status
 				{
 					Ok = true,
@@ -226,6 +226,123 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Edit product
+		#endregion
+		[HttpPut("Product/Edit/{productId}")]
+		public async Task<ActionResult<ResponseData>> EditProduct(long productId, [FromForm] EditProductRequestDTO request)
+		{
+			ResponseData response = new ResponseData();
+			//if (!ModelState.IsValid)
+			//{
+			//	response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+			//	response.Status.Ok = false;
+			//	response.Status.Message = "Vui lòng kiểm tra lại dữ liệu.";
+			//	return response;
+			//}
+			if (productId != request.ProductId)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				response.Status.Ok = false;
+				response.Status.Message = "Sản phẩm không hợp lệ.";
+				return response;
+			}
+			try
+			{
+				string filename = "";
+				DateTime now;
+				List<Tag> tags = new List<Tag>();
+				request.Tags.ForEach((value) =>
+				{
+					tags.Add(new Tag { ProductId = request.ProductId, TagName = value });
+				});
+
+				List<ProductMedia> productMediaNew = new List<ProductMedia>();
+				foreach (var file in request.ProductImagesNew)
+				{
+					now = DateTime.Now;
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+					string url = await _storageService.UploadFileToAzureAsync(file, filename);
+					productMediaNew.Add(new ProductMedia
+					{
+						ProductId = request.ProductId,
+						Url = url,
+					});
+				};
+
+				List<ProductVariant> productVariantsUpdate = new List<ProductVariant>();
+				for (int i = 0; i < request.ProductVariantIdUpdate.Count; i++)
+				{
+					productVariantsUpdate.Add(new ProductVariant
+					{
+						Name = request.ProductVariantNameUpdate[i],
+						Price = request.ProductVariantPriceUpdate[i],
+						ProductId = request.ProductId,
+						ProductVariantId = request.ProductVariantIdUpdate[i],
+						AssetInformation = request.ProductVariantFileUpdate.Count == 0 || request.ProductVariantFileUpdate[i] == null ? null : Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileUpdate[i]),
+					});
+				}
+				List<ProductVariant> productVariantsNew = new List<ProductVariant>();
+				for (int i = 0; i < request.ProductVariantFileNew.Count; i++)
+				{
+					productVariantsNew.Add(new ProductVariant
+					{
+						AssetInformation = Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileNew[i]),
+						isActivate = true,
+						Name = request.ProductVariantNameNew[i],
+						Price = request.ProductVariantPriceNew[i],
+						ProductId = request.ProductId,
+					});
+				}
+				string urlThumbnailOld = _productRepository.GetProductThumbnail(request.ProductId);
+				string urlThumbnailNew = "";
+				if (request.ProductThumbnail != null)
+				{
+					now = DateTime.Now;
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.ProductThumbnail.FileName.Substring(request.ProductThumbnail.FileName.LastIndexOf(".")));
+					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnail, filename);
+				}
+				
+				Product product = new Product
+				{
+					ProductId = request.ProductId,
+					ProductName = request.ProductName,
+					Description = request.ProductDescription,
+					Discount = request.Discount,
+					CategoryId = request.CategoryId,
+					Thumbnail = request.ProductThumbnail == null ? null : urlThumbnailNew
+				};
+				List<ProductMedia> productMedia = _productRepository.GetAllProductMediaById(request.ProductId);
+
+				_productRepository.EditProduct(product, productVariantsNew, productVariantsUpdate, tags, productMediaNew, request.ProductImagesOld);
+
+				// delete thumbnail old
+				if (request.ProductThumbnail != null)
+				{
+					await _storageService.RemoveFileFromAzureAsync(urlThumbnailOld.Substring(urlThumbnailOld.LastIndexOf("/") + 1));
+				}
+				// delete image product
+				if (productMedia.Count(x => !request.ProductImagesOld.Any(m => m == x.Url)) > 0)
+				{
+					List<ProductMedia> productMediaDelete = productMedia.Where(x => !request.ProductImagesOld.Any(m => m == x.Url)).ToList();
+					foreach (ProductMedia media in productMediaDelete)
+					{
+						await _storageService.RemoveFileFromAzureAsync(media.Url.Substring(media.Url.LastIndexOf("/") + 1));
+					}
+				}
+			}
+			catch (Exception)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Đã có lỗi xảy ra.";
+				return response;
+			}
+			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+			response.Status.Ok = true;
+			response.Status.Message = "";
+			return response;
+		}
+
 		#region register seller
 		/// <summary>
 		///	
@@ -233,7 +350,7 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="request"></param>
 		/// <returns>response</returns>
 		[HttpPost("Register")]
-		public async Task<ActionResult<ResponseData>> Register(RegisterShopRequestDTO request)
+		public  ActionResult<ResponseData> Register(RegisterShopRequestDTO request)
 		{
 			ResponseData response = new ResponseData();
 			if (!ModelState.IsValid)
@@ -246,12 +363,12 @@ namespace DigitalFUHubApi.Controllers
 			User? user;
 			try
 			{
-				await _shopRepository.CreateShopAsync(request);
+				 _shopRepository.CreateShop(request);
 				user = _userRepository.GetUserById(request.UserId);
 				if (user == null) throw new Exception("Người dùng không khả dụng.");
 				user.RoleId = Constants.SELLER_ROLE;
 				user.Role = null!;
-				await _userRepository.UpdateUser(user);
+				 _userRepository.UpdateUser(user);
 			}
 			catch (Exception e)
 			{

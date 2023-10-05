@@ -10,9 +10,9 @@ namespace DataAccess.IRepositories
 {
 	public interface IShopRepository
 	{
-		Task CreateShopAsync(RegisterShopRequestDTO request);
-		Task<Product> GetProductByIdAsync(long productId);
-		Task<bool> ShopHasProductAsync(long userId, long productId);
-		Task<bool> UserHasShopAsync(long userId);
+		void CreateShop(RegisterShopRequestDTO request);
+		Product GetProductById(long productId);
+		bool ShopHasProduct(long userId, long productId);
+		bool UserHasShop(long userId);
 	}
 }

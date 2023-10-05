@@ -75,7 +75,7 @@ namespace DataAccess.DAOs
 				{
 					result.Add(new ProductDetailVariantResponeDTO()
 					{
-						ProductVariantId = variant.ProductVariantId,	
+						ProductVariantId = variant.ProductVariantId,
 						Name = variant.Name,
 						Price = variant.Price,
 						Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
@@ -86,20 +86,20 @@ namespace DataAccess.DAOs
 		}
 
 
-        internal ProductDetailResponseDTO GetProductById(long productId)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
+		internal ProductDetailResponseDTO GetProductById(long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
 				long productQuantity = 0;
-                if (product == null) throw new ArgumentException("Not found Product hav id = " + productId);
-                List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
-                List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
-                List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
-                List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
-                foreach (var variant in productVariants)
-                {
-                    ProductDetailVariantResponeDTO productVariantResp = new ProductDetailVariantResponeDTO()
+				if (product == null) throw new ArgumentException("Not found Product hav id = " + productId);
+				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
+				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
+				List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
+				List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
+				foreach (var variant in productVariants)
+				{
+					ProductDetailVariantResponeDTO productVariantResp = new ProductDetailVariantResponeDTO()
 					{
 						ProductVariantId = variant.ProductVariantId,
 						Name = variant.Name,
@@ -107,72 +107,185 @@ namespace DataAccess.DAOs
 						Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
 					};
 
-                    variants.Add(productVariantResp);
+					variants.Add(productVariantResp);
 					productQuantity += productVariantResp?.Quantity ?? 0;
-                }
+				}
 
 				List<ProductMediaResponseDTO> medias = new List<ProductMediaResponseDTO>();
-                foreach (var media in productMedias)
-                {
-                    medias.Add(new ProductMediaResponseDTO()
-                    {
-                        ProductMediaId = media.ProductMediaId,
-                        Url = media.Url
-                    });
-                }
+				foreach (var media in productMedias)
+				{
+					medias.Add(new ProductMediaResponseDTO()
+					{
+						ProductMediaId = media.ProductMediaId,
+						Url = media.Url
+					});
+				}
 
-                List<TagResponseDTO> tags = new List<TagResponseDTO>();
-                foreach (var tag in productTags)
-                {
-                    tags.Add(new TagResponseDTO()
-                    {
-                        TagId = tag.TagId,
-                        TagName = tag.TagName,
-                    });
-                }
+				List<TagResponseDTO> tags = new List<TagResponseDTO>();
+				foreach (var tag in productTags)
+				{
+					tags.Add(new TagResponseDTO()
+					{
+						TagId = tag.TagId,
+						TagName = tag.TagName,
+					});
+				}
 
 
-                ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    Thumbnail = product.Thumbnail,
-                    Description = product.Description,
-                    Discount = product.Discount,
-                    ShopId = product.ShopId,
-                    CategoryId = product.CategoryId,
-                    Quantity = productQuantity,
-                    ProductVariants = variants,
-                    ProductMedias = medias,
-                    Tags = tags
-                };
+				ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
+				{
+					ProductId = product.ProductId,
+					ProductName = product.ProductName,
+					Thumbnail = product.Thumbnail,
+					Description = product.Description,
+					Discount = product.Discount,
+					ShopId = product.ShopId,
+					CategoryId = product.CategoryId,
+					Quantity = productQuantity,
+					ProductVariants = variants,
+					ProductMedias = medias,
+					Tags = tags
+				};
 
-                return productDetailResponse;
-            }
-        }
+				return productDetailResponse;
+			}
+		}
 
-		internal async Task AddProductAsync(Product product)
+		internal void AddProduct(Product product)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				using (var transaction = await context.Database.BeginTransactionAsync())
+				using (var transaction = context.Database.BeginTransaction())
 				{
 					try
 					{
 						context.Product.Add(product);
-						await context.SaveChangesAsync();
-						await transaction.CommitAsync();
+						context.SaveChanges();
+						transaction.Commit();
 					}
 					catch (Exception e)
 					{
-						await transaction.RollbackAsync();
+						transaction.Rollback();
 						throw new Exception(e.Message);
 					}
 				}
 			}
 		}
+
+		internal void EditProduct(Product product, List<ProductVariant> productVariantsNew, List<ProductVariant> productVariantsUpdate, List<Tag> tags, List<ProductMedia> productMediaNew, List<string> productMediaOld)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				using (var transaction = context.Database.BeginTransaction())
+				{
+					try
+					{
+						Product? productE = context.Product.Where(p => p.ProductId == product.ProductId).FirstOrDefault();
+						if (productE == null) throw new Exception("product not found");
+						productE.UpdateDate = DateTime.Now;
+						productE.CategoryId = product.CategoryId;
+						productE.ProductName = product.ProductName;
+						productE.Description = product.Description;
+						productE.Discount = product.Discount;
+						if (product.Thumbnail != null)
+						{
+							productE.Thumbnail = product.Thumbnail;
+						}
+						context.Product.Update(productE);
+						//context.SaveChanges();
+
+						// remove media
+						IQueryable<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == productE.ProductId && !productMediaOld.Any(pm => pm == x.Url));
+						context.ProductMedia.RemoveRange(productMedias);
+
+						// add new product media
+						foreach (var item in productMediaNew)
+						{
+							context.ProductMedia.Add(new ProductMedia
+							{
+								ProductId = product.ProductId,
+								Url = item.Url,
+							});
+						}
+						//context.SaveChanges();
+
+						List<ProductVariant> productVariantsDelete = context.ProductVariant.Where(x => x.ProductId == productE.ProductId && !productVariantsUpdate.Select(pv => pv.ProductVariantId).ToList().Any(pvd => pvd == x.ProductVariantId)).ToList();
+						foreach (var item in productVariantsDelete)
+						{
+							item.isActivate = false;
+						}
+						context.ProductVariant.UpdateRange(productVariantsDelete);
+						//context.SaveChanges();
+
+						foreach (var item in productVariantsUpdate)
+						{
+							ProductVariant? productVariant = context.ProductVariant.FirstOrDefault(x => x.ProductId == productE.ProductId && x.ProductVariantId == item.ProductVariantId);
+							if (productVariant != null)
+							{
+								// delete old data and add new data
+								if (item.AssetInformation != null || item.AssetInformation?.Count > 0)
+								{
+									IQueryable<AssetInformation> assetInformations = context.AssetInformation.Where(x => x.IsActive == true && x.ProductVariantId == item.ProductVariantId);
+									context.AssetInformation.RemoveRange(assetInformations);
+
+									//foreach (var asset in item.AssetInformation)
+									//{
+									//	context.AssetInformation.Add(new AssetInformation
+									//	{
+									//		ProductVariantId = item.ProductVariantId,
+									//		CreateDate = DateTime.Now,
+									//		Asset = asset.Asset,
+									//		IsActive = true
+									//	});
+									//}
+									productVariant.AssetInformation = item.AssetInformation;
+								}
+								productVariant.Name = item.Name;
+								productVariant.Price = item.Price;
+								context.ProductVariant.Update(productVariant);
+							}
+						}
+						foreach (var item in productVariantsNew)
+						{
+							context.ProductVariant.Add(new ProductVariant
+							{
+								isActivate = true,
+								AssetInformation = item.AssetInformation,
+								Price = item.Price,
+								Name = item.Name,
+								ProductId = productE.ProductId,
+							});
+						}
+
+						context.SaveChanges();
+						transaction.Commit();
+					}
+					catch (Exception)
+					{
+						transaction.Rollback();
+						throw new Exception();
+					}
+				}
+			}
+		}
+
+		internal string GetProductThumbnail(long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Product.FirstOrDefault(x => x.ProductId == productId)?.Thumbnail ?? "";
+			}
+		}
+
+		internal List<ProductMedia> GetAllProductMediaById(long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.ProductMedia.Where(x => x.ProductId == productId).ToList();
+			}
+		}
 	}
-}	
+}
 
 
 

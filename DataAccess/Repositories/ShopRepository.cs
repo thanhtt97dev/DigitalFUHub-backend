@@ -12,12 +12,12 @@ namespace DataAccess.Repositories
 {
 	public class ShopRepository : IShopRepository
 	{
-		public async Task CreateShopAsync(RegisterShopRequestDTO request) => await ShopDAO.Instance.CreateShopAsync(request);
+		public  void CreateShop (RegisterShopRequestDTO request) =>  ShopDAO.Instance.CreateShop(request);
 
-		public async Task<Product> GetProductByIdAsync(long productId) => await ShopDAO.Instance.GetProductByIdAsync(productId);
+		public Product GetProductById(long productId) =>  ShopDAO.Instance.GetProductById(productId);
 
-		public async Task<bool> ShopHasProductAsync(long userId, long productId) => await ShopDAO.Instance.ShopHasProductAsync(userId, productId);
+		public bool ShopHasProduct(long userId, long productId) =>  ShopDAO.Instance.ShopHasProduct(userId, productId);
 
-		public async Task<bool> UserHasShopAsync(long userId) => await ShopDAO.Instance.UserHasShopAsync(userId);
+		public bool UserHasShop(long userId) =>  ShopDAO.Instance.UserHasShop(userId);
 	}
 }

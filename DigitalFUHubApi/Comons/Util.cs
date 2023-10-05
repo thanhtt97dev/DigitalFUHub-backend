@@ -201,15 +201,19 @@ namespace DigitalFUHubApi.Comons
 					{
 						if (worksheet.Cells[i, 1].Value != null && i != 1)
 						{
-							string value = worksheet.Cells[i, 1].Value.ToString()??"";
-							result.Add(new AssetInformation
+							string value = worksheet.Cells[i, 1].Value?.ToString()?.Trim() ?? "";
+							if (!string.IsNullOrEmpty(value))
 							{
-								CreateDate = DateTime.Now,
-								Asset = value,
-								IsActive = true,
-							});
+								result.Add(new AssetInformation
+								{
+									CreateDate = DateTime.Now,
+									Asset = value,
+									IsActive = true,
+								});
+							}
 						}
 					}
+					break;
 				}
 			}
 			return result;
