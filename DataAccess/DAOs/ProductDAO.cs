@@ -7,6 +7,7 @@ using DTOs.Tag;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,7 +66,38 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<ProductDetailVariantResponeDTO> GetProductVariants(int productId)
+        internal List<AllProductResponseDTO> GetAllProduct()
+        {
+            List<AllProductResponseDTO> result = new List<AllProductResponseDTO>();
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var products = context.Product.ToList();
+                foreach (var product in products)
+                {
+                    var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
+                    List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
+                    foreach (var variant in productVariants)
+                    {
+                        variants.Add(new ProductDetailVariantResponeDTO()
+                        {
+                            ProductVariantId = variant.ProductVariantId,
+                            Price = variant.Price
+                        });
+                    }
+                    AllProductResponseDTO productResponeDTO = new AllProductResponseDTO()
+					{
+						ProductId = product.ProductId,
+						ProductName = product.ProductName,
+						Discount = product.Discount,
+                        ProductVariants = variants
+                    };
+                    result.Add(productResponeDTO);
+                }
+                return result;
+            }
+        }
+
+        internal List<ProductDetailVariantResponeDTO> GetProductVariants(int productId)
 		{
 			List<ProductDetailVariantResponeDTO> result = new List<ProductDetailVariantResponeDTO>();
 			using (DatabaseContext context = new DatabaseContext())

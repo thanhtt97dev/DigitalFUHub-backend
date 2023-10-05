@@ -17,7 +17,9 @@ namespace DataAccess.Repositories
 
 		public List<SellerProductResponeDTO> GetAllProduct(int userId) => ProductDAO.Instance.GetAllProduct(userId);
 
-		public List<ProductDetailVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
+        public List<AllProductResponseDTO> GetAllProduct() => ProductDAO.Instance.GetAllProduct();
+
+        public List<ProductDetailVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
 
         public ProductDetailResponseDTO GetProductById(long productId)
         {
