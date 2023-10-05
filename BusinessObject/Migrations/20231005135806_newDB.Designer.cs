@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231004150629_init db")]
-    partial class initdb
+    [Migration("20231005135806_newDB")]
+    partial class newDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -268,7 +268,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 4, 22, 6, 29, 238, DateTimeKind.Local).AddTicks(4635)
+                            StartDate = new DateTime(2023, 10, 5, 20, 58, 6, 639, DateTimeKind.Local).AddTicks(8960)
                         });
                 });
 
@@ -314,11 +314,21 @@ namespace BusinessObject.Migrations
                         new
                         {
                             CategoryId = 2L,
-                            CategoryName = "VPS"
+                            CategoryName = "Giáo dục"
                         },
                         new
                         {
                             CategoryId = 3L,
+                            CategoryName = "Trò chơi"
+                        },
+                        new
+                        {
+                            CategoryId = 4L,
+                            CategoryName = "VPS"
+                        },
+                        new
+                        {
+                            CategoryId = 5L,
                             CategoryName = "Khác"
                         });
                 });
@@ -562,8 +572,8 @@ namespace BusinessObject.Migrations
                     b.Property<long>("ProductVariantId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Quantity")
-                        .HasColumnType("bigint");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<long>("TotalAmount")
                         .HasColumnType("bigint");
