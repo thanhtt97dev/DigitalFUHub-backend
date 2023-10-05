@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class initdb : Migration
+    public partial class newDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -638,7 +638,7 @@ namespace BusinessObject.Migrations
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     ProductVariantId = table.Column<long>(type: "bigint", nullable: false),
                     BusinessFeeId = table.Column<long>(type: "bigint", nullable: false),
-                    Quantity = table.Column<long>(type: "bigint", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<long>(type: "bigint", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<long>(type: "bigint", nullable: false),
@@ -790,7 +790,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "BusinessFee",
                 columns: new[] { "BusinessFeeId", "Fee", "StartDate" },
-                values: new object[] { 1L, 5L, new DateTime(2023, 10, 4, 22, 6, 29, 238, DateTimeKind.Local).AddTicks(4635) });
+                values: new object[] { 1L, 5L, new DateTime(2023, 10, 5, 20, 58, 6, 639, DateTimeKind.Local).AddTicks(8960) });
 
             migrationBuilder.InsertData(
                 table: "Category",
@@ -798,8 +798,10 @@ namespace BusinessObject.Migrations
                 values: new object[,]
                 {
                     { 1L, "Mạng xã hội" },
-                    { 2L, "VPS" },
-                    { 3L, "Khác" }
+                    { 2L, "Giáo dục" },
+                    { 3L, "Trò chơi" },
+                    { 4L, "VPS" },
+                    { 5L, "Khác" }
                 });
 
             migrationBuilder.InsertData(

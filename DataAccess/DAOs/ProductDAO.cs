@@ -256,6 +256,19 @@ namespace DataAccess.DAOs
 								ProductId = productE.ProductId,
 							});
 						}
+						// delete old tag
+						List<Tag> tagsOld = context.Tag.Where(x => x.ProductId == productE.ProductId).ToList();
+						context.Tag.RemoveRange(tagsOld);
+
+						// add new tag
+						foreach (var item in tags)
+						{
+							context.Tag.Add(new Tag
+							{
+								ProductId = productE.ProductId,
+								TagName = item.TagName
+							});
+						}
 
 						context.SaveChanges();
 						transaction.Commit();
