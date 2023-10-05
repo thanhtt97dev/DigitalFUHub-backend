@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using DigitalFUHubApi.Services;
 using DigitalFUHubApi.Comons;
 using DTOs.Notification;
+using Comons;
 
 namespace DigitalFUHubApi.Hubs
 {

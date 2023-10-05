@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230928045744_init")]
-    partial class init
+    [Migration("20231004150629_init db")]
+    partial class initdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -98,6 +98,9 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<long?>("OrderId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("ProductVariantId")
                         .HasColumnType("bigint");
 
@@ -108,6 +111,8 @@ namespace BusinessObject.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("AssetInformationId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductVariantId");
 
@@ -124,6 +129,10 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("BankId"), 1L, 1);
 
+                    b.Property<string>("BankCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BankName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -134,6 +143,133 @@ namespace BusinessObject.Migrations
                     b.HasKey("BankId");
 
                     b.ToTable("Bank");
+
+                    b.HasData(
+                        new
+                        {
+                            BankId = 458761L,
+                            BankCode = "HSBC",
+                            BankName = "TNHH MTV HSBC Việt Nam (HSBC)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970403L,
+                            BankCode = "STB",
+                            BankName = "Sacombank (STB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970405L,
+                            BankCode = "VBA",
+                            BankName = "Nông nghiệp và Phát triển nông thôn (VBA)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970407L,
+                            BankCode = "TCB",
+                            BankName = "Kỹ Thương (TCB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970415L,
+                            BankCode = "VIETINBANK",
+                            BankName = "Công Thương Việt Nam (VIETINBANK)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970418L,
+                            BankCode = "BIDV",
+                            BankName = "Đầu tư và phát triển (BIDV)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970422L,
+                            BankCode = "MB",
+                            BankName = "Quân đội (MB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970423L,
+                            BankCode = "TPB",
+                            BankName = "Tiên Phong (TPB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970426L,
+                            BankCode = "MSB",
+                            BankName = "Hàng hải (MSB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970432L,
+                            BankCode = "VPB",
+                            BankName = "Việt Nam Thinh Vượng (VPB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970436L,
+                            BankCode = "VCB",
+                            BankName = "Ngoại thương Việt Nam (VCB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970441L,
+                            BankCode = "VIB",
+                            BankName = "Quốc tế (VIB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970443L,
+                            BankCode = "SHB",
+                            BankName = "Sài Gòn Hà Nội (SHB)",
+                            isActivate = true
+                        },
+                        new
+                        {
+                            BankId = 970449L,
+                            BankCode = "LPB",
+                            BankName = "Bưu điện Liên Việt (LPB)",
+                            isActivate = true
+                        });
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.BusinessFee", b =>
+                {
+                    b.Property<long>("BusinessFeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("BusinessFeeId"), 1L, 1);
+
+                    b.Property<long>("Fee")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("BusinessFeeId");
+
+                    b.ToTable("BusinessFee");
+
+                    b.HasData(
+                        new
+                        {
+                            BusinessFeeId = 1L,
+                            Fee = 5L,
+                            StartDate = new DateTime(2023, 10, 4, 22, 6, 29, 238, DateTimeKind.Local).AddTicks(4635)
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Cart", b =>
@@ -408,8 +544,8 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderId"), 1L, 1);
 
-                    b.Property<DateTime>("DateOrder")
-                        .HasColumnType("datetime2");
+                    b.Property<long>("BusinessFeeId")
+                        .HasColumnType("bigint");
 
                     b.Property<bool>("IsFeedback")
                         .HasColumnType("bit");
@@ -418,9 +554,6 @@ namespace BusinessObject.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long>("OrderStatusId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PlatformFeeId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("Price")
@@ -440,12 +573,11 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("OrderId");
 
+                    b.HasIndex("BusinessFeeId");
+
                     b.HasIndex("OrderStatusId");
 
-                    b.HasIndex("PlatformFeeId");
-
-                    b.HasIndex("ProductVariantId")
-                        .IsUnique();
+                    b.HasIndex("ProductVariantId");
 
                     b.HasIndex("UserId");
 
@@ -504,32 +636,18 @@ namespace BusinessObject.Migrations
                         new
                         {
                             OrderStatusId = 4L,
-                            Name = "Reject Complaint"
+                            Name = "Dispute"
                         },
                         new
                         {
                             OrderStatusId = 5L,
-                            Name = "Accept Complaint"
+                            Name = "Reject Complaint"
+                        },
+                        new
+                        {
+                            OrderStatusId = 6L,
+                            Name = "Seller violates"
                         });
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.PlatformFee", b =>
-                {
-                    b.Property<long>("PlatformFeeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("PlatformFeeId"), 1L, 1);
-
-                    b.Property<long>("Fee")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("PlatformFeeId");
-
-                    b.ToTable("PlatformFee");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Product", b =>
@@ -735,6 +853,7 @@ namespace BusinessObject.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ShopName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
@@ -913,6 +1032,23 @@ namespace BusinessObject.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1L,
+                            AccountBalance = 0L,
+                            Avatar = "",
+                            Email = "",
+                            Fullname = "Admin",
+                            IsConfirm = true,
+                            Password = "123",
+                            RoleId = 1L,
+                            SignInGoogle = false,
+                            Status = true,
+                            TwoFactorAuthentication = false,
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.UserBank", b =>
@@ -1096,6 +1232,10 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.AssetInformation", b =>
                 {
+                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                        .WithMany("AssetInformation")
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
                         .WithMany("AssetInformation")
                         .HasForeignKey("ProductVariantId")
@@ -1105,6 +1245,8 @@ namespace BusinessObject.Migrations
                     b.HasOne("BusinessObject.Entities.User", null)
                         .WithMany("AssetInformation")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Order");
 
                     b.Navigation("ProductVariant");
                 });
@@ -1212,22 +1354,22 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
+                    b.HasOne("BusinessObject.Entities.BusinessFee", "BusinessFee")
+                        .WithMany("Orders")
+                        .HasForeignKey("BusinessFeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BusinessObject.Entities.OrderStatus", "OrderStatus")
                         .WithMany("Orders")
                         .HasForeignKey("OrderStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.PlatformFee", "PlatformFee")
-                        .WithMany("Orders")
-                        .HasForeignKey("PlatformFeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
-                        .WithOne("Order")
-                        .HasForeignKey("BusinessObject.Entities.Order", "ProductVariantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Orders")
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1236,9 +1378,9 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("OrderStatus");
+                    b.Navigation("BusinessFee");
 
-                    b.Navigation("PlatformFee");
+                    b.Navigation("OrderStatus");
 
                     b.Navigation("ProductVariant");
 
@@ -1468,6 +1610,11 @@ namespace BusinessObject.Migrations
                     b.Navigation("UserBanks");
                 });
 
+            modelBuilder.Entity("BusinessObject.Entities.BusinessFee", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("BusinessObject.Entities.Category", b =>
                 {
                     b.Navigation("Products");
@@ -1492,15 +1639,12 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
+                    b.Navigation("AssetInformation");
+
                     b.Navigation("OrderCoupons");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.OrderStatus", b =>
-                {
-                    b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("BusinessObject.Entities.PlatformFee", b =>
                 {
                     b.Navigation("Orders");
                 });
@@ -1522,8 +1666,7 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("Carts");
 
-                    b.Navigation("Order")
-                        .IsRequired();
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Role", b =>

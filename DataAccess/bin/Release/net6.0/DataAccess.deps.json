@@ -9,6 +9,7 @@
       "DataAccess/1.0.0": {
         "dependencies": {
           "BusinessObject": "1.0.0",
+          "Comons": "1.0.0",
           "DTOs": "1.0.0"
         },
         "runtime": {
@@ -649,6 +650,15 @@
           "BusinessObject.dll": {}
         }
       },
+      "Comons/1.0.0": {
+        "dependencies": {
+          "BusinessObject": "1.0.0",
+          "DTOs": "1.0.0"
+        },
+        "runtime": {
+          "Comons.dll": {}
+        }
+      },
       "DTOs/1.0.0": {
         "dependencies": {
           "BusinessObject": "1.0.0",
@@ -1052,6 +1062,11 @@
       "hashPath": "system.windows.extensions.4.7.0.nupkg.sha512"
     },
     "BusinessObject/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Comons/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -28,5 +28,6 @@ namespace DataAccess.IRepositories
 		bool IsExistUsernameOrEmail(string username, string email);
 		User? GetUser(string email, string username, string fullname);
 		void UpdateUser(User user);
+		void UpdateBalance(long id, long newAccountBalance);
 	}
 }

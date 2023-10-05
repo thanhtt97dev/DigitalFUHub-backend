@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Comons;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -63,6 +64,49 @@ namespace DigitalFUHubApi.Controllers
             } catch (Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpGet("GetCartsByUserId/{userId}")]
+        [Authorize]
+        public async Task<IActionResult> GetCartsByUserId(long userId)
+        {
+            try
+            {
+                return Ok(await _cartRepository.GetCartsByUserId(userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPost("DeleteCart")]
+        [Authorize]
+        public async Task<IActionResult> DeleteCart([FromBody] DeleteCartRequestDTO deleteCartRequest)
+        {
+            try
+            {
+                await _cartRepository.DeleteCart(deleteCartRequest.UserId, deleteCartRequest.ProductVariantId);
+                return Ok(new Status
+                {
+                    Message = "Delete Cart Successfully"
+                    ,
+                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS
+                    ,
+                    Ok = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new Status
+                {
+                    Message = ex.Message
+                    ,
+                    ResponseCode = Constants.RESPONSE_CODE_FAILD
+                    ,
+                    Ok = false
+                });
             }
         }
     }

@@ -17,23 +17,24 @@ namespace BusinessObject.Entities
         public long OrderId { get; set; }
         public long UserId { get; set; }
         public long ProductVariantId { get; set; }
-        public long PlatformFeeId { get; set; }
-        public long Quantity { get; set; }
+        public long BusinessFeeId { get; set; }
+		public int Quantity { get; set; }
 		public long Price { get; set; }
 		public DateTime OrderDate { get; set; }
         public long TotalAmount { get; set; }
         public bool IsFeedback { get; set; }
         public long OrderStatusId { get; set; }
-        public DateTime DateOrder { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
         [ForeignKey(nameof(OrderStatusId))]
         public virtual OrderStatus? OrderStatus { get; set; } = null!;
         [ForeignKey(nameof(ProductVariantId))]
-        public virtual ProductVariant? ProductVariant { get; set; } = null!;
-        [ForeignKey(nameof(PlatformFeeId))]
-        public virtual PlatformFee? PlatformFee { get; set; } = null!;
-        public virtual List<OrderCoupon> OrderCoupons { get; set; } = null!;
+        public virtual ProductVariant ProductVariant { get; set; } = null!;
+
+		[ForeignKey(nameof(BusinessFeeId))]
+		public virtual BusinessFee BusinessFee { get; set; } = null!;
+        public virtual List<AssetInformation> AssetInformation { get; set; } = null!;
+		public virtual List<OrderCoupon>? OrderCoupons { get; set; }
     }
 }

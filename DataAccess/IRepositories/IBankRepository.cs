@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.IRepositories
 {
@@ -25,5 +26,6 @@ namespace DataAccess.IRepositories
 		WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId);
 		void UpdateWithdrawTransactionPaid(long transactionId);
 		string UpdateListWithdrawTransactionPaid(List<long> transactionIds);
+		List<Transaction> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId);
 	}
 }

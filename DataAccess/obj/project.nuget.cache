@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "FkEa09nEfPcyAfnladUmQ3zXOxjCyhc0GaoXOH8keoLfsnzk5PCeLEWOKwzYlxVkjuMuZRRGl73Kn0BCBwL4lQ==",
+  "dgSpecHash": "e72sGc6pn+/F3SVZTt5b6iLOucbov1RVzI+8Sf3fX8Xyk5i4jQF8FYkK7caA3/7nG2UIuCjdEoeXL2Ke0eXhyA==",
   "success": true,
   "projectFilePath": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
   "expectedPackageFiles": [
@@ -60,5 +60,12 @@
     "C:\\Users\\dell\\.nuget\\packages\\system.text.json\\7.0.0\\system.text.json.7.0.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file E:\\fpt\\fu-market-backend\\DataAccess\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 ﻿using DigitalFUHubApi.Services;
 using Microsoft.AspNetCore.SignalR;
-using DigitalFUHubApi.Comons;
+using Comons;
 
 namespace DigitalFUHubApi.Hubs
 {

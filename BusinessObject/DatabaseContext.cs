@@ -50,7 +50,7 @@ namespace BusinessObject
 		public virtual DbSet<Category> Category { get; set; } = null!;
 		public virtual DbSet<Cart> Cart { get; set; } = null!;
 		public virtual DbSet<AssetInformation> AssetInformation { get; set; } = null!;
-		public virtual DbSet<PlatformFee> PlatformFee { get; set; } = null!;
+		public virtual DbSet<BusinessFee> BusinessFee { get; set; } = null!;
 
 		#endregion
 
@@ -63,7 +63,6 @@ namespace BusinessObject
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-
 			modelBuilder.Entity<SenderConversation>()
 				.HasNoKey()
 				.ToView(null);
@@ -93,6 +92,11 @@ namespace BusinessObject
 				.HasOne(x => x.User)
 				.WithMany(x => x.Orders)
 				.HasForeignKey(x => x.UserId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<Order>()
+				.HasOne(x => x.ProductVariant)
+				.WithMany(x => x.Orders)
+				.HasForeignKey(x => x.ProductVariantId)
 				.OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<WithdrawTransaction>()
 				.HasOne(x => x.UserBank)
@@ -135,8 +139,37 @@ namespace BusinessObject
 				new OrderStatus{OrderStatusId = 1, Name = "Wait for customer confirmation"},
 				new OrderStatus{OrderStatusId = 2, Name = "Confirmed"},
 				new OrderStatus{OrderStatusId = 3, Name = "Complaint"},
-				new OrderStatus{OrderStatusId = 4, Name = "Reject Complaint"},
-				new OrderStatus{OrderStatusId = 5, Name = "Accept Complaint"},
+				new OrderStatus{OrderStatusId = 4, Name = "Dispute"},
+				new OrderStatus{OrderStatusId = 5, Name = "Reject Complaint"},
+				new OrderStatus{OrderStatusId = 6, Name = "Seller violates"},
+			});
+
+			modelBuilder.Entity<User>().HasData(new User[]
+			{
+				new User(){UserId = 1, RoleId = 1, Username = "admin", Password = "123", Fullname="Admin", Avatar =  "", Status = true, TwoFactorAuthentication = false, AccountBalance = 0, SignInGoogle = false, IsConfirm = true }
+			});
+
+			modelBuilder.Entity<Bank>().HasData(new Bank[] 
+			{
+				new Bank(){BankId = 458761, BankName = "TNHH MTV HSBC Việt Nam (HSBC)", BankCode = "HSBC", isActivate = true},
+				new Bank(){BankId = 970403, BankName = "Sacombank (STB)", BankCode = "STB", isActivate = true},
+				new Bank(){BankId = 970405, BankName = "Nông nghiệp và Phát triển nông thôn (VBA)", BankCode = "VBA", isActivate = true},
+				new Bank(){BankId = 970407, BankName = "Kỹ Thương (TCB)", BankCode = "TCB", isActivate = true},
+				new Bank(){BankId = 970415, BankName = "Công Thương Việt Nam (VIETINBANK)", BankCode = "VIETINBANK", isActivate = true},
+				new Bank(){BankId = 970418, BankName = "Đầu tư và phát triển (BIDV)", BankCode = "BIDV", isActivate = true},
+				new Bank(){BankId = 970422, BankName = "Quân đội (MB)", BankCode = "MB", isActivate = true},
+				new Bank(){BankId = 970423, BankName = "Tiên Phong (TPB)", BankCode = "TPB", isActivate = true},
+				new Bank(){BankId = 970426, BankName = "Hàng hải (MSB)", BankCode = "MSB", isActivate = true},
+				new Bank(){BankId = 970432, BankName = "Việt Nam Thinh Vượng (VPB)", BankCode = "VPB", isActivate = true},
+				new Bank(){BankId = 970436, BankName = "Ngoại thương Việt Nam (VCB)", BankCode = "VCB", isActivate = true},
+				new Bank(){BankId = 970441, BankName = "Quốc tế (VIB)", BankCode = "VIB", isActivate = true},
+				new Bank(){BankId = 970443, BankName = "Sài Gòn Hà Nội (SHB)", BankCode = "SHB", isActivate = true},
+				new Bank(){BankId = 970449, BankName = "Bưu điện Liên Việt (LPB)", BankCode = "LPB", isActivate = true},
+			});
+
+			modelBuilder.Entity<BusinessFee>().HasData(new BusinessFee[]
+			{
+				new BusinessFee() {BusinessFeeId = 1, Fee = 5, StartDate = DateTime.Now},
 			});
 
 

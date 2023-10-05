@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.Entities
 {
-	public class PlatformFee
+	public class BusinessFee
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public long PlatformFeeId { get; set; }
+		public long BusinessFeeId { get; set; }
 		public long Fee { get; set; }
 		public DateTime StartDate { get; set; }
 		public virtual ICollection<Order>? Orders { get; set; }

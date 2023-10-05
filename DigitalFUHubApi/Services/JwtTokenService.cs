@@ -13,6 +13,7 @@ using BusinessObject.Entities;
 using DTOs.User;
 using Quartz.Util;
 using BusinessObject;
+using Comons;
 
 namespace DigitalFUHubApi.Services
 {
@@ -53,7 +54,7 @@ namespace DigitalFUHubApi.Services
 			// settings token expired time for specific user's role
 			int tokenExpiredDate;
 			int.TryParse(_configuration["JWT:TokenAge"], out tokenExpiredDate);
-			DateTime accessTokenExpiredDate = DateTime.UtcNow;
+			DateTime accessTokenExpiredDate;
 			if (user.RoleId == Constants.ADMIN_ROLE)
 			{
 				accessTokenExpiredDate = DateTime.UtcNow.AddMinutes(tokenExpiredDate);

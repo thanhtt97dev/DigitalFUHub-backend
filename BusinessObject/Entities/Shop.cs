@@ -12,7 +12,7 @@ namespace BusinessObject.Entities
 	{
 		[Key]
 		public long UserId { get; set; }
-		public string? ShopName { get; set; }
+		public string ShopName { get; set; } = null!;
 		public DateTime DateCreate { get; set; }
 		public long Balance { get; set; }
 		public string? Description { get; set; }
@@ -20,7 +20,7 @@ namespace BusinessObject.Entities
 
 		[ForeignKey(nameof(UserId))]
 		public virtual User User { get; set; } = null!;
-		public virtual ICollection<Product>? Products { get; set; }
-		public virtual ICollection<Coupon>? Coupons { get; set; }
+		public virtual ICollection<Product> Products { get; set; } = null!;
+		public virtual ICollection<Coupon> Coupons { get; set; } = null!;
 	}
 }

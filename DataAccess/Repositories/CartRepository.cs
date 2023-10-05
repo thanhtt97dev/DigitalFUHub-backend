@@ -24,6 +24,20 @@ namespace DataAccess.Repositories
             await CartDAO.Instance.AddProductToCart(addProductToCartRequest);  
                 }
 
+        public async Task DeleteCart(long userId, long productVariantId)
+        {
+            if (userId == 0)
+            {
+                throw new ArgumentException(nameof(userId), "UserId must be difference from 0");
+            }
+            if (productVariantId == 0)
+            {
+                throw new ArgumentException(nameof(userId), "ProductVariantId must be difference from 0");
+            }
+
+            await CartDAO.Instance.DeleteCart(userId, productVariantId);
+        }
+
         public async Task<Cart?> GetCart(long userId, long productVariantId)
         {
             if (userId == 0)
@@ -39,6 +53,16 @@ namespace DataAccess.Repositories
 
             return cart;
 
+        }
+
+        public async Task<List<CartDTO>> GetCartsByUserId(long userId)
+        {
+            if (userId == 0)
+            {
+                throw new ArgumentException(nameof(userId), "UserId must be difference from 0");
+            }
+
+            return await CartDAO.Instance.GetCartsByUserId(userId);
         }
     }
 }

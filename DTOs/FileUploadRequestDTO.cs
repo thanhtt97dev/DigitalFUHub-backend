@@ -9,7 +9,7 @@ namespace DTOs
 {
 	public class FileUploadRequestDTO
 	{
-		public IFormFile FileUpload { get; set; }
+		public IFormFile FileUpload { get; set; } = null!;
 		public int UserId { get;set; }
 		public bool IsPublic { get;set; }
 	}

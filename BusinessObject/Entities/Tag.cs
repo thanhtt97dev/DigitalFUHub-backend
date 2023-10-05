@@ -17,6 +17,6 @@ namespace BusinessObject.Entities
 		public string? TagName { get; set; }
 
 		[ForeignKey(nameof(ProductId))]
-		public virtual Product? Product { get; set; }	
+		public virtual Product Product { get; set; } = null!;	
 	}
 }

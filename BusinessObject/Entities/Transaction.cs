@@ -23,9 +23,9 @@ namespace BusinessObject.Entities
 		public DateTime? DateCreate { get; set; }
 
 		[ForeignKey(nameof(UserId))]
-		public virtual User? User { get; set; } = null!;
+		public virtual User User { get; set; } = null!;
 		[ForeignKey(nameof(OrderId))]
-		public virtual Order? Order { get; set; } = null!;
+		public virtual Order Order { get; set; } = null!;
 		[ForeignKey(nameof(TransactionTypeId))]
 		public virtual TransactionType? TransactionType { get; set; } = null!;
 	}

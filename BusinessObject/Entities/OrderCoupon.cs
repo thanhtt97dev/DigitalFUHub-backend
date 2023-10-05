@@ -17,6 +17,6 @@ namespace BusinessObject.Entities
 		[ForeignKey(nameof(OrderId))]
 		public virtual Order? Order { get; set; }
 		[ForeignKey(nameof(CouponId))]
-		public virtual Coupon? Coupon { get; set; }
+		public virtual Coupon Coupon { get; set; } = null!;
 	}
 }
