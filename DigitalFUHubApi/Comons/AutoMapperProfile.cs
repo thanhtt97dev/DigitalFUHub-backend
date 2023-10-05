@@ -53,6 +53,9 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.ProductVariant.Product.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
 				.ReverseMap();
+			CreateMap<Order, OrderDetailResponseDTO>()
+				.ForMember(des => des.Customer, act => act.MapFrom(src => src.User))
+				.ReverseMap();
 
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))

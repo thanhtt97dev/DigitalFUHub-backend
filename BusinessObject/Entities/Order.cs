@@ -34,7 +34,7 @@ namespace BusinessObject.Entities
 
 		[ForeignKey(nameof(BusinessFeeId))]
 		public virtual BusinessFee BusinessFee { get; set; } = null!;
-        public virtual List<AssetInformation> AssetInformation { get; set; } = null!;
-		public virtual List<OrderCoupon>? OrderCoupons { get; set; }
-    }
+        public virtual List<AssetInformation> AssetInformations { get; set; } = null!;
+		public virtual List<OrderCoupon> OrderCoupons { get; set; } = null!;
+	}
 }

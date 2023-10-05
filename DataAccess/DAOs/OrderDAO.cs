@@ -49,7 +49,7 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					foreach(var order in orders) 
+					foreach (var order in orders)
 					{
 						// update order's status to confirmed
 						var orderUpdate = context.Order.First(x => x.OrderId == order.OrderId);
@@ -78,9 +78,9 @@ namespace DataAccess.DAOs
 						{
 							UserId = sellerId,
 							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
-							OrderId = order.OrderId,	
-							PaymentAmount =  sellerProfit,
-							Note="",
+							OrderId = order.OrderId,
+							PaymentAmount = sellerProfit,
+							Note = "",
 							DateCreate = DateTime.Now,
 						};
 						context.Transaction.Add(transactionSeller);
@@ -117,17 +117,17 @@ namespace DataAccess.DAOs
 							.Include(x => x.ProductVariant)
 							.ThenInclude(x => x.Product)
 							.ThenInclude(x => x.Shop)
-							.Where(x => 
+							.Where(x =>
 								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
 								x.User.Email.Contains(customerEmail) &&
 								x.ProductVariant.Product.Shop.ShopName.Contains(shopName)
 							)
 							.OrderByDescending(x => x.OrderDate).ToList();
-				if(orderId != 0)
+				if (orderId != 0)
 				{
-					orders = orders.Where(x => x.OrderId == orderId).ToList();	
+					orders = orders.Where(x => x.OrderId == orderId).ToList();
 				}
-				
+
 				if (status != 0)
 				{
 					orders = orders.Where(x => x.OrderStatusId == status).ToList();
@@ -137,29 +137,29 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-        internal void AddOrder(List<Order> orders)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal void AddOrder(List<Order> orders)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 
-                var transaction = context.Database.BeginTransaction();
-                try
-                {
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
 					foreach (var order in orders)
 					{
-                        context.Order.Add(order);
-                        context.SaveChanges();
+						context.Order.Add(order);
+						context.SaveChanges();
 
-                        var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
+						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
 						if (assetInformations.Count < order.Quantity) throw new Exception();
 
-                        foreach (var asset in assetInformations)
-                        {
-                            asset.OrderId = order.OrderId;
+						foreach (var asset in assetInformations)
+						{
+							asset.OrderId = order.OrderId;
 							asset.IsActive = false;
-                        }
+						}
 
-                        context.AssetInformation.UpdateRange(assetInformations);
+						context.AssetInformation.UpdateRange(assetInformations);
 
 						//update customer account balance
 						var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
@@ -173,28 +173,73 @@ namespace DataAccess.DAOs
 
 						// add new transaction
 						Transaction newTransaction = new Transaction
-                        {
-                            UserId = order.UserId,
-                            TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
-                            OrderId = order.OrderId,
-                            PaymentAmount = order.TotalAmount,
-                            Note = "Thanh toan",
-                            DateCreate = DateTime.Now
-                        };
+						{
+							UserId = order.UserId,
+							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
+							OrderId = order.OrderId,
+							PaymentAmount = order.TotalAmount,
+							Note = "Thanh toan",
+							DateCreate = DateTime.Now
+						};
 
-                        context.Transaction.Add(newTransaction);
-                    }
-                    
-                    context.SaveChanges();
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
-    }
+						context.Transaction.Add(newTransaction);
+					}
+
+					context.SaveChanges();
+					transaction.Commit();
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+			}
+		}
+
+		internal Order? GetOrder(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Order? order = context.Order
+					.Include(order => order.BusinessFee)
+					.Include(order => order.ProductVariant)
+					.FirstOrDefault(x => x.OrderId == orderId);
+
+				if (order == null) return null;
+				var customer = context.User.First(x => x.UserId == order.UserId);
+
+				var sellerId = context.Product.First(x => x.ProductId == order.ProductVariant.ProductId).ShopId;
+				var shop = context.Shop
+						.Select(shop => new Shop
+						{
+							UserId = shop.UserId,
+							ShopName = shop.ShopName,
+						})
+						.First(x => x.UserId == sellerId);
+				var productMedias = context.ProductMedia.Where(x => x.ProductId == order.ProductVariant.ProductId).ToList();
+				var assetInfomations = context.AssetInformation
+					.Select(asset => new AssetInformation
+					{
+						AssetInformationId = asset.AssetInformationId,
+						OrderId = orderId,
+						Asset = asset.Asset
+					})
+					.Where(x => x.OrderId == orderId)
+					.ToList();
+				var orderCoupons = context.OrderCoupon
+					.Include(x => x.Coupon)
+					.Where(x => x.OrderId == orderId)
+					.ToList();
+
+				order.AssetInformations = assetInfomations;
+				order.OrderCoupons = orderCoupons;
+				order.ProductVariant.Product.Shop = shop;
+				order.ProductVariant.Product.ProductMedias = productMedias;
+				order.User = customer;
+
+				return order;
+			}
+		}
+	}
 }
 
