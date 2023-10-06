@@ -8,6 +8,7 @@ namespace DTOs.Admin
 		public long CustomerId { get; set; }
 		public string? CustomerEmail { get; set; }
 		public long ProductVariantId { get; set; }
+		public string? ProductVariantName { get; set; }
 		public long ProductId { get; set; }
 		public string? ProductName { get; set; }
 		public string? ProductThumbnail { get; set; }

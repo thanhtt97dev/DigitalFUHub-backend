@@ -96,7 +96,7 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get order
 		[HttpPost("GetOrder/{id}")]
-		public IActionResult GetOrders(int id)
+		public IActionResult GetOrder(int id)
 		{
 			if (id == 0) return BadRequest();
 			ResponseData responseData = new ResponseData();
@@ -104,7 +104,6 @@ namespace DigitalFUHubApi.Controllers
 			
 			try
 			{
-
 				var order = orderRepository.GetOrder(id);
 				if(order == null)
 				{

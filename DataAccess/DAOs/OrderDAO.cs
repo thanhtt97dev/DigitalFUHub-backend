@@ -234,6 +234,7 @@ namespace DataAccess.DAOs
 									ProductVariant = new ProductVariant
 									{
 										ProductVariantId = productVariant.ProductVariantId,
+										Name = productVariant.Name,
 										ProductId = productVariant.ProductId,
 										Product = new Product
 										{
