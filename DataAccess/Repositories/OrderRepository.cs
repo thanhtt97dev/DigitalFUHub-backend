@@ -35,5 +35,6 @@ namespace DataAccess.Repositories
 
             OrderDAO.Instance.AddOrder(orders);
         }
-    }
+
+	}
 }
