@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccess.DAOs;
 
 namespace DataAccess.IRepositories
 {
@@ -18,5 +19,6 @@ namespace DataAccess.IRepositories
 		void EditProduct(Product product, List<ProductVariant> productVariantsNew, List<ProductVariant> productVariantsUpdate, List<Tag> tags, List<ProductMedia> productMediaNew, List<string> productImagesOld);
 		string GetProductThumbnail(long productId);
 		List<ProductMedia> GetAllProductMediaById(long productId);
-	}
+        List<AllProductResponseDTO> GetAllProduct();
+    }
 }
