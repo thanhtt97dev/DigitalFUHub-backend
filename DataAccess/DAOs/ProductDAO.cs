@@ -89,6 +89,7 @@ namespace DataAccess.DAOs
 						ProductId = product.ProductId,
 						ProductName = product.ProductName,
 						Discount = product.Discount,
+                        Thumbnail = product.Thumbnail,
                         ProductVariants = variants
                     };
                     result.Add(productResponeDTO);
