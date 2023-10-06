@@ -18,12 +18,12 @@ namespace BusinessObject.Entities
         public long UserId { get; set; }
         public long ProductVariantId { get; set; }
         public long BusinessFeeId { get; set; }
+		public long? FeedbackId { get; set; }
+		public long OrderStatusId { get; set; }
 		public int Quantity { get; set; }
 		public long Price { get; set; }
 		public DateTime OrderDate { get; set; }
         public long TotalAmount { get; set; }
-        public bool IsFeedback { get; set; }
-        public long OrderStatusId { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
@@ -34,7 +34,9 @@ namespace BusinessObject.Entities
 
 		[ForeignKey(nameof(BusinessFeeId))]
 		public virtual BusinessFee BusinessFee { get; set; } = null!;
-        public virtual List<AssetInformation> AssetInformations { get; set; } = null!;
+		[ForeignKey(nameof(FeedbackId))]
+		public virtual Feedback? Feedback { get; set; }
+		public virtual List<AssetInformation> AssetInformations { get; set; } = null!;
 		public virtual List<OrderCoupon> OrderCoupons { get; set; } = null!;
 	}
 }

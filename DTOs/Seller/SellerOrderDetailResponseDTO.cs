@@ -13,7 +13,7 @@ namespace DTOs.Seller
 		public long Price{ get; set; }
 		public int Quantity{ get; set; }
 		public DateTime OrderDate{ get; set; }
-		public bool IsFeedback { get; set; }
+		public long? FeedbackId { get; set; }
 		public long OrderStatusId { get; set; }
 		public string ProductName { get; set; } = string.Empty; 
 		public string ProductVariantName { get; set;} = string.Empty;

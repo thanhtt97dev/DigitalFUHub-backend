@@ -489,7 +489,7 @@ namespace DigitalFUHubApi.Controllers
 			SellerOrderDetailResponseDTO order = new SellerOrderDetailResponseDTO
 			{
 				EmailCustomer = orderRaw.User.Email,
-				IsFeedback = orderRaw.IsFeedback,
+				FeedbackId = orderRaw.FeedbackId,
 				OrderDate = orderRaw.OrderDate,
 				OrderId = orderId,
 				OrderStatusId = orderRaw.OrderStatusId,

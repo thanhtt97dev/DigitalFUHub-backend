@@ -224,7 +224,7 @@ namespace DataAccess.DAOs
 									Price = o.Price,
 									OrderDate = o.OrderDate,
 									TotalAmount = o.TotalAmount,
-									IsFeedback = o.IsFeedback,
+									FeedbackId = o.FeedbackId,	
 									OrderStatusId = o.OrderStatusId,
 									User = new User
 									{
@@ -283,6 +283,20 @@ namespace DataAccess.DAOs
 													).ToList(),
 								})
 							   .FirstOrDefault();
+
+				
+				if ( order != null && order.FeedbackId != null)
+				{
+					Feedback feedback = context.Feedback
+						.Select(f => new Feedback() 
+						{
+							FeedbackId = f.FeedbackId,
+							Content = f.Content,	
+							Rate = f.Rate,	
+						})
+						.First(x => x.FeedbackId == order.FeedbackId);	
+					order.Feedback = feedback;	
+				}
 
 				return order;
 			}

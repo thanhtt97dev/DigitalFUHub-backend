@@ -22,8 +22,9 @@ namespace DTOs.Admin
 		public long Price { get; set; }
 		public DateTime OrderDate { get; set; }
 		public long TotalAmount { get; set; }
-		public bool IsFeedback { get; set; }
+		public long? FeedbackId { get; set; }
 		public long OrderStatusId { get; set; }
+		public BusinessObject.Entities.Feedback? Feedback { get; set; }	
 		public List<string>? AssetInformations { get; set; }
 		public List<OrderDetailOrderCouponsDTO>? OrderCoupons { get; set; }
 		public List<string>? ProductMedias { get; set; }
