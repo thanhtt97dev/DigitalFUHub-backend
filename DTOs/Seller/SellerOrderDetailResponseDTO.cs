@@ -15,7 +15,9 @@ namespace DTOs.Seller
 		public DateTime OrderDate{ get; set; }
 		public bool IsFeedback { get; set; }
 		public long OrderStatusId { get; set; }
-		public List<SellerProductResponseDTO> Products { get; set; } = null!;
+		public string ProductName { get; set; } = string.Empty; 
+		public string ProductVariantName { get; set;} = string.Empty;
+		public string Thumbnail { get; set; } = string.Empty;
     }
 	
 }

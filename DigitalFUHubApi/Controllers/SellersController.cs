@@ -495,18 +495,9 @@ namespace DigitalFUHubApi.Controllers
 				OrderStatusId = orderRaw.OrderStatusId,
 				Price = orderRaw.Price,
 				Quantity = orderRaw.Quantity,
-				Products = orderRaw.AssetInformations.Select(x => new SellerProductResponseDTO
-				{
-					ProductId = x.ProductVariant.ProductId,
-					ProductName = x.ProductVariant.Product.ProductName,
-					Thumbnail = x.ProductVariant.Product.Thumbnail,
-					ProductVariants = orderRaw.AssetInformations.Select(pd => new ProductDetailVariantResponeDTO
-					{
-						Name = x.ProductVariant.Name,
-						Price = x.ProductVariant.Price,
-						Quantity = orderRaw.AssetInformations.Count(asst => asst.ProductVariantId == x.ProductVariantId)
-					}).ToList()
-				}).Distinct().ToList()
+				ProductName = orderRaw.ProductVariant.Product?.ProductName??"",
+				ProductVariantName = orderRaw.ProductVariant?.Name??"",
+				Thumbnail = orderRaw.ProductVariant?.Product?.Thumbnail??""
 			};
 			response.Status.Ok = true;
 			response.Status.Message = "Success";
