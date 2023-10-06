@@ -33,9 +33,9 @@ namespace DataAccess.DAOs
 				return instance;
 			}
 		}
-		internal List<SellerProductResponeDTO> GetAllProduct(int shopId)
+		internal List<SellerProductResponseDTO> GetAllProduct(int shopId)
 		{
-			List<SellerProductResponeDTO> result = new List<SellerProductResponeDTO>();
+			List<SellerProductResponseDTO> result = new List<SellerProductResponseDTO>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var products = context.Product.Where(x => x.ShopId == shopId).ToList();
@@ -53,7 +53,7 @@ namespace DataAccess.DAOs
 							Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
 						});
 					}
-					SellerProductResponeDTO productResponeDTO = new SellerProductResponeDTO()
+					SellerProductResponseDTO productResponeDTO = new SellerProductResponseDTO()
 					{
 						ProductId = product.ProductId,
 						ProductName = product.ProductName,
@@ -89,6 +89,7 @@ namespace DataAccess.DAOs
 						ProductId = product.ProductId,
 						ProductName = product.ProductName,
 						Discount = product.Discount,
+                        Thumbnail = product.Thumbnail,
                         ProductVariants = variants
                     };
                     result.Add(productResponeDTO);

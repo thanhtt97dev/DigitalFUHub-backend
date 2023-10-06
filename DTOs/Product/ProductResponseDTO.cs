@@ -40,6 +40,7 @@ namespace DTOs.Product
         public long ProductId { get; set; }
         public string? ProductName { get; set; }
         public int Discount { get; set; }
+        public string? Thumbnail { get; set; }
         public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }
     }
 }

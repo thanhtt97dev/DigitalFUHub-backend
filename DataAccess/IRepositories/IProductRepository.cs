@@ -13,7 +13,7 @@ namespace DataAccess.IRepositories
 	public interface IProductRepository
 	{
 		void AddProduct(Product product);
-		List<SellerProductResponeDTO> GetAllProduct(int userId);
+		List<SellerProductResponseDTO> GetAllProduct(int userId);
 		List<ProductDetailVariantResponeDTO> GetProductVariants(int productId);
         ProductDetailResponseDTO GetProductById(long productId);
 		void EditProduct(Product product, List<ProductVariant> productVariantsNew, List<ProductVariant> productVariantsUpdate, List<Tag> tags, List<ProductMedia> productMediaNew, List<string> productImagesOld);

@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
 	{
 		public void AddProduct(Product product) =>  ProductDAO.Instance.AddProduct(product);
 
-		public List<SellerProductResponeDTO> GetAllProduct(int userId) => ProductDAO.Instance.GetAllProduct(userId);
+		public List<SellerProductResponseDTO> GetAllProduct(int userId) => ProductDAO.Instance.GetAllProduct(userId);
 
         public List<AllProductResponseDTO> GetAllProduct() => ProductDAO.Instance.GetAllProduct();
 

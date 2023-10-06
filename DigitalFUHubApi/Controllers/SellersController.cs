@@ -12,6 +12,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Comons;
+using DTOs.Admin;
+using System.Globalization;
+using System.Reflection.Metadata.Ecma335;
+using BusinessObject;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -25,10 +30,11 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IShopRepository _shopRepository;
 		private readonly IUserRepository _userRepository;
 		private readonly IRoleRepository _roleRepository;
+		private readonly IOrderRepository _orderRepository;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 
-		public SellersController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IShopRepository shopRepository, IUserRepository userRepository, IRoleRepository roleRepository, JwtTokenService jwtTokenService, IMapper mapper)
+		public SellersController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IShopRepository shopRepository, IUserRepository userRepository, IRoleRepository roleRepository, IOrderRepository orderRepository, JwtTokenService jwtTokenService, IMapper mapper)
 		{
 			_configuration = configuration;
 			_productRepository = productRepository;
@@ -36,9 +42,12 @@ namespace DigitalFUHubApi.Controllers
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
 			_roleRepository = roleRepository;
+			_orderRepository = orderRepository;
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 		}
+
+
 
 
 		#region Get All Product with shopId (userId)
@@ -228,7 +237,6 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Edit product
-		#endregion
 		[HttpPut("Product/Edit/{productId}")]
 		public async Task<ActionResult<ResponseData>> EditProduct(long productId, [FromForm] EditProductRequestDTO request)
 		{
@@ -344,6 +352,7 @@ namespace DigitalFUHubApi.Controllers
 			response.Status.Message = "";
 			return response;
 		}
+		#endregion
 
 		#region register seller
 		/// <summary>
@@ -385,6 +394,116 @@ namespace DigitalFUHubApi.Controllers
 			response.Status.Message = "Đăng ký cửa hàng thành công.";
 			response.Status.Ok = true;
 			return response;
+		}
+		#endregion
+
+		#region Get orders
+		[HttpPost("Orders")]
+		public IActionResult GetOrders(SellerOrdersRequestDTO request)
+		{
+			if (request == null || request.OrderId == null ||
+				request.CustomerEmail == null || request.UserId == 0 ||
+				request.ToDate == null || request.FromDate == null) return BadRequest();
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
+			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
+			{
+				status.Message = "Invalid order status!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+
+			try
+			{
+
+				DateTime fromDate;
+				DateTime toDate;
+				string format = "M/d/yyyy";
+				try
+				{
+					fromDate = DateTime.ParseExact(request.FromDate, format, CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(request.ToDate, format, CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				long orderId;
+				long.TryParse(request.OrderId, out orderId);
+
+				List<Order> orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, "",
+					fromDate, toDate, request.Status)
+					.Where(x => x.ProductVariant.Product.ShopId == request.UserId).ToList();
+				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get orders
+		[HttpGet("Orders/{orderId}")]
+		public IActionResult GetOrderDetail(long orderId)
+		{
+			ResponseData response = new ResponseData();
+			if (orderId == 0)
+			{
+				return BadRequest();
+			}
+
+			Order? orderRaw = _orderRepository.GetSellerOrderDetail(orderId);
+
+			if (orderRaw == null)
+			{
+				response.Status.Ok = false;
+				response.Status.Message = "Not found.";
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+				return Ok(response);
+			}
+			SellerOrderDetailResponseDTO order = new SellerOrderDetailResponseDTO
+			{
+				EmailCustomer = orderRaw.User.Email,
+				IsFeedback = orderRaw.IsFeedback,
+				OrderDate = orderRaw.OrderDate,
+				OrderId = orderId,
+				OrderStatusId = orderRaw.OrderStatusId,
+				Price = orderRaw.Price,
+				Quantity = orderRaw.Quantity,
+				ProductName = orderRaw.ProductVariant.Product?.ProductName??"",
+				ProductVariantName = orderRaw.ProductVariant?.Name??"",
+				Thumbnail = orderRaw.ProductVariant?.Product?.Thumbnail??""
+			};
+			response.Status.Ok = true;
+			response.Status.Message = "Success";
+			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+			response.Result = order;
+			return Ok(response);
 		}
 		#endregion
 	}

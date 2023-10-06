@@ -136,7 +136,7 @@ namespace DataAccess.DAOs
 			}
 			return orders;
 		}
-
+		
 		internal void AddOrder(List<Order> orders)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -285,6 +285,16 @@ namespace DataAccess.DAOs
 							   .FirstOrDefault();
 
 				return order;
+			}
+		}
+
+		internal Order? GetSellerOrderDetail(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order.Include(i => i.AssetInformations)
+					.ThenInclude(ti => ti.ProductVariant).ThenInclude(x => x.Product).Include(x => x.User)
+					.Where(x => x.OrderId == orderId).FirstOrDefault();
 			}
 		}
 	}
