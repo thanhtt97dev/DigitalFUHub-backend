@@ -221,6 +221,7 @@ namespace DataAccess.DAOs
 									ProductVariantId = o.ProductVariantId,
 									BusinessFeeId = o.BusinessFeeId,
 									Quantity = o.Quantity,
+									Price = o.Price,
 									OrderDate = o.OrderDate,
 									TotalAmount = o.TotalAmount,
 									IsFeedback = o.IsFeedback,
@@ -236,7 +237,7 @@ namespace DataAccess.DAOs
 										ProductId = productVariant.ProductId,
 										Product = new Product
 										{
-											ProductId = productVariant.ProductId,
+											ProductId = product.ProductId,
 											ProductName = product.ProductName,
 											Thumbnail = product.Thumbnail,
 											Category = new Category 
