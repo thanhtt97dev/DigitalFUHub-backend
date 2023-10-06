@@ -40,10 +40,8 @@ namespace DigitalFUHubApi.Controllers
                 await _cartRepository.AddProductToCart(addProductToCartRequest);
                 return Ok(new Status
                 {
-                    Message = "Add Product To Cart Successfully"
-                    ,
-                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS
-                    ,
+                    Message = "Add Product To Cart Successfully",
+                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
                     Ok = true
                 });
 
@@ -90,10 +88,8 @@ namespace DigitalFUHubApi.Controllers
                 await _cartRepository.DeleteCart(deleteCartRequest.UserId, deleteCartRequest.ProductVariantId);
                 return Ok(new Status
                 {
-                    Message = "Delete Cart Successfully"
-                    ,
-                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS
-                    ,
+                    Message = "Delete Cart Successfully",
+                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
                     Ok = true
                 });
             }

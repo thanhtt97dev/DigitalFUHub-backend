@@ -22,6 +22,6 @@ namespace BusinessObject.Entities
         public virtual Product Product { get; set; } = null!;
         public virtual ICollection<Order> Orders { get; set; } = null!;
         public virtual ICollection<Cart> Carts { get; set; } = null!;
-		public virtual ICollection<AssetInformation> AssetInformation { get; set; } = null!;
+		public virtual ICollection<AssetInformation> AssetInformations { get; set; } = null!;
 	}
 }
