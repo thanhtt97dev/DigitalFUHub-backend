@@ -259,6 +259,7 @@ namespace DataAccess.DAOs
 									OrderDate = o.OrderDate,
 									TotalDiscount = o.TotalDiscount,
 									TotalAmount = o.TotalAmount,
+									Note = o.Note,
 									FeedbackId = o.FeedbackId,
 									OrderStatusId = o.OrderStatusId,
 									User = new User
@@ -337,6 +338,29 @@ namespace DataAccess.DAOs
 				return context.Order.Include(i => i.AssetInformations)
 					.ThenInclude(ti => ti.ProductVariant).ThenInclude(x => x.Product).Include(x => x.User)
 					.Where(x => x.OrderId == orderId).FirstOrDefault();
+			}
+		}
+
+		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var order = context.Order.First(x => x.OrderId == orderId);
+				order.OrderStatusId = status;
+				order.Note = note;	
+				context.SaveChanges();
+			}
+		}
+
+		internal Order? GetOrderForCheckingExisted(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var order = context.Order
+					.Include(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.OrderId == orderId);
+				return order;
 			}
 		}
 	}

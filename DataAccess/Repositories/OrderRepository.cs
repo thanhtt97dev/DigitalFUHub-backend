@@ -39,5 +39,9 @@ namespace DataAccess.Repositories
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 
         public Order? GetSellerOrderDetail(long orderId) => OrderDAO.Instance.GetSellerOrderDetail(orderId);
+
+		public void UpdateOrderStatusAdmin(long orderId, int status, string? note) => OrderDAO.Instance.UpdateOrderStatusAdmin(orderId, status, note);
+
+		public Order? GetOrderForCheckingExisted(long orderId) => OrderDAO.Instance.GetOrderForCheckingExisted(orderId);
 	}
 }

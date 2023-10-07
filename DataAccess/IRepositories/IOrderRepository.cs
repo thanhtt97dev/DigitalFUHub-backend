@@ -15,6 +15,8 @@ namespace DataAccess.IRepositories
 		void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders);
 		void AddOrder(List<Order> orders);
 		Order? GetOrder(long orderId);
+		Order? GetOrderForCheckingExisted(long orderId);
 		Order? GetSellerOrderDetail(long orderId);
+		void UpdateOrderStatusAdmin(long orderId, int status, string? note);	
 	}
 }

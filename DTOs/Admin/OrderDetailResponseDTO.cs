@@ -24,6 +24,7 @@ namespace DTOs.Admin
 		public DateTime OrderDate { get; set; }
 		public long TotalDiscount { get; set; }
 		public long TotalAmount { get; set; }
+		public string? Note { get; set; }
 		public long? FeedbackId { get; set; }
 		public int? FeedbackRate { get; set; }
 		public long OrderStatusId { get; set; }
