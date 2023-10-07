@@ -145,7 +145,8 @@ namespace DataAccess.DAOs
 				try
 				{
 					// get bussinsis fee
-					var businessFee = context.BusinessFee.MaxBy(x => x.StartDate);
+					var businessFeeDate = context.BusinessFee.Max(x => x.StartDate);
+					var businessFee = context.BusinessFee.FirstOrDefault(x => x.StartDate == businessFeeDate);
 					if (businessFee == null) throw new Exception();
 					long businessFeeId = businessFee.BusinessFeeId;
 					long businessFeeValue = businessFee.Fee;
@@ -177,7 +178,8 @@ namespace DataAccess.DAOs
 							Price = productVariant.Price,
 							Discount = product.Discount,
 							TotalDiscount = totalDiscount,
-							TotalAmount = productVariant.Price * data.Quantity - totalCouponsDiscount
+							TotalAmount = productVariant.Price * data.Quantity - totalCouponsDiscount,
+							OrderDate = DateTime.Now,
 						};
 						context.Order.Add(order);
 						context.SaveChanges();
