@@ -26,8 +26,9 @@ namespace BusinessObject.Entities
 		public DateTime OrderDate { get; set; }
 		public long TotalDiscount { get; set; }
 		public long TotalAmount { get; set; }
+		public string? Note { get; set; }
 
-        [ForeignKey(nameof(UserId))]
+		[ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
         [ForeignKey(nameof(OrderStatusId))]
         public virtual OrderStatus? OrderStatus { get; set; } = null!;
