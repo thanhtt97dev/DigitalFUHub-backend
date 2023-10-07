@@ -28,9 +28,9 @@ namespace DigitalFUHubApi.Controllers
                 var product = _productRepository.GetProductById(productId);
                 return Ok(product);
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return BadRequest(ex.Message);
             }
         }
 

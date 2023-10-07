@@ -31,7 +31,7 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal async Task AddProductToCart(CartDTO addProductToCartRequest)
+        internal void AddProductToCart(CartDTO addProductToCartRequest)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
@@ -47,23 +47,23 @@ namespace DataAccess.DAOs
                                 Quantity = addProductToCartRequest.Quantity,
                             };
                             context.Cart.Add(newCart);
-                            await context.SaveChangesAsync();
+                            context.SaveChanges();
 
                         } else
                         {
                             cart.Quantity += addProductToCartRequest.Quantity;
                             context.Cart.Update(cart);
-                            await context.SaveChangesAsync();
+                            context.SaveChanges();
                         }
                     }
         }
 
 
-        internal async Task<Cart?> GetCart(long userId, long productVariantId)
+        internal Cart? GetCart(long userId, long productVariantId)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                var cart = await context.Cart.FirstOrDefaultAsync(
+                var cart = context.Cart.FirstOrDefault(
                         c => c.UserId == userId && c.ProductVariantId == productVariantId
                     );
 

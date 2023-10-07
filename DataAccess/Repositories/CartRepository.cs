@@ -14,15 +14,7 @@ namespace DataAccess.Repositories
     public class CartRepository : ICartRepository
     {
 
-        public async Task AddProductToCart(CartDTO addProductToCartRequest)
-        {
-            if (addProductToCartRequest == null)
-            {
-                throw new ArgumentNullException(nameof(addProductToCartRequest), "The addProductToCartRequest request object must not be null");
-            }
-
-            await CartDAO.Instance.AddProductToCart(addProductToCartRequest);  
-                }
+        public void AddProductToCart(CartDTO addProductToCartRequest) => CartDAO.Instance.AddProductToCart(addProductToCartRequest);
 
         public async Task DeleteCart(long userId, long productVariantId)
         {
@@ -38,22 +30,7 @@ namespace DataAccess.Repositories
             await CartDAO.Instance.DeleteCart(userId, productVariantId);
         }
 
-        public async Task<Cart?> GetCart(long userId, long productVariantId)
-        {
-            if (userId == 0)
-            {
-                throw new ArgumentException(nameof(userId), "UserId must be difference from 0");
-            }
-            if (productVariantId == 0)
-            {
-                throw new ArgumentException(nameof(userId), "ProductVariantId must be difference from 0");
-            }
-
-            var cart = await CartDAO.Instance.GetCart(userId, productVariantId); 
-
-            return cart;
-
-        }
+        public Cart? GetCart(long userId, long productVariantId) => CartDAO.Instance.GetCart(userId, productVariantId);
 
         public async Task<List<CartDTO>> GetCartsByUserId(long userId)
         {

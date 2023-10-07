@@ -49,8 +49,12 @@
 		public const int PRODUCT_BAN = 2;
 		public const int PRODUCT_HIDE = 3;
 
-		//Order Status
-		public const int NUMBER_DAYS_AUTO_CONFIRM_ORDER = 3;
+        // Cart Status
+        public const string CART_RESPONSE_CODE_SUCCESS = "0";
+        public const string CART_RESPONSE_CODE_INVALID_QUANTITY = "1";
+
+        //Order Status
+        public const int NUMBER_DAYS_AUTO_CONFIRM_ORDER = 3;
 		public const int ORDER_ALL = 0;
 		public const int ORDER_WAIT_CONFIRMATION = 1;
 		public const int ORDER_CONFIRMED = 2;

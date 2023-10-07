@@ -11,9 +11,9 @@ namespace DataAccess.IRepositories
 {
     public interface ICartRepository
     {
-        Task AddProductToCart(CartDTO addProductRequest);
+        void AddProductToCart(CartDTO addProductRequest);
 
-        Task<Cart?> GetCart(long userId, long productVariantId);
+        Cart? GetCart(long userId, long productVariantId);
 
         Task<List<CartDTO>> GetCartsByUserId(long userId);
 

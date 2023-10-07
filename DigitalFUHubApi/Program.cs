@@ -99,8 +99,9 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<IFeedbackRepository, FeedbackRepository>();
 			builder.Services.AddSingleton<ICartRepository, CartRepository>();
 			builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
+            builder.Services.AddSingleton<IAssetInformationRepository, AssetInformationRepository>();
 
-			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();

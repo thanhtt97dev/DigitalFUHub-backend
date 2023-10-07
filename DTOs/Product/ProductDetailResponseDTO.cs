@@ -18,6 +18,7 @@ namespace DTOs.Product
         public string? Description { get; set; }
         public int Discount { get; set; }
         public long ShopId { get; set; }
+        public string ShopName { get; set; } = null!;
         public long CategoryId { get; set; }
         public long Quantity { get; set; } = 0;
         public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }

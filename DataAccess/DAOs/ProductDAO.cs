@@ -86,14 +86,14 @@ namespace DataAccess.DAOs
 		}
 
 
-		internal ProductDetailResponseDTO GetProductById(long productId)
+		internal ProductDetailResponseDTO? GetProductById(long productId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
-				long productQuantity = 0;
-				if (product == null) throw new ArgumentException("Not found Product hav id = " + productId);
-				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
+				var product = context.Product.Include(_ => _.Shop).FirstOrDefault(x => x.ProductId == productId);
+				if (product == null) return null;
+                long productQuantity = 0;
+                List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
 				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
 				List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
 				List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
@@ -139,7 +139,8 @@ namespace DataAccess.DAOs
 					Thumbnail = product.Thumbnail,
 					Description = product.Description,
 					Discount = product.Discount,
-					ShopId = product.ShopId,
+					ShopId = product.Shop.UserId,
+					ShopName = product.Shop.ShopName,
 					CategoryId = product.CategoryId,
 					Quantity = productQuantity,
 					ProductVariants = variants,

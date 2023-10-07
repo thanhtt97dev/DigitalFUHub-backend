@@ -11,6 +11,9 @@ namespace DigitalFUHubApi.Controllers
 	[ApiController]
 	public class ShopsController : ControllerBase
 	{
-
-	}
+        public ShopsController()
+        {
+            
+        }
+    }
 }

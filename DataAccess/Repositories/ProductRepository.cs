@@ -19,9 +19,10 @@ namespace DataAccess.Repositories
 
 		public List<ProductDetailVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
 
-        public ProductDetailResponseDTO GetProductById(long productId)
+        public ProductDetailResponseDTO? GetProductById(long productId)
         {
             if (productId == 0) throw new ArgumentException("productId cannot eq 0 (at getProductById)");
+
             return ProductDAO.Instance.GetProductById(productId);
         }
 
