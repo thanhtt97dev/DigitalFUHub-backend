@@ -253,7 +253,9 @@ namespace DataAccess.DAOs
 									BusinessFeeId = o.BusinessFeeId,
 									Quantity = o.Quantity,
 									Price = o.Price,
+									Discount = o.Discount,	
 									OrderDate = o.OrderDate,
+									TotalDiscount = o.TotalDiscount,
 									TotalAmount = o.TotalAmount,
 									FeedbackId = o.FeedbackId,
 									OrderStatusId = o.OrderStatusId,
@@ -304,12 +306,6 @@ namespace DataAccess.DAOs
 													select new OrderCoupon
 													{
 														PriceDiscount = orderCoupon.PriceDiscount,
-														UseDate = orderCoupon.UseDate,
-														Coupon = new Coupon
-														{
-															CouponId = coupon.CouponId,
-															CouponName = coupon.CouponName,
-														}
 													}
 													).ToList(),
 								})

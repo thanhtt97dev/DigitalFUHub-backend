@@ -33,10 +33,7 @@ namespace DTOs.Admin
 	}
 	public class OrderDetailOrderCouponsDTO
 	{
-		public long OrderId { get; set; }
-		public long CouponId { get; set; }
 		public long PriceDiscount { get; set; }
-		public DateTime UseDate { get; set; }
 	}
 }
 
