@@ -102,10 +102,8 @@ namespace DigitalFUHubApi.Controllers
                 await _cartRepository.DeleteCart(deleteCartRequest.UserId, deleteCartRequest.ProductVariantId);
                 return Ok(new Status
                 {
-                    Message = "Delete Cart Successfully"
-                    ,
-                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS
-                    ,
+                    Message = "Delete Cart Successfully",
+                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
                     Ok = true
                 });
             }

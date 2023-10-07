@@ -12,6 +12,7 @@ namespace BusinessObject.Entities
 	{
 		public long OrderId { get; set; }
 		public long CouponId { get; set; }
+		public long PriceDiscount { get; set; }
 		public DateTime UseDate { get; set; }
 
 		[ForeignKey(nameof(OrderId))]

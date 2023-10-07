@@ -13,6 +13,7 @@ namespace BusinessObject.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ConversationId { get; set; }
+        public string? ConversationName { get; set; }
         public DateTime DateCreate { get; set; }
         public bool IsActivate { get; set; }
 

@@ -49,7 +49,7 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					foreach(var order in orders) 
+					foreach (var order in orders)
 					{
 						// update order's status to confirmed
 						var orderUpdate = context.Order.First(x => x.OrderId == order.OrderId);
@@ -78,9 +78,9 @@ namespace DataAccess.DAOs
 						{
 							UserId = sellerId,
 							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
-							OrderId = order.OrderId,	
-							PaymentAmount =  sellerProfit,
-							Note="",
+							OrderId = order.OrderId,
+							PaymentAmount = sellerProfit,
+							Note = "",
 							DateCreate = DateTime.Now,
 						};
 						context.Transaction.Add(transactionSeller);
@@ -117,17 +117,17 @@ namespace DataAccess.DAOs
 							.Include(x => x.ProductVariant)
 							.ThenInclude(x => x.Product)
 							.ThenInclude(x => x.Shop)
-							.Where(x => 
+							.Where(x =>
 								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
 								x.User.Email.Contains(customerEmail) &&
 								x.ProductVariant.Product.Shop.ShopName.Contains(shopName)
 							)
 							.OrderByDescending(x => x.OrderDate).ToList();
-				if(orderId != 0)
+				if (orderId != 0)
 				{
-					orders = orders.Where(x => x.OrderId == orderId).ToList();	
+					orders = orders.Where(x => x.OrderId == orderId).ToList();
 				}
-				
+
 				if (status != 0)
 				{
 					orders = orders.Where(x => x.OrderStatusId == status).ToList();
@@ -137,29 +137,63 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-        internal void AddOrder(List<Order> orders)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal void AddOrder(List<Order> orders)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					// get bussinsis fee
+					var businessFeeDate = context.BusinessFee.Max(x => x.StartDate);
+					var businessFee = context.BusinessFee.FirstOrDefault(x => x.StartDate == businessFeeDate);
+					if (businessFee == null) throw new Exception();
+					long businessFeeId = businessFee.BusinessFeeId;
+					long businessFeeValue = businessFee.Fee;
 
-                var transaction = context.Database.BeginTransaction();
-                try
-                {
-					foreach (var order in orders)
+					foreach (var data in orders)
 					{
-                        context.Order.Add(order);
-                        context.SaveChanges();
+						// get productVariant
+						ProductVariant? productVariant = context.ProductVariant.FirstOrDefault(x => x.ProductVariantId == data.ProductVariantId);
+						if (productVariant == null) throw new Exception();
+						//get product 
+						Product? product = context.Product.FirstOrDefault(x => x.ProductId == productVariant.ProductId);
+						if (product == null) throw new Exception();
+						//get coupons
+						long totalCouponsDiscount = 0;
+						if (data.OrderCoupons != null)
+						{
+							totalCouponsDiscount = context.Coupon.Where(x => data.OrderCoupons.Any(o => o.CouponId == x.CouponId)).Sum(x => x.PriceDiscount);
+						}
 
-                        var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
+						long totalDiscount = data.Quantity * (productVariant.Price * product.Discount / 100) + totalCouponsDiscount;
+
+						var order = new Order
+						{
+							UserId = data.UserId,
+							ProductVariantId = data.ProductVariantId,
+							BusinessFeeId = businessFeeId,
+							OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION,
+							Quantity = data.Quantity,
+							Price = productVariant.Price,
+							Discount = product.Discount,
+							TotalDiscount = totalDiscount,
+							TotalAmount = productVariant.Price * data.Quantity - totalCouponsDiscount,
+							OrderDate = DateTime.Now,
+						};
+						context.Order.Add(order);
+						context.SaveChanges();
+
+						// update asset info
+						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
 						if (assetInformations.Count < order.Quantity) throw new Exception();
 
-                        foreach (var asset in assetInformations)
-                        {
-                            asset.OrderId = order.OrderId;
+						foreach (var asset in assetInformations)
+						{
+							asset.OrderId = order.OrderId;
 							asset.IsActive = false;
-                        }
-
-                        context.AssetInformation.UpdateRange(assetInformations);
+						}
+						context.AssetInformation.UpdateRange(assetInformations);
 
 						//update customer account balance
 						var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
@@ -173,28 +207,162 @@ namespace DataAccess.DAOs
 
 						// add new transaction
 						Transaction newTransaction = new Transaction
-                        {
-                            UserId = order.UserId,
-                            TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
-                            OrderId = order.OrderId,
-                            PaymentAmount = order.TotalAmount,
-                            Note = "Thanh toan",
-                            DateCreate = DateTime.Now
-                        };
+						{
+							UserId = order.UserId,
+							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
+							OrderId = order.OrderId,
+							PaymentAmount = order.TotalAmount,
+							Note = "Thanh toan",
+							DateCreate = DateTime.Now
+						};
 
-                        context.Transaction.Add(newTransaction);
-                    }
-                    
-                    context.SaveChanges();
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
-    }
+						context.Transaction.Add(newTransaction);
+					}
+					context.SaveChanges();
+					transaction.Commit();
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+			}
+		}
+
+		internal Order? GetOrder(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Order? order = (from o in context.Order
+								join user in context.User
+									on o.UserId equals user.UserId
+								join businessFee in context.BusinessFee
+									on o.BusinessFeeId equals businessFee.BusinessFeeId
+								join productVariant in context.ProductVariant
+									on o.ProductVariantId equals productVariant.ProductVariantId
+								join product in context.Product
+									on productVariant.ProductId equals product.ProductId
+								join shop in context.Shop
+									on product.ShopId equals shop.UserId
+								join category in context.Category
+									on product.CategoryId equals category.CategoryId
+								where o.OrderId == orderId
+								select new Order
+								{
+									OrderId = orderId,
+									UserId = o.UserId,
+									ProductVariantId = o.ProductVariantId,
+									BusinessFeeId = o.BusinessFeeId,
+									Quantity = o.Quantity,
+									Price = o.Price,
+									Discount = o.Discount,	
+									OrderDate = o.OrderDate,
+									TotalDiscount = o.TotalDiscount,
+									TotalAmount = o.TotalAmount,
+									Note = o.Note,
+									FeedbackId = o.FeedbackId,
+									OrderStatusId = o.OrderStatusId,
+									User = new User
+									{
+										UserId = o.UserId,
+										Email = user.Email,
+									},
+									ProductVariant = new ProductVariant
+									{
+										ProductVariantId = productVariant.ProductVariantId,
+										Name = productVariant.Name,
+										ProductId = productVariant.ProductId,
+										Product = new Product
+										{
+											ProductId = product.ProductId,
+											ProductName = product.ProductName,
+											Thumbnail = product.Thumbnail,
+											Category = new Category
+											{
+												CategoryId = category.CategoryId,
+												CategoryName = category.CategoryName
+											},
+											Shop = new Shop
+											{
+												UserId = shop.UserId,
+												ShopName = shop.ShopName,
+											},
+											ProductMedias = (from productMedia in context.ProductMedia
+															 where productMedia.ProductId == productMedia.ProductId
+															 select new ProductMedia { Url = productMedia.Url }
+															).ToList()
+										}
+									},
+									BusinessFee = new BusinessFee
+									{
+										BusinessFeeId = businessFee.BusinessFeeId,
+										Fee = businessFee.Fee,
+									},
+									AssetInformations = (from assetInformation in context.AssetInformation
+														 where assetInformation.OrderId == orderId
+														 select new AssetInformation { Asset = assetInformation.Asset }
+														).ToList(),
+									OrderCoupons = (from orderCoupon in context.OrderCoupon
+													join coupon in context.Coupon
+														on orderCoupon.CouponId equals coupon.CouponId
+													where orderCoupon.OrderId == orderId
+													select new OrderCoupon
+													{
+														PriceDiscount = orderCoupon.PriceDiscount,
+													}
+													).ToList(),
+								})
+							   .FirstOrDefault();
+
+
+				if (order != null && order.FeedbackId != null)
+				{
+					Feedback feedback = context.Feedback
+						.Select(f => new Feedback()
+						{
+							FeedbackId = f.FeedbackId,
+							Rate = f.Rate,
+						})
+						.First(x => x.FeedbackId == order.FeedbackId);
+					order.Feedback = feedback;
+				}
+
+				return order;
+			}
+		}
+
+		internal Order? GetSellerOrderDetail(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order.Include(i => i.AssetInformations)
+					.ThenInclude(ti => ti.ProductVariant).ThenInclude(x => x.Product).Include(x => x.User)
+					.Where(x => x.OrderId == orderId).FirstOrDefault();
+			}
+		}
+
+		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var order = context.Order.First(x => x.OrderId == orderId);
+				order.OrderStatusId = status;
+				order.Note = note;	
+				context.SaveChanges();
+			}
+		}
+
+		internal Order? GetOrderForCheckingExisted(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var order = context.Order
+					.Include(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.OrderId == orderId);
+				return order;
+			}
+		}
+	}
 }
 

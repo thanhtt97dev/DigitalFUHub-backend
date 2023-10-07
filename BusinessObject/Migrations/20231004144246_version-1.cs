@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class initdb : Migration
+    public partial class version1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -790,7 +790,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "BusinessFee",
                 columns: new[] { "BusinessFeeId", "Fee", "StartDate" },
-                values: new object[] { 1L, 5L, new DateTime(2023, 10, 4, 22, 6, 29, 238, DateTimeKind.Local).AddTicks(4635) });
+                values: new object[] { 1L, 5L, new DateTime(2023, 10, 4, 21, 42, 45, 617, DateTimeKind.Local).AddTicks(565) });
 
             migrationBuilder.InsertData(
                 table: "Category",

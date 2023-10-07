@@ -12,19 +12,23 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalFUHubApi.Controllers
 {
-	[Authorize(Roles ="Admin")]
+	//[Authorize(Roles ="Admin")]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class AdminsController : ControllerBase
 	{
 		private readonly IMapper mapper;
 		private readonly IOrderRepository orderRepository;
+		private readonly MailService mailService;
 
-		public AdminsController(IMapper mapper, IOrderRepository orderRepository)
+		public AdminsController(IMapper mapper, IOrderRepository orderRepository, MailService mailService)
 		{
 			this.mapper = mapper;
 			this.orderRepository = orderRepository;
+			this.mailService = mailService;
 		}
+
+
 
 		#region Get orders
 		[HttpPost("GetOrders")]
@@ -85,6 +89,89 @@ namespace DigitalFUHubApi.Controllers
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
 				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get order
+		[HttpPost("GetOrder/{id}")]
+		public IActionResult GetOrder(int id)
+		{
+			if (id == 0) return BadRequest();
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			
+			try
+			{
+				var order = orderRepository.GetOrder(id);
+				if(order == null)
+				{
+					status.Message = "Order not existed!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var result = mapper.Map<OrderDetailResponseDTO>(order);	
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Update order status
+		[HttpPost("UpdateOrderStatus")]
+		public IActionResult UpdateOrderStatus(UpdateOrderStatusRequestDTO requestDTO)
+		{
+			if (requestDTO.OrderId == 0 || requestDTO.Status == 0) return BadRequest();
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			try
+			{
+				int[] statusAccepted = { Constants.ORDER_DISPUTE, Constants.ORDER_REJECT_COMPLAINT, Constants.ORDER_SELLER_VIOLATES };
+				if (!statusAccepted.Contains(requestDTO.Status))
+				{
+					status.Message = "Invalid order status!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var order = orderRepository.GetOrderForCheckingExisted(requestDTO.OrderId);
+				if (order == null)
+				{
+					status.Message = "Order not existed!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				orderRepository.UpdateOrderStatusAdmin(requestDTO.OrderId, requestDTO.Status, requestDTO.Note);
+
+				// check seller have VIOLATE 
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

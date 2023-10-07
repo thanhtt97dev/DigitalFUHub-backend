@@ -114,8 +114,10 @@ namespace BusinessObject
 			modelBuilder.Entity<Category>().HasData(new Category[]
 			{
 				new Category{CategoryId = 1, CategoryName = "Mạng xã hội"},
-				new Category{CategoryId = 2, CategoryName = "VPS"},
-				new Category{CategoryId = 3, CategoryName = "Khác"},
+				new Category{CategoryId = 2, CategoryName = "Giáo dục"},
+				new Category{CategoryId = 3, CategoryName = "Trò chơi"},
+				new Category{CategoryId = 4, CategoryName = "VPS"},
+				new Category{CategoryId = 5, CategoryName = "Khác"},
 			});
 
 			modelBuilder.Entity<TransactionType>().HasData(new TransactionType[]
@@ -139,9 +141,10 @@ namespace BusinessObject
 				new OrderStatus{OrderStatusId = 1, Name = "Wait for customer confirmation"},
 				new OrderStatus{OrderStatusId = 2, Name = "Confirmed"},
 				new OrderStatus{OrderStatusId = 3, Name = "Complaint"},
-				new OrderStatus{OrderStatusId = 4, Name = "Dispute"},
-				new OrderStatus{OrderStatusId = 5, Name = "Reject Complaint"},
-				new OrderStatus{OrderStatusId = 6, Name = "Seller violates"},
+				new OrderStatus{OrderStatusId = 4, Name = "Seller refunded"},
+				new OrderStatus{OrderStatusId = 5, Name = "Dispute"},
+				new OrderStatus{OrderStatusId = 6, Name = "Reject Complaint"},
+				new OrderStatus{OrderStatusId = 7, Name = "Seller violates"},
 			});
 
 			modelBuilder.Entity<User>().HasData(new User[]

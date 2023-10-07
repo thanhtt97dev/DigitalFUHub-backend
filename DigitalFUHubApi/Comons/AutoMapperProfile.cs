@@ -53,6 +53,28 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.ProductVariant.Product.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
 				.ReverseMap();
+			CreateMap<OrderCoupon, OrderDetailOrderCouponsDTO>()
+				.ReverseMap();
+			CreateMap<Order, OrderDetailResponseDTO>()
+				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
+				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))
+				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductVariant.ProductId))
+				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductVariant.Product.ProductName))
+				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.ProductVariant.Product.Thumbnail))
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.ProductVariant.Product.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
+				.ForMember(des => des.ProductCategoryId, act => act.MapFrom(src => src.ProductVariant.Product.Category.CategoryId))
+				.ForMember(des => des.ProductCategoryName, act => act.MapFrom(src => src.ProductVariant.Product.Category.CategoryName))
+				.ForMember(des => des.FeedbackRate,  opt => opt.MapFrom((src, dest) =>
+				{
+					if (src.Feedback == null) return 0;
+					return src.Feedback.Rate;
+				}))
+				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
+				.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
+				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductVariant.Product.ProductMedias.Select(x => x.Url).ToList()))
+				.ReverseMap();
 
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))

@@ -34,6 +34,20 @@ namespace DigitalFUHubApi.Controllers
             }
         }
 
-
+        #region Get All Product 
+        [HttpGet("GetAllProduct")]
+        public IActionResult GetAllProduct()
+        {
+            try
+            {
+                var products = _productRepository.GetAllProduct();
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+        #endregion
     }
 }

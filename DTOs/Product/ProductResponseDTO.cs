@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DTOs.Tag;
+using DTOs.Seller;
 
 namespace DTOs.Product
 {
@@ -27,11 +28,19 @@ namespace DTOs.Product
 		public long ProductVariantId { get; set; }
 		public string? Name { get; set; }
 		public long? Price { get; set; }
-		public virtual ICollection<AssetInformationResponseDTO>? AssetInformation { get; set; }
+		public virtual ICollection<AssetInformationResponseDTO>? AssetInformations { get; set; }
 	}
 	public class AssetInformationResponseDTO
 	{
 		public long AssetInformationId { get; set; }
 		public string? Asset { get; set; }
 	}
+    public class AllProductResponseDTO
+    {
+        public long ProductId { get; set; }
+        public string? ProductName { get; set; }
+        public int Discount { get; set; }
+        public string? Thumbnail { get; set; }
+        public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }
+    }
 }

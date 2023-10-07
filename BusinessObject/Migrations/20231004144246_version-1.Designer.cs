@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231004150629_init db")]
-    partial class initdb
+    [Migration("20231004144246_version-1")]
+    partial class version1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -268,7 +268,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 4, 22, 6, 29, 238, DateTimeKind.Local).AddTicks(4635)
+                            StartDate = new DateTime(2023, 10, 4, 21, 42, 45, 617, DateTimeKind.Local).AddTicks(565)
                         });
                 });
 

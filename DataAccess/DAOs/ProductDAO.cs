@@ -7,6 +7,7 @@ using DTOs.Tag;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,9 +33,9 @@ namespace DataAccess.DAOs
 				return instance;
 			}
 		}
-		internal List<SellerProductResponeDTO> GetAllProduct(int shopId)
+		internal List<SellerProductResponseDTO> GetAllProduct(int shopId)
 		{
-			List<SellerProductResponeDTO> result = new List<SellerProductResponeDTO>();
+			List<SellerProductResponseDTO> result = new List<SellerProductResponseDTO>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var products = context.Product.Where(x => x.ShopId == shopId).ToList();
@@ -52,7 +53,7 @@ namespace DataAccess.DAOs
 							Quantity = context.AssetInformation.Count(x => x.ProductVariantId == variant.ProductVariantId)
 						});
 					}
-					SellerProductResponeDTO productResponeDTO = new SellerProductResponeDTO()
+					SellerProductResponseDTO productResponeDTO = new SellerProductResponseDTO()
 					{
 						ProductId = product.ProductId,
 						ProductName = product.ProductName,
@@ -65,7 +66,39 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<ProductDetailVariantResponeDTO> GetProductVariants(int productId)
+        internal List<AllProductResponseDTO> GetAllProduct()
+        {
+            List<AllProductResponseDTO> result = new List<AllProductResponseDTO>();
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var products = context.Product.ToList();
+                foreach (var product in products)
+                {
+                    var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
+                    List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
+                    foreach (var variant in productVariants)
+                    {
+                        variants.Add(new ProductDetailVariantResponeDTO()
+                        {
+                            ProductVariantId = variant.ProductVariantId,
+                            Price = variant.Price
+                        });
+                    }
+                    AllProductResponseDTO productResponeDTO = new AllProductResponseDTO()
+					{
+						ProductId = product.ProductId,
+						ProductName = product.ProductName,
+						Discount = product.Discount,
+                        Thumbnail = product.Thumbnail,
+                        ProductVariants = variants
+                    };
+                    result.Add(productResponeDTO);
+                }
+                return result;
+            }
+        }
+
+        internal List<ProductDetailVariantResponeDTO> GetProductVariants(int productId)
 		{
 			List<ProductDetailVariantResponeDTO> result = new List<ProductDetailVariantResponeDTO>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -224,7 +257,7 @@ namespace DataAccess.DAOs
 							if (productVariant != null)
 							{
 								// delete old data and add new data
-								if (item.AssetInformation != null || item.AssetInformation?.Count > 0)
+								if (item.AssetInformations != null || item.AssetInformations?.Count > 0)
 								{
 									IQueryable<AssetInformation> assetInformations = context.AssetInformation.Where(x => x.IsActive == true && x.ProductVariantId == item.ProductVariantId);
 									context.AssetInformation.RemoveRange(assetInformations);
@@ -239,7 +272,7 @@ namespace DataAccess.DAOs
 									//		IsActive = true
 									//	});
 									//}
-									productVariant.AssetInformation = item.AssetInformation;
+									productVariant.AssetInformations = item.AssetInformations;
 								}
 								productVariant.Name = item.Name;
 								productVariant.Price = item.Price;
@@ -251,10 +284,23 @@ namespace DataAccess.DAOs
 							context.ProductVariant.Add(new ProductVariant
 							{
 								isActivate = true,
-								AssetInformation = item.AssetInformation,
+								AssetInformations = item.AssetInformations,
 								Price = item.Price,
 								Name = item.Name,
 								ProductId = productE.ProductId,
+							});
+						}
+						// delete old tag
+						List<Tag> tagsOld = context.Tag.Where(x => x.ProductId == productE.ProductId).ToList();
+						context.Tag.RemoveRange(tagsOld);
+
+						// add new tag
+						foreach (var item in tags)
+						{
+							context.Tag.Add(new Tag
+							{
+								ProductId = productE.ProductId,
+								TagName = item.TagName
 							});
 						}
 
