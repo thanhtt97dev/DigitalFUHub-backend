@@ -20,11 +20,13 @@ namespace DTOs.Admin
 		public long BusinessFeeValue { get; set; }
 		public int Quantity { get; set; }
 		public long Price { get; set; }
+		public long Discount { get; set; }
 		public DateTime OrderDate { get; set; }
+		public long TotalDiscount { get; set; }
 		public long TotalAmount { get; set; }
 		public long? FeedbackId { get; set; }
+		public int? FeedbackRate { get; set; }
 		public long OrderStatusId { get; set; }
-		public BusinessObject.Entities.Feedback? Feedback { get; set; }	
 		public List<string>? AssetInformations { get; set; }
 		public List<OrderDetailOrderCouponsDTO>? OrderCoupons { get; set; }
 		public List<string>? ProductMedias { get; set; }

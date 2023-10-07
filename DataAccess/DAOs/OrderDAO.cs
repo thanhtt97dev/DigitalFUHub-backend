@@ -136,20 +136,53 @@ namespace DataAccess.DAOs
 			}
 			return orders;
 		}
-		
+
 		internal void AddOrder(List<Order> orders)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					foreach (var order in orders)
+					// get bussinsis fee
+					var businessFee = context.BusinessFee.MaxBy(x => x.StartDate);
+					if (businessFee == null) throw new Exception();
+					long businessFeeId = businessFee.BusinessFeeId;
+					long businessFeeValue = businessFee.Fee;
+
+					foreach (var data in orders)
 					{
+						// get productVariant
+						ProductVariant? productVariant = context.ProductVariant.FirstOrDefault(x => x.ProductVariantId == data.ProductVariantId);
+						if (productVariant == null) throw new Exception();
+						//get product 
+						Product? product = context.Product.FirstOrDefault(x => x.ProductId == productVariant.ProductId);
+						if (product == null) throw new Exception();
+						//get coupons
+						long totalCouponsDiscount = 0;
+						if (data.OrderCoupons != null)
+						{
+							totalCouponsDiscount = context.Coupon.Where(x => data.OrderCoupons.Any(o => o.CouponId == x.CouponId)).Sum(x => x.PriceDiscount);
+						}
+
+						long totalDiscount = data.Quantity * (productVariant.Price * product.Discount / 100) + totalCouponsDiscount;
+
+						var order = new Order
+						{
+							UserId = data.UserId,
+							ProductVariantId = data.ProductVariantId,
+							BusinessFeeId = businessFeeId,
+							OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION,
+							Quantity = data.Quantity,
+							Price = productVariant.Price,
+							Discount = product.Discount,
+							TotalDiscount = totalDiscount,
+							TotalAmount = productVariant.Price * data.Quantity - totalCouponsDiscount
+						};
 						context.Order.Add(order);
 						context.SaveChanges();
 
+						// update asset info
 						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
 						if (assetInformations.Count < order.Quantity) throw new Exception();
 
@@ -158,7 +191,6 @@ namespace DataAccess.DAOs
 							asset.OrderId = order.OrderId;
 							asset.IsActive = false;
 						}
-
 						context.AssetInformation.UpdateRange(assetInformations);
 
 						//update customer account balance
@@ -184,7 +216,6 @@ namespace DataAccess.DAOs
 
 						context.Transaction.Add(newTransaction);
 					}
-
 					context.SaveChanges();
 					transaction.Commit();
 				}
@@ -224,7 +255,7 @@ namespace DataAccess.DAOs
 									Price = o.Price,
 									OrderDate = o.OrderDate,
 									TotalAmount = o.TotalAmount,
-									FeedbackId = o.FeedbackId,	
+									FeedbackId = o.FeedbackId,
 									OrderStatusId = o.OrderStatusId,
 									User = new User
 									{
@@ -241,10 +272,10 @@ namespace DataAccess.DAOs
 											ProductId = product.ProductId,
 											ProductName = product.ProductName,
 											Thumbnail = product.Thumbnail,
-											Category = new Category 
+											Category = new Category
 											{
 												CategoryId = category.CategoryId,
-												CategoryName = category.CategoryName 
+												CategoryName = category.CategoryName
 											},
 											Shop = new Shop
 											{
@@ -252,8 +283,8 @@ namespace DataAccess.DAOs
 												ShopName = shop.ShopName,
 											},
 											ProductMedias = (from productMedia in context.ProductMedia
-															where productMedia.ProductId == productMedia.ProductId	
-															select new ProductMedia { Url = productMedia.Url}
+															 where productMedia.ProductId == productMedia.ProductId
+															 select new ProductMedia { Url = productMedia.Url }
 															).ToList()
 										}
 									},
@@ -264,7 +295,7 @@ namespace DataAccess.DAOs
 									},
 									AssetInformations = (from assetInformation in context.AssetInformation
 														 where assetInformation.OrderId == orderId
-														 select new AssetInformation { Asset = assetInformation.Asset}
+														 select new AssetInformation { Asset = assetInformation.Asset }
 														).ToList(),
 									OrderCoupons = (from orderCoupon in context.OrderCoupon
 													join coupon in context.Coupon
@@ -274,28 +305,27 @@ namespace DataAccess.DAOs
 													{
 														PriceDiscount = orderCoupon.PriceDiscount,
 														UseDate = orderCoupon.UseDate,
-														Coupon = new Coupon 
-														{ 
-															CouponId = coupon.CouponId,	
+														Coupon = new Coupon
+														{
+															CouponId = coupon.CouponId,
 															CouponName = coupon.CouponName,
-														} 
+														}
 													}
 													).ToList(),
 								})
 							   .FirstOrDefault();
 
-				
-				if ( order != null && order.FeedbackId != null)
+
+				if (order != null && order.FeedbackId != null)
 				{
 					Feedback feedback = context.Feedback
-						.Select(f => new Feedback() 
+						.Select(f => new Feedback()
 						{
 							FeedbackId = f.FeedbackId,
-							Content = f.Content,	
-							Rate = f.Rate,	
+							Rate = f.Rate,
 						})
-						.First(x => x.FeedbackId == order.FeedbackId);	
-					order.Feedback = feedback;	
+						.First(x => x.FeedbackId == order.FeedbackId);
+					order.Feedback = feedback;
 				}
 
 				return order;
