@@ -141,9 +141,10 @@ namespace BusinessObject
 				new OrderStatus{OrderStatusId = 1, Name = "Wait for customer confirmation"},
 				new OrderStatus{OrderStatusId = 2, Name = "Confirmed"},
 				new OrderStatus{OrderStatusId = 3, Name = "Complaint"},
-				new OrderStatus{OrderStatusId = 4, Name = "Dispute"},
-				new OrderStatus{OrderStatusId = 5, Name = "Reject Complaint"},
-				new OrderStatus{OrderStatusId = 6, Name = "Seller violates"},
+				new OrderStatus{OrderStatusId = 4, Name = "Seller refunded"},
+				new OrderStatus{OrderStatusId = 5, Name = "Dispute"},
+				new OrderStatus{OrderStatusId = 6, Name = "Reject Complaint"},
+				new OrderStatus{OrderStatusId = 7, Name = "Seller violates"},
 			});
 
 			modelBuilder.Entity<User>().HasData(new User[]
