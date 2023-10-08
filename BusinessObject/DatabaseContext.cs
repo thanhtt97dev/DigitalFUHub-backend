@@ -27,6 +27,7 @@ namespace BusinessObject
 		public virtual DbSet<TwoFactorAuthentication> TwoFactorAuthentication { get; set; } = null!;
 		public virtual DbSet<DepositTransaction> DepositTransaction { get; set; } = null!;
 		public virtual DbSet<WithdrawTransaction> WithdrawTransaction { get; set; } = null!;
+		public virtual DbSet<WithdrawTransactionStatus> WithdrawTransactionStatus { get; set; } = null!;
 		public virtual DbSet<WithdrawTransactionBill> WithdrawTransactionBill { get; set; } = null!;
 		public virtual DbSet<Transaction> Transaction { get; set; } = null!;
 		public virtual DbSet<TransactionType> TransactionType { get; set; } = null!;
@@ -145,6 +146,13 @@ namespace BusinessObject
 				new OrderStatus{OrderStatusId = 5, Name = "Dispute"},
 				new OrderStatus{OrderStatusId = 6, Name = "Reject Complaint"},
 				new OrderStatus{OrderStatusId = 7, Name = "Seller violates"},
+			});
+
+			modelBuilder.Entity<WithdrawTransactionStatus>().HasData(new WithdrawTransactionStatus[]
+			{
+				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 1, Name = "In processing"},
+				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 2, Name = "Paid"},
+				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 3, Name = "Reject"},
 			});
 
 			modelBuilder.Entity<User>().HasData(new User[]

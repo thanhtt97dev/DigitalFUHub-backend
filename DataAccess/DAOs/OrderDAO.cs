@@ -288,7 +288,7 @@ namespace DataAccess.DAOs
 												ShopName = shop.ShopName,
 											},
 											ProductMedias = (from productMedia in context.ProductMedia
-															 where productMedia.ProductId == productMedia.ProductId
+															 where product.ProductId == productMedia.ProductId
 															 select new ProductMedia { Url = productMedia.Url }
 															).ToList()
 										}

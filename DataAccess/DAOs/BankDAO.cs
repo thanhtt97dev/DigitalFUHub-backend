@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
+using Comons;
 using DTOs.MbBank;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -100,7 +101,7 @@ namespace DataAccess.DAOs
 				transaction.UserBankId = userBank.UserBankId;
 				transaction.RequestDate = DateTime.Now;
 				transaction.PaidDate = null;
-				transaction.IsPay = false;
+				transaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_IN_PROCESSING;
 				transaction.UserId = transaction.UserId;
 				context.WithdrawTransaction.Add(transaction);
 				// update account balance
@@ -167,9 +168,9 @@ namespace DataAccess.DAOs
 
 						if (withdraw != null)
 						{
-							if (withdraw.IsPay == true) continue;
+							if (withdraw.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID) continue;
 							// set status is paid
-							withdraw.IsPay = true;
+							withdraw.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
 							withdraw.PaidDate = item.transactionDate;
 							// add bill info
 							WithdrawTransactionBill withdrawTransactionBill = new WithdrawTransactionBill()
@@ -277,7 +278,7 @@ namespace DataAccess.DAOs
 				}
 				if (status != 0)
 				{
-					withdraws = withdraws.Where(x => x.IsPay == (status == 1)).ToList();
+					withdraws = withdraws.Where(x => x.WithdrawTransactionStatusId == status).ToList();
 				}
 
 			}
@@ -302,7 +303,7 @@ namespace DataAccess.DAOs
 				}
 				if (status != 0)
 				{
-					withdraws = withdraws.Where(x => x.IsPay == (status == 1)).ToList();
+					withdraws = withdraws.Where(x => x.WithdrawTransactionStatusId == status).ToList();
 				}
 
 			}
@@ -333,7 +334,7 @@ namespace DataAccess.DAOs
 			{
 				var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
 				if (withDrawTransaction == null) throw new Exception();
-				withDrawTransaction.IsPay = true;
+				withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
 				withDrawTransaction.PaidDate = DateTime.Now;
 				context.SaveChanges();
 			}
@@ -359,12 +360,12 @@ namespace DataAccess.DAOs
 							transaction.Rollback();
 							return RESPONSE_CODE_DATA_NOT_FOUND;
 						}
-						if (withDrawTransaction.IsPay)
+						if (withDrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID)
 						{
 							transaction.Rollback();
 							return RESPONSE_CODE_BANK_WITHDRAW_PAID;
 						}
-						withDrawTransaction.IsPay = true;
+						withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
 						withDrawTransaction.PaidDate = DateTime.Now;
 					}
 					transaction.Commit();

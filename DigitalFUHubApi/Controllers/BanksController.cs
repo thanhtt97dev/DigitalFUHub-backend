@@ -715,7 +715,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				if (!withdrawTransaction.IsPay)
+				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID)
 				{
 					status.Message = "Withdraw transaction hasn't paid!";
 					status.Ok = false;
@@ -780,11 +780,20 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				if (!withdrawTransaction.IsPay)
+				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
 				{
 					status.Message = "Withdraw transaction hasn't paid!";
 					status.Ok = false;
 					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_REJECT)
+				{
+					status.Message = "Withdraw transaction hasn been rejected!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_REJECT;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
@@ -834,7 +843,7 @@ namespace DigitalFUHubApi.Controllers
 					responseData.Status = status;
 					return Ok(responseData);
 				}
-				if (withdrawTransaction.IsPay)
+				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID)
 				{
 					status.Message = "Withdraw transaction has been paid!";
 					status.Ok = false;
