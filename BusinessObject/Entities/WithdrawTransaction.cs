@@ -20,8 +20,9 @@ namespace BusinessObject.Entities
 		public DateTime? PaidDate { get; set; }
 		public string Code { get; set; } = null!;
 		public long Amount { get; set; }
+		public string? Note { get; set; }
 
-        [ForeignKey(nameof(UserId))]
+		[ForeignKey(nameof(UserId))]
         public virtual User User { get; set; } = null!;
 		[ForeignKey(nameof(UserBankId))]
 		public virtual UserBank UserBank { get; set; } = null!;

@@ -547,23 +547,23 @@ namespace DigitalFUHubApi.Controllers
 		#region Get history withdraw transaction of a user
 		[Authorize]
 		[HttpPost("HistoryWithdraw/{id}")]
-		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
+		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO requestDTO)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0 || historyWithdrawRequestDTO == null ||
-					historyWithdrawRequestDTO.FromDate == null ||
-					historyWithdrawRequestDTO.ToDate == null) return BadRequest();
+				if (id == 0 || requestDTO == null ||
+					requestDTO.FromDate == null ||
+					requestDTO.ToDate == null) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
 				try
 				{
-					fromDate = DateTime.ParseExact(historyWithdrawRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(historyWithdrawRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
 					if (fromDate > toDate)
 					{
 						status.Message = "From date must be less than to date";
@@ -583,11 +583,10 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				long withdrawTransactionId;
-				long.TryParse(historyWithdrawRequestDTO.WithdrawTransactionId, out withdrawTransactionId);
+				long.TryParse(requestDTO.WithdrawTransactionId, out withdrawTransactionId);
 
-				// 0 : All, 1: paid, 2: in process
-				if (historyWithdrawRequestDTO.Status != 0 && historyWithdrawRequestDTO.Status != 1 &&
-					historyWithdrawRequestDTO.Status != 2)
+				if(!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(requestDTO.Status) && 
+					requestDTO.Status != Constants.WITHDRAW_TRANSACTION_ALL)
 				{
 					status.Message = "Invalid transaction's status";
 					status.Ok = false;
@@ -596,7 +595,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var withdraws = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, historyWithdrawRequestDTO.Status);
+				var withdraws = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, requestDTO.Status);
 
 				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(withdraws);
 
@@ -617,24 +616,24 @@ namespace DigitalFUHubApi.Controllers
 		#region Get history withdraw transaction for admin
 		[Authorize(Roles ="Admin")]
 		[HttpPost("HistoryWithdrawAll")]
-		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO historyWithdrawRequestDTO)
+		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO requestDTO)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			string format = "M/d/yyyy";
 			try
 			{
-				if (historyWithdrawRequestDTO == null ||
-					historyWithdrawRequestDTO.Email == null ||
-					historyWithdrawRequestDTO.FromDate == null ||
-					historyWithdrawRequestDTO.ToDate == null) return BadRequest();
+				if (requestDTO == null ||
+					requestDTO.Email == null ||
+					requestDTO.FromDate == null ||
+					requestDTO.ToDate == null) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
 				try
 				{
-					fromDate = DateTime.ParseExact(historyWithdrawRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(historyWithdrawRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
 					if (fromDate > toDate)
 					{
 						status.Message = "From date must be less than to date";
@@ -653,12 +652,8 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				long withdrawTransactionId;
-				long.TryParse(historyWithdrawRequestDTO.WithdrawTransactionId, out withdrawTransactionId);
-
-				// 0 : All, 1: paid, 2: in process
-				if (historyWithdrawRequestDTO.Status != 0 && historyWithdrawRequestDTO.Status != 1 &&
-					historyWithdrawRequestDTO.Status != 2)
+				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(requestDTO.Status) &&
+					requestDTO.Status != Constants.WITHDRAW_TRANSACTION_ALL)
 				{
 					status.Message = "Invalid transaction's status";
 					status.Ok = false;
@@ -667,7 +662,10 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, historyWithdrawRequestDTO.Email, fromDate, toDate, historyWithdrawRequestDTO.Status);
+				long withdrawTransactionId;
+				long.TryParse(requestDTO.WithdrawTransactionId, out withdrawTransactionId);
+
+				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate, requestDTO.Status);
 
 				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
 
@@ -715,12 +713,22 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID)
+				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
 				{
 					status.Message = "Withdraw transaction hasn't paid!";
 					status.Ok = false;
 					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY;
 					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_REJECT)
+				{
+					status.Message = "Withdraw transaction hasn been rejected!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_REJECT;
+					responseData.Status = status;
+					responseData.Result = withdrawTransaction.Note ?? string.Empty;
 					return Ok(responseData);
 				}
 
@@ -794,6 +802,7 @@ namespace DigitalFUHubApi.Controllers
 					status.Message = "Withdraw transaction hasn been rejected!";
 					status.Ok = false;
 					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_REJECT;
+					responseData.Result = withdrawTransaction.Note ?? string.Empty;
 					responseData.Status = status;
 					return Ok(responseData);
 				}
