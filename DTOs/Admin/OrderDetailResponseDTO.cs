@@ -29,8 +29,10 @@ namespace DTOs.Admin
 		public long? FeedbackId { get; set; }
 		public int? FeedbackRate { get; set; }
 		public long OrderStatusId { get; set; }
+		/*
 		public List<string>? AssetInformations { get; set; }
 		public List<OrderDetailOrderCouponsDTO>? OrderCoupons { get; set; }
+		*/
 		public List<string>? ProductMedias { get; set; }
 	}
 	public class OrderDetailOrderCouponsDTO

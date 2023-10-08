@@ -365,6 +365,7 @@ namespace DataAccess.DAOs
 										BusinessFeeId = businessFee.BusinessFeeId,
 										Fee = businessFee.Fee,
 									},
+									/*
 									AssetInformations = (from assetInformation in context.AssetInformation
 														 where assetInformation.OrderId == orderId
 														 select new AssetInformation { Asset = assetInformation.Asset }
@@ -378,6 +379,7 @@ namespace DataAccess.DAOs
 														PriceDiscount = orderCoupon.PriceDiscount,
 													}
 													).ToList(),
+									*/
 								})
 							   .FirstOrDefault();
 

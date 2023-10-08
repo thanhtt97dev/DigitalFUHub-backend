@@ -779,14 +779,6 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				if (withdrawTransaction.UserId != requestDTO.UserId)
-				{
-					status.Message = "You not have permitsion to view this data!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
-					responseData.Status = status;
-					return Ok(responseData);
-				}
 
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
 				{

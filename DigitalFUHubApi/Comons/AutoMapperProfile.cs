@@ -72,7 +72,7 @@ namespace DigitalFUHubApi.Comons
 					return src.Feedback.Rate;
 				}))
 				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
-				.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
+				//.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
 				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductVariant.Product.ProductMedias.Select(x => x.Url).ToList()))
 				.ReverseMap();
 
