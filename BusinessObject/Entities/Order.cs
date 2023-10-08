@@ -23,9 +23,10 @@ namespace BusinessObject.Entities
 		public int Quantity { get; set; }
 		public long Price { get; set; }
 		public long Discount { get; set; }
-		public DateTime OrderDate { get; set; }
-		public long TotalDiscount { get; set; }
 		public long TotalAmount { get; set; }
+		public long TotalCouponDiscount { get; set; }
+		public long TotalPayment { get; set; }
+		public DateTime OrderDate { get; set; }
 		public string? Note { get; set; }
 
 		[ForeignKey(nameof(UserId))]

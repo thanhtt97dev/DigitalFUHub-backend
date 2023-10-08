@@ -6,15 +6,17 @@ using System.Threading.Tasks;
 
 namespace DTOs.Order
 {
-    public class AddOrderRequestDTO
-    {
-        public long UserId { get; set; }
-        public long ProductVariantId { get; set; }
-        public long BusinessFeeId { get; set; }
-        public long Quantity { get; set; }
-        public long Price { get; set; }
-        public DateTime OrderDate { get; set; }
-        public long TotalAmount { get; set; }
-        public bool IsFeedback { get; set; }
-    }
+	public class AddOrderRequestDTO
+	{
+		public long UserId { get; set; }
+		public long ProductVariantId { get; set; }
+		public long BusinessFeeId { get; set; }
+		public int Quantity { get; set; }
+		public List<string> Coupons { get; set; } = new List<string>();
+	}
+
+	public class CouponRequestAddOrderDTO
+	{
+		public string CouponCode { get; set; } = string.Empty;	
+	}
 }

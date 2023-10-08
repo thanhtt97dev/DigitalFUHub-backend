@@ -16,25 +16,25 @@ using DTOs.Coupon;
 
 namespace DigitalFUHubApi.Comons
 {
-    public class AutoMapperProfile : Profile
-    {
-        public AutoMapperProfile()
-        {
-            CreateMap<User, UserResponeDTO>()
-                .ForMember(des => des.RoleName, act => act.MapFrom(src => src.Role.RoleName)).ReverseMap();
+	public class AutoMapperProfile : Profile
+	{
+		public AutoMapperProfile()
+		{
+			CreateMap<User, UserResponeDTO>()
+				.ForMember(des => des.RoleName, act => act.MapFrom(src => src.Role.RoleName)).ReverseMap();
 			CreateMap<User, UserSignInResponseDTO>()
 				.ForMember(des => des.RoleName, act => act.MapFrom(src => src.Role.RoleName)).ReverseMap();
 			CreateMap<User, UserUpdateRequestDTO>().ReverseMap();
-            CreateMap<Role, RoleDTO>().ReverseMap();
-            CreateMap<Notification, NotificationRespone>().ReverseMap();
+			CreateMap<Role, RoleDTO>().ReverseMap();
+			CreateMap<Notification, NotificationRespone>().ReverseMap();
 			CreateMap<DepositTransaction, CreateTransactionRequestDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, CreateTransactionRequestDTO>().ReverseMap();
 			CreateMap<Bank, BankResponeDTO>().ReverseMap();
 			CreateMap<UserBank, BankAccountResponeDTO>()
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.Bank.BankName))
-				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => Util.HideCharacters(src.CreditAccount,5)))
+				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => Util.HideCharacters(src.CreditAccount, 5)))
 				.ReverseMap();
-            CreateMap<Message, MessageResponseDTO>().ReverseMap();
+			CreateMap<Message, MessageResponseDTO>().ReverseMap();
 			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, HistoryWithdrawResponsetDTO>()
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
@@ -67,14 +67,19 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
 				.ForMember(des => des.ProductCategoryId, act => act.MapFrom(src => src.ProductVariant.Product.Category.CategoryId))
 				.ForMember(des => des.ProductCategoryName, act => act.MapFrom(src => src.ProductVariant.Product.Category.CategoryName))
-				.ForMember(des => des.FeedbackRate,  opt => opt.MapFrom((src, dest) =>
+				.ForMember(des => des.FeedbackRate, opt => opt.MapFrom((src, dest) =>
 				{
 					if (src.Feedback == null) return 0;
 					return src.Feedback.Rate;
 				}))
 				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
-				.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
+				//.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
 				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductVariant.Product.ProductMedias.Select(x => x.Url).ToList()))
+				.ReverseMap();
+
+
+			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
+				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();
 
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
@@ -92,5 +97,5 @@ namespace DigitalFUHubApi.Comons
 
 
         }
-    }
+	}
 }

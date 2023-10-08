@@ -14,7 +14,8 @@ namespace BusinessObject.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long CouponId { get; set; }
         public long ShopId { get; set; }
-        public string? CouponName { get; set; }
+        public string CouponCode { get; set; } = string.Empty;
+		public string? CouponName { get; set; }
         public long PriceDiscount { get; set; }
         public long Quantity { get; set; }
         public DateTime StartDate { get; set; }

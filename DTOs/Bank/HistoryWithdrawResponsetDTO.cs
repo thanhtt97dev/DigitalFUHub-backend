@@ -18,7 +18,7 @@ namespace DTOs.Bank
 		public string CreditAccount { get; set; } = null!;
 		public string BankName { get; set; } = string.Empty;
 		public string BankCode { get; set; } = null!;
-		public bool IsPay { get; set; }
+		public long WithdrawTransactionStatusId { get; set; }
 
 	}
 }

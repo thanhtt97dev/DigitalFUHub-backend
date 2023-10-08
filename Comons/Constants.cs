@@ -27,9 +27,16 @@
 		public const string RESPONSE_CODE_FAILD = "03";
 		public const string RESPONSE_CODE_UN_AUTHORIZE = "04";
 
+
 		public const string RESPONSE_CODE_BANK_WITHDRAW_PAID = "BANK_01";
 		public const string RESPONSE_CODE_BANK_WITHDRAW_UNPAY = "BANK_02";
-		public const string RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND = "BANK_03";
+		public const string RESPONSE_CODE_BANK_WITHDRAW_REJECT = "BANK_03";
+		public const string RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND = "BANK_04";
+
+		public const string RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY = "ORDER_01";
+		public const string RESPONSE_CODE_ORDER_COUPON_USED = "ORDER_02";
+		public const string RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE = "ORDER_03";
+		
 
 
 		//SignalR
@@ -49,8 +56,15 @@
 		public const int PRODUCT_BAN = 2;
 		public const int PRODUCT_HIDE = 3;
 
-        // Cart Status
-        public const string CART_RESPONSE_CODE_SUCCESS = "0";
+		// Withdraw transaction Status
+		public const int WITHDRAW_TRANSACTION_ALL = 0;
+		public const int WITHDRAW_TRANSACTION_IN_PROCESSING = 1;
+		public const int WITHDRAW_TRANSACTION_PAID = 2;
+		public const int WITHDRAW_TRANSACTION_REJECT = 3;
+		public static int[] WITHDRAW_TRANSACTION_STATUS = new int[] { WITHDRAW_TRANSACTION_IN_PROCESSING, WITHDRAW_TRANSACTION_PAID, WITHDRAW_TRANSACTION_REJECT };
+
+		// Cart Status
+		public const string CART_RESPONSE_CODE_SUCCESS = "0";
         public const string CART_RESPONSE_CODE_INVALID_QUANTITY = "1";
 
         //Order Status
