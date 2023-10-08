@@ -137,7 +137,7 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-		internal (string, string) AddOrder(List<Order> orders)
+		internal (string, string) AddOrder(List<AddOrderRequestDTO> orders)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -175,28 +175,20 @@ namespace DataAccess.DAOs
 						// get list coupon
 						List<Coupon> coupons = new List<Coupon>();
 
-						if (data.OrderCoupons != null)
+						if (data.Coupons != null && data.Coupons.Count != 0)
 						{
-							List<string> couponCodes = new List<string>();
-							foreach (var item in data.OrderCoupons)
-							{
-								couponCodes.Add(item.Coupon.CouponCode);
-							}
 							//get coupon
 							coupons = (from coupon in context.Coupon
-									   where couponCodes.Contains(coupon.CouponCode) &&
+									   where data.Coupons.Contains(coupon.CouponCode) &&
 									   coupon.StartDate < DateTime.Now && coupon.EndDate > DateTime.Now &&
 									   coupon.IsActive && coupon.Quantity > 1
 									   select coupon).ToList();
 
-							if (coupons.Count != data.OrderCoupons.Count)
+							if (coupons.Count != data.Coupons.Count)
 							{
 								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
 							}
-							if (coupons.Count != 0)
-							{
-								totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
-							}
+							totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
 						}
 						long totalAmount = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
 						long totalPayment = totalAmount - totalCouponsDiscount;

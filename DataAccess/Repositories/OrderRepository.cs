@@ -21,7 +21,7 @@ namespace DataAccess.Repositories
 
 		public void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders) => OrderDAO.Instance.ConfirmOrdersWithWaitToConfirmStatus(orders);
 
-		public (string, string) AddOrder(List<Order> orders) => OrderDAO.Instance.AddOrder(orders);
+		public (string, string) AddOrder(List<AddOrderRequestDTO> orders) => OrderDAO.Instance.AddOrder(orders);
 
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 

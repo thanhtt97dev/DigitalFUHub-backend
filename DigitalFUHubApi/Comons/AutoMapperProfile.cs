@@ -80,12 +80,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();
-			/*
-			CreateMap<Coupon, CouponRequestAddOrderDTO>()
-				.ForMember(des => des.CouponCode, act => act.MapFrom(src => src.CouponCode))
-				.ReverseMap();
-			*/
-			
+
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();
