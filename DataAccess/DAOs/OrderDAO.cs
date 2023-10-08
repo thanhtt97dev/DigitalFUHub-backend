@@ -137,7 +137,7 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-		internal void AddOrder(List<Order> orders)
+		internal (string, string) AddOrder(List<Order> orders)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -147,7 +147,10 @@ namespace DataAccess.DAOs
 					// get bussinsis fee
 					var businessFeeDate = context.BusinessFee.Max(x => x.StartDate);
 					var businessFee = context.BusinessFee.FirstOrDefault(x => x.StartDate == businessFeeDate);
-					if (businessFee == null) throw new Exception();
+					if (businessFee == null)
+					{
+						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Business fee not found!");
+					}
 					long businessFeeId = businessFee.BusinessFeeId;
 					long businessFeeValue = businessFee.Fee;
 
@@ -155,18 +158,48 @@ namespace DataAccess.DAOs
 					{
 						// get productVariant
 						ProductVariant? productVariant = context.ProductVariant.FirstOrDefault(x => x.ProductVariantId == data.ProductVariantId);
-						if (productVariant == null) throw new Exception();
+						if (productVariant == null)
+						{
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not found!");
+						}
 						//get product 
 						Product? product = context.Product.FirstOrDefault(x => x.ProductId == productVariant.ProductId);
-						if (product == null) throw new Exception();
+						if (product == null)
+						{
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!");
+
+						}
 						//get coupons
 						long totalCouponsDiscount = 0;
+
+						// get list coupon
+						List<Coupon> coupons = new List<Coupon>();
+
 						if (data.OrderCoupons != null)
 						{
-							totalCouponsDiscount = context.Coupon.Where(x => data.OrderCoupons.Any(o => o.CouponId == x.CouponId)).Sum(x => x.PriceDiscount);
-						}
+							List<string> couponCodes = new List<string>();
+							foreach (var item in data.OrderCoupons)
+							{
+								couponCodes.Add(item.Coupon.CouponCode);
+							}
+							//get coupon
+							coupons = (from coupon in context.Coupon
+									   where couponCodes.Contains(coupon.CouponCode) &&
+									   coupon.StartDate < DateTime.Now && coupon.EndDate > DateTime.Now &&
+									   coupon.IsActive && coupon.Quantity > 1
+									   select coupon).ToList();
 
-						long totalDiscount = data.Quantity * (productVariant.Price * product.Discount / 100) + totalCouponsDiscount;
+							if (coupons.Count != data.OrderCoupons.Count)
+							{
+								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
+							}
+							if (coupons.Count != 0)
+							{
+								totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
+							}
+						}
+						long totalAmount = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
+						long totalPayment = totalAmount - totalCouponsDiscount;
 
 						var order = new Order
 						{
@@ -177,16 +210,56 @@ namespace DataAccess.DAOs
 							Quantity = data.Quantity,
 							Price = productVariant.Price,
 							Discount = product.Discount,
-							TotalDiscount = totalDiscount,
-							TotalAmount = productVariant.Price * data.Quantity - totalCouponsDiscount,
+							TotalAmount = totalAmount,
+							TotalCouponDiscount = totalCouponsDiscount,
+							TotalPayment = totalPayment,
 							OrderDate = DateTime.Now,
 						};
 						context.Order.Add(order);
 						context.SaveChanges();
 
+						//update customer account balance
+						var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
+						if (customer == null)
+						{
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
+						}
+						if (customer.AccountBalance < totalPayment)
+						{
+							return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
+						}
+						customer.AccountBalance = customer.AccountBalance - totalPayment;
+						context.User.Update(customer);
+						context.SaveChanges();
+
+						// add orderCoupon and update coupon's status
+						if (coupons.Count != 0)
+						{
+							foreach (var coupon in coupons)
+							{
+								OrderCoupon orderCoupon = new OrderCoupon()
+								{
+									OrderId = order.OrderId,
+									CouponId = coupon.CouponId,
+									PriceDiscount = coupon.PriceDiscount,
+									UseDate = DateTime.Now
+								};
+								context.OrderCoupon.Add(orderCoupon);
+								context.SaveChanges();
+
+								coupon.Quantity = coupon.Quantity - 1;
+								context.Coupon.Update(coupon);
+								context.SaveChanges();
+							}
+
+						}
+
 						// update asset info
 						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
-						if (assetInformations.Count < order.Quantity) throw new Exception();
+						if (assetInformations.Count < order.Quantity)
+						{
+							return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
+						}
 
 						foreach (var asset in assetInformations)
 						{
@@ -194,16 +267,14 @@ namespace DataAccess.DAOs
 							asset.IsActive = false;
 						}
 						context.AssetInformation.UpdateRange(assetInformations);
+						context.SaveChanges();
 
-						//update customer account balance
-						var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
-						if (customer == null) throw new NullReferenceException();
-						if (customer.AccountBalance < order.TotalAmount) throw new Exception();
-						customer.AccountBalance = customer.AccountBalance - order.TotalAmount;
 
 						//update admin account balance
 						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-						admin.AccountBalance = admin.AccountBalance + order.TotalAmount;
+						admin.AccountBalance = admin.AccountBalance + totalPayment;
+						context.User.Update(admin);
+						context.SaveChanges();
 
 						// add new transaction
 						Transaction newTransaction = new Transaction
@@ -212,20 +283,23 @@ namespace DataAccess.DAOs
 							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
 							OrderId = order.OrderId,
 							PaymentAmount = order.TotalAmount,
-							Note = "Thanh toan",
+							Note = "Payment",
 							DateCreate = DateTime.Now
 						};
-
 						context.Transaction.Add(newTransaction);
+						context.SaveChanges();
+
 					}
 					context.SaveChanges();
 					transaction.Commit();
+
 				}
 				catch (Exception ex)
 				{
 					transaction.Rollback();
 					throw new Exception(ex.Message);
 				}
+				return (Constants.RESPONSE_CODE_SUCCESS, "Success!");
 			}
 		}
 
@@ -255,10 +329,11 @@ namespace DataAccess.DAOs
 									BusinessFeeId = o.BusinessFeeId,
 									Quantity = o.Quantity,
 									Price = o.Price,
-									Discount = o.Discount,	
+									Discount = o.Discount,
 									OrderDate = o.OrderDate,
-									TotalDiscount = o.TotalDiscount,
 									TotalAmount = o.TotalAmount,
+									TotalCouponDiscount = o.TotalCouponDiscount,
+									TotalPayment = o.TotalPayment,
 									Note = o.Note,
 									FeedbackId = o.FeedbackId,
 									OrderStatusId = o.OrderStatusId,
@@ -347,7 +422,7 @@ namespace DataAccess.DAOs
 			{
 				var order = context.Order.First(x => x.OrderId == orderId);
 				order.OrderStatusId = status;
-				order.Note = note;	
+				order.Note = note;
 				context.SaveChanges();
 			}
 		}

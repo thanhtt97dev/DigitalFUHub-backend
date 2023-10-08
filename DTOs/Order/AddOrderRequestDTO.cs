@@ -12,9 +12,11 @@ namespace DTOs.Order
         public long ProductVariantId { get; set; }
         public long BusinessFeeId { get; set; }
         public long Quantity { get; set; }
-        public long Price { get; set; }
-        public DateTime OrderDate { get; set; }
-        public long TotalAmount { get; set; }
-        public bool IsFeedback { get; set; }
+		public List<CouponRequestAddOrderDTO> Coupons { get; set; }   
+	}
+
+    public class CouponRequestAddOrderDTO
+    {
+        public string? CouponCode { get; set; }
     }
 }

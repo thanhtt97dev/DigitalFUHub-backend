@@ -31,19 +31,22 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-                List<Order> orders = _mapper.Map<List<Order>>(addOrderRequest);
-                _repository.AddOrder(orders);
-                return Ok(new Status
-                {
-                    Message = "Add Order Successfully"
-                    ,
-                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS
-                    ,
-                    Ok = true
-                });
+                if (addOrderRequest == null) return BadRequest();
 
+				List<Order> orders = _mapper.Map<List<Order>>(addOrderRequest);
+				(string responseCode, string message) = _repository.AddOrder(orders);
+
+				ResponseData responseData = new ResponseData();
+				Status status = new Status()
+                {
+					Message = message,
+					Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS,
+					ResponseCode = responseCode
+			    };
+                responseData.Status = status;
+				return Ok(responseData);
             }
-            catch (ArgumentNullException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
