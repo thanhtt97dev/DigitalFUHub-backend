@@ -12,6 +12,7 @@ using DTOs.Tag;
 using DTOs.Cart;
 using DTOs.Admin;
 using DTOs.Order;
+using DTOs.Coupon;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -87,6 +88,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
             CreateMap<Cart, CartDTO>().ReverseMap();
             CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
+            CreateMap<Coupon, CouponResponseDTO>().ReverseMap();
 
 
         }

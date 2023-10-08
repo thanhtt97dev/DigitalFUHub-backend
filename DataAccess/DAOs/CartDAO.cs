@@ -102,7 +102,8 @@ namespace DataAccess.DAOs
                             PriceDiscount = price - (price * (product?.Discount ?? 1) / 100),
                             Quantity = context.AssetInformation.Count(x => x.ProductVariantId == cart.ProductVariantId)
                         },
-                        ShopName = product?.Shop.ShopName ?? ""
+                        ShopName = product?.Shop.ShopName ?? "",
+                        ShopId = product?.Shop.UserId ?? 0
                     };
                     cartDTOs.Add(cartDTO);
                 }

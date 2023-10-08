@@ -80,7 +80,7 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("GetCartsByUserId/{userId}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetCartsByUserId(long userId)
         {
             try
