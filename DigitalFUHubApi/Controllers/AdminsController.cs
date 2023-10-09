@@ -19,15 +19,16 @@ namespace DigitalFUHubApi.Controllers
 	{
 		private readonly IMapper mapper;
 		private readonly IOrderRepository orderRepository;
+		private readonly IBankRepository bankRepository;
 		private readonly MailService mailService;
 
-		public AdminsController(IMapper mapper, IOrderRepository orderRepository, MailService mailService)
+		public AdminsController(IMapper mapper, IOrderRepository orderRepository, IBankRepository bankRepository, MailService mailService)
 		{
 			this.mapper = mapper;
 			this.orderRepository = orderRepository;
+			this.bankRepository = bankRepository;
 			this.mailService = mailService;
 		}
-
 
 
 		#region Get orders
@@ -181,5 +182,54 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+
+		#region RejectWithdrawTransaction
+		[HttpPost("RejectWithdrawTransaction")]
+		public IActionResult RejectWithdrawTransaction(RejectWithdrawTransaction requestDTO)
+		{
+			if (requestDTO.WithdrawTransactionId == 0 || string.IsNullOrEmpty(requestDTO.Note)) return BadRequest();
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			try
+			{
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(requestDTO.WithdrawTransactionId);
+
+				if (withdrawTransaction == null)
+				{
+					status.Message = "Withdraw transaction not existed!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if(withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID ||
+					withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_REJECT)
+				{
+					status.Message = $"Withdraw transaction has been " +
+						$"{(withdrawTransaction.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID ? "Paid" : "Rejected")}!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				bankRepository.RejectWithdrawTransaction(requestDTO.WithdrawTransactionId, requestDTO.Note);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 	}
 }
+ 

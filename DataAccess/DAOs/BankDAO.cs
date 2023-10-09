@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.DAOs
 {
@@ -411,6 +412,17 @@ namespace DataAccess.DAOs
 
 			}
 			return transactions;
+		}
+
+		internal void RejectWithdrawTransaction(long withdrawTransactionId, string? note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var withdrawTransaction = context.WithdrawTransaction.First(x => x.WithdrawTransactionId == withdrawTransactionId);
+				withdrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_REJECT;
+				withdrawTransaction.Note = note;
+				context.SaveChanges();
+			}
 		}
 	}
 }
