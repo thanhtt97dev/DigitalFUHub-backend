@@ -57,7 +57,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize("Customer,Seller")]
 		[HttpPost("All")]
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
@@ -108,7 +108,7 @@ namespace DigitalFUHubApi.Controllers
 			response.Result = orderResponse;
 			return Ok(response);
 		}
-		[Authorize]
+		[Authorize("Customer,Seller")]
 		[HttpPost("Edit/Status")]
 		public IActionResult UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
 		{
@@ -119,7 +119,7 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
 			}
-			Order? order = _orderRepository.GetOrder(request.OrderId);
+			Order? order = orderRepository.GetOrder(request.OrderId);
 			if (order == null)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
@@ -147,7 +147,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.StatusId);
+				orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.StatusId);
 			}
 			catch (Exception e)
 			{
