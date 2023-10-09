@@ -37,7 +37,7 @@ namespace DigitalFUHubApi.Comons
 		#endregion
 
 		#region Get access token from httpContext
-		public string GetAccessToken(HttpContext httpContext)
+		public static string GetAccessToken(HttpContext httpContext)
 		{
 			string token = string.Empty;
 			string authorization = httpContext.Request.Headers["Authorization"].ToString();
