@@ -72,7 +72,8 @@ namespace DigitalFUHubApi.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                Console.WriteLine(ex.Message);
+                return BadRequest(new Status());
             }
         }
 
@@ -160,7 +161,7 @@ namespace DigitalFUHubApi.Controllers
             }
             catch (Exception ex)
             {
-                Util.WriteLog(true, ex.Message);
+                Console.WriteLine(ex.Message);
                 return BadRequest(new Status());
             }
         }
