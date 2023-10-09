@@ -20,15 +20,18 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IMapper mapper;
 		private readonly IOrderRepository orderRepository;
 		private readonly IBankRepository bankRepository;
+		private readonly IUserRepository userRepository;
 		private readonly MailService mailService;
 
-		public AdminsController(IMapper mapper, IOrderRepository orderRepository, IBankRepository bankRepository, MailService mailService)
+		public AdminsController(IMapper mapper, IOrderRepository orderRepository, IBankRepository bankRepository, IUserRepository userRepository, MailService mailService)
 		{
 			this.mapper = mapper;
 			this.orderRepository = orderRepository;
 			this.bankRepository = bankRepository;
+			this.userRepository = userRepository;
 			this.mailService = mailService;
 		}
+
 
 
 		#region Get orders
@@ -235,6 +238,42 @@ namespace DigitalFUHubApi.Controllers
 				status.Ok = true;
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status = status;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get users
+		[HttpPost("GetUsers")]
+		public IActionResult GetUsers(UsersRequestDTO requestDTO)
+		{
+			
+			if(requestDTO == null || requestDTO.Email == null ||
+				requestDTO.FullName == null || requestDTO.UserId == null)
+			{
+				return BadRequest();
+			}
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			try
+			{
+				long userId = 0;
+				long.TryParse(requestDTO.UserId, out userId);
+
+				var users = userRepository.GetUsers(userId, requestDTO.Email, requestDTO.FullName, requestDTO.RoleId, requestDTO.Status);
+				var result = mapper.Map<List<UsersResponseDTO>>(users);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

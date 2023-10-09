@@ -5,6 +5,7 @@ using Comons;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
+using DigitalFUHubApi.Services;
 using DTOs.Cart;
 using DTOs.Order;
 using Microsoft.AspNetCore.Authorization;
@@ -17,13 +18,15 @@ namespace DigitalFUHubApi.Controllers
 	[ApiController]
 	public class OrdersController : ControllerBase
 	{
-		private readonly IMapper _mapper;
-		private readonly IOrderRepository _orderRepository;
+		private readonly IMapper mapper;
+		private readonly IOrderRepository orderRepository;
+		private readonly JwtTokenService jwtTokenService;
 
-		public OrdersController(IMapper mapper, IOrderRepository orderRepository)
+		public OrdersController(IMapper mapper, IOrderRepository orderRepository, JwtTokenService jwtTokenService)
 		{
-			_mapper = mapper;
-			_orderRepository = orderRepository;
+			this.mapper = mapper;
+			this.orderRepository = orderRepository;
+			this.jwtTokenService = jwtTokenService;
 		}
 
 		[HttpPost("AddOrder")]
@@ -34,8 +37,8 @@ namespace DigitalFUHubApi.Controllers
 			{
 				if (addOrderRequest == null) return BadRequest();
 
-				(string responseCode, string message) = _orderRepository.AddOrder(addOrderRequest);
-				List<Order> orders = _mapper.Map<List<Order>>(addOrderRequest);
+				(string responseCode, string message) = orderRepository.AddOrder(addOrderRequest);
+				List<Order> orders = mapper.Map<List<Order>>(addOrderRequest);
 
 
 				ResponseData responseData = new ResponseData();
@@ -64,8 +67,20 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
+				return Ok(response);
 			}
-			List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
+
+			var accessToken = Util.GetAccessToken(HttpContext);
+			var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+			if(request.UserId != userIdFromAccessToken) 
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
+				response.Status.Ok = false;
+				response.Status.Message = "Not have permission to get data!";
+				return Ok(response);
+			}
+
+			List<Order> orders = orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 			OrderResponseDTO orderResponse = new OrderResponseDTO()
 			{
 				NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,

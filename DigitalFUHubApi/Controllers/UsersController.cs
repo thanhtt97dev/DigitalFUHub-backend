@@ -493,7 +493,7 @@
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
 
-				string accessToken = Util.Instance.GetAccessToken(HttpContext);
+				string accessToken = Util.GetAccessToken(HttpContext);
 
 				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 				if (user.UserId != userIdInAccessToken) return NotFound();
