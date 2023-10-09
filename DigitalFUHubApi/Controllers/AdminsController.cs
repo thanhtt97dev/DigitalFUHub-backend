@@ -165,7 +165,22 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				orderRepository.UpdateOrderStatusAdmin(requestDTO.OrderId, requestDTO.Status, requestDTO.Note);
+				if (requestDTO.Status == Constants.ORDER_REJECT_COMPLAINT)
+				{
+					orderRepository.UpdateOrderStatusSellerViolates(requestDTO.OrderId, requestDTO.Note);
+				}
+				else if (requestDTO.Status == Constants.ORDER_SELLER_VIOLATES)
+				{
+					orderRepository.UpdateOrderStatusRejectComplaint(requestDTO.OrderId, requestDTO.Note);
+				}
+				else
+				{
+					status.Message = "Invalid order status!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
 				// check seller have VIOLATE 
 
@@ -181,7 +196,6 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
-
 
 		#region RejectWithdrawTransaction
 		[HttpPost("RejectWithdrawTransaction")]

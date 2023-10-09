@@ -17,7 +17,6 @@ namespace BusinessObject.Entities
 		public long UserId { get; set; }
 		public long TransactionTypeId { get; set; }
 		public long OrderId { get; set; }
-
 		public long PaymentAmount { get; set; }
 		public string Note { get; set; } = null!;
 		public DateTime? DateCreate { get; set; }

@@ -418,10 +418,27 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var withdrawTransaction = context.WithdrawTransaction.First(x => x.WithdrawTransactionId == withdrawTransactionId);
-				withdrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_REJECT;
-				withdrawTransaction.Note = note;
-				context.SaveChanges();
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					//update withdraw transation status
+					var withdrawTransaction = context.WithdrawTransaction.First(x => x.WithdrawTransactionId == withdrawTransactionId);
+					withdrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_REJECT;
+					withdrawTransaction.Note = note;
+					context.SaveChanges();
+
+					// refund money to customer
+					var customer = context.User.First(x => x.UserId == withdrawTransaction.UserId);
+					customer.AccountBalance = customer.AccountBalance + withdrawTransaction.Amount;
+					context.SaveChanges();
+					transaction.Commit();
+				}
+				catch(Exception ex) 
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+				
 			}
 		}
 	}
