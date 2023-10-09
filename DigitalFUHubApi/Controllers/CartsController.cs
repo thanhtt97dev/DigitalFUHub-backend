@@ -46,22 +46,20 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-
-                var cart = _cartRepository.GetCart(addProductToCartRequest.UserId, addProductToCartRequest.ProductVariantId);
-                if (cart != null)
+                var resultCheck = _cartRepository.CheckQuantityForCart(addProductToCartRequest.UserId,
+                                                                           addProductToCartRequest.ProductVariantId,
+                                                                           addProductToCartRequest.Quantity);
+                bool resultBool = resultCheck.Item1;
+                long cartQuantity = resultCheck.Item2;
+                if (!resultBool)
                 {
-                    long quantityPurchased = addProductToCartRequest.Quantity + cart.Quantity;
-                    long quantityProductVariant = _assetInformationRepository.GetByProductVariantId(cart.ProductVariantId).Count();
-                    if (quantityPurchased > quantityProductVariant)
+                    return Ok(new Status
                     {
-                        return Ok(new Status
-                        {
-                            ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
-                            Message = $"Sản phẩm này đang có số lượng {cart.Quantity} trong giỏ hàng của bạn," +
-                            $"Không thể thêm số lượng đã chọn vào giỏ hàng vì đã vượt quá số lượng sản phẩm có sẵn",
-                            Ok = false
-                        });
-                    }
+                        ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
+                        Message = $"Sản phẩm này đang có số lượng {cartQuantity} trong giỏ hàng của bạn," +
+                            $" không thể thêm số lượng đã chọn vào giỏ hàng vì đã vượt quá số lượng sản phẩm có sẵn",
+                        Ok = resultBool
+                    });
                 }
                 _cartRepository.AddProductToCart(addProductToCartRequest);
 
@@ -90,6 +88,80 @@ namespace DigitalFUHubApi.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPut("Update")]
+        [Authorize]
+        public IActionResult UpdateCart(UpdateCartRequestDTO? updateCartRequest)
+        {
+            try
+            {
+                if (updateCartRequest == null || updateCartRequest.UserId == 0 ||
+                        updateCartRequest.ProductVariantId == 0)
+                {
+                    return BadRequest(new Status());
+                }
+                long quantityProductVariant = _assetInformationRepository.GetByProductVariantId(updateCartRequest.ProductVariantId).Count();
+                if (updateCartRequest.Quantity == 0)
+                {
+                    var cart = _cartRepository.GetCart(updateCartRequest.UserId, updateCartRequest.ProductVariantId);
+                    if (cart != null)
+                    {
+                        if (cart.Quantity > quantityProductVariant)
+                        {
+                            updateCartRequest.Quantity = quantityProductVariant;
+                            _cartRepository.UpdateCart(_mapper.Map<Cart>(updateCartRequest));
+                            return Ok(new Status
+                            {
+                                ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY,
+                                Message = $"Rất tiếc, bạn chỉ có thể mua số lượng tối đa {quantityProductVariant} sản phẩm " +
+                                $"(Số lượng sản phẩm trong giỏ hàng của bạn đã được thay đổi thành {quantityProductVariant})",
+                                Ok = false
+                            });
+                        } else {
+                            return Ok(new Status
+                            {
+                                ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS,
+                                Message = "",
+                                Ok = true
+                            });
+                        }
+                    }
+                    else
+                    {
+                        return NotFound(new Status());
+                    }
+                }
+
+                var resultCheck = !(updateCartRequest.Quantity > quantityProductVariant);
+                if (!resultCheck)
+                {
+                    updateCartRequest.Quantity = quantityProductVariant;
+                    _cartRepository.UpdateCart(_mapper.Map<Cart>(updateCartRequest));
+                    return Ok(new Status
+                    {
+                        ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
+                        Message = $"Sản phẩm này đang có số lượng tối đa là {quantityProductVariant} " +
+                        $"(số lượng sản phẩm trong giỏ hàng của bạn đã được thay đổi thành {quantityProductVariant})",
+                        Ok = resultCheck
+                    });
+                }
+
+                _cartRepository.UpdateCart(_mapper.Map<Cart>(updateCartRequest));
+                return Ok(new Status
+                {
+                    ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS,
+                    Message = "",
+                    Ok = true
+                });
+
+
+            }
+            catch (Exception ex)
+            {
+                Util.WriteLog(true, ex.Message);
+                return BadRequest(new Status());
             }
         }
 

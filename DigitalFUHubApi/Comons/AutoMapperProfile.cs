@@ -92,6 +92,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Tag, TagResponseDTO>().ReverseMap(); ;
 			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
             CreateMap<Cart, CartDTO>().ReverseMap();
+            CreateMap<Cart, UpdateCartRequestDTO>().ReverseMap();
             CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
             CreateMap<Coupon, CouponResponseDTO>().ReverseMap();
 

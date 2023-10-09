@@ -218,6 +218,14 @@ namespace DigitalFUHubApi.Comons
 			}
 			return result;
 		}
-		#endregion
-	}
+        #endregion
+
+        #region Write Log Color
+		public static void WriteLog(bool isError, string content) {
+            Console.ForegroundColor = isError ? ConsoleColor.Red : ConsoleColor.White;
+			Console.WriteLine(content);
+            Console.ResetColor();
+        }
+        #endregion
+    }
 }
