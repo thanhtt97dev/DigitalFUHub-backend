@@ -67,6 +67,7 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
+				return Ok(response);
 			}
 
 			var accessToken = Util.GetAccessToken(HttpContext);
@@ -76,6 +77,7 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
 				response.Status.Ok = false;
 				response.Status.Message = "Not have permission to get data!";
+				return Ok(response);
 			}
 
 			List<Order> orders = orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
