@@ -246,7 +246,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
-					UpdateAt = DateTime.UtcNow,
+					UpdateAt = DateTime.Now,
 					isActivate = true
 				};
 
@@ -354,7 +354,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
-					UpdateAt = DateTime.UtcNow,
+					UpdateAt = DateTime.Now,
 					isActivate = true,
 				};
 
@@ -623,10 +623,10 @@ namespace DigitalFUHubApi.Controllers
 			string format = "M/d/yyyy";
 			try
 			{
-				if (requestDTO == null ||
-					requestDTO.Email == null ||
-					requestDTO.FromDate == null ||
-					requestDTO.ToDate == null) return BadRequest();
+				if (requestDTO == null ||requestDTO.Email == null ||
+					requestDTO.FromDate == null ||requestDTO.ToDate == null ||
+					requestDTO.CreditAccount == null
+					) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
@@ -665,7 +665,7 @@ namespace DigitalFUHubApi.Controllers
 				long withdrawTransactionId;
 				long.TryParse(requestDTO.WithdrawTransactionId, out withdrawTransactionId);
 
-				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate, requestDTO.Status);
+				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate,requestDTO.BankId,requestDTO.CreditAccount, requestDTO.Status);
 
 				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
 

@@ -12,6 +12,8 @@ namespace DTOs.Bank
 		public string? Email { get; set; }
 		public string? FromDate { get; set; }
 		public string? ToDate { get; set; }
+		public long BankId { get; set; }
+		public string? CreditAccount { get; set; }
 		public int Status { get; set; }
 	}
 }
