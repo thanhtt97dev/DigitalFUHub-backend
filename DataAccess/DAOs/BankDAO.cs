@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.DAOs
 {
@@ -285,7 +286,7 @@ namespace DataAccess.DAOs
 			return withdraws;
 		}
 
-		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, int status)
+		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, long bankId, string creditAccount, int status)
 		{
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -294,7 +295,11 @@ namespace DataAccess.DAOs
 							.Include(x => x.User)
 							.Include(x => x.UserBank)
 							.ThenInclude(x => x.Bank)
-							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate && x.User.Email.Contains(email))
+							.Where(x => 
+								fromDate <= x.RequestDate && toDate >= x.RequestDate && 
+								x.User.Email.Contains(email) &&
+								x.UserBank.CreditAccount.Contains(creditAccount)
+								) 
 							.OrderByDescending(x => x.RequestDate).ToList();
 
 				if (withdrawTransactionId != 0)
@@ -304,6 +309,10 @@ namespace DataAccess.DAOs
 				if (status != 0)
 				{
 					withdraws = withdraws.Where(x => x.WithdrawTransactionStatusId == status).ToList();
+				}
+				if(bankId != 0) 
+				{
+					withdraws = withdraws.Where(x => x.UserBank.BankId == bankId).ToList();	
 				}
 
 			}
@@ -403,6 +412,34 @@ namespace DataAccess.DAOs
 
 			}
 			return transactions;
+		}
+
+		internal void RejectWithdrawTransaction(long withdrawTransactionId, string? note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					//update withdraw transation status
+					var withdrawTransaction = context.WithdrawTransaction.First(x => x.WithdrawTransactionId == withdrawTransactionId);
+					withdrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_REJECT;
+					withdrawTransaction.Note = note;
+					context.SaveChanges();
+
+					// refund money to customer
+					var customer = context.User.First(x => x.UserId == withdrawTransaction.UserId);
+					customer.AccountBalance = customer.AccountBalance + withdrawTransaction.Amount;
+					context.SaveChanges();
+					transaction.Commit();
+				}
+				catch(Exception ex) 
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+				
+			}
 		}
 	}
 }

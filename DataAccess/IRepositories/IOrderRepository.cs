@@ -13,10 +13,12 @@ namespace DataAccess.IRepositories
 		List<Order> GetAllOrderWaitToConfirm(int days);
 		List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status);
 		void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders);
-		(string, string) AddOrder(List<Order> orders);
+		(string, string) AddOrder(List<AddOrderRequestDTO> orders);
 		Order? GetOrder(long orderId);
 		Order? GetOrderForCheckingExisted(long orderId);
 		Order? GetSellerOrderDetail(long orderId);
+		void UpdateOrderStatusSellerViolates(long orderId, string? note);
+		void UpdateOrderStatusRejectComplaint(long orderId, string? note);
 		void UpdateOrderStatusAdmin(long orderId, int status, string? note);
 		List<Order> GetAllOrderByUser(long userId,int statusId, int limit, int offset);
 	}

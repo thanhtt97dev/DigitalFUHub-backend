@@ -246,7 +246,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
-					UpdateAt = DateTime.UtcNow,
+					UpdateAt = DateTime.Now,
 					isActivate = true
 				};
 
@@ -354,7 +354,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = bankLinkAccountRequestDTO.UserId,
 					CreditAccount = bankLinkAccountRequestDTO.CreditAccount,
 					CreditAccountName = benName.ToString() ?? string.Empty,
-					UpdateAt = DateTime.UtcNow,
+					UpdateAt = DateTime.Now,
 					isActivate = true,
 				};
 
@@ -407,10 +407,44 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				ResponseData responseData = new ResponseData();
+				Status status = new Status();
+				if (requestDTO.UserId == 0 || requestDTO.Amount == 0)
+				{
+					return BadRequest();
+				}
+
+				// get customer
+				var customer = userRepository.GetUserById(requestDTO.UserId);
+				if(customer == null) 
+				{
+					status.Message = "User not found!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				// check balance
+				if(customer.AccountBalance < requestDTO.Amount)
+				{
+					status.Message = "Insufficient balance!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				// create withdraw tranascation
 				var transaction = mapper.Map<WithdrawTransaction>(requestDTO);
 				transaction.Code = Util.GetRandomString(10) + requestDTO.UserId + Constants.BANK_TRANSACTION_CODE_KEY;
 				bankRepository.CreateWithdrawTransaction(transaction);
-				return Ok();
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				return Ok(responseData);
 			}
 			catch (Exception)
 			{
@@ -623,10 +657,10 @@ namespace DigitalFUHubApi.Controllers
 			string format = "M/d/yyyy";
 			try
 			{
-				if (requestDTO == null ||
-					requestDTO.Email == null ||
-					requestDTO.FromDate == null ||
-					requestDTO.ToDate == null) return BadRequest();
+				if (requestDTO == null ||requestDTO.Email == null ||
+					requestDTO.FromDate == null ||requestDTO.ToDate == null ||
+					requestDTO.CreditAccount == null
+					) return BadRequest();
 
 				DateTime fromDate;
 				DateTime toDate;
@@ -665,7 +699,7 @@ namespace DigitalFUHubApi.Controllers
 				long withdrawTransactionId;
 				long.TryParse(requestDTO.WithdrawTransactionId, out withdrawTransactionId);
 
-				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate, requestDTO.Status);
+				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate,requestDTO.BankId,requestDTO.CreditAccount, requestDTO.Status);
 
 				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
 
@@ -779,14 +813,6 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				if (withdrawTransaction.UserId != requestDTO.UserId)
-				{
-					status.Message = "You not have permitsion to view this data!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
-					responseData.Status = status;
-					return Ok(responseData);
-				}
 
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
 				{

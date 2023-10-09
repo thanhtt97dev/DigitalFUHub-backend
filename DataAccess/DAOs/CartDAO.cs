@@ -102,12 +102,43 @@ namespace DataAccess.DAOs
                             PriceDiscount = price - (price * (product?.Discount ?? 1) / 100),
                             Quantity = context.AssetInformation.Count(x => x.ProductVariantId == cart.ProductVariantId)
                         },
-                        ShopName = product?.Shop.ShopName ?? ""
+                        ShopName = product?.Shop.ShopName ?? "",
+                        ShopId = product?.Shop.UserId ?? 0
                     };
                     cartDTOs.Add(cartDTO);
                 }
               
                 return cartDTOs.OrderBy(c => c.ShopName).ToList();
+            }
+        }
+
+        internal (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var cart = GetCart(userId, productVariantId);
+                if (cart != null)
+                {
+                    long quantityPurchased = quantity + cart.Quantity;
+                    long quantityProductVariant = context.AssetInformation.Count(a => a.ProductVariantId == productVariantId);
+                    if (quantityPurchased > quantityProductVariant)
+                    {
+                        return (false, cart.Quantity);
+                    }
+                }
+                return (true, cart?.Quantity ?? 0);
+            }
+        }
+
+        internal void UpdateCart(Cart newCart)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var cart = context.Cart.FirstOrDefault(x => x.UserId == newCart.UserId && x.ProductVariantId == newCart.ProductVariantId);
+                if (cart == null) throw new Exception("Cart's not existed!");
+                cart.ProductVariant = newCart.ProductVariant;
+                cart.Quantity = newCart.Quantity != 0 ? newCart.Quantity : cart.Quantity;
+                context.SaveChanges();
             }
         }
 

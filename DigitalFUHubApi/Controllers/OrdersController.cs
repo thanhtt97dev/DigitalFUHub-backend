@@ -34,8 +34,9 @@ namespace DigitalFUHubApi.Controllers
 			{
 				if (addOrderRequest == null) return BadRequest();
 
+				(string responseCode, string message) = _orderRepository.AddOrder(addOrderRequest);
 				List<Order> orders = _mapper.Map<List<Order>>(addOrderRequest);
-				(string responseCode, string message) = _orderRepository.AddOrder(orders);
+
 
 				ResponseData responseData = new ResponseData();
 				Status status = new Status()

@@ -11,7 +11,6 @@ namespace BusinessObject.Entities
 	public class OrderStatus
 	{
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long OrderStatusId { get; set; }
 		public string? Name { get; set; }
 

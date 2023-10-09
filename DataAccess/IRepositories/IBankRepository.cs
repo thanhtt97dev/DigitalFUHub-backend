@@ -21,11 +21,12 @@ namespace DataAccess.IRepositories
 		List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status);
 		List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string email,DateTime fromDate, DateTime toDate);
 		List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status);
-		List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId,string email, DateTime fromDate, DateTime toDate, int status);
+		List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId,string email, DateTime fromDate, DateTime toDate,long bankId, string creditAccount, int status);
 		WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId);
 		WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId);
 		void UpdateWithdrawTransactionPaid(long transactionId);
 		string UpdateListWithdrawTransactionPaid(List<long> transactionIds);
 		List<Transaction> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId);
+		void RejectWithdrawTransaction(long withdrawTransactionId, string? note);
 	}
 }

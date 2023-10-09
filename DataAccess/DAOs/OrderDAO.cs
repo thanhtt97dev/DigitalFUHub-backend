@@ -137,7 +137,7 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-		internal (string, string) AddOrder(List<Order> orders)
+		internal (string, string) AddOrder(List<AddOrderRequestDTO> orders)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -175,28 +175,20 @@ namespace DataAccess.DAOs
 						// get list coupon
 						List<Coupon> coupons = new List<Coupon>();
 
-						if (data.OrderCoupons != null)
+						if (data.Coupons != null && data.Coupons.Count != 0)
 						{
-							List<string> couponCodes = new List<string>();
-							foreach (var item in data.OrderCoupons)
-							{
-								couponCodes.Add(item.Coupon.CouponCode);
-							}
 							//get coupon
 							coupons = (from coupon in context.Coupon
-									   where couponCodes.Contains(coupon.CouponCode) &&
+									   where data.Coupons.Contains(coupon.CouponCode) &&
 									   coupon.StartDate < DateTime.Now && coupon.EndDate > DateTime.Now &&
 									   coupon.IsActive && coupon.Quantity > 1
 									   select coupon).ToList();
 
-							if (coupons.Count != data.OrderCoupons.Count)
+							if (coupons.Count != data.Coupons.Count)
 							{
 								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
 							}
-							if (coupons.Count != 0)
-							{
-								totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
-							}
+							totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
 						}
 						long totalAmount = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
 						long totalPayment = totalAmount - totalCouponsDiscount;
@@ -373,6 +365,7 @@ namespace DataAccess.DAOs
 										BusinessFeeId = businessFee.BusinessFeeId,
 										Fee = businessFee.Fee,
 									},
+									/*
 									AssetInformations = (from assetInformation in context.AssetInformation
 														 where assetInformation.OrderId == orderId
 														 select new AssetInformation { Asset = assetInformation.Asset }
@@ -386,6 +379,7 @@ namespace DataAccess.DAOs
 														PriceDiscount = orderCoupon.PriceDiscount,
 													}
 													).ToList(),
+									*/
 								})
 							   .FirstOrDefault();
 
@@ -416,14 +410,108 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
+		internal void UpdateOrderStatusSellerViolates(long orderId, string? note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var order = context.Order.First(x => x.OrderId == orderId);
-				order.OrderStatusId = status;
-				order.Note = note;
-				context.SaveChanges();
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					var order = context.Order.First(x => x.OrderId == orderId);
+					order.OrderStatusId = Constants.ORDER_SELLER_VIOLATES;
+					order.Note = note;
+					context.SaveChanges();
+
+					var customerId = order.UserId;
+
+					// add transaction for refund money to customer
+					Transaction transactionInternal = new Transaction()
+					{
+						UserId = customerId,
+						OrderId = orderId,
+						TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+						PaymentAmount = order.TotalPayment,
+						DateCreate = DateTime.Now,
+					};
+					context.Transaction.Add(transactionInternal);
+					context.SaveChanges();
+
+					// update customer account balance
+					var customer = context.User.First(x => x.UserId == customerId);
+					customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
+					context.SaveChanges();
+
+					transaction.Commit();
+				}
+				catch(Exception ex) 
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+			}
+		}
+
+		internal void UpdateOrderStatusRejectComplaint(long orderId, string? note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					var order = context.Order
+									.Include(x => x.BusinessFee)
+									.Include(x => x.ProductVariant)
+									.ThenInclude(x => x.Product)
+									.First(x => x.OrderId == orderId);
+					order.OrderStatusId = Constants.ORDER_REJECT_COMPLAINT;
+					order.Note = note;
+					context.SaveChanges();
+
+					var sellerId = order.ProductVariant.Product.ShopId;
+					var adminProfit = order.TotalPayment * order.BusinessFee.Fee / 100;
+					var sellerProfit = order.TotalPayment - adminProfit;
+
+					// add transaction for refund money to seller
+					Transaction transactionInternalSeller = new Transaction()
+					{
+						UserId = sellerId,
+						OrderId = orderId,
+						TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+						PaymentAmount = sellerProfit,
+						DateCreate = DateTime.Now,
+					};
+					context.Transaction.Add(transactionInternalSeller);
+					context.SaveChanges();
+
+					// add transaction for get profit admin
+					Transaction transactionInternalAdmin = new Transaction()
+					{
+						UserId = Constants.ADMIN_USER_ID,
+						OrderId = orderId,
+						TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+						PaymentAmount = adminProfit,
+						DateCreate = DateTime.Now,
+					};
+					context.Transaction.Add(transactionInternalAdmin);
+					context.SaveChanges();
+
+					// update seller account balance
+					var seller = context.User.First(x => x.UserId == sellerId);
+					seller.AccountBalance = seller.AccountBalance + sellerProfit;
+					context.SaveChanges();
+
+					//update admin profit account balance
+					var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+					admin.AccountBalance = admin.AccountBalance + adminProfit;
+					context.SaveChanges();
+
+					transaction.Commit();
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
 			}
 		}
 

@@ -12,6 +12,7 @@ using DTOs.Tag;
 using DTOs.Cart;
 using DTOs.Admin;
 using DTOs.Order;
+using DTOs.Coupon;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -72,7 +73,7 @@ namespace DigitalFUHubApi.Comons
 					return src.Feedback.Rate;
 				}))
 				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
-				.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
+				//.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
 				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductVariant.Product.ProductMedias.Select(x => x.Url).ToList()))
 				.ReverseMap();
 
@@ -80,12 +81,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();
-			/*
-			CreateMap<Coupon, CouponRequestAddOrderDTO>()
-				.ForMember(des => des.CouponCode, act => act.MapFrom(src => src.CouponCode))
-				.ReverseMap();
-			*/
-			
+
 			CreateMap<Transaction, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();
@@ -95,10 +91,12 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<ProductMedia, ProductMediaResponseDTO>().ReverseMap(); ;
 			CreateMap<Tag, TagResponseDTO>().ReverseMap(); ;
 			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
-			CreateMap<Cart, CartDTO>().ReverseMap();
-			CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
+            CreateMap<Cart, CartDTO>().ReverseMap();
+            CreateMap<Cart, UpdateCartRequestDTO>().ReverseMap();
+            CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
+            CreateMap<Coupon, CouponResponseDTO>().ReverseMap();
 
 
-		}
+        }
 	}
 }

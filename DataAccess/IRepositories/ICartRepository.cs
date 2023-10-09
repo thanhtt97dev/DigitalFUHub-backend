@@ -18,5 +18,9 @@ namespace DataAccess.IRepositories
         Task<List<CartDTO>> GetCartsByUserId(long userId);
 
         Task DeleteCart(long userId, long productVariantId);
+
+        (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity);
+
+        void UpdateCart(Cart newCart);
     }
 }

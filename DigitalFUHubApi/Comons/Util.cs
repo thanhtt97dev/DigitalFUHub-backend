@@ -218,6 +218,10 @@ namespace DigitalFUHubApi.Comons
 			}
 			return result;
 		}
-		#endregion
-	}
+        #endregion
+
+        #region Write Log Color
+	
+        #endregion
+    }
 }

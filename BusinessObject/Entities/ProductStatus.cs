@@ -11,7 +11,6 @@ namespace BusinessObject.Entities
 	public class ProductStatus
 	{
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long ProductStatusId { get; set; }
 		public string? ProductStatusName { get; set; }
 	}
