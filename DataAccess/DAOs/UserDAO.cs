@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
+using Comons;
 using DTOs.User;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -157,6 +158,30 @@ namespace DataAccess.DAOs
 			catch (Exception e)
 			{
 				throw new Exception(e.Message);
+			}
+		}
+
+		internal List<User> GetUsers(long userId, string email, string fullName, int roleId, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var users = context.User
+							.Include(x => x.Role)
+							.Where(x => x.Email.Contains(email) && x.Fullname.Contains(fullName) &&  x.RoleId != Constants.ADMIN_ROLE)
+							.ToList();
+				if(userId != 0)
+				{
+					users = users.Where(x => x.UserId == userId).ToList();
+				}
+				if(roleId != 0)
+				{
+					users = users.Where(x => x.RoleId == roleId).ToList();	
+				}
+				if(status != 0)
+				{
+					users = users.Where(x => x.Status == (status == 1)).ToList();
+				}
+				return users;
 			}
 		}
 	}

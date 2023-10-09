@@ -44,6 +44,7 @@ namespace DataAccess.Repositories
 
              UserDAO.Instance.UpdateUser(user);
         }
-		
+
+		public List<User> GetUsers(long userId, string email, string fullName, int roleId, int status) => UserDAO.Instance.GetUsers(userId, email, fullName, roleId, status);
 	}
 }
