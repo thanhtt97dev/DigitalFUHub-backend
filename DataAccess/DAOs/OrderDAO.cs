@@ -502,7 +502,7 @@ namespace DataAccess.DAOs
 
 					//update admin profit account balance
 					var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-					admin.AccountBalance = seller.AccountBalance + adminProfit;
+					admin.AccountBalance = admin.AccountBalance + adminProfit;
 					context.SaveChanges();
 
 					transaction.Commit();
