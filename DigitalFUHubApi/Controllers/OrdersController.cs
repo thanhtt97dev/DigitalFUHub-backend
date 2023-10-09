@@ -59,7 +59,30 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
 			ResponseData response = new ResponseData();
-			
+			List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
+			OrderResponseDTO orderResponse = new OrderResponseDTO()
+			{
+				NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
+				Orders = orders.Select(x => new OrderProductResponseDTO
+				{
+					ShopId = x.ProductVariant.Product.ShopId,
+					ShopName = x.ProductVariant.Product.Shop.ShopName,
+					Quantity = x.Quantity,
+					Price = x.Price,
+					Discount = x.Discount,
+					IsFeedback = x.FeedbackId == 0 ? false : true,
+					ProductName = x.ProductVariant?.Product?.ProductName ?? "",
+					ProductId = x.ProductVariant?.ProductId ?? 0,
+					CouponDiscount = x.TotalCouponDiscount,
+					ProductVariantName = x.ProductVariant?.Name ?? "",
+					StatusId = x.OrderStatusId,
+					Thumbnail = x.ProductVariant?.Product.Thumbnail ?? "",
+					Assest = x.AssetInformations.Select(x => x.Asset ?? "").ToList(),
+				}).ToList()
+			};
+			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+			response.Status.Ok = true;
+			response.Result = orderResponse;
 			return Ok(response);
 		}
 	}
