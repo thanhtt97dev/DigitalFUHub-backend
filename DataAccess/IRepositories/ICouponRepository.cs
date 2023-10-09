@@ -9,6 +9,6 @@ namespace DataAccess.IRepositories
 {
     public interface ICouponRepository
     {
-        List<Coupon> GetByShopId (long shopId);
+        List<Coupon> GetCoupons (long shopId, string couponCode);
     }
 }

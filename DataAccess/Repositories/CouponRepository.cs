@@ -11,6 +11,6 @@ namespace DataAccess.Repositories
 {
     public class CouponRepository : ICouponRepository
     {
-        public List<Coupon> GetByShopId(long shopId) => CouponDAO.Instance.GetByShopId(shopId);
+        public List<Coupon> GetCoupons(long shopId, string couponCode) => CouponDAO.Instance.GetCoupons(shopId, couponCode);
     }
 }
