@@ -2702,11 +2702,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
+      "projectUniqueName": "E:\\Capstone\\DigitalFUHub-backend\\DataAccess\\DataAccess.csproj",
       "projectName": "DataAccess",
-      "projectPath": "E:\\fpt\\fu-market-backend\\DataAccess\\DataAccess.csproj",
+      "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\DataAccess\\DataAccess.csproj",
       "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-      "outputPath": "E:\\fpt\\fu-market-backend\\DataAccess\\obj\\",
+      "outputPath": "E:\\Capstone\\DigitalFUHub-backend\\DataAccess\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -2723,14 +2723,14 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
-              "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj"
+            "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj": {
+              "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj"
             },
-            "E:\\fpt\\fu-market-backend\\Comons\\Comons.csproj": {
-              "projectPath": "E:\\fpt\\fu-market-backend\\Comons\\Comons.csproj"
+            "E:\\Capstone\\DigitalFUHub-backend\\Comons\\Comons.csproj": {
+              "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\Comons\\Comons.csproj"
             },
-            "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj": {
-              "projectPath": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj"
+            "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj": {
+              "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj"
             }
           }
         }

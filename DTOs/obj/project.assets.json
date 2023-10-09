@@ -2663,11 +2663,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj",
+      "projectUniqueName": "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj",
       "projectName": "DTOs",
-      "projectPath": "E:\\fpt\\fu-market-backend\\DTOs\\DTOs.csproj",
+      "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj",
       "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-      "outputPath": "E:\\fpt\\fu-market-backend\\DTOs\\obj\\",
+      "outputPath": "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -2684,8 +2684,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj": {
-              "projectPath": "E:\\fpt\\fu-market-backend\\BusinessObject\\BusinessObject.csproj"
+            "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj": {
+              "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj"
             }
           }
         }
