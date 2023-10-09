@@ -514,6 +514,16 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var order = context.Order.First(x => x.OrderId == orderId);
+				order.OrderStatusId = status;
+				order.Note = note;
+				context.SaveChanges();
+			}
+		}
 
 		internal Order? GetOrderForCheckingExisted(long orderId)
 		{
@@ -527,7 +537,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetAllOrderByUser(long userId, int statusId, int limit, int offset)
+		internal List<Order> GetAllOrderByUser(long userId, List<int> statusId, int limit, int offset)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -537,7 +547,11 @@ namespace DataAccess.DAOs
 					.Include(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.ThenInclude(x => x.Shop)
-					.Where(x => x.UserId == userId && (statusId == 0 ? true : x.OrderStatusId == statusId))
+					.Where(x => x.UserId == userId
+						&& 
+						(statusId.Count == 1 && statusId[0] == 0 
+						? true : 
+						statusId.Any(st => st == x.OrderStatusId)))
 					.OrderByDescending(x => x.OrderDate)
 					.Skip(offset)
 					.Take(limit)

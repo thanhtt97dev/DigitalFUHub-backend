@@ -59,6 +59,12 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
 			ResponseData response = new ResponseData();
+			if(!ModelState.IsValid)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+			}
 			List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 			OrderResponseDTO orderResponse = new OrderResponseDTO()
 			{
