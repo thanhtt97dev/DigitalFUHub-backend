@@ -29,13 +29,14 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal List<Coupon> GetByShopId(long shopId)
+        internal List<Coupon> GetCoupons(long shopId, string couponCode)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
                 var coupons = context.Coupon.Where(c => c.ShopId == shopId 
                                                             && c.IsActive == true 
                                                             && c.Quantity > 0
+                                                            && c.CouponCode.Equals(couponCode)
                                                             && c.EndDate > DateTime.Now).ToList();
 
                 return coupons;

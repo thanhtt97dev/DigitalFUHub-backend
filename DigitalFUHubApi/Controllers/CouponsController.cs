@@ -23,16 +23,21 @@ namespace DigitalFUHubApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("getByShopId/{shopId}")]
+        [HttpGet("getCoupons")]
 
-        public IActionResult GetCoupons(long shopId = 0) {
+        public IActionResult GetCoupons(long shopId, string couponCode ) {
             try
             {
                 if (shopId == 0)
                 {
                     return BadRequest(new Status());
                 }
-                List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetByShopId(shopId));
+                if (string.IsNullOrEmpty(couponCode))
+                {
+                    return BadRequest(new Status());
+                }
+
+                List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetCoupons(shopId, couponCode));
 
                 return Ok(coupons) ;
             } catch (Exception ex)
