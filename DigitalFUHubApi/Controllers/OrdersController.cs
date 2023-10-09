@@ -54,7 +54,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 
-		[Authorize]
+		//[Authorize]
 		[HttpPost("All")]
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
@@ -88,6 +88,7 @@ namespace DigitalFUHubApi.Controllers
 			};
 			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 			response.Status.Ok = true;
+			response.Status.Message = "Success";
 			response.Result = orderResponse;
 			return Ok(response);
 		}

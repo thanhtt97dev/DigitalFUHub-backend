@@ -51,6 +51,12 @@ namespace DigitalFUHubApi
 			{
 				options.AddPolicy("AdminOnly", policy =>
 					policy.RequireRole("Admin"));
+				options.AddPolicy("Seller", policy =>
+					policy.RequireRole("Seller"));
+				options.AddPolicy("Customer", policy =>
+					policy.RequireRole("Customer"));
+				options.AddPolicy("Customer,Seller", policy =>
+					policy.RequireRole("Customer", "Seller"));
 			});
 
 			//Add Cors

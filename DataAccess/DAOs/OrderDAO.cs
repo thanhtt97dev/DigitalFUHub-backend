@@ -537,7 +537,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetAllOrderByUser(long userId, List<int> statusId, int limit, int offset)
+		internal List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{

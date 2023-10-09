@@ -239,7 +239,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Edit product
-		[Authorize("Seller")]
+		[Authorize(Roles = "Seller")]
 		[HttpPut("Product/Edit/{productId}")]
 		public async Task<ActionResult<ResponseData>> EditProduct(long productId, [FromForm] EditProductRequestDTO request)
 		{

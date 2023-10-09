@@ -9,7 +9,7 @@ namespace DTOs.Order
 	public class GetAllOrderRequestDTO
 	{
 		public long UserId { get; set; }
-		public List<int> StatusId { get; set; } = null!;
+		public List<long> StatusId { get; set; } = null!;
 		public int Limit { get; set; }
 		public int Offset { get; set; }
 	}
