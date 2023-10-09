@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class version1 : Migration
+    public partial class updateDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -57,6 +57,7 @@ namespace BusinessObject.Migrations
                 {
                     ConversationId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ConversationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActivate = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -115,6 +116,19 @@ namespace BusinessObject.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TransactionType", x => x.TransactionTypeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WithdrawTransactionStatus",
+                columns: table => new
+                {
+                    WithdrawTransactionStatusId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WithdrawTransactionStatus", x => x.WithdrawTransactionStatusId);
                 });
 
             migrationBuilder.CreateTable(
@@ -374,6 +388,7 @@ namespace BusinessObject.Migrations
                     CouponId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ShopId = table.Column<long>(type: "bigint", nullable: false),
+                    CouponCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CouponName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PriceDiscount = table.Column<long>(type: "bigint", nullable: false),
                     Quantity = table.Column<long>(type: "bigint", nullable: false),
@@ -438,11 +453,12 @@ namespace BusinessObject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserBankId = table.Column<long>(type: "bigint", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
+                    WithdrawTransactionStatusId = table.Column<long>(type: "bigint", nullable: false),
                     RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Amount = table.Column<long>(type: "bigint", nullable: false),
-                    IsPay = table.Column<bool>(type: "bit", nullable: false)
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -458,6 +474,12 @@ namespace BusinessObject.Migrations
                         column: x => x.UserBankId,
                         principalTable: "UserBank",
                         principalColumn: "UserBankId");
+                    table.ForeignKey(
+                        name: "FK_WithdrawTransaction_WithdrawTransactionStatus_WithdrawTransactionStatusId",
+                        column: x => x.WithdrawTransactionStatusId,
+                        principalTable: "WithdrawTransactionStatus",
+                        principalColumn: "WithdrawTransactionStatusId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -516,7 +538,7 @@ namespace BusinessObject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<long>(type: "bigint", nullable: true),
+                    Price = table.Column<long>(type: "bigint", nullable: false),
                     isActivate = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -638,12 +660,16 @@ namespace BusinessObject.Migrations
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     ProductVariantId = table.Column<long>(type: "bigint", nullable: false),
                     BusinessFeeId = table.Column<long>(type: "bigint", nullable: false),
-                    Quantity = table.Column<long>(type: "bigint", nullable: false),
+                    FeedbackId = table.Column<long>(type: "bigint", nullable: true),
+                    OrderStatusId = table.Column<long>(type: "bigint", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<long>(type: "bigint", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Discount = table.Column<long>(type: "bigint", nullable: false),
                     TotalAmount = table.Column<long>(type: "bigint", nullable: false),
-                    IsFeedback = table.Column<bool>(type: "bit", nullable: false),
-                    OrderStatusId = table.Column<long>(type: "bigint", nullable: false)
+                    TotalCouponDiscount = table.Column<long>(type: "bigint", nullable: false),
+                    TotalPayment = table.Column<long>(type: "bigint", nullable: false),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -654,6 +680,11 @@ namespace BusinessObject.Migrations
                         principalTable: "BusinessFee",
                         principalColumn: "BusinessFeeId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Order_Feedback_FeedbackId",
+                        column: x => x.FeedbackId,
+                        principalTable: "Feedback",
+                        principalColumn: "FeedbackId");
                     table.ForeignKey(
                         name: "FK_Order_OrderStatus_OrderStatusId",
                         column: x => x.OrderStatusId,
@@ -683,8 +714,7 @@ namespace BusinessObject.Migrations
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Asset = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrderId = table.Column<long>(type: "bigint", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<long>(type: "bigint", nullable: true)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -700,11 +730,6 @@ namespace BusinessObject.Migrations
                         principalTable: "ProductVariant",
                         principalColumn: "ProductVariantId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AssetInformation_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -713,6 +738,7 @@ namespace BusinessObject.Migrations
                 {
                     OrderId = table.Column<long>(type: "bigint", nullable: false),
                     CouponId = table.Column<long>(type: "bigint", nullable: false),
+                    PriceDiscount = table.Column<long>(type: "bigint", nullable: false),
                     UseDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -790,7 +816,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "BusinessFee",
                 columns: new[] { "BusinessFeeId", "Fee", "StartDate" },
-                values: new object[] { 1L, 5L, new DateTime(2023, 10, 4, 21, 42, 45, 617, DateTimeKind.Local).AddTicks(565) });
+                values: new object[] { 1L, 5L, new DateTime(2023, 10, 8, 21, 27, 16, 577, DateTimeKind.Local).AddTicks(1456) });
 
             migrationBuilder.InsertData(
                 table: "Category",
@@ -798,8 +824,10 @@ namespace BusinessObject.Migrations
                 values: new object[,]
                 {
                     { 1L, "Mạng xã hội" },
-                    { 2L, "VPS" },
-                    { 3L, "Khác" }
+                    { 2L, "Giáo dục" },
+                    { 3L, "Trò chơi" },
+                    { 4L, "VPS" },
+                    { 5L, "Khác" }
                 });
 
             migrationBuilder.InsertData(
@@ -810,9 +838,10 @@ namespace BusinessObject.Migrations
                     { 1L, "Wait for customer confirmation" },
                     { 2L, "Confirmed" },
                     { 3L, "Complaint" },
-                    { 4L, "Dispute" },
-                    { 5L, "Reject Complaint" },
-                    { 6L, "Seller violates" }
+                    { 4L, "Seller refunded" },
+                    { 5L, "Dispute" },
+                    { 6L, "Reject Complaint" },
+                    { 7L, "Seller violates" }
                 });
 
             migrationBuilder.InsertData(
@@ -847,6 +876,16 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "WithdrawTransactionStatus",
+                columns: new[] { "WithdrawTransactionStatusId", "Name" },
+                values: new object[,]
+                {
+                    { 1L, "In processing" },
+                    { 2L, "Paid" },
+                    { 3L, "Reject" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "User",
                 columns: new[] { "UserId", "AccountBalance", "Avatar", "Email", "Fullname", "IsConfirm", "Password", "RoleId", "SignInGoogle", "Status", "TwoFactorAuthentication", "Username" },
                 values: new object[] { 1L, 0L, "", "", "Admin", true, "123", 1L, false, true, false, "admin" });
@@ -865,11 +904,6 @@ namespace BusinessObject.Migrations
                 name: "IX_AssetInformation_ProductVariantId",
                 table: "AssetInformation",
                 column: "ProductVariantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AssetInformation_UserId",
-                table: "AssetInformation",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cart_ProductVariantId",
@@ -920,6 +954,13 @@ namespace BusinessObject.Migrations
                 name: "IX_Order_BusinessFeeId",
                 table: "Order",
                 column: "BusinessFeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_FeedbackId",
+                table: "Order",
+                column: "FeedbackId",
+                unique: true,
+                filter: "[FeedbackId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_OrderStatusId",
@@ -1032,6 +1073,11 @@ namespace BusinessObject.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_WithdrawTransaction_WithdrawTransactionStatusId",
+                table: "WithdrawTransaction",
+                column: "WithdrawTransactionStatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WithdrawTransactionBill_WithdrawTransactionId",
                 table: "WithdrawTransactionBill",
                 column: "WithdrawTransactionId");
@@ -1085,9 +1131,6 @@ namespace BusinessObject.Migrations
                 name: "WithdrawTransactionBill");
 
             migrationBuilder.DropTable(
-                name: "Feedback");
-
-            migrationBuilder.DropTable(
                 name: "Coupon");
 
             migrationBuilder.DropTable(
@@ -1106,6 +1149,9 @@ namespace BusinessObject.Migrations
                 name: "BusinessFee");
 
             migrationBuilder.DropTable(
+                name: "Feedback");
+
+            migrationBuilder.DropTable(
                 name: "OrderStatus");
 
             migrationBuilder.DropTable(
@@ -1113,6 +1159,9 @@ namespace BusinessObject.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserBank");
+
+            migrationBuilder.DropTable(
+                name: "WithdrawTransactionStatus");
 
             migrationBuilder.DropTable(
                 name: "Product");

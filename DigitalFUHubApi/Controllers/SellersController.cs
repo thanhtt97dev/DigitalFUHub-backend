@@ -75,6 +75,7 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="userId"></param>
 		/// <param name="productId"></param>
 		/// <returns></returns>
+		[Authorize("Seller")]
 		[HttpGet("{userId}/GetProduct/{productId}")]
 		public ActionResult<ResponseData> GetProductVariants(long userId, long productId)
 		{
@@ -132,6 +133,7 @@ namespace DigitalFUHubApi.Controllers
 		/// </summary>
 		/// <param name="request"></param>
 		/// <returns>response</returns>
+		[Authorize("Seller")]
 		[HttpPost("Product/New")]
 		public async Task<ActionResult<ResponseData>> AddProduct([FromForm] AddProductRequestDTO request)
 		{
@@ -237,6 +239,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Edit product
+		[Authorize(Roles = "Seller")]
 		[HttpPut("Product/Edit/{productId}")]
 		public async Task<ActionResult<ResponseData>> EditProduct(long productId, [FromForm] EditProductRequestDTO request)
 		{
@@ -360,6 +363,7 @@ namespace DigitalFUHubApi.Controllers
 		/// </summary>
 		/// <param name="request"></param>
 		/// <returns>response</returns>
+		[Authorize("Customer")]
 		[HttpPost("Register")]
 		public ActionResult<ResponseData> Register(RegisterShopRequestDTO request)
 		{
@@ -398,6 +402,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get orders
+		[Authorize("Seller")]
 		[HttpPost("Orders")]
 		public IActionResult GetOrders(SellerOrdersRequestDTO request)
 		{
@@ -468,6 +473,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get orders
+		[Authorize("Seller")]
 		[HttpGet("Orders/{orderId}")]
 		public IActionResult GetOrderDetail(long orderId)
 		{

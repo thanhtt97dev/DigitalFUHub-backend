@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
 {
 	public class OrderRepository : IOrderRepository
 	{
-        public List<Order> GetAllOrderWaitToConfirm(int days) => OrderDAO.Instance.GetAllOrderWaitToConfirm(days);
+		public List<Order> GetAllOrderWaitToConfirm(int days) => OrderDAO.Instance.GetAllOrderWaitToConfirm(days);
 
 		public List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopName, fromDate, toDate, status);
 
@@ -25,13 +25,16 @@ namespace DataAccess.Repositories
 
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 
-        public Order? GetSellerOrderDetail(long orderId) => OrderDAO.Instance.GetSellerOrderDetail(orderId);
-
+		public Order? GetSellerOrderDetail(long orderId) => OrderDAO.Instance.GetSellerOrderDetail(orderId);
+		
+		public void UpdateOrderStatusAdmin(long orderId, int status, string? note) => OrderDAO.Instance.UpdateOrderStatusAdmin(orderId, status, note);
+		
 		public void UpdateOrderStatusSellerViolates(long orderId, string? note) => OrderDAO.Instance.UpdateOrderStatusSellerViolates(orderId, note);
+		
 		public void UpdateOrderStatusRejectComplaint(long orderId, string? note) => OrderDAO.Instance.UpdateOrderStatusRejectComplaint(orderId, note);
 
 		public Order? GetOrderForCheckingExisted(long orderId) => OrderDAO.Instance.GetOrderForCheckingExisted(orderId);
 
-		
+		public List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId,statusId, limit, offset);
 	}
 }

@@ -19,5 +19,7 @@ namespace DataAccess.IRepositories
 		Order? GetSellerOrderDetail(long orderId);
 		void UpdateOrderStatusSellerViolates(long orderId, string? note);
 		void UpdateOrderStatusRejectComplaint(long orderId, string? note);
+		void UpdateOrderStatusAdmin(long orderId, int status, string? note);
+		List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset);
 	}
 }
