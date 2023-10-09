@@ -54,7 +54,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpPost("All")]
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
@@ -71,6 +71,7 @@ namespace DigitalFUHubApi.Controllers
 				NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
 				Orders = orders.Select(x => new OrderProductResponseDTO
 				{
+					OrderId = x.OrderId,
 					ShopId = x.ProductVariant.Product.ShopId,
 					ShopName = x.ProductVariant.Product.Shop.ShopName,
 					Quantity = x.Quantity,
@@ -92,5 +93,56 @@ namespace DigitalFUHubApi.Controllers
 			response.Result = orderResponse;
 			return Ok(response);
 		}
+		[Authorize]
+		[HttpPost("Edit/Status")]
+		public IActionResult UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
+		{
+			ResponseData response = new ResponseData();
+			if (!ModelState.IsValid)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+			}
+			Order? order = _orderRepository.GetOrder(request.OrderId);
+			if (order == null)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			} else if(order.ProductVariant.Product.Shop.UserId != request.ShopId)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			} else if(order.UserId != request.UserId)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			} else if(request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			}
+			try
+			{
+				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.StatusId);
+			}
+			catch (Exception e)
+			{
+				return Conflict(e.Message);
+			}
+			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+			response.Status.Ok = true;
+			response.Status.Message = "Success";
+			return Ok(response);
+		}
 	}
+	
 }

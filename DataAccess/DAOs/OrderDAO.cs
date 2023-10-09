@@ -559,6 +559,17 @@ namespace DataAccess.DAOs
 				return orders;
 			}
 		}
+
+		internal void UpdateOrderStatusCustomer(long orderId, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Order order = context.Order.First(x => x.OrderId == orderId);
+				order.OrderStatusId = status;
+				context.SaveChanges();
+			}
+		}
+
 	}
 }
 

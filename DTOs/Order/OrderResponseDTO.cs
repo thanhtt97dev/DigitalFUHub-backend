@@ -14,6 +14,7 @@ namespace DTOs.Order
 
 	public class OrderProductResponseDTO
 	{
+		public long OrderId { get; set; }
 		public long ShopId { get; set; }
 		public string ShopName { get; set; } = string.Empty;
 		public long ProductId { get; set; }

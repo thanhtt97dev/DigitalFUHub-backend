@@ -36,5 +36,12 @@ namespace DataAccess.Repositories
 		public Order? GetOrderForCheckingExisted(long orderId) => OrderDAO.Instance.GetOrderForCheckingExisted(orderId);
 
 		public List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId,statusId, limit, offset);
+
+		public void UpdateOrderStatusCustomer(long orderId, int status)
+		{
+			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId, status);
+		}
+
+	
 	}
 }
