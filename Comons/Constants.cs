@@ -64,8 +64,9 @@
 		public static int[] WITHDRAW_TRANSACTION_STATUS = new int[] { WITHDRAW_TRANSACTION_IN_PROCESSING, WITHDRAW_TRANSACTION_PAID, WITHDRAW_TRANSACTION_REJECT };
 
 		// Cart Status
-		public const string CART_RESPONSE_CODE_SUCCESS = "0";
-        public const string CART_RESPONSE_CODE_INVALID_QUANTITY = "1";
+		public const string CART_RESPONSE_CODE_SUCCESS = "CART_00";
+        public const string CART_RESPONSE_CODE_INVALID_QUANTITY = "CART_01";
+        public const string CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
 
         //Order Status
         public const int NUMBER_DAYS_AUTO_CONFIRM_ORDER = 3;

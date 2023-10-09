@@ -16,6 +16,8 @@ namespace DataAccess.Repositories
 
         public void AddProductToCart(CartDTO addProductToCartRequest) => CartDAO.Instance.AddProductToCart(addProductToCartRequest);
 
+        public (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity) => CartDAO.Instance.CheckQuantityForCart(userId, productVariantId, quantity);
+
         public async Task DeleteCart(long userId, long productVariantId)
         {
             if (userId == 0)
@@ -41,5 +43,7 @@ namespace DataAccess.Repositories
 
             return await CartDAO.Instance.GetCartsByUserId(userId);
         }
+
+        public void UpdateCart(Cart newCart) => CartDAO.Instance.UpdateCart(newCart);
     }
 }
