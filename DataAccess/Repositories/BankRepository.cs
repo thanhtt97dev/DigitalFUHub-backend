@@ -29,7 +29,7 @@ namespace DataAccess.Repositories
 
 		public List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetWithdrawTransaction(userId, withdrawTransactionId, fromDate, toDate, status);
 
-		public List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetAllWithdrawTransaction(withdrawTransactionId, email, fromDate, toDate, status);
+		public List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, long bankId, string creditAccount, int status) => BankDAO.Instance.GetAllWithdrawTransaction(withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount,  status);
 		public WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransaction(withdrawTransactionId);
 		public WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransactionBill(withdrawTransactionId);
 
@@ -39,5 +39,6 @@ namespace DataAccess.Repositories
 
 		public List<Transaction> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId) => BankDAO.Instance.GetHistoryTransactionInternal(orderId, email, fromDate, toDate, transactionTypeId);
 
+		public void RejectWithdrawTransaction(long withdrawTransactionId, string? note) => BankDAO.Instance.RejectWithdrawTransaction(withdrawTransactionId, note);
 	}
 }
