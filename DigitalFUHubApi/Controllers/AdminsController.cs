@@ -167,11 +167,11 @@ namespace DigitalFUHubApi.Controllers
 
 				if (requestDTO.Status == Constants.ORDER_REJECT_COMPLAINT)
 				{
-					orderRepository.UpdateOrderStatusSellerViolates(requestDTO.OrderId, requestDTO.Note);
+					orderRepository.UpdateOrderStatusRejectComplaint(requestDTO.OrderId, requestDTO.Note);
 				}
 				else if (requestDTO.Status == Constants.ORDER_SELLER_VIOLATES)
 				{
-					orderRepository.UpdateOrderStatusRejectComplaint(requestDTO.OrderId, requestDTO.Note);
+					orderRepository.UpdateOrderStatusSellerViolates(requestDTO.OrderId, requestDTO.Note);
 				}
 				else
 				{

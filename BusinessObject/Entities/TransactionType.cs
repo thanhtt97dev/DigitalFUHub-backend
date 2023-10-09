@@ -11,7 +11,6 @@ namespace BusinessObject.Entities
 	public class TransactionType
 	{
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long TransactionTypeId { get; set; }
 		public string Name { get; set; } = null!;
 

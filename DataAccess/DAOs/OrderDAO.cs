@@ -420,6 +420,7 @@ namespace DataAccess.DAOs
 					var order = context.Order.First(x => x.OrderId == orderId);
 					order.OrderStatusId = Constants.ORDER_SELLER_VIOLATES;
 					order.Note = note;
+					context.SaveChanges();
 
 					var customerId = order.UserId;
 
@@ -464,9 +465,10 @@ namespace DataAccess.DAOs
 									.First(x => x.OrderId == orderId);
 					order.OrderStatusId = Constants.ORDER_REJECT_COMPLAINT;
 					order.Note = note;
+					context.SaveChanges();
 
 					var sellerId = order.ProductVariant.Product.ShopId;
-					var adminProfit = order.TotalPayment * (100 - order.BusinessFee.Fee)/100;
+					var adminProfit = order.TotalPayment * order.BusinessFee.Fee / 100;
 					var sellerProfit = order.TotalPayment - adminProfit;
 
 					// add transaction for refund money to seller
