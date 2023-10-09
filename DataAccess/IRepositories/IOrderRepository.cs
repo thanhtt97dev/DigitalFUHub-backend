@@ -17,6 +17,7 @@ namespace DataAccess.IRepositories
 		Order? GetOrder(long orderId);
 		Order? GetOrderForCheckingExisted(long orderId);
 		Order? GetSellerOrderDetail(long orderId);
-		void UpdateOrderStatusAdmin(long orderId, int status, string? note);	
+		void UpdateOrderStatusAdmin(long orderId, int status, string? note);
+		List<Order> GetAllOrderByUser(long userId,int statusId, int limit, int offset);
 	}
 }

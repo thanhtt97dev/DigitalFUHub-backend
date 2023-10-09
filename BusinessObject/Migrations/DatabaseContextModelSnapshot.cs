@@ -105,16 +105,11 @@ namespace BusinessObject.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("AssetInformationId");
 
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductVariantId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("AssetInformation");
                 });
@@ -266,7 +261,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 6, 0, 7, 9, 15, DateTimeKind.Local).AddTicks(9824)
+                            StartDate = new DateTime(2023, 10, 8, 21, 27, 16, 577, DateTimeKind.Local).AddTicks(1456)
                         });
                 });
 
@@ -339,6 +334,9 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ConversationId"), 1L, 1);
 
+                    b.Property<string>("ConversationName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateCreate")
                         .HasColumnType("datetime2");
 
@@ -357,6 +355,10 @@ namespace BusinessObject.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CouponId"), 1L, 1);
+
+                    b.Property<string>("CouponCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CouponName")
                         .HasColumnType("nvarchar(max)");
@@ -555,8 +557,14 @@ namespace BusinessObject.Migrations
                     b.Property<long>("BusinessFeeId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("IsFeedback")
-                        .HasColumnType("bit");
+                    b.Property<long>("Discount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("FeedbackId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -576,12 +584,22 @@ namespace BusinessObject.Migrations
                     b.Property<long>("TotalAmount")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("TotalCouponDiscount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalPayment")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("OrderId");
 
                     b.HasIndex("BusinessFeeId");
+
+                    b.HasIndex("FeedbackId")
+                        .IsUnique()
+                        .HasFilter("[FeedbackId] IS NOT NULL");
 
                     b.HasIndex("OrderStatusId");
 
@@ -647,16 +665,21 @@ namespace BusinessObject.Migrations
                         new
                         {
                             OrderStatusId = 4L,
-                            Name = "Dispute"
+                            Name = "Seller refunded"
                         },
                         new
                         {
                             OrderStatusId = 5L,
-                            Name = "Reject Complaint"
+                            Name = "Dispute"
                         },
                         new
                         {
                             OrderStatusId = 6L,
+                            Name = "Reject Complaint"
+                        },
+                        new
+                        {
+                            OrderStatusId = 7L,
                             Name = "Seller violates"
                         });
                 });
@@ -770,7 +793,7 @@ namespace BusinessObject.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("Price")
+                    b.Property<long>("Price")
                         .HasColumnType("bigint");
 
                     b.Property<long>("ProductId")
@@ -1137,8 +1160,8 @@ namespace BusinessObject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsPay")
-                        .HasColumnType("bit");
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("PaidDate")
                         .HasColumnType("datetime2");
@@ -1152,11 +1175,16 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("WithdrawTransactionStatusId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("WithdrawTransactionId");
 
                     b.HasIndex("UserBankId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("WithdrawTransactionStatusId");
 
                     b.ToTable("WithdrawTransaction");
                 });
@@ -1230,6 +1258,40 @@ namespace BusinessObject.Migrations
                     b.ToTable("WithdrawTransactionBill");
                 });
 
+            modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionStatus", b =>
+                {
+                    b.Property<long>("WithdrawTransactionStatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("WithdrawTransactionStatusId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WithdrawTransactionStatusId");
+
+                    b.ToTable("WithdrawTransactionStatus");
+
+                    b.HasData(
+                        new
+                        {
+                            WithdrawTransactionStatusId = 1L,
+                            Name = "In processing"
+                        },
+                        new
+                        {
+                            WithdrawTransactionStatusId = 2L,
+                            Name = "Paid"
+                        },
+                        new
+                        {
+                            WithdrawTransactionStatusId = 3L,
+                            Name = "Reject"
+                        });
+                });
+
             modelBuilder.Entity("BusinessObject.Entities.AccessToken", b =>
                 {
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1252,10 +1314,6 @@ namespace BusinessObject.Migrations
                         .HasForeignKey("ProductVariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("BusinessObject.Entities.User", null)
-                        .WithMany("AssetInformation")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Order");
 
@@ -1371,6 +1429,10 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BusinessObject.Entities.Feedback", "Feedback")
+                        .WithOne("Order")
+                        .HasForeignKey("BusinessObject.Entities.Order", "FeedbackId");
+
                     b.HasOne("BusinessObject.Entities.OrderStatus", "OrderStatus")
                         .WithMany("Orders")
                         .HasForeignKey("OrderStatusId")
@@ -1390,6 +1452,8 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.Navigation("BusinessFee");
+
+                    b.Navigation("Feedback");
 
                     b.Navigation("OrderStatus");
 
@@ -1600,9 +1664,17 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BusinessObject.Entities.WithdrawTransactionStatus", "WithdrawTransactionStatus")
+                        .WithMany("WithdrawTransactions")
+                        .HasForeignKey("WithdrawTransactionStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("User");
 
                     b.Navigation("UserBank");
+
+                    b.Navigation("WithdrawTransactionStatus");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionBill", b =>
@@ -1646,6 +1718,8 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Entities.Feedback", b =>
                 {
                     b.Navigation("FeedbackMedias");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
@@ -1701,8 +1775,6 @@ namespace BusinessObject.Migrations
                 {
                     b.Navigation("AccessTokens");
 
-                    b.Navigation("AssetInformation");
-
                     b.Navigation("Carts");
 
                     b.Navigation("DepositTransactions");
@@ -1724,6 +1796,11 @@ namespace BusinessObject.Migrations
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.UserBank", b =>
+                {
+                    b.Navigation("WithdrawTransactions");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.WithdrawTransactionStatus", b =>
                 {
                     b.Navigation("WithdrawTransactions");
                 });

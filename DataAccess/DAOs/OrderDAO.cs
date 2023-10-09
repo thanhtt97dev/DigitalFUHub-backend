@@ -438,6 +438,25 @@ namespace DataAccess.DAOs
 				return order;
 			}
 		}
+
+		internal List<Order> GetAllOrderByUser(long userId, int statusId, int limit, int offset)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				List<Order> orders = context.Order
+					.Include (x => x.Feedback)
+					.Include(x => x.AssetInformations)
+					.Include(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.ThenInclude(x => x.Shop)
+					.Where(x => x.UserId == userId && (statusId == 0 ? true : x.OrderStatusId == statusId))
+					.OrderByDescending(x => x.OrderDate)
+					.Skip(offset)
+					.Take(limit)
+					.ToList();
+				return orders;
+			}
+		}
 	}
 }
 
