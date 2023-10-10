@@ -147,7 +147,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.StatusId);
+				orderRepository.UpdateOrderStatusCustomer(request.OrderId,request.ShopId, request.StatusId);
 			}
 			catch (Exception e)
 			{

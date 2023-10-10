@@ -37,9 +37,9 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId,statusId, limit, offset);
 
-		public void UpdateOrderStatusCustomer(long orderId, int status)
+		public void UpdateOrderStatusCustomer(long orderId,long shopId, int status)
 		{
-			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId, status);
+			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
 		}
 
 	

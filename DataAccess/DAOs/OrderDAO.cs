@@ -443,7 +443,7 @@ namespace DataAccess.DAOs
 
 					transaction.Commit();
 				}
-				catch(Exception ex) 
+				catch (Exception ex)
 				{
 					transaction.Rollback();
 					throw new Exception(ex.Message);
@@ -542,15 +542,15 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				List<Order> orders = context.Order
-					.Include (x => x.Feedback)
+					.Include(x => x.Feedback)
 					.Include(x => x.AssetInformations)
 					.Include(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.ThenInclude(x => x.Shop)
 					.Where(x => x.UserId == userId
-						&& 
-						(statusId.Count == 1 && statusId[0] == 0 
-						? true : 
+						&&
+						(statusId.Count == 1 && statusId[0] == 0
+						? true :
 						statusId.Any(st => st == x.OrderStatusId)))
 					.OrderByDescending(x => x.OrderDate)
 					.Skip(offset)
@@ -560,13 +560,59 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void UpdateOrderStatusCustomer(long orderId, int status)
+		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				Order order = context.Order.First(x => x.OrderId == orderId);
-				order.OrderStatusId = status;
-				context.SaveChanges();
+				using (var transaction = context.Database.BeginTransaction())
+				{
+					try
+					{
+						// update order status
+						Order order = context.Order.First(x => x.OrderId == orderId);
+						order.OrderStatusId = status;
+						if (status == Constants.ORDER_CONFIRMED)
+						{
+							BusinessFee fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId);
+							// update blance of shop
+							Shop shop = context.Shop.First(x => x.UserId == shopId);
+							shop.Balance += (order.TotalPayment - (order.TotalPayment * fee.Fee / 100));
+							// add transaction receive payment and profit
+							List<Transaction> trans = new List<Transaction>
+							{
+								new Transaction
+								{
+									DateCreate = DateTime.Now,
+									Note = "Receive Payment",
+									OrderId = order.OrderId,
+									PaymentAmount = order.TotalPayment - (order.TotalPayment * fee.Fee / 100),
+									TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+									UserId = shop.UserId,
+								},
+								new Transaction
+								{
+									DateCreate = DateTime.Now,
+									Note = "Profit",
+									OrderId = order.OrderId,
+									PaymentAmount = order.TotalPayment * fee.Fee / 100,
+									TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+									UserId = Constants.ADMIN_USER_ID,
+								},
+							};
+							context.Transaction.AddRange(trans);
+							// update profit for admin
+							User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+							admin.AccountBalance += order.TotalPayment * fee.Fee / 100;
+						}
+						context.SaveChanges();
+						transaction.Commit();
+					}
+					catch (Exception e)
+					{
+						transaction.Rollback();
+						throw new Exception(e.Message);
+					}
+				}
 			}
 		}
 
