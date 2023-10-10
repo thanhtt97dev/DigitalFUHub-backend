@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
+using Comons;
 using DTOs.MbBank;
 using DTOs.Product;
 using DTOs.Seller;
@@ -38,7 +39,7 @@ namespace DataAccess.DAOs
 			List<SellerProductResponseDTO> result = new List<SellerProductResponseDTO>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var products = context.Product.Where(x => x.ShopId == shopId).ToList();
+				var products = context.Product.Where(x => x.ShopId == shopId && x.ProductStatusId == Constants.PRODUCT_ACTIVE).ToList();
 				foreach (var product in products)
 				{
 					var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();

@@ -12,6 +12,8 @@ namespace DataAccess.Repositories
 {
 	public class ShopRepository : IShopRepository
 	{
+		public bool CheckShopNameExisted(string shopName) => ShopDAO.Instance.CheckShopNameExisted(shopName);
+
 		public  void CreateShop (RegisterShopRequestDTO request) =>  ShopDAO.Instance.CreateShop(request);
 
 		public Product GetProductById(long productId) =>  ShopDAO.Instance.GetProductById(productId);

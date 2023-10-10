@@ -150,7 +150,14 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
 				return Ok(response);
-			} else if(request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
+			} else if(order.OrderStatusId == Constants.ORDER_CONFIRMED)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			}
+			else if(request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;

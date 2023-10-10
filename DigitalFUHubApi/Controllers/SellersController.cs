@@ -76,8 +76,8 @@ namespace DigitalFUHubApi.Controllers
 		/// <param name="productId"></param>
 		/// <returns></returns>
 		[Authorize("Seller")]
-		[HttpGet("{userId}/GetProduct/{productId}")]
-		public ActionResult<ResponseData> GetProductVariants(long userId, long productId)
+		[HttpGet("{userId}/Product/{productId}")]
+		public ActionResult<ResponseData> GetProduct(long userId, long productId)
 		{
 			ResponseData response = new ResponseData();
 			// check user have shop
@@ -501,9 +501,9 @@ namespace DigitalFUHubApi.Controllers
 				OrderStatusId = orderRaw.OrderStatusId,
 				Price = orderRaw.Price,
 				Quantity = orderRaw.Quantity,
-				ProductName = orderRaw.ProductVariant.Product?.ProductName??"",
-				ProductVariantName = orderRaw.ProductVariant?.Name??"",
-				Thumbnail = orderRaw.ProductVariant?.Product?.Thumbnail??""
+				ProductName = orderRaw.ProductVariant.Product?.ProductName ?? "",
+				ProductVariantName = orderRaw.ProductVariant?.Name ?? "",
+				Thumbnail = orderRaw.ProductVariant?.Product?.Thumbnail ?? ""
 			};
 			response.Status.Ok = true;
 			response.Status.Message = "Success";
