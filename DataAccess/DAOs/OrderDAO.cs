@@ -42,7 +42,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders)
+		internal void UpdateStatusOrderToConfirm(List<Order> orders)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -107,6 +107,68 @@ namespace DataAccess.DAOs
 			}
 		}
 
+		internal List<Order> GetAllOrderComplaint(int days)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				DateTime timeAccept = DateTime.Now.AddDays(-days);
+				var orders = context.Order
+					.Where(x =>
+						x.OrderStatusId == Constants.ORDER_COMPLAINT &&
+						x.OrderDate < timeAccept)
+					.ToList();
+				return orders;
+			}
+		}
+
+		internal void UpdateStatusOrderToSellerRefunded(List<Order> orders)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					foreach (var item in orders)
+					{
+						//update order status
+						var order = context.Order.First(x => x.OrderId == item.OrderId);
+						order.OrderStatusId = Constants.ORDER_SELLER_REFUNDED;
+						context.SaveChanges();
+
+						var customerId = order.UserId;
+
+						// add transaction internal
+						var transactionInternal = new Transaction()
+						{
+							UserId = customerId,
+							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+							OrderId = order.OrderId,
+							PaymentAmount = order.TotalPayment,
+							Note = "Seller refund money",
+							DateCreate = DateTime.Now,	
+						};
+						context.Transaction.Add(transactionInternal);
+						context.SaveChanges();
+
+						// update customer balance
+						var customer = context.User.First(x => x.UserId == customerId);
+						customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
+						context.SaveChanges();
+						//update admin banance
+						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+						admin.AccountBalance = admin.AccountBalance - order.TotalPayment;
+						context.SaveChanges();
+					}
+					transaction.Commit();	
+				}
+				catch(Exception ex) 
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+			}
+		}
+
 		internal List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status)
 		{
 			List<Order> orders = new List<Order>();
@@ -157,17 +219,20 @@ namespace DataAccess.DAOs
 					foreach (var data in orders)
 					{
 						// get productVariant
-						ProductVariant? productVariant = context.ProductVariant.FirstOrDefault(x => x.ProductVariantId == data.ProductVariantId);
+						ProductVariant? productVariant = context.ProductVariant
+							.FirstOrDefault(x => x.ProductVariantId == data.ProductVariantId && x.isActivate);
 						if (productVariant == null)
 						{
+							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not found!");
 						}
 						//get product 
-						Product? product = context.Product.FirstOrDefault(x => x.ProductId == productVariant.ProductId);
+						Product? product = context.Product
+							.FirstOrDefault(x => x.ProductId == productVariant.ProductId && x.ProductStatusId == Constants.PRODUCT_ACTIVE);
 						if (product == null)
 						{
+							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!");
-
 						}
 						//get coupons
 						long totalCouponsDiscount = 0;
@@ -179,19 +244,24 @@ namespace DataAccess.DAOs
 						{
 							//get coupon
 							coupons = (from coupon in context.Coupon
-									   where data.Coupons.Contains(coupon.CouponCode) &&
+									   where data.Coupons.Distinct().Contains(coupon.CouponCode) &&
 									   coupon.StartDate < DateTime.Now && coupon.EndDate > DateTime.Now &&
-									   coupon.IsActive && coupon.Quantity > 1
+									   coupon.IsActive && coupon.Quantity > 0
 									   select coupon).ToList();
 
 							if (coupons.Count != data.Coupons.Count)
 							{
+								transaction.Rollback();
 								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
 							}
 							totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
 						}
 						long totalAmount = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
 						long totalPayment = totalAmount - totalCouponsDiscount;
+						if(totalPayment < 0)
+						{
+							totalPayment = 0;
+						}
 
 						var order = new Order
 						{
@@ -214,10 +284,12 @@ namespace DataAccess.DAOs
 						var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
 						if (customer == null)
 						{
+							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
 						}
 						if (customer.AccountBalance < totalPayment)
 						{
+							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
 						}
 						customer.AccountBalance = customer.AccountBalance - totalPayment;
@@ -248,8 +320,9 @@ namespace DataAccess.DAOs
 
 						// update asset info
 						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
-						if (assetInformations.Count < order.Quantity)
+						if (assetInformations.Count != order.Quantity)
 						{
+							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
 						}
 
@@ -615,6 +688,7 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+
 
 	}
 }

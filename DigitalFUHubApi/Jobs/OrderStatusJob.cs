@@ -17,11 +17,20 @@ namespace DigitalFUHubApi.Jobs
 
 		public Task Execute(IJobExecutionContext context)
 		{
-			var ordersWaitConfirm = orderRepository.GetAllOrderWaitToConfirm(Constants.NUMBER_DAYS_AUTO_CONFIRM_ORDER);
-			if (ordersWaitConfirm.Count == 0) return Task.CompletedTask;
 
-			//RULE: hanlde change order's status to "Confirmed" and refund money to seller and get benefit
-			orderRepository.ConfirmOrdersWithWaitToConfirmStatus(ordersWaitConfirm);
+			//RULE: handle change order's status to "Confirmed" if order status still "wait confirm" in a range times
+			var ordersWaitConfirm = orderRepository.GetAllOrderWaitToConfirm(Constants.NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER);
+			if (ordersWaitConfirm.Count != 0)
+			{
+				orderRepository.UpdateStatusOrderToConfirm(ordersWaitConfirm);
+			}
+
+			//RULE: handle change order's status to "seller refunded " if order status still "complaint" in a range times
+			var ordersComplaint = orderRepository.GetAllOrderComplaint(Constants.NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER);
+			if(ordersComplaint.Count != 0)
+			{
+				orderRepository.UpdateStatusOrderToSellerRefunded(ordersComplaint);
+			}
 
 			return Task.CompletedTask;	
 		}
