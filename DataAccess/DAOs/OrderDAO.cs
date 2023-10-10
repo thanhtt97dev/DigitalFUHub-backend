@@ -538,7 +538,6 @@ namespace DataAccess.DAOs
 									.First(x => x.OrderId == orderId);
 					order.OrderStatusId = Constants.ORDER_REJECT_COMPLAINT;
 					order.Note = note;
-					context.SaveChanges();
 
 					var sellerId = order.ProductVariant.Product.ShopId;
 					var adminProfit = order.TotalPayment * order.BusinessFee.Fee / 100;
@@ -554,7 +553,6 @@ namespace DataAccess.DAOs
 						DateCreate = DateTime.Now,
 					};
 					context.Transaction.Add(transactionInternalSeller);
-					context.SaveChanges();
 
 					// add transaction for get profit admin
 					Transaction transactionInternalAdmin = new Transaction()
@@ -566,18 +564,16 @@ namespace DataAccess.DAOs
 						DateCreate = DateTime.Now,
 					};
 					context.Transaction.Add(transactionInternalAdmin);
-					context.SaveChanges();
 
 					// update seller account balance
 					var seller = context.User.First(x => x.UserId == sellerId);
 					seller.AccountBalance = seller.AccountBalance + sellerProfit;
-					context.SaveChanges();
 
 					//update admin profit account balance
 					var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
 					admin.AccountBalance = admin.AccountBalance + adminProfit;
+					
 					context.SaveChanges();
-
 					transaction.Commit();
 				}
 				catch (Exception ex)
@@ -647,9 +643,11 @@ namespace DataAccess.DAOs
 						if (status == Constants.ORDER_CONFIRMED)
 						{
 							BusinessFee fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId);
-							// update blance of shop
-							Shop shop = context.Shop.First(x => x.UserId == shopId);
-							shop.Balance += (order.TotalPayment - (order.TotalPayment * fee.Fee / 100));
+							var adminProfit = order.TotalPayment * fee.Fee / 100;
+							var sellerProfit = order.TotalPayment - adminProfit;
+							// update blance of seller
+							var seller = context.User.First(x => x.UserId == shopId);
+							seller.AccountBalance = seller.AccountBalance + sellerProfit;
 							// add transaction receive payment and profit
 							List<Transaction> trans = new List<Transaction>
 							{
@@ -660,7 +658,7 @@ namespace DataAccess.DAOs
 									OrderId = order.OrderId,
 									PaymentAmount = order.TotalPayment - (order.TotalPayment * fee.Fee / 100),
 									TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
-									UserId = shop.UserId,
+									UserId = shopId,
 								},
 								new Transaction
 								{
@@ -675,7 +673,7 @@ namespace DataAccess.DAOs
 							context.Transaction.AddRange(trans);
 							// update profit for admin
 							User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-							admin.AccountBalance += order.TotalPayment * fee.Fee / 100;
+							admin.AccountBalance += adminProfit;
 						}
 						context.SaveChanges();
 						transaction.Commit();

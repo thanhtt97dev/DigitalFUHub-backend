@@ -30,8 +30,8 @@ namespace DigitalFUHubApi.Controllers
 			this.jwtTokenService = jwtTokenService;
 		}
 
+		[Authorize("Customer,Seller")]
 		[HttpPost("AddOrder")]
-		//[Authorize]
 		public IActionResult AddOrder([FromBody] List<AddOrderRequestDTO> request)
 		{
 			try
