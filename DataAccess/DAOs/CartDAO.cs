@@ -82,7 +82,7 @@ namespace DataAccess.DAOs
                     var productVariant = await context.ProductVariant.FirstOrDefaultAsync(p => p.ProductVariantId == cart.ProductVariantId);
                     if (productVariant == null) throw new ArgumentNullException("Not found product variant");
                     var product = await context.Product.Include(_ => _.Shop).FirstOrDefaultAsync(p => p.ProductId == productVariant.ProductId);
-                    long price = productVariant.Price * cart.Quantity;
+                    //long price = productVariant.Price * cart.Quantity;
                     CartDTO cartDTO = new CartDTO()
                     {
                         ProductVariantId = cart.ProductVariantId,
@@ -98,8 +98,8 @@ namespace DataAccess.DAOs
                         ProductVariant = new ProductVariantCartResponseDTO
                         {
                             ProductVariantName = productVariant.Name,
-                            Price = price,
-                            PriceDiscount = price - (price * (product?.Discount ?? 1) / 100),
+                            Price = productVariant.Price,
+                            PriceDiscount = productVariant.Price - (productVariant.Price * (product?.Discount ?? 1) / 100),
                             Quantity = context.AssetInformation.Count(x => x.ProductVariantId == cart.ProductVariantId)
                         },
                         ShopName = product?.Shop.ShopName ?? "",

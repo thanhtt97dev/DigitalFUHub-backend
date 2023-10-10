@@ -35,7 +35,6 @@ namespace DataAccess.DAOs
             {
                 var coupons = context.Coupon.Where(c => c.ShopId == shopId 
                                                             && c.IsActive == true 
-                                                            && c.Quantity > 0
                                                             && c.CouponCode.Equals(couponCode)
                                                             && c.EndDate > DateTime.Now).ToList();
 
