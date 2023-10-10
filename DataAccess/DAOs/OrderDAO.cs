@@ -320,7 +320,7 @@ namespace DataAccess.DAOs
 
 						// update asset info
 						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
-						if (assetInformations.Count < order.Quantity)
+						if (assetInformations.Count != order.Quantity)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
