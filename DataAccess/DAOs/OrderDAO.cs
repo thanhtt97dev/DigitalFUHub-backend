@@ -244,7 +244,7 @@ namespace DataAccess.DAOs
 						{
 							//get coupon
 							coupons = (from coupon in context.Coupon
-									   where data.Coupons.Contains(coupon.CouponCode) &&
+									   where data.Coupons.Distinct().Contains(coupon.CouponCode) &&
 									   coupon.StartDate < DateTime.Now && coupon.EndDate > DateTime.Now &&
 									   coupon.IsActive && coupon.Quantity > 0
 									   select coupon).ToList();
