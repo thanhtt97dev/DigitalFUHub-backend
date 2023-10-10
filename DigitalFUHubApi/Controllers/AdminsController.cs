@@ -283,6 +283,9 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Get user info by Id
+
+		#endregion
 	}
 }
  

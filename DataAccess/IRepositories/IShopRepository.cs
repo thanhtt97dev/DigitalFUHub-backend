@@ -10,6 +10,7 @@ namespace DataAccess.IRepositories
 {
 	public interface IShopRepository
 	{
+		bool CheckShopNameExisted(string v);
 		void CreateShop(RegisterShopRequestDTO request);
 		Product GetProductById(long productId);
 		bool ShopHasProduct(long userId, long productId);

@@ -174,3 +174,22 @@ D:\fu-workspace\Semester 9\SEP490\src-final\be-1\DataAccess\bin\Debug\net6.0\Com
 D:\fu-workspace\Semester 9\SEP490\src-final\be-1\DataAccess\bin\Debug\net6.0\Comons.pdb
 E:\fpt\fu-market-backend\DataAccess\bin\Debug\net6.0\Comons.dll
 E:\fpt\fu-market-backend\DataAccess\bin\Debug\net6.0\Comons.pdb
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\DataAccess.deps.json
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\DataAccess.dll
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\DataAccess.pdb
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\BusinessObject.dll
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\Comons.dll
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\DTOs.dll
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\BusinessObject.pdb
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\Comons.pdb
+E:\Capstone\DigitalFUHub-backend\DataAccess\bin\Debug\net6.0\DTOs.pdb
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.csproj.AssemblyReference.cache
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.AssemblyInfoInputs.cache
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.AssemblyInfo.cs
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.csproj.CoreCompileInputs.cache
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.csproj.CopyComplete
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.dll
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\refint\DataAccess.dll
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.pdb
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\ref\DataAccess.dll

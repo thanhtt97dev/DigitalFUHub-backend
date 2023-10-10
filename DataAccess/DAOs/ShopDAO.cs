@@ -101,6 +101,14 @@ namespace DataAccess.DAOs
 				return product;
 			}
 		}
+
+		internal bool CheckShopNameExisted(string shopName)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Shop.Any(x => x.ShopName.ToLower() == shopName.ToLower());
+			}
+		}
 	}
 }
 

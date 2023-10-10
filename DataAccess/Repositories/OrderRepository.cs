@@ -16,10 +16,11 @@ namespace DataAccess.Repositories
 	public class OrderRepository : IOrderRepository
 	{
 		public List<Order> GetAllOrderWaitToConfirm(int days) => OrderDAO.Instance.GetAllOrderWaitToConfirm(days);
+		public void UpdateStatusOrderToConfirm(List<Order> orders) => OrderDAO.Instance.UpdateStatusOrderToConfirm(orders);
+		public List<Order> GetAllOrderComplaint(int days) => OrderDAO.Instance.GetAllOrderComplaint(days);
+		public void UpdateStatusOrderToSellerRefunded(List<Order> orders) => OrderDAO.Instance.UpdateStatusOrderToSellerRefunded(orders);
 
 		public List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopName, fromDate, toDate, status);
-
-		public void ConfirmOrdersWithWaitToConfirmStatus(List<Order> orders) => OrderDAO.Instance.ConfirmOrdersWithWaitToConfirmStatus(orders);
 
 		public (string, string) AddOrder(List<AddOrderRequestDTO> orders) => OrderDAO.Instance.AddOrder(orders);
 
@@ -37,11 +38,11 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId,statusId, limit, offset);
 
-		public void UpdateOrderStatusCustomer(long orderId, int status)
+		public void UpdateOrderStatusCustomer(long orderId,long shopId, int status)
 		{
-			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId, status);
+			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
 		}
 
-	
+		
 	}
 }

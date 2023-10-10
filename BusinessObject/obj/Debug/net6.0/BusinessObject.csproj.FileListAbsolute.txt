@@ -138,3 +138,17 @@ E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\refint\BusinessObject.d
 E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
 E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
 E:\fpt\fu-market-backend\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll
+E:\Capstone\DigitalFUHub-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.deps.json
+E:\Capstone\DigitalFUHub-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.runtimeconfig.json
+E:\Capstone\DigitalFUHub-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.dll
+E:\Capstone\DigitalFUHub-backend\BusinessObject\bin\Debug\net6.0\BusinessObject.pdb
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.AssemblyReference.cache
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.GeneratedMSBuildEditorConfig.editorconfig
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfoInputs.cache
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfo.cs
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.CoreCompileInputs.cache
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.dll
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\refint\BusinessObject.dll
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll

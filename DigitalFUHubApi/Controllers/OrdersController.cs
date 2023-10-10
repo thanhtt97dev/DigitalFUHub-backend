@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Azure.Core;
 using BusinessObject.Entities;
 using Comons;
@@ -29,26 +30,37 @@ namespace DigitalFUHubApi.Controllers
 			this.jwtTokenService = jwtTokenService;
 		}
 
+		[Authorize("Customer,Seller")]
 		[HttpPost("AddOrder")]
-		//[Authorize]
-		public IActionResult AddOrder([FromBody] List<AddOrderRequestDTO> addOrderRequest)
+		public IActionResult AddOrder([FromBody] List<AddOrderRequestDTO> request)
 		{
 			try
 			{
-				if (addOrderRequest == null) return BadRequest();
-
-				(string responseCode, string message) = orderRepository.AddOrder(addOrderRequest);
-				List<Order> orders = mapper.Map<List<Order>>(addOrderRequest);
-
+				if (request == null || request.Count == 0) return BadRequest();
 
 				ResponseData responseData = new ResponseData();
-				Status status = new Status()
+				var accessToken = Util.GetAccessToken(HttpContext);
+				var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+				if(request.Count(x => x.UserId == userIdFromAccessToken) != request.Count) 
 				{
-					Message = message,
-					Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS,
-					ResponseCode = responseCode
-				};
-				responseData.Status = status;
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Invalid params!";
+					return Ok(responseData);
+				}
+				if (request.ElementAt(0).UserId != userIdFromAccessToken)
+				{
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Not have permission!";
+					return Ok(responseData);
+				}
+
+				(string responseCode, string message) = orderRepository.AddOrder(request);
+
+				responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS;
+				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status.Message = message;
 				return Ok(responseData);
 			}
 			catch (Exception ex)
@@ -92,7 +104,7 @@ namespace DigitalFUHubApi.Controllers
 					Quantity = x.Quantity,
 					Price = x.Price,
 					Discount = x.Discount,
-					IsFeedback = x.FeedbackId == 0 ? false : true,
+					IsFeedback = x.FeedbackId == null ? false : true,
 					ProductName = x.ProductVariant?.Product?.ProductName ?? "",
 					ProductId = x.ProductVariant?.ProductId ?? 0,
 					CouponDiscount = x.TotalCouponDiscount,
@@ -138,7 +150,14 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
 				return Ok(response);
-			} else if(request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
+			} else if(order.OrderStatusId == Constants.ORDER_CONFIRMED)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			}
+			else if(request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;
@@ -147,7 +166,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.StatusId);
+				orderRepository.UpdateOrderStatusCustomer(request.OrderId,request.ShopId, request.StatusId);
 			}
 			catch (Exception e)
 			{
