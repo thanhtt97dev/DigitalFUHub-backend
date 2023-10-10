@@ -69,7 +69,8 @@
         public const string CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
 
         //Order Status
-        public const int NUMBER_DAYS_AUTO_CONFIRM_ORDER = 3;
+        public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
+		public const int NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER = NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER + 3;
 		public const int ORDER_ALL = 0;
 		public const int ORDER_WAIT_CONFIRMATION = 1;
 		public const int ORDER_CONFIRMED = 2;
