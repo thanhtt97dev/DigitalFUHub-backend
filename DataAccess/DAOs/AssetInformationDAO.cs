@@ -33,7 +33,7 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == productVariantId).ToList();
+                var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == productVariantId && a.IsActive == true).ToList();
 
                 return assetInformations;
             }

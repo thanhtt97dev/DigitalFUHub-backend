@@ -111,13 +111,14 @@ namespace DigitalFUHubApi.Controllers
                     {
                         if (cart.Quantity > quantityProductVariant)
                         {
+                            
                             updateCartRequest.Quantity = quantityProductVariant;
                             _cartRepository.UpdateCart(_mapper.Map<Cart>(updateCartRequest));
                             return Ok(new Status
                             {
                                 ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY,
                                 Message = $"Rất tiếc, bạn chỉ có thể mua số lượng tối đa {quantityProductVariant} sản phẩm " +
-                                $"(Số lượng sản phẩm trong giỏ hàng của bạn đã được thay đổi thành {quantityProductVariant})",
+                                $"(Số lượng sản phẩm trong giỏ hàng của bạn đã được thay đổi)",
                                 Ok = false
                             });
                         } else {
