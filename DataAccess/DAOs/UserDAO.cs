@@ -184,5 +184,16 @@ namespace DataAccess.DAOs
 				return users;
 			}
 		}
+
+		internal User? GetUserInfo(int id)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var user = context.User.FirstOrDefault(x => x.UserId == id);
+				if (user == null) return null;
+
+				return user;	
+			}
+		}
 	}
 }

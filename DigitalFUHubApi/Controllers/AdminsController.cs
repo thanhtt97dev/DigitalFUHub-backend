@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
@@ -284,7 +285,26 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get user info by Id
+		[HttpPost("GetUser/{id}")]
+		public IActionResult GetUser(int id)
+		{
+			if(id == 0) return  BadRequest();	
+			ResponseData responseData = new ResponseData();
 
+			try
+			{
+				
+
+				responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS;
+				responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 		#endregion
 	}
 }
