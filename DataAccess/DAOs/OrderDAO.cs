@@ -234,6 +234,14 @@ namespace DataAccess.DAOs
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!");
 						}
+
+						//check customers buy their own products 
+						if(data.UserId == product.ShopId)
+						{
+							transaction.Rollback();
+							return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Customers buy their own products !");
+						}
+
 						//get coupons
 						long totalCouponsDiscount = 0;
 
