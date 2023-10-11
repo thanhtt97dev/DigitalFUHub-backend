@@ -145,14 +145,10 @@ namespace DataAccess.DAOs
 					productQuantity += productVariantResp?.Quantity ?? 0;
 				}
 
-				List<ProductMediaResponseDTO> medias = new List<ProductMediaResponseDTO>();
+				List<string> medias = new List<string>();
 				foreach (var media in productMedias)
 				{
-					medias.Add(new ProductMediaResponseDTO()
-					{
-						ProductMediaId = media.ProductMediaId,
-						Url = media.Url
-					});
+					medias.Add(media.Url);
 				}
 
 				List<TagResponseDTO> tags = new List<TagResponseDTO>();

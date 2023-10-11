@@ -26,7 +26,16 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
+                if (productId == 0)
+                {
+                    return BadRequest(new Status());
+                }
+
                 var product = _productRepository.GetProductById(productId);
+                if (product == null)
+                {
+                    return NotFound(new Status());
+                }
                 return Ok(product);
             }
             catch (Exception ex)
