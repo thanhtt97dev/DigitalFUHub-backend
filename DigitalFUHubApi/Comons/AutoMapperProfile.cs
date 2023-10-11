@@ -40,7 +40,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
 				.ForMember(des => des.CreditAccountName, act => act.MapFrom(src => src.UserBank.CreditAccountName))
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
-				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
+				.ForMember(des => des.UserId, act => act.MapFrom(src => src.UserId))
 				//.ForMember(des => des.CreditAccount, atc => atc.MapFrom(src => Util.HideCharacters(src.UserBank.CreditAccount, 5)))
 				.ForMember(des => des.CreditAccount, atc => atc.MapFrom(src => src.UserBank.CreditAccount))
 				.ForMember(des => des.BankCode, atc => atc.MapFrom(src => src.UserBank.Bank.BankCode))

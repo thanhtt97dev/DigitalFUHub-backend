@@ -167,20 +167,13 @@ namespace DataAccess.DAOs
 			{
 				var users = context.User
 							.Include(x => x.Role)
-							.Where(x => x.Email.Contains(email) && x.Fullname.Contains(fullName) &&  x.RoleId != Constants.ADMIN_ROLE)
-							.ToList();
-				if(userId != 0)
-				{
-					users = users.Where(x => x.UserId == userId).ToList();
-				}
-				if(roleId != 0)
-				{
-					users = users.Where(x => x.RoleId == roleId).ToList();	
-				}
-				if(status != 0)
-				{
-					users = users.Where(x => x.Status == (status == 1)).ToList();
-				}
+							.Where(x => 
+								x.Email.Contains(email) && x.Fullname.Contains(fullName) && 
+								x.RoleId != Constants.ADMIN_ROLE &&
+								(userId == 0 ? true : x.UserId == userId) &&
+								(roleId == 0 ? true : x.RoleId == roleId) &&
+								(status == 0 ? true : x.Status == (status == 1))
+								).ToList();
 				return users;
 			}
 		}

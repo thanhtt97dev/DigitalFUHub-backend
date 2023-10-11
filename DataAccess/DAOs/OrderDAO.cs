@@ -182,19 +182,10 @@ namespace DataAccess.DAOs
 							.Where(x =>
 								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
 								x.User.Email.Contains(customerEmail) &&
-								x.ProductVariant.Product.Shop.ShopName.Contains(shopName)
-							)
-							.OrderByDescending(x => x.OrderDate).ToList();
-				if (orderId != 0)
-				{
-					orders = orders.Where(x => x.OrderId == orderId).ToList();
-				}
-
-				if (status != 0)
-				{
-					orders = orders.Where(x => x.OrderStatusId == status).ToList();
-				}
-
+								x.ProductVariant.Product.Shop.ShopName.Contains(shopName) &&
+								(orderId == 0 ? true : x.OrderId == orderId) &&
+								(status ==0 ? true : x.OrderStatusId == status)
+							).OrderByDescending(x => x.OrderDate).ToList();
 			}
 			return orders;
 		}

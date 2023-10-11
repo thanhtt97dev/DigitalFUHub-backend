@@ -227,18 +227,11 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				deposits = context.DepositTransaction
-							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
-							.OrderByDescending(x => x.RequestDate).ToList();
-
-				if (depositTransactionId != 0)
-				{
-					deposits = deposits.Where(x => x.DepositTransactionId == depositTransactionId).ToList();
-				}
-				if (status != 0)
-				{
-					deposits = deposits.Where(x => x.IsPay == (status == 1)).ToList();
-				}
-
+							.Where(x =>
+								fromDate <= x.RequestDate && toDate >= x.RequestDate && 
+								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+								(status == 0 ? true : x.IsPay == (status == 1))
+								).OrderByDescending(x => x.RequestDate).ToList();
 			}
 			return deposits;
 		}
@@ -250,13 +243,11 @@ namespace DataAccess.DAOs
 			{
 				deposits = context.DepositTransaction
 							.Include(x => x.User)
-							.Where(x => fromDate <= x.RequestDate && toDate >= x.RequestDate && x.User.Email.Contains(email) && x.IsPay)
-							.OrderByDescending(x => x.RequestDate).ToList();
-
-				if (depositTransactionId != 0)
-				{
-					deposits = deposits.Where(x => x.DepositTransactionId == depositTransactionId).ToList();
-				}
+							.Where(x => 
+								fromDate <= x.RequestDate && toDate >= x.RequestDate && 
+								x.User.Email.Contains(email) && x.IsPay && 
+								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId)
+								).OrderByDescending(x => x.RequestDate).ToList();
 			}
 			return deposits;
 		}
@@ -266,22 +257,40 @@ namespace DataAccess.DAOs
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				withdraws = context.WithdrawTransaction
-							.Include(x => x.User)
-							.Include(x => x.UserBank)
-							.ThenInclude(x => x.Bank)
-							.Where(x => x.UserId == userId && fromDate <= x.RequestDate && toDate >= x.RequestDate)
-							.OrderByDescending(x => x.RequestDate).ToList();
-
-				if (withdrawTransactionId != 0)
-				{
-					withdraws = withdraws.Where(x => x.WithdrawTransactionId == withdrawTransactionId).ToList();
-				}
-				if (status != 0)
-				{
-					withdraws = withdraws.Where(x => x.WithdrawTransactionStatusId == status).ToList();
-				}
-
+				withdraws = (from withdraw in context.WithdrawTransaction
+							 join user in context.User
+								 on withdraw.UserId equals user.UserId
+							 join userBank in context.UserBank
+								 on withdraw.UserBankId equals userBank.UserBankId
+							 join bank in context.Bank
+								 on userBank.BankId equals bank.BankId
+							 where
+							 (1 == 1) &&
+							 withdraw.UserId == userId &&	
+							 fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate &&
+							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status)
+							 select new WithdrawTransaction
+							 {
+								 WithdrawTransactionId = withdraw.WithdrawTransactionId,
+								 UserId = withdraw.UserId,
+								 User = new User { Email = user.Email },
+								 Amount = withdraw.Amount,
+								 Code = withdraw.Code,
+								 RequestDate = withdraw.RequestDate,
+								 UserBank = new UserBank
+								 {
+									 CreditAccount = userBank.CreditAccount,
+									 CreditAccountName = userBank.CreditAccountName,
+									 Bank = new Bank
+									 {
+										 BankCode = bank.BankCode,
+										 BankName = bank.BankName,
+									 }
+								 },
+								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+							 }
+							).OrderByDescending(x => x.RequestDate).ToList();
 			}
 			return withdraws;
 		}
@@ -291,30 +300,42 @@ namespace DataAccess.DAOs
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				withdraws = context.WithdrawTransaction
-							.Include(x => x.User)
-							.Include(x => x.UserBank)
-							.ThenInclude(x => x.Bank)
-							.Where(x => 
-								fromDate <= x.RequestDate && toDate >= x.RequestDate && 
-								x.User.Email.Contains(email) &&
-								x.UserBank.CreditAccount.Contains(creditAccount)
-								) 
-							.OrderByDescending(x => x.RequestDate).ToList();
-
-				if (withdrawTransactionId != 0)
-				{
-					withdraws = withdraws.Where(x => x.WithdrawTransactionId == withdrawTransactionId).ToList();
-				}
-				if (status != 0)
-				{
-					withdraws = withdraws.Where(x => x.WithdrawTransactionStatusId == status).ToList();
-				}
-				if(bankId != 0) 
-				{
-					withdraws = withdraws.Where(x => x.UserBank.BankId == bankId).ToList();	
-				}
-
+				withdraws = (from withdraw in context.WithdrawTransaction
+							 join user in context.User
+								 on withdraw.UserId equals user.UserId
+							 join userBank in context.UserBank
+								 on withdraw.UserBankId equals userBank.UserBankId
+							 join bank in context.Bank
+								 on userBank.BankId equals bank.BankId
+							 where
+							 (1 == 1) &&
+							 fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate &&
+							 user.Email.Contains(email) &&
+							 userBank.CreditAccount.Contains(creditAccount) &&
+							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
+							 (bankId == 0 ? true : bank.BankId == bankId) 
+							 select new WithdrawTransaction
+							 {
+								WithdrawTransactionId = withdraw.WithdrawTransactionId,
+								UserId = withdraw.UserId,
+								User = new User { Email = user.Email},
+								Amount = withdraw.Amount,	
+								Code = withdraw.Code,
+								RequestDate = withdraw.RequestDate,
+								UserBank = new UserBank 
+								{
+									CreditAccount = userBank.CreditAccount,
+									CreditAccountName = userBank.CreditAccountName,
+									Bank = new Bank
+									{
+										BankCode = bank.BankCode, 
+										BankName = bank.BankName,
+									}
+								},
+								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+							 }
+							).OrderByDescending(x => x.RequestDate).ToList();
 			}
 			return withdraws;
 		}
@@ -397,19 +418,12 @@ namespace DataAccess.DAOs
 			{
 				transactions = context.Transaction
 								.Include(x => x.User)
-								//.Include(x => x.Order)	
-								.Where(x => fromDate <= x.DateCreate && toDate >= x.DateCreate && x.User.Email.Contains(email))
-								.OrderByDescending(x => x.DateCreate).ToList();
-
-				if (orderId != 0)
-				{
-					transactions = transactions.Where(x => x.OrderId == orderId).ToList();
-				}
-				if (transactionTypeId != 0)
-				{
-					transactions = transactions.Where(x => x.TransactionTypeId == transactionTypeId).ToList();
-				}
-
+								.Where(x => 
+									fromDate <= x.DateCreate && toDate >= x.DateCreate && 
+									x.User.Email.Contains(email) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionTypeId == 0 ? true : x.TransactionTypeId == transactionTypeId)
+									).OrderByDescending(x => x.DateCreate).ToList();
 			}
 			return transactions;
 		}
