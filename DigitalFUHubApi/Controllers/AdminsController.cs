@@ -23,17 +23,21 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IBankRepository bankRepository;
 		private readonly IUserRepository userRepository;
 		private readonly IBusinessFeeRepository businessFeeRepository;
+		private readonly ITransactionRepository transactionRepository;
 		private readonly MailService mailService;
 
-		public AdminsController(IMapper mapper, IOrderRepository orderRepository, IBankRepository bankRepository, IUserRepository userRepository, IBusinessFeeRepository businessFeeRepository, MailService mailService)
+		public AdminsController(IMapper mapper, IOrderRepository orderRepository, IBankRepository bankRepository, IUserRepository userRepository, IBusinessFeeRepository businessFeeRepository, ITransactionRepository transactionRepository, MailService mailService)
 		{
 			this.mapper = mapper;
 			this.orderRepository = orderRepository;
 			this.bankRepository = bankRepository;
 			this.userRepository = userRepository;
 			this.businessFeeRepository = businessFeeRepository;
+			this.transactionRepository = transactionRepository;
 			this.mailService = mailService;
 		}
+
+
 
 		#region Get orders
 		[HttpPost("GetOrders")]
@@ -347,6 +351,77 @@ namespace DigitalFUHubApi.Controllers
 				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status.Ok = true;
 				responseData.Status.Message = "Success!";
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get History transaction of internal 
+		[HttpPost("HistoryTransactionInternal")]
+		public IActionResult GetHistoryTransactionInternal(HistoryTransactionInternalRequestDTO requestDTO)
+		{
+			if (requestDTO == null || requestDTO.OrderId == null ||
+				requestDTO.Email == null || requestDTO.ToDate == null ||
+				requestDTO.FromDate == null) return BadRequest();
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			const int TRANSACTION_TYPE_ALL = 0;
+			int[] transactionTypes = Constants.TRANSACTION_STATUS;
+			if (!transactionTypes.Contains(requestDTO.TransactionTypeId) && requestDTO.TransactionTypeId != TRANSACTION_TYPE_ALL)
+			{
+				status.Message = "Invalid transaction type id!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+
+			try
+			{
+
+				DateTime fromDate;
+				DateTime toDate;
+				string format = "M/d/yyyy";
+				try
+				{
+					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				long orderId;
+				long.TryParse(requestDTO.OrderId, out orderId);
+
+				var transactions = transactionRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionTypeId);
+
+				var result = mapper.Map<List<HistoryTransactionInternalResponseDTO>>(transactions);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
 				return Ok(responseData);
 			}
 			catch (Exception ex)

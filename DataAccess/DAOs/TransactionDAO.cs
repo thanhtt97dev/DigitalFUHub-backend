@@ -1,4 +1,6 @@
-﻿using BusinessObject.Entities;
+﻿using BusinessObject;
+using BusinessObject.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +32,23 @@ namespace DataAccess.DAOs
 		internal void AddTransactionsForOrderConfirmed(Order order)
 		{
 			throw new NotImplementedException();
+		}
+
+		internal List<Transaction> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId)
+		{
+			List<Transaction> transactions = new List<Transaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				transactions = context.Transaction
+								.Include(x => x.User)
+								.Where(x =>
+									fromDate <= x.DateCreate && toDate >= x.DateCreate &&
+									x.User.Email.Contains(email) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionTypeId == 0 ? true : x.TransactionTypeId == transactionTypeId)
+									).OrderByDescending(x => x.DateCreate).ToList();
+			}
+			return transactions;
 		}
 	}
 }

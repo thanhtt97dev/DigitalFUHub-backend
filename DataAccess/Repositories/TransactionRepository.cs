@@ -13,6 +13,6 @@ namespace DataAccess.Repositories
 	{
 		public void AddTransactionsForOrderConfirmed(Order order) => TransactionDAO.Instance.AddTransactionsForOrderConfirmed(order);
 
-
+		public List<Transaction> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId) => TransactionDAO.Instance.GetHistoryTransactionInternal(orderId, email, fromDate, toDate, transactionTypeId);
 	}
 }
