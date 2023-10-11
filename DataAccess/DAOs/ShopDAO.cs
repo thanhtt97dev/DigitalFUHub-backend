@@ -47,7 +47,6 @@ namespace DataAccess.DAOs
 						DateCreate = DateTime.Now,
 						ShopName = request.ShopName,
 						IsActive = true,
-						Balance = 0,
 						Description = request.ShopDescription,
 						UserId = request.UserId,
 					};
