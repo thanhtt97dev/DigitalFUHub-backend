@@ -24,5 +24,6 @@ namespace BusinessObject.Entities
         public virtual User User { get; set; } = null!;
         public virtual Order? Order { get; set; }
 		public virtual ICollection<FeedbackMedia> FeedbackMedias { get; set; } = null!;
-    }
+		public virtual TransactionCoin? TransactionCoin { get; set; }
+	}
 }

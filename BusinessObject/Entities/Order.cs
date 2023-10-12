@@ -24,6 +24,7 @@ namespace BusinessObject.Entities
 		public long Price { get; set; }
 		public long Discount { get; set; }
 		public long TotalAmount { get; set; }
+		public long TotalDiscountCoin { get; set; }
 		public long TotalCouponDiscount { get; set; }
 		public long TotalPayment { get; set; }
 		public DateTime OrderDate { get; set; }
@@ -42,5 +43,6 @@ namespace BusinessObject.Entities
 		public virtual Feedback? Feedback { get; set; }
 		public virtual List<AssetInformation> AssetInformations { get; set; } = null!;
 		public virtual List<OrderCoupon> OrderCoupons { get; set; } = null!;
+		public virtual TransactionCoin? TransactionCoin { get; set; }
 	}
 }

@@ -25,7 +25,8 @@ namespace BusinessObject.Entities
         public bool Status { get; set; }
         public bool TwoFactorAuthentication { get; set; }
         public long AccountBalance { get; set; }
-        public bool SignInGoogle { get; set; }
+		public long Coin { get; set; }
+		public bool SignInGoogle { get; set; }
         public bool IsConfirm { get; set; }
 
         [ForeignKey(nameof(RoleId))]
@@ -40,5 +41,7 @@ namespace BusinessObject.Entities
         public virtual ICollection<TransactionInternal>? TransactionInternals { get; set; }
         public virtual ICollection<WithdrawTransaction>? WithdrawTransactions { get; set; }
         public virtual ICollection<Cart>? Carts { get; set; }
-    }
+        public virtual ICollection<TransactionCoin>? TransactionCoins { get; set; } 
+
+	}
 }

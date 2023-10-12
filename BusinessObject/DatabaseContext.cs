@@ -52,6 +52,8 @@ namespace BusinessObject
 		public virtual DbSet<Cart> Cart { get; set; } = null!;
 		public virtual DbSet<AssetInformation> AssetInformation { get; set; } = null!;
 		public virtual DbSet<BusinessFee> BusinessFee { get; set; } = null!;
+		public virtual DbSet<TransactionCoin> TransactionCoin { get; set; } = null!;
+		public virtual DbSet<TransactionCoinType> TransactionCoinType { get; set; } = null!;
 
 		#endregion
 
@@ -129,6 +131,12 @@ namespace BusinessObject
 				new TransactionInternalType{TransactionInternalTypeId = 4, Name = "Profit"},
 			});
 
+
+			modelBuilder.Entity<TransactionCoinType>().HasData(new TransactionCoinType[]
+			{
+				new TransactionCoinType{TransactionCoinTypeId = 1, Name = "Get coin"},
+				new TransactionCoinType{TransactionCoinTypeId = 2, Name = "Use coin"},
+			});
 
 			modelBuilder.Entity<ProductStatus>().HasData(new ProductStatus[]
 			{
