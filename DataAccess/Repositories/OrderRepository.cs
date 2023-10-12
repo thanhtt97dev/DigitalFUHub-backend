@@ -43,6 +43,7 @@ namespace DataAccess.Repositories
 			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
 		}
 
-		
+		public List<OrderCoupon> GetCouponsInOrder(long orderId) => OrderDAO.Instance.GetCouponsInOrder(orderId);
+
 	}
 }

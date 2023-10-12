@@ -431,6 +431,31 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Get Coupon in order was used
+		[HttpPost("OrderCoupon/{id}")]
+		public IActionResult GetOrderCoupon(int id)
+		{
+			if (id == 0) return BadRequest();
+			ResponseData responseData = new ResponseData();
+
+			try
+			{
+				var orderCoupons = orderRepository.GetCouponsInOrder(id);
+				var result = mapper.Map<List<OrderCouponResponseDTO>>(orderCoupons);
+
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 		#region Get user info by Id
 		[HttpPost("GetUser/{id}")]
 		public IActionResult GetUser(int id)
