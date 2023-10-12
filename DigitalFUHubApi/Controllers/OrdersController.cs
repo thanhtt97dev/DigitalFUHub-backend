@@ -58,7 +58,7 @@ namespace DigitalFUHubApi.Controllers
 
 				(string responseCode, string message) = orderRepository.AddOrder(request);
 
-				responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS;
+				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status.Message = message;
 				return Ok(responseData);
