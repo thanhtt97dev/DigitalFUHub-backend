@@ -686,7 +686,22 @@ namespace DataAccess.DAOs
 			}
 		}
 
-
+		internal List<OrderCoupon> GetCouponsInOrder(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var orderCoupons = (from orderCoupon in context.OrderCoupon
+									join  coupon in context.Coupon
+										on orderCoupon.CouponId equals coupon.CouponId
+									where orderCoupon.OrderId == orderId
+									select new OrderCoupon 
+									{ 
+										PriceDiscount =orderCoupon.PriceDiscount,
+										Coupon = new Coupon { CouponName  = coupon.CouponName },
+									}).ToList();
+				return orderCoupons;
+			}
+		}
 	}
 }
 

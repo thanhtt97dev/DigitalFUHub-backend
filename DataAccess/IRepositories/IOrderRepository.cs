@@ -24,5 +24,6 @@ namespace DataAccess.IRepositories
 		void UpdateOrderStatusAdmin(long orderId, int status, string? note);
 		void UpdateOrderStatusCustomer(long orderId,long shopId, int status);
 		List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset);
+		List<OrderCoupon> GetCouponsInOrder(long orderId);
 	}
 }
