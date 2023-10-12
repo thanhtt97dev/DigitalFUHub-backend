@@ -24,7 +24,7 @@ namespace BusinessObject.Entities
 		public long Price { get; set; }
 		public long Discount { get; set; }
 		public long TotalAmount { get; set; }
-		public long TotalDiscountCoin { get; set; }
+		public long TotalCoinDiscount { get; set; }
 		public long TotalCouponDiscount { get; set; }
 		public long TotalPayment { get; set; }
 		public DateTime OrderDate { get; set; }
