@@ -251,7 +251,7 @@ namespace DataAccess.DAOs
 							if (coupons.Count != data.Coupons.Count)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "Tồn tại phiếu giảm giá đã được sử dụng");
+                                return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
                             }
                             totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
 						}
@@ -289,7 +289,7 @@ namespace DataAccess.DAOs
 						if (customer.AccountBalance < totalPayment)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Số dư không đủ, vui lòng nạp thêm tiền vào tài khoản!");
+                            return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
                         }
                         customer.AccountBalance = customer.AccountBalance - totalPayment;
 						context.User.Update(customer);
@@ -322,7 +322,7 @@ namespace DataAccess.DAOs
 						if (assetInformations.Count != order.Quantity)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Không thể mua nhiều hơn số lượng có sẵn");
+                            return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
                         }
 
                         foreach (var asset in assetInformations)

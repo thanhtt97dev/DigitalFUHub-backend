@@ -56,8 +56,7 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(new Status
                     {
                         ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
-                        Message = $"Sản phẩm này đang có số lượng {cartQuantity} trong giỏ hàng của bạn," +
-                            $" không thể thêm số lượng đã chọn vào giỏ hàng vì đã vượt quá số lượng sản phẩm có sẵn",
+                        Message = cartQuantity.ToString(),
                         Ok = resultBool
                     });
                 }
