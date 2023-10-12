@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.Entities
 {
-	public class TransactionType
+	public class TransactionInternalType
 	{
 		[Key]
-		public long TransactionTypeId { get; set; }
+		public long TransactionInternalTypeId { get; set; }
 		public string Name { get; set; } = null!;
 
-		public virtual ICollection<Transaction>? Transactions { get; set;}
+		public virtual ICollection<TransactionInternal>? Transactions { get; set;}
 	}
 }

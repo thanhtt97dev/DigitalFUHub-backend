@@ -12,7 +12,7 @@ namespace DTOs.Bank
 		public long UserId { get; set; }	
 		public string Email { get; set; } = null!;
 		public long PaymentAmount { get; set; }
-		public int TransactionTypeId { get; set; }
+		public int TransactionInternalTypeId { get; set; }
 		public DateTime? DateCreate { get; set; }
 	}
 }

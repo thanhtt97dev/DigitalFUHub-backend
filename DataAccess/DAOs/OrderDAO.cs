@@ -74,10 +74,10 @@ namespace DataAccess.DAOs
 						admin.AccountBalance = admin.AccountBalance + adminProfit;
 
 						// add transaction for refund money to seller
-						Transaction transactionSeller = new Transaction()
+						TransactionInternal transactionSeller = new TransactionInternal()
 						{
 							UserId = sellerId,
-							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
 							OrderId = order.OrderId,
 							PaymentAmount = sellerProfit,
 							Note = "",
@@ -85,10 +85,10 @@ namespace DataAccess.DAOs
 						};
 						context.Transaction.Add(transactionSeller);
 						// add transaction for get benefit
-						Transaction transactionAdmin = new Transaction()
+						TransactionInternal transactionAdmin = new TransactionInternal()
 						{
 							UserId = Constants.ADMIN_USER_ID,
-							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
 							OrderId = order.OrderId,
 							PaymentAmount = adminProfit,
 							Note = "",
@@ -138,10 +138,10 @@ namespace DataAccess.DAOs
 						var customerId = order.UserId;
 
 						// add transaction internal
-						var transactionInternal = new Transaction()
+						var transactionInternal = new TransactionInternal()
 						{
 							UserId = customerId,
-							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
 							OrderId = order.OrderId,
 							PaymentAmount = order.TotalPayment,
 							Note = "Seller refund money",
@@ -341,10 +341,10 @@ namespace DataAccess.DAOs
 						context.SaveChanges();
 
 						// add new transaction
-						Transaction newTransaction = new Transaction
+						TransactionInternal newTransaction = new TransactionInternal
 						{
 							UserId = order.UserId,
-							TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
+							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
 							OrderId = order.OrderId,
 							PaymentAmount = order.TotalAmount,
 							Note = "Payment",
@@ -497,11 +497,11 @@ namespace DataAccess.DAOs
 					var customerId = order.UserId;
 
 					// add transaction for refund money to customer
-					Transaction transactionInternal = new Transaction()
+					TransactionInternal transactionInternal = new TransactionInternal()
 					{
 						UserId = customerId,
 						OrderId = orderId,
-						TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+						TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
 						PaymentAmount = order.TotalPayment,
 						DateCreate = DateTime.Now,
 					};
@@ -543,22 +543,22 @@ namespace DataAccess.DAOs
 					var sellerProfit = order.TotalPayment - adminProfit;
 
 					// add transaction for refund money to seller
-					Transaction transactionInternalSeller = new Transaction()
+					TransactionInternal transactionInternalSeller = new TransactionInternal()
 					{
 						UserId = sellerId,
 						OrderId = orderId,
-						TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+						TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
 						PaymentAmount = sellerProfit,
 						DateCreate = DateTime.Now,
 					};
 					context.Transaction.Add(transactionInternalSeller);
 
 					// add transaction for get profit admin
-					Transaction transactionInternalAdmin = new Transaction()
+					TransactionInternal transactionInternalAdmin = new TransactionInternal()
 					{
 						UserId = Constants.ADMIN_USER_ID,
 						OrderId = orderId,
-						TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+						TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
 						PaymentAmount = adminProfit,
 						DateCreate = DateTime.Now,
 					};
@@ -648,24 +648,24 @@ namespace DataAccess.DAOs
 							var seller = context.User.First(x => x.UserId == shopId);
 							seller.AccountBalance = seller.AccountBalance + sellerProfit;
 							// add transaction receive payment and profit
-							List<Transaction> trans = new List<Transaction>
+							List<TransactionInternal> trans = new List<TransactionInternal>
 							{
-								new Transaction
+								new TransactionInternal
 								{
 									DateCreate = DateTime.Now,
 									Note = "Receive Payment",
 									OrderId = order.OrderId,
 									PaymentAmount = order.TotalPayment - (order.TotalPayment * fee.Fee / 100),
-									TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
 									UserId = shopId,
 								},
-								new Transaction
+								new TransactionInternal
 								{
 									DateCreate = DateTime.Now,
 									Note = "Profit",
 									OrderId = order.OrderId,
 									PaymentAmount = order.TotalPayment * fee.Fee / 100,
-									TransactionTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
 									UserId = Constants.ADMIN_USER_ID,
 								},
 							};

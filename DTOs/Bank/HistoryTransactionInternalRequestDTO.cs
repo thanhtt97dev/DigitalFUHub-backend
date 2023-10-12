@@ -12,6 +12,6 @@ namespace DTOs.Bank
 		public string Email { get; set; } = null!;
 		public string FromDate { get; set; } = null!;
 		public string ToDate { get; set; } = null!;
-		public int TransactionTypeId { get; set; }
+		public int TransactionInternalTypeId { get; set; }
 	}
 }

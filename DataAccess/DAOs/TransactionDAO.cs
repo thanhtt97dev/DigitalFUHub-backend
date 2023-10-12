@@ -34,9 +34,9 @@ namespace DataAccess.DAOs
 			throw new NotImplementedException();
 		}
 
-		internal List<Transaction> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId)
+		internal List<TransactionInternal> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId)
 		{
-			List<Transaction> transactions = new List<Transaction>();
+			List<TransactionInternal> transactions = new List<TransactionInternal>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				transactions = context.Transaction
@@ -45,7 +45,7 @@ namespace DataAccess.DAOs
 									fromDate <= x.DateCreate && toDate >= x.DateCreate &&
 									x.User.Email.Contains(email) &&
 									(orderId == 0 ? true : x.OrderId == orderId) &&
-									(transactionTypeId == 0 ? true : x.TransactionTypeId == transactionTypeId)
+									(transactionTypeId == 0 ? true : x.TransactionInternalTypeId == transactionTypeId)
 									).OrderByDescending(x => x.DateCreate).ToList();
 			}
 			return transactions;

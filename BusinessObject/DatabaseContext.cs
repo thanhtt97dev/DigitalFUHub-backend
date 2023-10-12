@@ -29,8 +29,8 @@ namespace BusinessObject
 		public virtual DbSet<WithdrawTransaction> WithdrawTransaction { get; set; } = null!;
 		public virtual DbSet<WithdrawTransactionStatus> WithdrawTransactionStatus { get; set; } = null!;
 		public virtual DbSet<WithdrawTransactionBill> WithdrawTransactionBill { get; set; } = null!;
-		public virtual DbSet<Transaction> Transaction { get; set; } = null!;
-		public virtual DbSet<TransactionType> TransactionType { get; set; } = null!;
+		public virtual DbSet<TransactionInternal> Transaction { get; set; } = null!;
+		public virtual DbSet<TransactionInternalType> TransactionType { get; set; } = null!;
 		public virtual DbSet<UserConversation> UserConversation { get; set; } = null!;
 		public virtual DbSet<Conversation> Conversations { get; set; } = null!;
 		public virtual DbSet<Message> Messages { get; set; } = null!;
@@ -74,9 +74,9 @@ namespace BusinessObject
 				.WithMany(x => x.OrderCoupons)
 				.HasForeignKey(x => x.OrderId)
 				.OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<Transaction>().
+			modelBuilder.Entity<TransactionInternal>().
 				HasOne(x => x.User)
-				.WithMany(x => x.Transactions)
+				.WithMany(x => x.TransactionInternals)
 				.HasForeignKey(x => x.UserId)
 				.OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Feedback>().
@@ -121,12 +121,12 @@ namespace BusinessObject
 				new Category{CategoryId = 5, CategoryName = "Khác"},
 			});
 
-			modelBuilder.Entity<TransactionType>().HasData(new TransactionType[]
+			modelBuilder.Entity<TransactionInternalType>().HasData(new TransactionInternalType[]
 			{
-				new TransactionType{TransactionTypeId = 1, Name = "Payment"},
-				new TransactionType{TransactionTypeId = 2, Name = "Receive payment"},
-				new TransactionType{TransactionTypeId = 3, Name = "Receive refund"},
-				new TransactionType{TransactionTypeId = 4, Name = "Profit"},
+				new TransactionInternalType{TransactionInternalTypeId = 1, Name = "Payment"},
+				new TransactionInternalType{TransactionInternalTypeId = 2, Name = "Receive payment"},
+				new TransactionInternalType{TransactionInternalTypeId = 3, Name = "Receive refund"},
+				new TransactionInternalType{TransactionInternalTypeId = 4, Name = "Profit"},
 			});
 
 

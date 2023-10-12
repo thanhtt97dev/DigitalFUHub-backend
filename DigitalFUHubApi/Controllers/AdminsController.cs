@@ -373,7 +373,7 @@ namespace DigitalFUHubApi.Controllers
 
 			const int TRANSACTION_TYPE_ALL = 0;
 			int[] transactionTypes = Constants.TRANSACTION_STATUS;
-			if (!transactionTypes.Contains(requestDTO.TransactionTypeId) && requestDTO.TransactionTypeId != TRANSACTION_TYPE_ALL)
+			if (!transactionTypes.Contains(requestDTO.TransactionInternalTypeId) && requestDTO.TransactionInternalTypeId != TRANSACTION_TYPE_ALL)
 			{
 				status.Message = "Invalid transaction type id!";
 				status.Ok = false;
@@ -413,7 +413,7 @@ namespace DigitalFUHubApi.Controllers
 				long orderId;
 				long.TryParse(requestDTO.OrderId, out orderId);
 
-				var transactions = transactionRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionTypeId);
+				var transactions = transactionRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionInternalTypeId);
 
 				var result = mapper.Map<List<HistoryTransactionInternalResponseDTO>>(transactions);
 
