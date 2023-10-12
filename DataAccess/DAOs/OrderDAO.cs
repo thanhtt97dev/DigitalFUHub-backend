@@ -83,7 +83,7 @@ namespace DataAccess.DAOs
 							Note = "",
 							DateCreate = DateTime.Now,
 						};
-						context.Transaction.Add(transactionSeller);
+						context.TransactionInternal.Add(transactionSeller);
 						// add transaction for get benefit
 						TransactionInternal transactionAdmin = new TransactionInternal()
 						{
@@ -94,7 +94,7 @@ namespace DataAccess.DAOs
 							Note = "",
 							DateCreate = DateTime.Now,
 						};
-						context.Transaction.Add(transactionAdmin);
+						context.TransactionInternal.Add(transactionAdmin);
 					}
 					context.SaveChanges();
 					transaction.Commit();
@@ -147,7 +147,7 @@ namespace DataAccess.DAOs
 							Note = "Seller refund money",
 							DateCreate = DateTime.Now,	
 						};
-						context.Transaction.Add(transactionInternal);
+						context.TransactionInternal.Add(transactionInternal);
 						context.SaveChanges();
 
 						// update customer balance
@@ -350,7 +350,7 @@ namespace DataAccess.DAOs
 							Note = "Payment",
 							DateCreate = DateTime.Now
 						};
-						context.Transaction.Add(newTransaction);
+						context.TransactionInternal.Add(newTransaction);
 						context.SaveChanges();
 
 					}
@@ -505,7 +505,7 @@ namespace DataAccess.DAOs
 						PaymentAmount = order.TotalPayment,
 						DateCreate = DateTime.Now,
 					};
-					context.Transaction.Add(transactionInternal);
+					context.TransactionInternal.Add(transactionInternal);
 					context.SaveChanges();
 
 					// update customer account balance
@@ -551,7 +551,7 @@ namespace DataAccess.DAOs
 						PaymentAmount = sellerProfit,
 						DateCreate = DateTime.Now,
 					};
-					context.Transaction.Add(transactionInternalSeller);
+					context.TransactionInternal.Add(transactionInternalSeller);
 
 					// add transaction for get profit admin
 					TransactionInternal transactionInternalAdmin = new TransactionInternal()
@@ -562,7 +562,7 @@ namespace DataAccess.DAOs
 						PaymentAmount = adminProfit,
 						DateCreate = DateTime.Now,
 					};
-					context.Transaction.Add(transactionInternalAdmin);
+					context.TransactionInternal.Add(transactionInternalAdmin);
 
 					// update seller account balance
 					var seller = context.User.First(x => x.UserId == sellerId);
@@ -669,7 +669,7 @@ namespace DataAccess.DAOs
 									UserId = Constants.ADMIN_USER_ID,
 								},
 							};
-							context.Transaction.AddRange(trans);
+							context.TransactionInternal.AddRange(trans);
 							// update profit for admin
 							User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
 							admin.AccountBalance += adminProfit;

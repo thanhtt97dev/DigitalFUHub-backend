@@ -29,8 +29,8 @@ namespace BusinessObject
 		public virtual DbSet<WithdrawTransaction> WithdrawTransaction { get; set; } = null!;
 		public virtual DbSet<WithdrawTransactionStatus> WithdrawTransactionStatus { get; set; } = null!;
 		public virtual DbSet<WithdrawTransactionBill> WithdrawTransactionBill { get; set; } = null!;
-		public virtual DbSet<TransactionInternal> Transaction { get; set; } = null!;
-		public virtual DbSet<TransactionInternalType> TransactionType { get; set; } = null!;
+		public virtual DbSet<TransactionInternal> TransactionInternal { get; set; } = null!;
+		public virtual DbSet<TransactionInternalType> TransactionInternalType { get; set; } = null!;
 		public virtual DbSet<UserConversation> UserConversation { get; set; } = null!;
 		public virtual DbSet<Conversation> Conversations { get; set; } = null!;
 		public virtual DbSet<Message> Messages { get; set; } = null!;

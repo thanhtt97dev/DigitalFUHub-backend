@@ -39,7 +39,7 @@ namespace DataAccess.DAOs
 			List<TransactionInternal> transactions = new List<TransactionInternal>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				transactions = context.Transaction
+				transactions = context.TransactionInternal
 								.Include(x => x.User)
 								.Where(x =>
 									fromDate <= x.DateCreate && toDate >= x.DateCreate &&
