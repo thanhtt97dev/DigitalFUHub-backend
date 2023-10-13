@@ -1,6 +1,7 @@
 ﻿using BusinessObject.DataTransfer;
 using BusinessObject.Entities;
 using DTOs.Chat;
+using DTOs.Conversation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepositories
 {
-    public interface IChatRepository
+    public interface IConversationRepository
     {
-        Task<List<SenderConversation>> GetSenderConversations(long userId);
+        List<ConversationResponseDTO> GetUsersConversations(long userId);
 
         Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest);
 

@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DTOs.Chat;
+using DTOs.Conversation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-    public class ChatRepository : IChatRepository
+    public class ConversationRepository : IConversationRepository
     {
         public async Task<List<Message>> GetListMessage(long conversationId)
         {
@@ -20,17 +21,17 @@ namespace DataAccess.Repositories
                 throw new ArgumentException("conversationId = 0, Can not get list message");
             }
 
-            return await ChatDAO.Instance.GetListMessage(conversationId);
+            return await ConversationDAO.Instance.GetListMessage(conversationId);
         }
 
-        public async Task<List<SenderConversation>> GetSenderConversations(long userId)
+        public List<ConversationResponseDTO> GetUsersConversations(long userId)
         {
             if (userId == 0)
             {
                 throw new ArgumentException("UserId = 0, Can not get sender conversations");
             }
 
-            return await ChatDAO.Instance.GetSenderConversations(userId);
+            return ConversationDAO.Instance.GetSenderConversations(userId);
         }
 
         public bool GetUserConversation(long senderId, long recipientId)
@@ -40,7 +41,7 @@ namespace DataAccess.Repositories
                 throw new ArgumentException("senderId or recipientId invalid");
             }
             bool result = false;
-            List<UserConversation> userConversations = ChatDAO.Instance.GetUserConversation(senderId, recipientId);
+            List<UserConversation> userConversations = ConversationDAO.Instance.GetUserConversation(senderId, recipientId);
             if (userConversations.Count == 2)
             {
                 result = true;
@@ -55,7 +56,7 @@ namespace DataAccess.Repositories
             {
                 throw new ArgumentException("ChatRequestDTO is null");
             }
-            await ChatDAO.Instance.SendChatMessage(sendChatMessageRequest);
+            await ConversationDAO.Instance.SendChatMessage(sendChatMessageRequest);
         }
 
 

@@ -9,24 +9,27 @@ using DataAccess.IRepositories;
 using BusinessObject.DataTransfer;
 using Microsoft.AspNetCore.Authorization;
 using Comons;
+using DataAccess.Repositories;
+using BusinessObject.Entities;
+using DTOs.Conversation;
 
 namespace DigitalFUHubApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChatsController : ControllerBase
+    public class ConversationsController : ControllerBase
     {
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IConnectionManager _connectionManager;
-        private readonly IChatRepository _chatRepository;
+        private readonly IConversationRepository _conversationRepository;
         private readonly IMapper _mapper;
 
-        public ChatsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, 
-            IChatRepository chatRepository, IMapper mapper)
+        public ConversationsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, 
+            IConversationRepository conversationRepository, IMapper mapper)
         {
             _hubContext = hubContext;
             _connectionManager = connectionManager;
-            _chatRepository = chatRepository;
+            _conversationRepository = conversationRepository;
             _mapper = mapper;
         }
 
@@ -59,7 +62,7 @@ namespace DigitalFUHubApi.Controllers
                     }
                 }
                
-                await _chatRepository.SendChatMessage(sendChatMessageRequest);
+                await _conversationRepository.SendChatMessage(sendChatMessageRequest);
                 return Ok();
             }
             catch (ArgumentException ex)
@@ -69,16 +72,18 @@ namespace DigitalFUHubApi.Controllers
 
         }
 
-        [HttpGet("getSenders")]
-        public async Task<IActionResult> GetSendersConversation(long userId)
+        [HttpGet("getUsers")]
+        public IActionResult GetUsersConversation(long userId)
         {
             try
             {
-                List<SenderConversation> senderConversations = await _chatRepository.GetSenderConversations(userId);
-                return Ok(senderConversations);
-            } catch (ArgumentException ex)
+                List<ConversationResponseDTO> userConversations = _conversationRepository.GetUsersConversations(userId);
+
+                return Ok(userConversations);
+            } catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                Console.WriteLine(ex.ToString());
+                return BadRequest(new Status());
             }
         }
 
@@ -89,7 +94,7 @@ namespace DigitalFUHubApi.Controllers
             try
             {
                 List<MessageResponseDTO> messages = _mapper
-                    .Map<List<MessageResponseDTO>>(await _chatRepository.GetListMessage(conversationId));
+                    .Map<List<MessageResponseDTO>>(await _conversationRepository.GetListMessage(conversationId));
                 return Ok(messages);
             }
             catch (ArgumentException ex)
@@ -104,7 +109,7 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-                return Ok(_chatRepository.GetUserConversation(senderId, recipientId));
+                return Ok(_conversationRepository.GetUserConversation(senderId, recipientId));
             }
             catch (ArgumentException ex)
             {
