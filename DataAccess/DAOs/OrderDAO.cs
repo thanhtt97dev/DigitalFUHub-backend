@@ -190,7 +190,7 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-		internal (string, string) AddOrder(long userId, List<AddOrderRequestDTO> orders , bool isUseCoin)
+		internal (string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders , bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{

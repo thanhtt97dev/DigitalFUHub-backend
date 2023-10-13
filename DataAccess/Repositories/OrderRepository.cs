@@ -22,7 +22,7 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopName, fromDate, toDate, status);
 
-		public (string, string) AddOrder(long userId, List<AddOrderRequestDTO> orders, bool isUseCoin) => OrderDAO.Instance.AddOrder(userId, orders, isUseCoin);
+		public (string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders, bool isUseCoin) => OrderDAO.Instance.AddOrder(userId, orders, isUseCoin);
 
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 

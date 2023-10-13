@@ -32,23 +32,19 @@ namespace DigitalFUHubApi.Controllers
 
 		[Authorize("Customer,Seller")]
 		[HttpPost("AddOrder")]
-		public IActionResult AddOrder([FromBody] List<AddOrderRequestDTO> request)
+		public IActionResult AddOrder([FromBody] AddOrderRequestDTO request)
 		{
 			try
 			{
-				if (request == null || request.Count == 0) return BadRequest();
+				if(!ModelState.IsValid) 
+				{
+					return BadRequest();
+				}
 
 				ResponseData responseData = new ResponseData();
 				var accessToken = Util.GetAccessToken(HttpContext);
 				var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
-				if(request.Count(x => x.UserId == userIdFromAccessToken) != request.Count) 
-				{
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Invalid params!";
-					return Ok(responseData);
-				}
-				if (request.ElementAt(0).UserId != userIdFromAccessToken)
+				if (request.UserId != userIdFromAccessToken)
 				{
 					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
 					responseData.Status.Ok = false;
@@ -56,9 +52,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				bool isUseCoin = true; //fix cứng
-				long userId = request.ElementAt(0).UserId; //fix cứng
-				(string responseCode, string message) = orderRepository.AddOrder(userId, request, isUseCoin);
+				(string responseCode, string message) = orderRepository.AddOrder(request.UserId, request.Products, request.IsUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
