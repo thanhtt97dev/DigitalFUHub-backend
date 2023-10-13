@@ -1,4 +1,4 @@
-﻿using BusinessObject.DataTransfer;
+﻿
 using BusinessObject.Entities;
 using DTOs.Chat;
 using DTOs.Conversation;
@@ -14,10 +14,13 @@ namespace DataAccess.IRepositories
     {
         List<ConversationResponseDTO> GetUsersConversations(long userId);
 
-        Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest);
+        Task SendChatMessage(SendMessageConversationRequestDTO sendChatMessageRequest);
 
-        Task<List<Message>> GetListMessage(long conversationId);
+        List<Message> GetMessages (long conversationId);
 
         bool GetUserConversation(long senderId, long recipientId);
+
+        long AddConversation(AddConversationRequestDTO addConversation);
+        (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation);
     }
 }

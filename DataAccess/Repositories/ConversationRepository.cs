@@ -1,4 +1,4 @@
-﻿using BusinessObject.DataTransfer;
+﻿
 using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
@@ -14,25 +14,11 @@ namespace DataAccess.Repositories
 {
     public class ConversationRepository : IConversationRepository
     {
-        public async Task<List<Message>> GetListMessage(long conversationId)
-        {
-            if (conversationId == 0)
-            {
-                throw new ArgumentException("conversationId = 0, Can not get list message");
-            }
+        public List<Message> GetMessages(long conversationId) => ConversationDAO.Instance.GetMessages(conversationId);
 
-            return await ConversationDAO.Instance.GetListMessage(conversationId);
-        }
+        public List<ConversationResponseDTO> GetUsersConversations(long userId) => ConversationDAO.Instance.GetSenderConversations(userId);
 
-        public List<ConversationResponseDTO> GetUsersConversations(long userId)
-        {
-            if (userId == 0)
-            {
-                throw new ArgumentException("UserId = 0, Can not get sender conversations");
-            }
 
-            return ConversationDAO.Instance.GetSenderConversations(userId);
-        }
 
         public bool GetUserConversation(long senderId, long recipientId)
         {
@@ -50,15 +36,17 @@ namespace DataAccess.Repositories
             return result;
         }
 
-        public async Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest)
+        public async Task SendChatMessage(SendMessageConversationRequestDTO sendChatMessageRequest)
         {
             if (sendChatMessageRequest == null)
             {
                 throw new ArgumentException("ChatRequestDTO is null");
             }
-            await ConversationDAO.Instance.SendChatMessage(sendChatMessageRequest);
+            //await ConversationDAO.Instance.SendChatMessage(sendChatMessageRequest);
         }
 
+        public long AddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.AddConversation(addConversation);
 
+        public (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.ValidateAddConversation(addConversation);
     }
 }

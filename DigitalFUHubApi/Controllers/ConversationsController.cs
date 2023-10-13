@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using DTOs.Chat;
 using DataAccess.IRepositories;
-using BusinessObject.DataTransfer;
 using Microsoft.AspNetCore.Authorization;
 using Comons;
 using DataAccess.Repositories;
 using BusinessObject.Entities;
 using DTOs.Conversation;
+using DigitalFUHubApi.Services;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -23,44 +23,48 @@ namespace DigitalFUHubApi.Controllers
         private readonly IConnectionManager _connectionManager;
         private readonly IConversationRepository _conversationRepository;
         private readonly IMapper _mapper;
+        private readonly StorageService _storageService;
 
         public ConversationsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, 
-            IConversationRepository conversationRepository, IMapper mapper)
+            IConversationRepository conversationRepository, IMapper mapper, StorageService storageService)
         {
             _hubContext = hubContext;
             _connectionManager = connectionManager;
             _conversationRepository = conversationRepository;
             _mapper = mapper;
+            _storageService = storageService;
         }
 
         [HttpPost("SendMessage")]
-        public async Task<IActionResult> SendMessage([FromForm] SendChatMessageRequestDTO sendChatMessageRequest)
+        public async Task<IActionResult> SendMessage([FromForm] SendMessageConversationRequestDTO sendChatMessageRequest)
         {
             try
             {
-                if (!string.IsNullOrEmpty(sendChatMessageRequest.Content))
-                {
-                    int recipientId = unchecked((int)sendChatMessageRequest.RecipientId);
-                    HashSet<string>? connections = _connectionManager
-                        .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
 
-                    MessageResponseDTO messageResponse = new MessageResponseDTO
-                    {
-                        UserId = sendChatMessageRequest.SenderId,
-                        ConversationId = sendChatMessageRequest.ConversationId,
-                        Content = sendChatMessageRequest.Content,
-                        DateCreate = sendChatMessageRequest.DateCreate,
-                        MessageType = sendChatMessageRequest.MessageType
-                    };
-                    if (connections != null)
-                    {
-                        foreach (var connection in connections)
-                        {
-                            await _hubContext.Clients.Clients(connection)
-                                .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, messageResponse);
-                        }
-                    }
-                }
+
+                //if (!string.IsNullOrEmpty(sendChatMessageRequest.Content))
+                //{
+                //    int recipientId = unchecked((int)sendChatMessageRequest.RecipientId);
+                //    HashSet<string>? connections = _connectionManager
+                //        .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
+
+                //    MessageResponseDTO messageResponse = new MessageResponseDTO
+                //    {
+                //        UserId = sendChatMessageRequest.SenderId,
+                //        ConversationId = sendChatMessageRequest.ConversationId,
+                //        Content = sendChatMessageRequest.Content,
+                //        DateCreate = sendChatMessageRequest.DateCreate,
+                //        MessageType = sendChatMessageRequest.MessageType
+                //    };
+                //    if (connections != null)
+                //    {
+                //        foreach (var connection in connections)
+                //        {
+                //            await _hubContext.Clients.Clients(connection)
+                //                .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, messageResponse);
+                //        }
+                //    }
+                //}
                
                 await _conversationRepository.SendChatMessage(sendChatMessageRequest);
                 return Ok();
@@ -77,6 +81,10 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
+                if (userId == 0)
+                {
+                    return BadRequest(new Status());
+                }
                 List<ConversationResponseDTO> userConversations = _conversationRepository.GetUsersConversations(userId);
 
                 return Ok(userConversations);
@@ -87,19 +95,46 @@ namespace DigitalFUHubApi.Controllers
             }
         }
 
-
-        [HttpGet("getListMessage")]
-        public async Task<IActionResult> GetListMessage(long conversationId)
+        [HttpPost("add")]
+        public IActionResult AddConversation ([FromBody] AddConversationRequestDTO addConversation)
         {
             try
             {
-                List<MessageResponseDTO> messages = _mapper
-                    .Map<List<MessageResponseDTO>>(await _conversationRepository.GetListMessage(conversationId));
+                (bool, string) result = _conversationRepository.ValidateAddConversation(addConversation);
+                if (!result.Item1)
+                {
+                    Console.WriteLine(result.Item2);
+                    return BadRequest(new Status()); 
+                }
+                long conversationId = _conversationRepository.AddConversation(addConversation);
+
+                return Ok(conversationId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return BadRequest(new Status());
+            }
+        }
+
+
+        [HttpGet("getMessages")]
+        public IActionResult GetMessages (long conversationId)
+        {
+            try
+            {
+                if (conversationId == 0)
+                {
+                    return BadRequest(new Status());
+                }
+                List<MessageConversationResponseDTO> messages = _mapper
+                    .Map<List<MessageConversationResponseDTO>>(_conversationRepository.GetMessages(conversationId));
                 return Ok(messages);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                Console.WriteLine(ex.Message);
+                return BadRequest(new Status());
             }
         }
 

@@ -1,11 +1,12 @@
 ﻿using BusinessObject;
-using BusinessObject.DataTransfer;
+
 using BusinessObject.Entities;
 using DTOs.Chat;
 using DTOs.Conversation;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,57 +64,127 @@ namespace DataAccess.DAOs
                         }).Distinct().ToList()
                     }).ToList();
 
-                //    string sql = "EXECUTE dbo.GetSenderConversation @userId";
-                ////List<SenderConversation> result = await context.SenderConversations.FromSqlRaw(sql,
-                ////        new SqlParameter("@userId", userId)
-                ////    ).ToListAsync();
-                //List <SenderConversation> result = await context.Set<SenderConversation>().FromSqlRaw(sql,
-                //        new SqlParameter("@userId", userId)
-                //    ).ToListAsync();
-
-
-
                 return groupedConversations;
                 }
        
         }
 
-
-        public long ConversationId { get; set; }
-        public string? ConversationName { get; set; }
-        public DateTime DateCreate { get; set; }
-        public bool IsActivate { get; set; }
-        public ICollection<UserConversationResponseDTO>? Users { get; set; }
-
-        internal async Task SendChatMessage(SendChatMessageRequestDTO sendChatMessageRequest)
+        internal long AddConversation (AddConversationRequestDTO addConversation)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                string sql = "EXEC dbo.SendChatMessage @conversationId, @senderId, @recipientId, @content, @dateCreate, @messageType";
-                 await context.Database.ExecuteSqlRawAsync(sql,
-                        new SqlParameter("@conversationId", sendChatMessageRequest.ConversationId),
-                        new SqlParameter("@senderId", sendChatMessageRequest.SenderId),
-                        new SqlParameter("@recipientId", sendChatMessageRequest.RecipientId),
-                        new SqlParameter("@content", sendChatMessageRequest.Content ?? ""),
-                        new SqlParameter("@dateCreate", sendChatMessageRequest.DateCreate),
-                        new SqlParameter("@messageType", sendChatMessageRequest.MessageType)
-                    );
+                List<long> listUserId = addConversation.UserIds;
+                var userConversation = context.UserConversation.ToList();
+                if (userConversation != null) {
+                    var groupUserConversation = userConversation
+                     .GroupBy(x => x.ConversationId)
+                     .Select(group => new
+                     {
+                         ConversationId = group.Key,
+                         Count = group.Distinct().Count()
+                     }).ToList();
+
+                    if (groupUserConversation != null && groupUserConversation.Count > 0)
+                    {
+                        foreach (var item in groupUserConversation)
+                        {
+                            if (item.Count == listUserId.Count)
+                            {
+                                long conversationId = item.ConversationId;
+                                var findUserConversation = context.UserConversation.Where(x => x.ConversationId == conversationId && listUserId.Contains(x.UserId)).ToList();
+                                if (findUserConversation.Count == item.Count)
+                                {
+                                    return conversationId;
+                                }
+                            }
+                        }
+                    }
+                }
+                var transaction = context.Database.BeginTransaction();
+                try
+                {
+                    Conversation conversation = new Conversation
+                    {
+                        ConversationName = addConversation.ConversationName ?? null,
+                        DateCreate = addConversation.DateCreate,
+                        IsActivate = true,
+                    };
+                    context.Conversations.Add(conversation);
+                    context.SaveChanges();
+                    long conversationId = conversation.ConversationId;
+                    foreach (long userId in listUserId)
+                    {
+                        UserConversation newUserConversation = new UserConversation
+                        {
+                            UserId = userId,
+                            ConversationId = conversationId,
+                        };
+                        context.UserConversation.Add(newUserConversation);
+                    }
+                    context.SaveChanges();
+                    transaction.Commit();
+                    return conversationId;
+                } catch (Exception ex) {
+                    transaction.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
+
+        }
+
+        internal (bool, string) ValidateAddConversation (AddConversationRequestDTO addConversation)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                List<long> listUserId = addConversation.UserIds;
+                if (listUserId == null || listUserId.Count < 2
+                    || (listUserId.Count == 2 && !string.IsNullOrEmpty(addConversation.ConversationName))
+                    || (listUserId.Count > 2 && string.IsNullOrEmpty(addConversation.ConversationName)))
+                {
+                    return (false, "Missing name conversation or invalid number of Users");
+                }
+                var duplicates = listUserId
+                      .GroupBy(x => x)
+                      .Where(group => group.Count() > 1)
+                      .Select(group => group.Key)
+                      .ToList();
+                if (duplicates.Count > 0)
+                {
+                    return (false, "Elements appear more than once");
+                }
+                var users = context.User.Where(x => listUserId.Contains(x.UserId)).ToList();
+                if (users.Count != listUserId.Count)
+                {
+                    return (false, "Appears that the user does not exist in the system");
+                }
+
+                return (true, "Success");
+            }
+        }
+
+
+
+
+        internal async void SendMessageConversation(SendMessageConversationRequestDTO sendChatMessageRequest)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                
 
             }
 
         }
 
-        internal async Task<List<Message>> GetListMessage(long conversationId)
+        internal List<Message> GetMessages(long conversationId)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                List<Message> result = await context.Messages
+                List<Message> result = context.Messages
                     .Where(m => m.ConversationId == conversationId)
-                    .ToListAsync();
+                    .ToList();
 
                 return result;
             }
-
         }
 
         internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
