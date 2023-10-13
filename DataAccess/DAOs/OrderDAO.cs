@@ -275,8 +275,7 @@ namespace DataAccess.DAOs
 
 						if (isUseCoin && customerCoin > 0 && totalPayment > 0) 
 						{
-							totalCoinDiscount = totalPayment - customerCoin;
-							if(totalCoinDiscount <= 0)
+							if(totalPayment <= customerCoin)
 							{
 								totalCoinDiscount = totalPayment;
 								totalPayment = 0;
