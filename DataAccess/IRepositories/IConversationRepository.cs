@@ -14,7 +14,7 @@ namespace DataAccess.IRepositories
     {
         List<ConversationResponseDTO> GetUsersConversations(long userId);
 
-        Task SendChatMessage(SendMessageConversationRequestDTO sendChatMessageRequest);
+        Task SendMessageConversation(SendMessageConversationRequestDTO request, List<string> urlImages);
 
         List<Message> GetMessages (long conversationId);
 

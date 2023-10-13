@@ -12,6 +12,8 @@ using DataAccess.Repositories;
 using BusinessObject.Entities;
 using DTOs.Conversation;
 using DigitalFUHubApi.Services;
+using Azure.Core;
+using Azure;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -36,10 +38,41 @@ namespace DigitalFUHubApi.Controllers
         }
 
         [HttpPost("SendMessage")]
-        public async Task<IActionResult> SendMessage([FromForm] SendMessageConversationRequestDTO sendChatMessageRequest)
+        public async Task<IActionResult> SendMessage([FromForm] SendMessageConversationRequestDTO request)
         {
+            if (request == null)
+            {
+                return BadRequest(new Status());
+            }
+
+            string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+            List<string> urlImages = new List<string>();
             try
             {
+                if (request.Images != null) {
+                if (request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))) {
+                    Console.WriteLine("File không hợp lệ");
+                    return Ok(new Status {
+                        Ok = false,
+                        ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
+                        Message = ""
+                    });
+                }
+
+                DateTime now;
+                string filename;
+
+                foreach (IFormFile file in request.Images)
+                {
+                    now = DateTime.Now;
+                    filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+                    string url = await _storageService.UploadFileToAzureAsync(file, filename);
+                    urlImages.Add(url);
+                }
+            }
+
+
+           
 
 
                 //if (!string.IsNullOrEmpty(sendChatMessageRequest.Content))
@@ -65,8 +98,8 @@ namespace DigitalFUHubApi.Controllers
                 //        }
                 //    }
                 //}
-               
-                await _conversationRepository.SendChatMessage(sendChatMessageRequest);
+
+                await _conversationRepository.SendMessageConversation(request, urlImages);
                 return Ok();
             }
             catch (ArgumentException ex)

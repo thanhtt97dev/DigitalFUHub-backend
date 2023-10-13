@@ -36,14 +36,7 @@ namespace DataAccess.Repositories
             return result;
         }
 
-        public async Task SendChatMessage(SendMessageConversationRequestDTO sendChatMessageRequest)
-        {
-            if (sendChatMessageRequest == null)
-            {
-                throw new ArgumentException("ChatRequestDTO is null");
-            }
-            //await ConversationDAO.Instance.SendChatMessage(sendChatMessageRequest);
-        }
+        public async Task SendMessageConversation(SendMessageConversationRequestDTO request, List<string> urlImages) => await ConversationDAO.Instance.SendMessageConversation(request, urlImages);
 
         public long AddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.AddConversation(addConversation);
 

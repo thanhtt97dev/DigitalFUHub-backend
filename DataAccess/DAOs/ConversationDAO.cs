@@ -1,6 +1,7 @@
 ﻿using BusinessObject;
 
 using BusinessObject.Entities;
+using Comons;
 using DTOs.Chat;
 using DTOs.Conversation;
 using Microsoft.Data.SqlClient;
@@ -165,15 +166,51 @@ namespace DataAccess.DAOs
 
 
 
-        internal async void SendMessageConversation(SendMessageConversationRequestDTO sendChatMessageRequest)
+        internal async Task SendMessageConversation(SendMessageConversationRequestDTO request, List<string> urlImages)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                
+                var transaction = context.Database.BeginTransaction();
+                try
+                {
+                    Message newMessage;
+                    if (urlImages != null && urlImages.Count > 0)
+                    {
+                        foreach (string url in urlImages)
+                        {
+                            newMessage = new Message
+                            {
+                                UserId = request.UserId,
+                                ConversationId = request.ConversationId,
+                                Content = url,
+                                MessageType = Constants.MESSAGE_TYPE_CONVERSATION_IMAGE,
+                                DateCreate = request.DateCreate,
+                                IsDelete = false
+                            };
+                            context.Messages.Add(newMessage);
+                        }
+                    }
+                    newMessage = new Message
+                    {
+                        UserId = request.UserId,
+                        ConversationId = request.ConversationId,
+                        Content = request.Content,
+                        MessageType = Constants.MESSAGE_TYPE_CONVERSATION_TEXT,
+                        DateCreate = request.DateCreate,
+                        IsDelete = false
+                    };
+                    context.Messages.Add(newMessage);
 
+                    await context.SaveChangesAsync();
+                    transaction.Commit();
+                } catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception(ex.Message);
+                }
             }
-
         }
+
 
         internal List<Message> GetMessages(long conversationId)
         {
