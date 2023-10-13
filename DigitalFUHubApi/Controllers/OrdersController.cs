@@ -56,7 +56,9 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				(string responseCode, string message) = orderRepository.AddOrder(request);
+				bool isUseCoin = true; //fix cứng
+				long userId = request.ElementAt(0).UserId; //fix cứng
+				(string responseCode, string message) = orderRepository.AddOrder(userId, request, isUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;

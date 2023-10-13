@@ -190,7 +190,7 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-		internal (string, string) AddOrder(List<AddOrderRequestDTO> orders)
+		internal (string, string) AddOrder(long userId, List<AddOrderRequestDTO> orders , bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -207,8 +207,20 @@ namespace DataAccess.DAOs
 					long businessFeeId = businessFee.BusinessFeeId;
 					long businessFeeValue = businessFee.Fee;
 
+
+
 					foreach (var data in orders)
 					{
+						//get customer info
+						var customerInfo = context.User
+							.Select(x => new User { UserId = x.UserId, Coin = x.Coin })
+							.FirstOrDefault(x => x.UserId == userId);
+						if (customerInfo == null)
+						{
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
+						}
+						long customerCoin = customerInfo.Coin;
+
 						// get productVariant
 						ProductVariant? productVariant = context.ProductVariant
 							.FirstOrDefault(x => x.ProductVariantId == data.ProductVariantId && x.isActivate);
@@ -227,7 +239,7 @@ namespace DataAccess.DAOs
 						}
 
 						//check customers buy their own products 
-						if(data.UserId == product.ShopId)
+						if(userId == product.ShopId)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Customers buy their own products !");
@@ -257,14 +269,33 @@ namespace DataAccess.DAOs
 						}
 						long totalAmount = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
 						long totalPayment = totalAmount - totalCouponsDiscount;
-						if(totalPayment < 0)
+
+						// set total coin discount
+						long totalCoinDiscount = 0;
+
+						if (isUseCoin && customerCoin > 0 && totalPayment > 0) 
+						{
+							totalCoinDiscount = totalPayment - customerCoin;
+							if(totalCoinDiscount <= 0)
+							{
+								totalCoinDiscount = totalPayment;
+								totalPayment = 0;
+							}
+							else
+							{
+								totalCoinDiscount = customerCoin;
+								totalPayment = totalPayment - customerCoin;
+							}
+						}
+
+						if (totalPayment < 0)
 						{
 							totalPayment = 0;
 						}
 
 						var order = new Order
 						{
-							UserId = data.UserId,
+							UserId = userId,
 							ProductVariantId = data.ProductVariantId,
 							BusinessFeeId = businessFeeId,
 							OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION,
@@ -273,27 +304,67 @@ namespace DataAccess.DAOs
 							Discount = product.Discount,
 							TotalAmount = totalAmount,
 							TotalCouponDiscount = totalCouponsDiscount,
+							TotalCoinDiscount = totalCoinDiscount,
 							TotalPayment = totalPayment,
 							OrderDate = DateTime.Now,
 						};
 						context.Order.Add(order);
 						context.SaveChanges();
 
-						//update customer account balance
-						var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
-						if (customer == null)
+						// update asset info
+						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
+						if (assetInformations.Count != order.Quantity)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
+							return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
 						}
-						if (customer.AccountBalance < totalPayment)
+
+						foreach (var asset in assetInformations)
 						{
-							transaction.Rollback();
-                            return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
-                        }
-                        customer.AccountBalance = customer.AccountBalance - totalPayment;
-						context.User.Update(customer);
+							asset.OrderId = order.OrderId;
+							asset.IsActive = false;
+						}
+						context.AssetInformation.UpdateRange(assetInformations);
 						context.SaveChanges();
+
+						// update customer coin 
+						if(totalCoinDiscount > 0)
+						{
+							var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
+							if (customer == null)
+							{
+								transaction.Rollback();
+								return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
+							}
+							customer.Coin = customer.Coin - totalCoinDiscount;
+							context.User.Update(customer);
+							context.SaveChanges();
+						}
+
+						//update customer and admin account balance
+						if (totalPayment > 0)
+						{
+							
+							var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
+							if (customer == null)
+							{
+								transaction.Rollback();
+								return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
+							}
+							if (customer.AccountBalance < totalPayment)
+							{
+								transaction.Rollback();
+								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
+							}
+							customer.AccountBalance = customer.AccountBalance - totalPayment;
+
+							//update admin account balance
+							var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+							admin.AccountBalance = admin.AccountBalance + totalPayment;
+
+							context.User.UpdateRange(admin, customer);
+							context.SaveChanges();
+						}
 
 						// add orderCoupon and update coupon's status
 						if (coupons.Count != 0)
@@ -314,33 +385,25 @@ namespace DataAccess.DAOs
 								context.Coupon.Update(coupon);
 								context.SaveChanges();
 							}
-
 						}
 
-						// update asset info
-						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
-						if (assetInformations.Count != order.Quantity)
-						{
-							transaction.Rollback();
-                            return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
-                        }
 
-                        foreach (var asset in assetInformations)
+						// add new transaction coin
+						if(totalCoinDiscount > 0)
 						{
-							asset.OrderId = order.OrderId;
-							asset.IsActive = false;
+							TransactionCoin transactionCoin = new TransactionCoin
+							{
+								UserId = userId,
+								OrderId = order.OrderId,
+								TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_USE,
+								Amount = totalCoinDiscount,
+								DateCreate = DateTime.Now,
+							};
+							context.TransactionCoin.Add(transactionCoin); 
+							context.SaveChanges();
 						}
-						context.AssetInformation.UpdateRange(assetInformations);
-						context.SaveChanges();
 
-
-						//update admin account balance
-						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-						admin.AccountBalance = admin.AccountBalance + totalPayment;
-						context.User.Update(admin);
-						context.SaveChanges();
-
-						// add new transaction
+						// add new transaction internal
 						TransactionInternal newTransaction = new TransactionInternal
 						{
 							UserId = order.UserId,
@@ -397,6 +460,7 @@ namespace DataAccess.DAOs
 									OrderDate = o.OrderDate,
 									TotalAmount = o.TotalAmount,
 									TotalCouponDiscount = o.TotalCouponDiscount,
+									TotalCoinDiscount = o.TotalCoinDiscount,
 									TotalPayment = o.TotalPayment,
 									Note = o.Note,
 									FeedbackId = o.FeedbackId,
