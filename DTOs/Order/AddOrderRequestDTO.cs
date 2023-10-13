@@ -9,8 +9,13 @@ namespace DTOs.Order
 	public class AddOrderRequestDTO
 	{
 		public long UserId { get; set; }
+		public List<ProductRequestAddOrderDTO> Products { get; set; } = new List<ProductRequestAddOrderDTO>();
+		public bool IsUseCoin { get; set; }	
+	}
+
+	public class ProductRequestAddOrderDTO 
+	{
 		public long ProductVariantId { get; set; }
-		public long BusinessFeeId { get; set; }
 		public int Quantity { get; set; }
 		public List<string> Coupons { get; set; } = new List<string>();
 	}

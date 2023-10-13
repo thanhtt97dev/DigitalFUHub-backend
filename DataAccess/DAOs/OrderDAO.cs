@@ -190,7 +190,7 @@ namespace DataAccess.DAOs
 			return orders;
 		}
 
-		internal (string, string) AddOrder(long userId, List<AddOrderRequestDTO> orders , bool isUseCoin)
+		internal (string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders , bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -275,8 +275,7 @@ namespace DataAccess.DAOs
 
 						if (isUseCoin && customerCoin > 0 && totalPayment > 0) 
 						{
-							totalCoinDiscount = totalPayment - customerCoin;
-							if(totalCoinDiscount <= 0)
+							if(totalPayment <= customerCoin)
 							{
 								totalCoinDiscount = totalPayment;
 								totalPayment = 0;
