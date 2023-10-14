@@ -91,6 +91,14 @@
 		//Transaction coin Type
 		public const int TRANSACTION_COIN_TYPE_RECEIVE = 1;
 		public const int TRANSACTION_COIN_TYPE_USE = 2;
+<<<<<<< HEAD
 		public const int TRANSACTION_COIN_TYPE_REFUND = 3;
 	}
+=======
+
+        //Message Type
+        public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
+        public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
+    }
+>>>>>>> 4a1e3247cf4e992fead7b152039d7d2406d36397
 }

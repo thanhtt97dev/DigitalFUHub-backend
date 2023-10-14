@@ -1,5 +1,4 @@
-﻿using BusinessObject.DataTransfer;
-using BusinessObject.Entities;
+﻿using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -66,9 +65,6 @@ namespace BusinessObject
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<SenderConversation>()
-				.HasNoKey()
-				.ToView(null);
             modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductVariantId });
 			modelBuilder.Entity<OrderCoupon>().HasKey(x => new { x.OrderId, x.CouponId });
 			modelBuilder.Entity<OrderCoupon>().
