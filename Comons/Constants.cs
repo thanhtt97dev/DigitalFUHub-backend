@@ -91,6 +91,7 @@
 		//Transaction coin Type
 		public const int TRANSACTION_COIN_TYPE_RECEIVE = 1;
 		public const int TRANSACTION_COIN_TYPE_USE = 2;
+		public const int TRANSACTION_COIN_TYPE_REFUND = 3;
 
         //Message Type
         public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";

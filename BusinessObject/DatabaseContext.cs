@@ -40,13 +40,14 @@ namespace BusinessObject
 		public virtual DbSet<ProductStatus> ProductStatus { get; set; } = null!;
 		public virtual DbSet<Tag> Tag { get; set; } = null!;
 		public virtual DbSet<Shop> Shop { get; set; } = null!;
+		public virtual DbSet<Feedback> Feedback { get; set; } = null!;
+		public virtual DbSet<FeedbackBenefit> FeedbackBenefit { get; set; } = null!;
 		public virtual DbSet<FeedbackMedia> FeedbackMedia { get; set; } = null!;
 		public virtual DbSet<ProductMedia> ProductMedia { get; set; } = null!;
 		public virtual DbSet<Coupon> Coupon { get; set; } = null!;
 		public virtual DbSet<Order> Order { get; set; } = null!;
 		public virtual DbSet<OrderStatus> OrderStatus { get; set; } = null!;
 		public virtual DbSet<OrderCoupon> OrderCoupon { get; set; } = null!;
-		public virtual DbSet<Feedback> Feedback { get; set; } = null!;
 		public virtual DbSet<Category> Category { get; set; } = null!;
 		public virtual DbSet<Cart> Cart { get; set; } = null!;
 		public virtual DbSet<AssetInformation> AssetInformation { get; set; } = null!;
@@ -65,7 +66,7 @@ namespace BusinessObject
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-            modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductVariantId });
+			modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductVariantId });
 			modelBuilder.Entity<OrderCoupon>().HasKey(x => new { x.OrderId, x.CouponId });
 			modelBuilder.Entity<OrderCoupon>().
 				HasOne(x => x.Order)
@@ -132,6 +133,7 @@ namespace BusinessObject
 			{
 				new TransactionCoinType{TransactionCoinTypeId = 1, Name = "Get coin"},
 				new TransactionCoinType{TransactionCoinTypeId = 2, Name = "Use coin"},
+				new TransactionCoinType{TransactionCoinTypeId = 3, Name = "Refund"}
 			});
 
 			modelBuilder.Entity<ProductStatus>().HasData(new ProductStatus[]
@@ -164,7 +166,8 @@ namespace BusinessObject
 				new User(){UserId = 1, RoleId = 1, Username = "admin", Password = "123", Fullname="Admin", Avatar =  "", Status = true, TwoFactorAuthentication = false, AccountBalance = 0, SignInGoogle = false, IsConfirm = true }
 			});
 
-			modelBuilder.Entity<Bank>().HasData(new Bank[] 
+
+			modelBuilder.Entity<Bank>().HasData(new Bank[]
 			{
 				new Bank(){BankId = 458761, BankName = "TNHH MTV HSBC Việt Nam (HSBC)", BankCode = "HSBC", isActivate = true},
 				new Bank(){BankId = 970403, BankName = "Sacombank (STB)", BankCode = "STB", isActivate = true},
@@ -187,8 +190,11 @@ namespace BusinessObject
 				new BusinessFee() {BusinessFeeId = 1, Fee = 5, StartDate = DateTime.Now},
 			});
 
-
+			modelBuilder.Entity<FeedbackBenefit>().HasData(new FeedbackBenefit[]
+			{
+				new FeedbackBenefit{FeedbackBenefitId = 1, Coin = 100, StartDate = DateTime.Now},
+			});
 		}
 
-    }
+	}
 }

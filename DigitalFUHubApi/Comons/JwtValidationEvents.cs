@@ -31,9 +31,13 @@ namespace DigitalFUHubApi.Comons
 			int.TryParse(userIdStr, out userId);
 
 			var dbContext = context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
-			var user = dbContext.User.First(x => x.UserId == userId);
-
-			if (user != null && !user.Status)
+			var user = dbContext.User.FirstOrDefault(x => x.UserId == userId);
+			if (user == null) 
+			{
+				context.Fail("Unauthorized");
+				return base.TokenValidated(context);
+			}
+			if (!user.Status)
 			{
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
@@ -43,7 +47,7 @@ namespace DigitalFUHubApi.Comons
 			if (accessToken == null)
 			{
 				//Hanlde revoke all token of this user
-				var tokens = dbContext.AccessToken.Where(x => x.UserId == userId).ToList();
+				var tokens = dbContext.AccessToken.Where(x => x.UserId == userId && x.IsRevoked == false).ToList();
 				tokens.ForEach((token) => { token.IsRevoked = true; });
 				dbContext.SaveChanges();
 
