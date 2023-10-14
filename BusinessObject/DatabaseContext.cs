@@ -136,6 +136,7 @@ namespace BusinessObject
 			{
 				new TransactionCoinType{TransactionCoinTypeId = 1, Name = "Get coin"},
 				new TransactionCoinType{TransactionCoinTypeId = 2, Name = "Use coin"},
+				new TransactionCoinType{TransactionCoinTypeId = 3, Name = "Refund"}
 			});
 
 			modelBuilder.Entity<ProductStatus>().HasData(new ProductStatus[]

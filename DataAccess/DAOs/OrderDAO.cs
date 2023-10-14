@@ -212,14 +212,14 @@ namespace DataAccess.DAOs
 					foreach (var data in orders)
 					{
 						//get customer info
-						var customerInfo = context.User
+						var customer = context.User
 							.Select(x => new User { UserId = x.UserId, Coin = x.Coin })
 							.FirstOrDefault(x => x.UserId == userId);
-						if (customerInfo == null)
+						if (customer == null)
 						{
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
 						}
-						long customerCoin = customerInfo.Coin;
+						long customerCoin = customer.Coin;
 
 						// get productVariant
 						ProductVariant? productVariant = context.ProductVariant
@@ -267,12 +267,11 @@ namespace DataAccess.DAOs
                             }
                             totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
 						}
-						long totalAmount = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
-						long totalPayment = totalAmount - totalCouponsDiscount;
+						long totalAmount = (productVariant.Price * data.Quantity * (100 - product.Discount) / 100) - totalCouponsDiscount;
+						long totalPayment = totalAmount;
 
-						// set total coin discount
+						// caculate total coin discount
 						long totalCoinDiscount = 0;
-
 						if (isUseCoin && customerCoin > 0 && totalPayment > 0) 
 						{
 							if(totalPayment <= customerCoin)
@@ -329,12 +328,6 @@ namespace DataAccess.DAOs
 						// update customer coin 
 						if(totalCoinDiscount > 0)
 						{
-							var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
-							if (customer == null)
-							{
-								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
-							}
 							customer.Coin = customer.Coin - totalCoinDiscount;
 							context.User.Update(customer);
 							context.SaveChanges();
@@ -343,13 +336,6 @@ namespace DataAccess.DAOs
 						//update customer and admin account balance
 						if (totalPayment > 0)
 						{
-							
-							var customer = context.User.FirstOrDefault(x => x.UserId == order.UserId);
-							if (customer == null)
-							{
-								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
-							}
 							if (customer.AccountBalance < totalPayment)
 							{
 								transaction.Rollback();
