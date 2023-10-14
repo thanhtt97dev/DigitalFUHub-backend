@@ -68,7 +68,7 @@ namespace DataAccess.DAOs
                         FeedbackId = feedback.FeedbackId,
                         Content = feedback.Content,
                         Rate = feedback.Rate,
-                        UpdateAt = feedback.UpdateAt,
+                        UpdateAt = feedback.UpdateDate,
                         User = new UserResponeDTO {
                             UserId = feedback.User.UserId,
                             RoleId = feedback.User.RoleId,

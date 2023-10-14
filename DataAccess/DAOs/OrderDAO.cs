@@ -448,7 +448,7 @@ namespace DataAccess.DAOs
 									TotalCoinDiscount = o.TotalCoinDiscount,
 									TotalPayment = o.TotalPayment,
 									Note = o.Note,
-									FeedbackId = o.FeedbackId,
+									IsFeedback = o.IsFeedback,
 									OrderStatusId = o.OrderStatusId,
 									User = new User
 									{
@@ -505,7 +505,7 @@ namespace DataAccess.DAOs
 							   .FirstOrDefault();
 
 
-				if (order != null && order.FeedbackId != null)
+				if (order != null && order.IsFeedback)
 				{
 					Feedback feedback = context.Feedback
 						.Select(f => new Feedback()
@@ -513,7 +513,7 @@ namespace DataAccess.DAOs
 							FeedbackId = f.FeedbackId,
 							Rate = f.Rate,
 						})
-						.First(x => x.FeedbackId == order.FeedbackId);
+						.First(x => x.OrderId == order.OrderId);
 					order.Feedback = feedback;
 				}
 

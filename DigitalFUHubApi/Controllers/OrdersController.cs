@@ -100,7 +100,7 @@ namespace DigitalFUHubApi.Controllers
 					Quantity = x.Quantity,
 					Price = x.Price,
 					Discount = x.Discount,
-					IsFeedback = x.FeedbackId == null ? false : true,
+					IsFeedback = x.IsFeedback,
 					ProductName = x.ProductVariant?.Product?.ProductName ?? "",
 					ProductId = x.ProductVariant?.ProductId ?? 0,
 					CouponDiscount = x.TotalCouponDiscount,
