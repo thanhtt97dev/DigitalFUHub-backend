@@ -47,6 +47,15 @@ namespace DigitalFUHubApi.Controllers
 
             string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
             List<string> urlImages = new List<string>();
+            List<HashSet<string>?> connections = new List<HashSet<string>?>();
+            foreach (long userId in request.RecipientIds)
+            {
+                int recipientId = unchecked((int)userId);
+                HashSet<string>? connection = _connectionManager
+                        .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
+                connections.Add(connection);
+            }
+            
             try
             {
                 if (request.Images != null) {

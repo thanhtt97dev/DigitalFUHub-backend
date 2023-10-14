@@ -76,7 +76,7 @@ namespace DataAccess.DAOs
             using (DatabaseContext context = new DatabaseContext())
             {
                 List<CartDTO> cartDTOs = new List<CartDTO>();
-                var carts = await context.Cart.Where(c => c.UserId == userId).ToListAsync();
+                var carts = await context.Cart.Include(_ => _.User).Where(c => c.UserId == userId).ToListAsync();
                 foreach (var cart in carts)
                 {
                     var productVariant = await context.ProductVariant.FirstOrDefaultAsync(p => p.ProductVariantId == cart.ProductVariantId);
@@ -103,7 +103,8 @@ namespace DataAccess.DAOs
                             Quantity = context.AssetInformation.Count(x => x.ProductVariantId == cart.ProductVariantId)
                         },
                         ShopName = product?.Shop.ShopName ?? "",
-                        ShopId = product?.Shop.UserId ?? 0
+                        ShopId = product?.Shop.UserId ?? 0,
+                        Coin = cart.User.Coin
                     };
                     cartDTOs.Add(cartDTO);
                 }
