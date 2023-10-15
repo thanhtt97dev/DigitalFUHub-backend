@@ -379,9 +379,11 @@ namespace DigitalFUHubApi.Controllers
 			User? user;
 			try
 			{
-				_shopRepository.CreateShop(request);
 				user = _userRepository.GetUserById(request.UserId);
+				bool shopNameExist = _shopRepository.CheckShopNameExisted(request.ShopName.Trim());
 				if (user == null) throw new Exception("Người dùng không khả dụng.");
+				if(shopNameExist) throw new Exception("Tên cửa hàng đã tồn tại.");
+				_shopRepository.CreateShop(request);
 				user.RoleId = Constants.SELLER_ROLE;
 				user.Role = null!;
 				_userRepository.UpdateUser(user);
@@ -593,13 +595,15 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				bool isShop = _shopRepository.UserHasShop(request.UserId);
-				if (!isShop)
+				bool couponCodeExist = _couponRepository.CheckCouponCodeExist(request.CouponCode.Trim());
+				if (!isShop || couponCodeExist)
 				{
 					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
 					response.Status.Ok = false;
 					response.Status.Message = "Invalid";
 					return Ok(response);
-				}
+				} 
+				
 				Coupon coupon = new Coupon
 				{
 					IsPublic = request.IsPublic,
