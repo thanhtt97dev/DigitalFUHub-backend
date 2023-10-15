@@ -15,7 +15,7 @@ namespace DataAccess.IRepositories
 		List<Order> GetAllOrderComplaint(int days);
 		void UpdateStatusOrderToSellerRefunded(List<Order> orders);
 		List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status);
-		(string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders, bool isUseCoin);
+		(string, string) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin);
 		Order? GetOrder(long orderId);
 		Order? GetOrderForCheckingExisted(long orderId);
 		Order? GetSellerOrderDetail(long orderId);

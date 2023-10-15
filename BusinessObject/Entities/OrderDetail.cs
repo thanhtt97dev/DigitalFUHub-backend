@@ -18,8 +18,8 @@ namespace BusinessObject.Entities
 		public int Quantity { get; set; }
 		public long Price { get; set; }	
 		public int Discount { get;set; }
-		public long TotalOrderValue { get; set; }
-		public long TotalDiscount { get; set; }
+		//public long TotalOrderValue { get; set; }
+		//public long TotalDiscount { get; set; }
 		public long TotalAmount { get; set; }
 		public bool IsFeedback { get; set; }
 
