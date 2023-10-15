@@ -54,7 +54,7 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult CheckCouponCodeExist(string couponCode)
 		{
 			ResponseData response = new ResponseData();
-			if (string.IsNullOrEmpty(couponCode?.Trim()))
+			if (string.IsNullOrWhiteSpace(couponCode))
 			{
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";

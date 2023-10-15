@@ -15,6 +15,7 @@
 	using DTOs.User;
 	using System.Net;
     using global::Comons;
+	using static QRCoder.PayloadGenerator;
 
     [Route("api/[controller]")]
 	[ApiController]
@@ -193,7 +194,7 @@
 		[HttpGet("ResetPassword/{email}")]
 		public async Task<IActionResult> ResetPassword(string email)
 		{
-			if (string.IsNullOrEmpty(email.Trim()))
+			if (string.IsNullOrWhiteSpace(email))
 			{
 				return UnprocessableEntity();
 			}
@@ -602,6 +603,10 @@
 		[HttpGet("CheckExistEmail/{email}")]
 		public IActionResult CheckExistEmail(string email)
 		{
+			if(string.IsNullOrWhiteSpace(email))
+			{
+				return Ok("Y");
+			}
 			User? user = _userRepository.GetUserByEmail(email);
 			if (user == null)
 			{
@@ -615,6 +620,10 @@
 		[HttpGet("CheckExistUsername/{username}")]
 		public IActionResult CheckExistUsername(string username)
 		{
+			if (string.IsNullOrWhiteSpace(username))
+			{
+				return Ok("Y");
+			}
 			User? user = _userRepository.GetUserByUsername(username);
 			if (user == null)
 			{
