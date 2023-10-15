@@ -21,5 +21,6 @@ namespace BusinessObject.Entities
 		public virtual User User { get; set; } = null!;
 		public virtual ICollection<Product> Products { get; set; } = null!;
 		public virtual ICollection<Coupon> Coupons { get; set; } = null!;
+		public virtual ICollection<Order> Orders { get; set; } = null!;
 	}
 }

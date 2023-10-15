@@ -15,7 +15,7 @@ namespace BusinessObject.Entities
         public long FeedbackId { get; set; }
         public long ProductId { get; set; }
         public long UserId { get; set; }
-		public long OrderId { get; set; }
+		public long OrderDetailId { get; set; }
 		public int FeedbackBenefitId { get; set; }
 		public string? Content { get; set; }
         public int Rate { get; set; }
@@ -26,8 +26,8 @@ namespace BusinessObject.Entities
         public virtual User User { get; set; } = null!;
 		[ForeignKey(nameof(FeedbackBenefitId))]
 		public virtual FeedbackBenefit FeedbackBenefit { get; set; } = null!;
-		[ForeignKey(nameof(OrderId))]
-		public virtual Order Order { get; set; } = null!;
+		[ForeignKey(nameof(OrderDetailId))]
+		public virtual OrderDetail OrderDetail { get; set; } = null!;
 		public virtual ICollection<FeedbackMedia> FeedbackMedias { get; set; } = null!;
 		public virtual TransactionCoin? TransactionCoin { get; set; }
 	}

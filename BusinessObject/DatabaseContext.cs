@@ -46,6 +46,7 @@ namespace BusinessObject
 		public virtual DbSet<ProductMedia> ProductMedia { get; set; } = null!;
 		public virtual DbSet<Coupon> Coupon { get; set; } = null!;
 		public virtual DbSet<Order> Order { get; set; } = null!;
+		public virtual DbSet<OrderDetail> OrderDetail { get; set; } = null!;
 		public virtual DbSet<OrderStatus> OrderStatus { get; set; } = null!;
 		public virtual DbSet<OrderCoupon> OrderCoupon { get; set; } = null!;
 		public virtual DbSet<Category> Category { get; set; } = null!;
@@ -93,10 +94,15 @@ namespace BusinessObject
 				.WithMany(x => x.Orders)
 				.HasForeignKey(x => x.UserId)
 				.OnDelete(DeleteBehavior.NoAction);
-			modelBuilder.Entity<Order>()
+			modelBuilder.Entity<OrderDetail>()
 				.HasOne(x => x.ProductVariant)
-				.WithMany(x => x.Orders)
+				.WithMany(x => x.OrderDetails)
 				.HasForeignKey(x => x.ProductVariantId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<Feedback>()
+				.HasOne(x => x.Product)
+				.WithMany(x => x.Feedbacks)
+				.HasForeignKey(x => x.ProductId)
 				.OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<WithdrawTransaction>()
 				.HasOne(x => x.UserBank)

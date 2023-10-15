@@ -29,6 +29,8 @@ namespace DataAccess.DAOs
 
 		internal List<Order> GetAllOrderWaitToConfirm(int days)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				DateTime timeAccept = DateTime.Now.AddDays(-days);
@@ -40,10 +42,13 @@ namespace DataAccess.DAOs
 					.ToList();
 				return orders;
 			}
+			*/
 		}
 
 		internal void UpdateStatusOrderToConfirm(List<Order> orders)
 		{
+			return;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -105,10 +110,13 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
+			*/
 		}
 
 		internal List<Order> GetAllOrderComplaint(int days)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				DateTime timeAccept = DateTime.Now.AddDays(-days);
@@ -119,10 +127,13 @@ namespace DataAccess.DAOs
 					.ToList();
 				return orders;
 			}
+			*/
 		}
 
 		internal void UpdateStatusOrderToSellerRefunded(List<Order> orders)
 		{
+			return;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -167,10 +178,13 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
+			*/
 		}
 
 		internal List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status)
 		{
+			return null;
+			/*
 			List<Order> orders = new List<Order>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -188,10 +202,13 @@ namespace DataAccess.DAOs
 							).OrderByDescending(x => x.OrderDate).ToList();
 			}
 			return orders;
+			*/
 		}
 
 		internal (string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders, bool isUseCoin)
 		{
+			return ("daw", "daw");
+				/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -417,10 +434,13 @@ namespace DataAccess.DAOs
 				}
 				return (Constants.RESPONSE_CODE_SUCCESS, "Success!");
 			}
+				*/
 		}
 
 		internal Order? GetOrder(long orderId)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				Order? order = (from o in context.Order
@@ -490,21 +510,6 @@ namespace DataAccess.DAOs
 										BusinessFeeId = businessFee.BusinessFeeId,
 										Fee = businessFee.Fee,
 									},
-									/*
-									AssetInformations = (from assetInformation in context.AssetInformation
-														 where assetInformation.OrderId == orderId
-														 select new AssetInformation { Asset = assetInformation.Asset }
-														).ToList(),
-									OrderCoupons = (from orderCoupon in context.OrderCoupon
-													join coupon in context.Coupon
-														on orderCoupon.CouponId equals coupon.CouponId
-													where orderCoupon.OrderId == orderId
-													select new OrderCoupon
-													{
-														PriceDiscount = orderCoupon.PriceDiscount,
-													}
-													).ToList(),
-									*/
 								})
 							   .FirstOrDefault();
 
@@ -523,20 +528,26 @@ namespace DataAccess.DAOs
 
 				return order;
 			}
+			*/
 		}
 
 		internal Order? GetSellerOrderDetail(long orderId)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Order.Include(i => i.AssetInformations)
 					.ThenInclude(ti => ti.ProductVariant).ThenInclude(x => x.Product).Include(x => x.User)
 					.Where(x => x.OrderId == orderId).FirstOrDefault();
 			}
+			*/
 		}
 
 		internal void UpdateOrderStatusSellerViolates(long orderId, string? note)
 		{
+			return;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -574,10 +585,13 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
+			*/
 		}
 
 		internal void UpdateOrderStatusRejectComplaint(long orderId, string? note)
 		{
+			return;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -634,9 +648,12 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
+			*/
 		}
 		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
 		{
+			return;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var order = context.Order.First(x => x.OrderId == orderId);
@@ -644,10 +661,13 @@ namespace DataAccess.DAOs
 				order.Note = note;
 				context.SaveChanges();
 			}
+			*/
 		}
 
 		internal Order? GetOrderForCheckingExisted(long orderId)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var order = context.Order
@@ -656,10 +676,13 @@ namespace DataAccess.DAOs
 					.FirstOrDefault(x => x.OrderId == orderId);
 				return order;
 			}
+			*/
 		}
 
 		internal List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				List<Order> orders = context.Order
@@ -679,10 +702,13 @@ namespace DataAccess.DAOs
 					.ToList();
 				return orders;
 			}
+			*/
 		}
 
 		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)
 		{
+			return;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				using (var transaction = context.Database.BeginTransaction())
@@ -737,10 +763,13 @@ namespace DataAccess.DAOs
 					}
 				}
 			}
+			*/
 		}
 
 		internal List<OrderCoupon> GetCouponsInOrder(long orderId)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var orderCoupons = (from orderCoupon in context.OrderCoupon
@@ -754,6 +783,7 @@ namespace DataAccess.DAOs
 									}).ToList();
 				return orderCoupons;
 			}
+			*/
 		}
 	}
 }
