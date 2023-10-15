@@ -17,7 +17,6 @@ namespace DigitalFUHubApi.Jobs
 
 		public Task Execute(IJobExecutionContext context)
 		{
-			return Task.CompletedTask;
 			//RULE: handle change order's status to "Confirmed" if order status still "wait confirm" in a range times
 			var ordersWaitConfirm = orderRepository.GetAllOrderWaitToConfirm(Constants.NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER);
 			if (ordersWaitConfirm.Count != 0)

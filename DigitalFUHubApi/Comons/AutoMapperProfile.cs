@@ -49,14 +49,13 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<DepositTransaction, HistoryDepositResponeDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();
-			/*
 			CreateMap<Order, OrdersResponseDTO>()
 				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
-				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.ProductVariant.Product.Shop.UserId))
-				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
+				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
 				.ReverseMap();
-			*/
+
 			CreateMap<OrderCoupon, OrderDetailOrderCouponsDTO>()
 				.ReverseMap();
 			/*

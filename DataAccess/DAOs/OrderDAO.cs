@@ -170,26 +170,39 @@ namespace DataAccess.DAOs
 
 		internal List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status)
 		{
-			return null;
-			/*
 			List<Order> orders = new List<Order>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				orders = context.Order
 							.Include(x => x.User)
-							.Include(x => x.ProductVariant)
-							.ThenInclude(x => x.Product)
-							.ThenInclude(x => x.Shop)
+							.Include(x => x.Shop)
+							.Select(o => new Order
+							{
+								OrderId = o.OrderId,
+								OrderDate = o.OrderDate,
+								TotalPayment = o.TotalPayment,	
+								User = new User 
+								{
+									UserId = o.User.UserId,
+									Email = o.User.Email,
+								},
+								Shop = new Shop
+								{
+									UserId = o.ShopId,
+									ShopName = o.Shop.ShopName
+								},
+								OrderStatusId = o.OrderStatusId
+							})
 							.Where(x =>
 								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
 								x.User.Email.Contains(customerEmail) &&
-								x.ProductVariant.Product.Shop.ShopName.Contains(shopName) &&
+								x.Shop.ShopName.Contains(shopName) &&
 								(orderId == 0 ? true : x.OrderId == orderId) &&
 								(status == 0 ? true : x.OrderStatusId == status)
 							).OrderByDescending(x => x.OrderDate).ToList();
+			
 			}
 			return orders;
-			*/
 		}
 
 		#region Add order
