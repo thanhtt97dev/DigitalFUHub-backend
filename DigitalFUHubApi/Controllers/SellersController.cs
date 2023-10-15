@@ -456,7 +456,8 @@ namespace DigitalFUHubApi.Controllers
 
 				List<Order> orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, "",
 					fromDate, toDate, request.Status)
-					.Where(x => x.ProductVariant.Product.ShopId == request.UserId).ToList();
+					//.Where(x => x.ProductVariant.Product.ShopId == request.UserId)
+					.ToList();
 				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
 
 				status.Message = "Success!";
@@ -495,6 +496,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			SellerOrderDetailResponseDTO order = new SellerOrderDetailResponseDTO
 			{
+				/*
 				EmailCustomer = orderRaw.User.Email,
 				IsFeedbacked = orderRaw.IsFeedback,
 				OrderDate = orderRaw.OrderDate,
@@ -505,6 +507,7 @@ namespace DigitalFUHubApi.Controllers
 				ProductName = orderRaw.ProductVariant.Product?.ProductName ?? "",
 				ProductVariantName = orderRaw.ProductVariant?.Name ?? "",
 				Thumbnail = orderRaw.ProductVariant?.Product?.Thumbnail ?? ""
+				*/
 			};
 			response.Status.Ok = true;
 			response.Status.Message = "Success";

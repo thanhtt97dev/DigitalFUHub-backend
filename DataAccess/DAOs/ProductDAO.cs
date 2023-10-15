@@ -161,21 +161,41 @@ namespace DataAccess.DAOs
 					});
 				}
 
+				long shopId = product.Shop.UserId;
+				var productOfShop = context.Product.Where(x => x.ShopId == shopId);
+				long productNumber = productOfShop.Count();
+				long feedbachNumber = 0;
+                foreach (Product item in productOfShop)
+                {
+					feedbachNumber += context.Feedback.Where(x => x.ProductId == item.ProductId).Count();
+                }
 
-				ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
+
+
+                ProductDetailShopResponseDTO shop = new ProductDetailShopResponseDTO
+				{
+					ShopId = product.Shop.UserId,
+					Avatar = "",
+                    ShopName = product.Shop.ShopName,
+                    DateCreate = product.Shop.DateCreate,
+                    FeedbackNumber = feedbachNumber,
+                    ProductNumber = productNumber
+                };
+
+
+        ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
 				{
 					ProductId = product.ProductId,
 					ProductName = product.ProductName,
 					Thumbnail = product.Thumbnail,
 					Description = product.Description,
 					Discount = product.Discount,
-					ShopId = product.Shop.UserId,
-					ShopName = product.Shop.ShopName,
 					CategoryId = product.CategoryId,
 					Quantity = productQuantity,
 					ProductVariants = variants,
 					ProductMedias = medias,
-					Tags = tags
+					Tags = tags,
+					Shop = shop
 				};
 
 				return productDetailResponse;

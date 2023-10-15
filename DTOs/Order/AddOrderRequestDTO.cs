@@ -9,19 +9,20 @@ namespace DTOs.Order
 	public class AddOrderRequestDTO
 	{
 		public long UserId { get; set; }
+		public List<ShopProductRequestAddOrderDTO> ShopProducts { get; set; } = new List<ShopProductRequestAddOrderDTO>();
+		public bool IsUseCoin { get; set; }
+	}
+
+	public class ShopProductRequestAddOrderDTO
+	{
+		public long ShopId { get; set; }
 		public List<ProductRequestAddOrderDTO> Products { get; set; } = new List<ProductRequestAddOrderDTO>();
-		public bool IsUseCoin { get; set; }	
+		public string Coupon { get; set; } = string.Empty;
 	}
 
 	public class ProductRequestAddOrderDTO 
 	{
 		public long ProductVariantId { get; set; }
 		public int Quantity { get; set; }
-		public string Coupon { get; set; } = string.Empty;
-	}
-
-	public class CouponRequestAddOrderDTO
-	{
-		public string CouponCode { get; set; } = string.Empty;	
 	}
 }

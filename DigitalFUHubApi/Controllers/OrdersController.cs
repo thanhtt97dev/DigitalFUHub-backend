@@ -52,7 +52,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				(string responseCode, string message) = orderRepository.AddOrder(request.UserId, request.Products, request.IsUseCoin);
+				(string responseCode, string message) = orderRepository.AddOrder(request.UserId, request.ShopProducts ,request.IsUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
@@ -92,6 +92,7 @@ namespace DigitalFUHubApi.Controllers
 			OrderResponseDTO orderResponse = new OrderResponseDTO()
 			{
 				NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
+				/*
 				Orders = orders.Select(x => new OrderProductResponseDTO
 				{
 					OrderId = x.OrderId,
@@ -109,6 +110,7 @@ namespace DigitalFUHubApi.Controllers
 					Thumbnail = x.ProductVariant?.Product.Thumbnail ?? "",
 					Assest = x.AssetInformations.Select(x => x.Asset ?? "").ToList(),
 				}).ToList()
+				*/
 			};
 			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 			response.Status.Ok = true;
@@ -134,7 +136,9 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
 				return Ok(response);
-			} else if(order.ProductVariant.Product.Shop.UserId != request.ShopId)
+			}
+			else if (true)
+			//} else if(order.ProductVariant.Product.Shop.UserId != request.ShopId)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;
