@@ -9,8 +9,17 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-    public class CouponRepository : ICouponRepository
-    {
-        public List<Coupon> GetCoupons(long shopId, string couponCode) => CouponDAO.Instance.GetCoupons(shopId, couponCode);
-    }
+	public class CouponRepository : ICouponRepository
+	{
+		public void AddCoupon(Coupon coupon) => CouponDAO.Instance.AddCoupon(coupon);
+
+		public List<Coupon> GetCoupons(long shopId, string couponCode) => CouponDAO.Instance.GetCoupons(shopId, couponCode);
+
+		public Coupon? GetCoupons(long couponId) => CouponDAO.Instance.GetCoupon(couponId);
+
+		public List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate, bool? isPublic)
+		=> CouponDAO.Instance.GetListCouponsByShop(userId, couponCode, startDate, endDate, isPublic);
+
+		public void UpdateCoupon(Coupon coupon) => CouponDAO.Instance.UpdateCoupon(coupon);
+	}
 }

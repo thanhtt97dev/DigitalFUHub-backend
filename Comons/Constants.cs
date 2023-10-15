@@ -97,5 +97,5 @@
         //Message Type
         public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
         public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
-    }
+	}
 }
