@@ -213,7 +213,7 @@ namespace DataAccess.DAOs
 					{
 						//get customer info
 						var customer = context.User
-							.Select(x => new User { UserId = x.UserId, Coin = x.Coin })
+							.Select(x => new User { UserId = x.UserId, Coin = x.Coin,AccountBalance = x.AccountBalance })
 							.FirstOrDefault(x => x.UserId == userId);
 						if (customer == null)
 						{
