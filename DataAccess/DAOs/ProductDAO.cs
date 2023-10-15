@@ -190,10 +190,6 @@ namespace DataAccess.DAOs
 					Thumbnail = product.Thumbnail,
 					Description = product.Description,
 					Discount = product.Discount,
-
-					ShopId = product.Shop.UserId,
-					ShopName = product.Shop.ShopName,
-
 					CategoryId = product.CategoryId,
 					Quantity = productQuantity,
 					ProductVariants = variants,
