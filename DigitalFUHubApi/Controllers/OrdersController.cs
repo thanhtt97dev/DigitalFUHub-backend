@@ -32,7 +32,7 @@ namespace DigitalFUHubApi.Controllers
 
 		[Authorize("Customer,Seller")]
 		[HttpPost("AddOrder")]
-		public IActionResult AddOrder([FromBody] AddOrderRequestDTO request)
+		public IActionResult AddOrder(AddOrderRequestDTO request)
 		{
 			try
 			{

@@ -192,6 +192,7 @@ namespace DataAccess.DAOs
 			*/
 		}
 
+		#region Add order
 		internal (string, string) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -252,7 +253,6 @@ namespace DataAccess.DAOs
 
 						//get customer info
 						var customer = context.User
-							.Select(x => new User { UserId = x.UserId, Coin = x.Coin, AccountBalance = x.AccountBalance })
 							.FirstOrDefault(x => x.UserId == userId);
 						if (customer == null)
 						{
@@ -365,7 +365,7 @@ namespace DataAccess.DAOs
 									  shopProduct.Coupon == c.CouponCode &&
 									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
 									  c.IsActive && c.Quantity > 0
-									  select c).First();
+									  select c).FirstOrDefault();
 							if (coupon == null)
 							{
 								transaction.Rollback();
@@ -379,7 +379,7 @@ namespace DataAccess.DAOs
 							}
 							totalCouponDiscount = coupon.PriceDiscount;
 
-							// add orderCoupon and update coupon's status
+							// add orderCoupon and update coupon's quantity
 							OrderCoupon orderCoupon = new OrderCoupon()
 							{
 								OrderId = order.OrderId,
@@ -418,16 +418,6 @@ namespace DataAccess.DAOs
 							}
 						}
 
-						// update order
-						order.TotalAmount = totalAmount;
-						order.TotalCouponDiscount = totalCouponDiscount;
-						order.TotalCoinDiscount = totalCoinDiscount;
-						order.TotalPayment = totalPayment;
-
-						context.Order.Update(order);
-						context.SaveChanges();
-
-
 						//update customer and admin account balance
 						if (totalPayment > 0)
 						{
@@ -437,7 +427,7 @@ namespace DataAccess.DAOs
 								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
 							}
 							customer.AccountBalance = customer.AccountBalance - totalPayment;
-							if(totalCoinDiscount > 0)
+							if (totalCoinDiscount > 0)
 							{
 								customer.Coin = customer.Coin - totalCoinDiscount;
 							}
@@ -450,6 +440,14 @@ namespace DataAccess.DAOs
 							context.SaveChanges();
 						}
 
+						// update order
+						order.TotalAmount = totalAmount;
+						order.TotalCouponDiscount = totalCouponDiscount;
+						order.TotalCoinDiscount = totalCoinDiscount;
+						order.TotalPayment = totalPayment;
+
+						context.Order.Update(order);
+						context.SaveChanges();
 
 						// add new transaction coin
 						if (totalCoinDiscount > 0)
@@ -474,7 +472,7 @@ namespace DataAccess.DAOs
 								UserId = order.UserId,
 								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
 								OrderId = order.OrderId,
-								PaymentAmount = order.TotalAmount,
+								PaymentAmount = order.TotalPayment,
 								Note = "Payment",
 								DateCreate = DateTime.Now
 							};
@@ -492,6 +490,7 @@ namespace DataAccess.DAOs
 			}
 			return (Constants.RESPONSE_CODE_SUCCESS, "Success!");
 		}
+		#endregion
 
 		internal Order? GetOrder(long orderId)
 		{
