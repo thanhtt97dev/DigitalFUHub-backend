@@ -29,8 +29,6 @@ namespace DataAccess.DAOs
 
 		internal List<Order> GetAllOrderWaitToConfirm(int days)
 		{
-			return null;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				DateTime timeAccept = DateTime.Now.AddDays(-days);
@@ -42,13 +40,10 @@ namespace DataAccess.DAOs
 					.ToList();
 				return orders;
 			}
-			*/
 		}
 
 		internal void UpdateStatusOrderToConfirm(List<Order> orders)
 		{
-			return;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -63,8 +58,7 @@ namespace DataAccess.DAOs
 						//get platform fee
 						var fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
 						//get sellerId
-						var productId = context.ProductVariant.First(x => x.ProductVariantId == order.ProductVariantId).ProductId;
-						var sellerId = context.Product.First(x => x.ProductId == productId).ShopId;
+						var sellerId = order.ShopId;
 
 						//get profit
 						var adminProfit = order.TotalAmount * fee / 100;
@@ -110,13 +104,10 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
-			*/
 		}
 
 		internal List<Order> GetAllOrderComplaint(int days)
 		{
-			return null;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				DateTime timeAccept = DateTime.Now.AddDays(-days);
@@ -127,13 +118,10 @@ namespace DataAccess.DAOs
 					.ToList();
 				return orders;
 			}
-			*/
 		}
 
 		internal void UpdateStatusOrderToSellerRefunded(List<Order> orders)
 		{
-			return;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -178,7 +166,6 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
-			*/
 		}
 
 		internal List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status)
@@ -234,10 +221,10 @@ namespace DataAccess.DAOs
 					long businessFeeId = businessFee.BusinessFeeId;
 					long businessFeeValue = businessFee.Fee;
 
-					foreach (var data in shopProducts)
+					foreach (var shopProduct in shopProducts)
 					{
 						// check ProductVariant existed
-						var productVariantIdOrder = data.Products.Select(x => x.ProductVariantId).ToList();
+						var productVariantIdOrder = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
 						var productVariantOrder = context.ProductVariant
 							.Include(x => x.Product)
 							.Where(x => productVariantIdOrder.Contains(x.ProductVariantId)).ToList();	
@@ -251,7 +238,7 @@ namespace DataAccess.DAOs
 						}
 
 						//check shop existed
-						var shop = context.Shop.FirstOrDefault(x => x.UserId == data.ShopId);
+						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId);
 						if (shop == null)
 						{
 							transaction.Rollback();
@@ -260,7 +247,7 @@ namespace DataAccess.DAOs
 
 						//check ProductVariant of shop
 						var isAllProductInShop = productVariantOrder
-							.All(x => x.Product.ShopId == data.ShopId);
+							.All(x => x.Product.ShopId == shopProduct.ShopId);
 
 						if (!isAllProductInShop)
 						{
@@ -292,7 +279,7 @@ namespace DataAccess.DAOs
 						Order order = new Order()
 						{
 							UserId = userId,
-							ShopId = data.ShopId,
+							ShopId = shopProduct.ShopId,
 							BusinessFeeId = businessFeeId,
 							OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION,
 							OrderDate = DateTime.Now
@@ -302,7 +289,7 @@ namespace DataAccess.DAOs
 
 						//create order detail
 						List<OrderDetail> orderDetails = new List<OrderDetail>();	
-						foreach (var item in data.Products)
+						foreach (var item in shopProduct.Products)
 						{
 							// check quantity
 							var assetInformationRemaining = context.AssetInformation
@@ -375,11 +362,11 @@ namespace DataAccess.DAOs
 						long totalAmount = orderDetails.Sum(x => x.TotalAmount);
 						// check coupon
 						long totalCouponDiscount = 0;
-						if (!string.IsNullOrEmpty(data.Coupon))
+						if (!string.IsNullOrEmpty(shopProduct.Coupon))
 						{
 							var coupon = (from c in context.Coupon
 									  where
-									  data.Coupon == c.CouponCode &&
+									  shopProduct.Coupon == c.CouponCode &&
 									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
 									  c.IsActive && c.Quantity > 0
 									  select c).First();
@@ -619,8 +606,6 @@ namespace DataAccess.DAOs
 
 		internal void UpdateOrderStatusSellerViolates(long orderId, string? note)
 		{
-			return;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -658,13 +643,10 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
-			*/
 		}
 
 		internal void UpdateOrderStatusRejectComplaint(long orderId, string? note)
 		{
-			return;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
@@ -672,15 +654,14 @@ namespace DataAccess.DAOs
 				{
 					var order = context.Order
 									.Include(x => x.BusinessFee)
-									.Include(x => x.ProductVariant)
-									.ThenInclude(x => x.Product)
 									.First(x => x.OrderId == orderId);
 					order.OrderStatusId = Constants.ORDER_REJECT_COMPLAINT;
 					order.Note = note;
+					context.Order.Update(order);
 
-					var sellerId = order.ProductVariant.Product.ShopId;
-					var adminProfit = order.TotalPayment * order.BusinessFee.Fee / 100;
-					var sellerProfit = order.TotalPayment - adminProfit;
+					var sellerId = order.ShopId;
+					var adminProfit = order.TotalAmount * order.BusinessFee.Fee / 100;
+					var sellerProfit = order.TotalAmount - adminProfit;
 
 					// add transaction for refund money to seller
 					TransactionInternal transactionInternalSeller = new TransactionInternal()
@@ -721,7 +702,6 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
-			*/
 		}
 		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
 		{
@@ -739,17 +719,12 @@ namespace DataAccess.DAOs
 
 		internal Order? GetOrderForCheckingExisted(long orderId)
 		{
-			return null;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var order = context.Order
-					.Include(x => x.ProductVariant)
-					.ThenInclude(x => x.Product)
 					.FirstOrDefault(x => x.OrderId == orderId);
 				return order;
 			}
-			*/
 		}
 
 		internal List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset)
@@ -780,8 +755,6 @@ namespace DataAccess.DAOs
 
 		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)
 		{
-			return;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				using (var transaction = context.Database.BeginTransaction())
@@ -794,8 +767,8 @@ namespace DataAccess.DAOs
 						if (status == Constants.ORDER_CONFIRMED)
 						{
 							BusinessFee fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId);
-							var adminProfit = order.TotalPayment * fee.Fee / 100;
-							var sellerProfit = order.TotalPayment - adminProfit;
+							var adminProfit = order.TotalAmount * fee.Fee / 100;
+							var sellerProfit = order.TotalAmount - adminProfit;
 							// update blance of seller
 							var seller = context.User.First(x => x.UserId == shopId);
 							seller.AccountBalance = seller.AccountBalance + sellerProfit;
@@ -807,7 +780,7 @@ namespace DataAccess.DAOs
 									DateCreate = DateTime.Now,
 									Note = "Receive Payment",
 									OrderId = order.OrderId,
-									PaymentAmount = order.TotalPayment - (order.TotalPayment * fee.Fee / 100),
+									PaymentAmount = sellerProfit,
 									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
 									UserId = shopId,
 								},
@@ -816,7 +789,7 @@ namespace DataAccess.DAOs
 									DateCreate = DateTime.Now,
 									Note = "Profit",
 									OrderId = order.OrderId,
-									PaymentAmount = order.TotalPayment * fee.Fee / 100,
+									PaymentAmount = adminProfit,
 									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
 									UserId = Constants.ADMIN_USER_ID,
 								},
@@ -836,13 +809,10 @@ namespace DataAccess.DAOs
 					}
 				}
 			}
-			*/
 		}
 
 		internal List<OrderCoupon> GetCouponsInOrder(long orderId)
 		{
-			return null;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var orderCoupons = (from orderCoupon in context.OrderCoupon
@@ -856,7 +826,6 @@ namespace DataAccess.DAOs
 									}).ToList();
 				return orderCoupons;
 			}
-			*/
 		}
 	}
 }
