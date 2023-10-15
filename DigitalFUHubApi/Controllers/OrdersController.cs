@@ -36,7 +36,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if(!ModelState.IsValid) 
+				if (!ModelState.IsValid)
 				{
 					return BadRequest();
 				}
@@ -52,7 +52,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				(string responseCode, string message) = orderRepository.AddOrder(request.UserId, request.ShopProducts ,request.IsUseCoin);
+				(string responseCode, string message) = orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
@@ -69,54 +69,53 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("All")]
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
-			ResponseData response = new ResponseData();
-			if(!ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
 
 			var accessToken = Util.GetAccessToken(HttpContext);
 			var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
-			if(request.UserId != userIdFromAccessToken) 
+			if (request.UserId != userIdFromAccessToken)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
-				response.Status.Ok = false;
-				response.Status.Message = "Not have permission to get data!";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
 			}
 
 			List<Order> orders = orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 			OrderResponseDTO orderResponse = new OrderResponseDTO()
 			{
 				NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
-				/*
+
 				Orders = orders.Select(x => new OrderProductResponseDTO
 				{
 					OrderId = x.OrderId,
-					ShopId = x.ProductVariant.Product.ShopId,
-					ShopName = x.ProductVariant.Product.Shop.ShopName,
-					Quantity = x.Quantity,
-					Price = x.Price,
-					Discount = x.Discount,
-					IsFeedback = x.IsFeedback,
-					ProductName = x.ProductVariant?.Product?.ProductName ?? "",
-					ProductId = x.ProductVariant?.ProductId ?? 0,
-					CouponDiscount = x.TotalCouponDiscount,
-					ProductVariantName = x.ProductVariant?.Name ?? "",
+					Note = x.Note ?? "",
+					OrderDate = x.OrderDate,
+					ShopId = x.ShopId,
+					ShopName = x.Shop.ShopName,
 					StatusId = x.OrderStatusId,
-					Thumbnail = x.ProductVariant?.Product.Thumbnail ?? "",
-					Assest = x.AssetInformations.Select(x => x.Asset ?? "").ToList(),
+					TotalAmount = x.TotalAmount,
+					TotalCoinDiscount = x.TotalCoinDiscount,
+					TotalCouponDiscount = x.TotalCouponDiscount,
+					TotalPayment = x.TotalPayment,
+					OrderDetails = x.OrderDetails.Select(od => new OrderDetailProductResponseDTO
+					{
+						Discount = od.Discount,
+						IsFeedback = od.IsFeedback,
+						OrderDetailId = od.OrderDetailId,
+						Price = od.Price,
+						ProductId = od.ProductVariant.ProductId,
+						ProductName = od.ProductVariant?.Product?.ProductName ?? "",
+						ProductVariantId = od.ProductVariantId,
+						ProductVariantName = od.ProductVariant?.Name ?? "",
+						Quantity = od.Quantity,
+						Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
+						TotalAmount = od.TotalAmount
+					}).ToList(),
 				}).ToList()
-				*/
+
 			};
-			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-			response.Status.Ok = true;
-			response.Status.Message = "Success";
-			response.Result = orderResponse;
-			return Ok(response);
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, orderResponse));
 		}
 		[Authorize("Customer,Seller")]
 		[HttpPost("Edit/Status")]
@@ -144,20 +143,22 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
 				return Ok(response);
-			} else if(order.UserId != request.UserId)
-			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
-			} else if(order.OrderStatusId == Constants.ORDER_CONFIRMED)
+			}
+			else if (order.UserId != request.UserId)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;
 				response.Status.Message = "Invalid";
 				return Ok(response);
 			}
-			else if(request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
+			else if (order.OrderStatusId == Constants.ORDER_CONFIRMED)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			}
+			else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;
@@ -166,7 +167,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				orderRepository.UpdateOrderStatusCustomer(request.OrderId,request.ShopId, request.StatusId);
+				orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
 			}
 			catch (Exception e)
 			{
@@ -178,5 +179,5 @@ namespace DigitalFUHubApi.Controllers
 			return Ok(response);
 		}
 	}
-	
+
 }

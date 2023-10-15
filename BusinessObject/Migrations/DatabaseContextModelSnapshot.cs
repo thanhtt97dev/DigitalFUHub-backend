@@ -69,7 +69,7 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("OrderId")
+                    b.Property<long?>("OrderDetailId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("ProductVariantId")
@@ -80,7 +80,7 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("AssetInformationId");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderDetailId");
 
                     b.HasIndex("ProductVariantId");
 
@@ -237,7 +237,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 15, 10, 18, 10, 569, DateTimeKind.Local).AddTicks(8757)
+                            StartDate = new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6734)
                         });
                 });
 
@@ -418,7 +418,7 @@ namespace BusinessObject.Migrations
                     b.Property<int>("FeedbackBenefitId")
                         .HasColumnType("int");
 
-                    b.Property<long>("OrderId")
+                    b.Property<long>("OrderDetailId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("ProductId")
@@ -437,8 +437,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("FeedbackBenefitId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique();
+                    b.HasIndex("OrderDetailId");
 
                     b.HasIndex("ProductId");
 
@@ -473,7 +472,7 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 100,
-                            StartDate = new DateTime(2023, 10, 15, 10, 18, 10, 569, DateTimeKind.Local).AddTicks(8782)
+                            StartDate = new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6761)
                         });
                 });
 
@@ -580,12 +579,6 @@ namespace BusinessObject.Migrations
                     b.Property<long>("BusinessFeeId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Discount")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsFeedback")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -595,14 +588,8 @@ namespace BusinessObject.Migrations
                     b.Property<long>("OrderStatusId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Price")
+                    b.Property<long>("ShopId")
                         .HasColumnType("bigint");
-
-                    b.Property<long>("ProductVariantId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<long>("TotalAmount")
                         .HasColumnType("bigint");
@@ -625,7 +612,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("OrderStatusId");
 
-                    b.HasIndex("ProductVariantId");
+                    b.HasIndex("ShopId");
 
                     b.HasIndex("UserId");
 
@@ -651,6 +638,44 @@ namespace BusinessObject.Migrations
                     b.HasIndex("CouponId");
 
                     b.ToTable("OrderCoupon");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
+                {
+                    b.Property<long>("OrderDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderDetailId"), 1L, 1);
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsFeedback")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductVariantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("OrderDetailId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductVariantId");
+
+                    b.ToTable("OrderDetail");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.OrderStatus", b =>
@@ -970,9 +995,7 @@ namespace BusinessObject.Migrations
                         .IsUnique()
                         .HasFilter("[FeedbackId] IS NOT NULL");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique()
-                        .HasFilter("[OrderId] IS NOT NULL");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("TransactionCoinTypeId");
 
@@ -1407,9 +1430,9 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.AssetInformation", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                    b.HasOne("BusinessObject.Entities.OrderDetail", "OrderDetail")
                         .WithMany("AssetInformations")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderDetailId");
 
                     b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
                         .WithMany("AssetInformations")
@@ -1417,7 +1440,7 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("OrderDetail");
 
                     b.Navigation("ProductVariant");
                 });
@@ -1471,16 +1494,16 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.Order", "Order")
-                        .WithOne("Feedback")
-                        .HasForeignKey("BusinessObject.Entities.Feedback", "OrderId")
+                    b.HasOne("BusinessObject.Entities.OrderDetail", "OrderDetail")
+                        .WithMany()
+                        .HasForeignKey("OrderDetailId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.Product", "Product")
                         .WithMany("Feedbacks")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1491,7 +1514,7 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("FeedbackBenefit");
 
-                    b.Navigation("Order");
+                    b.Navigation("OrderDetail");
 
                     b.Navigation("Product");
 
@@ -1553,10 +1576,10 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
+                    b.HasOne("BusinessObject.Entities.Shop", "Shop")
                         .WithMany("Orders")
-                        .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1569,7 +1592,7 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("OrderStatus");
 
-                    b.Navigation("ProductVariant");
+                    b.Navigation("Shop");
 
                     b.Navigation("User");
                 });
@@ -1591,6 +1614,25 @@ namespace BusinessObject.Migrations
                     b.Navigation("Coupon");
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
+                {
+                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Product", b =>
@@ -1682,8 +1724,8 @@ namespace BusinessObject.Migrations
                         .HasForeignKey("BusinessObject.Entities.TransactionCoin", "FeedbackId");
 
                     b.HasOne("BusinessObject.Entities.Order", "Order")
-                        .WithOne("TransactionCoin")
-                        .HasForeignKey("BusinessObject.Entities.TransactionCoin", "OrderId");
+                        .WithMany("TransactionCoin")
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("BusinessObject.Entities.TransactionCoinType", "TransactionCoinType")
                         .WithMany("TransactionCoin")
@@ -1709,7 +1751,7 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Entities.TransactionInternal", b =>
                 {
                     b.HasOne("BusinessObject.Entities.Order", "Order")
-                        .WithMany()
+                        .WithMany("TransactionInternal")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1867,13 +1909,18 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
-                    b.Navigation("AssetInformations");
-
-                    b.Navigation("Feedback");
-
                     b.Navigation("OrderCoupons");
 
+                    b.Navigation("OrderDetails");
+
                     b.Navigation("TransactionCoin");
+
+                    b.Navigation("TransactionInternal");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
+                {
+                    b.Navigation("AssetInformations");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.OrderStatus", b =>
@@ -1898,7 +1945,7 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("Carts");
 
-                    b.Navigation("Orders");
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Role", b =>
@@ -1909,6 +1956,8 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Entities.Shop", b =>
                 {
                     b.Navigation("Coupons");
+
+                    b.Navigation("Orders");
 
                     b.Navigation("Products");
                 });

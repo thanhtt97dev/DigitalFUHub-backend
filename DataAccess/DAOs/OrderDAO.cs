@@ -737,28 +737,24 @@ namespace DataAccess.DAOs
 
 		internal List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset)
 		{
-			return null;
-			/*
+
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				List<Order> orders = context.Order
-					.Include(x => x.Feedback)
-					.Include(x => x.AssetInformations)
-					.Include(x => x.ProductVariant)
+					.Include(x => x.OrderCoupons)
+					.Include(x => x.Shop)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.ThenInclude(x => x.Shop)
 					.Where(x => x.UserId == userId
-						&&
-						(statusId.Count == 1 && statusId[0] == 0
-						? true :
-						statusId.Any(st => st == x.OrderStatusId)))
+						&& (statusId.Count == 1 && statusId[0] == 0 ? true : statusId.Any(st => st == x.OrderStatusId)))
 					.OrderByDescending(x => x.OrderDate)
 					.Skip(offset)
 					.Take(limit)
 					.ToList();
 				return orders;
 			}
-			*/
+
 		}
 
 		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)

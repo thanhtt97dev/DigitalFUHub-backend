@@ -17,16 +17,27 @@ namespace DTOs.Order
 		public long OrderId { get; set; }
 		public long ShopId { get; set; }
 		public string ShopName { get; set; } = string.Empty;
+		public DateTime OrderDate { get; set; }
+		public string Note { get; set; } = string.Empty;
+		public long TotalAmount { get; set; }
+		public long TotalCouponDiscount { get; set; }
+		public long TotalCoinDiscount { get; set; }
+		public long TotalPayment { get; set; }
+		public long StatusId { get; set; }
+		public List<OrderDetailProductResponseDTO> OrderDetails { get; set; } = null!;
+	}
+	public class OrderDetailProductResponseDTO
+	{
+		public long OrderDetailId { get; set; }
 		public long ProductId { get; set; }
+		public long ProductVariantId { get; set; }
 		public string ProductName { get; set; } = string.Empty;
+		public string ProductVariantName { get; set; } = string.Empty;
 		public string Thumbnail { get; set; } = string.Empty;
 		public int Quantity { get; set; }
 		public long Price { get; set; }
-		public string ProductVariantName { get; set; } = string.Empty;
-		public bool IsFeedback { get; set; }
 		public long Discount { get; set; }
-		public long StatusId { get; set; }
-		public long CouponDiscount { get; set; }
-		public List<string> Assest { get; set; } = null!;
+		public long TotalAmount { get; set; }
+		public bool IsFeedback { get; set; }
 	}
 }
