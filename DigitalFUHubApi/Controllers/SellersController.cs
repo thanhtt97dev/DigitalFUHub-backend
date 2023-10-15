@@ -369,7 +369,7 @@ namespace DigitalFUHubApi.Controllers
 		public ActionResult<ResponseData> Register(RegisterShopRequestDTO request)
 		{
 			ResponseData response = new ResponseData();
-			if (!ModelState.IsValid)
+			if (!ModelState.IsValid || request.ShopName.Trim() == "" || request.ShopDescription.Trim() == "")
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
 				response.Status.Message = "Vui lòng kiểm tra lại dữ liệu.";
@@ -380,13 +380,15 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				user = _userRepository.GetUserById(request.UserId);
-				bool shopNameExist = _shopRepository.CheckShopNameExisted(request.ShopName.Trim());
 				if (user == null) throw new Exception("Người dùng không khả dụng.");
-				if(shopNameExist) throw new Exception("Tên cửa hàng đã tồn tại.");
-				_shopRepository.CreateShop(request);
-				user.RoleId = Constants.SELLER_ROLE;
-				user.Role = null!;
-				_userRepository.UpdateUser(user);
+
+				bool userShopExist = _shopRepository.UserHasShop(request.UserId);
+				if (userShopExist) throw new Exception("Đã tồn tại cửa hàng không thể tạo thêm.");
+
+				bool shopNameExist = _shopRepository.CheckShopNameExisted(request.ShopName.Trim());
+				if (shopNameExist) throw new Exception("Tên cửa hàng đã tồn tại.");
+				
+				_shopRepository.CreateShop(request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
 			}
 			catch (Exception e)
 			{
@@ -602,8 +604,8 @@ namespace DigitalFUHubApi.Controllers
 					response.Status.Ok = false;
 					response.Status.Message = "Invalid";
 					return Ok(response);
-				} 
-				
+				}
+
 				Coupon coupon = new Coupon
 				{
 					IsPublic = request.IsPublic,
@@ -659,7 +661,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(response);
 				}
 				Coupon? coupon = _couponRepository.GetCoupons(request.CouponId);
-				if(coupon == null)
+				if (coupon == null)
 				{
 					response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
 					response.Status.Ok = false;
