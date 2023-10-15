@@ -10,9 +10,9 @@ namespace DTOs.Shop
 	public class RegisterShopRequestDTO
 	{
         [Required]
-        public string ShopName { get; set; } = null!;
+        public string ShopName { get; set; } = string.Empty!;
         [Required]
-        public string ShopDescription { get; set; } = null!;
+        public string ShopDescription { get; set; } = string.Empty!;
 		[Required]
 		public long UserId { get; set; }
     }
