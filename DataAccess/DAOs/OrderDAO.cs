@@ -208,16 +208,12 @@ namespace DataAccess.DAOs
 					var isCustomerExisted = context.User.Any(x => x.UserId == userId);
 					if (!isCustomerExisted)
 					{
-						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!");
+						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!");
 					}
 
 					// get bussinsis fee
 					var businessFeeDate = context.BusinessFee.Max(x => x.StartDate);
-					var businessFee = context.BusinessFee.FirstOrDefault(x => x.StartDate == businessFeeDate);
-					if (businessFee == null)
-					{
-						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Business fee not found!");
-					}
+					var businessFee = context.BusinessFee.First(x => x.StartDate == businessFeeDate);
 					long businessFeeId = businessFee.BusinessFeeId;
 					long businessFeeValue = businessFee.Fee;
 
@@ -227,10 +223,9 @@ namespace DataAccess.DAOs
 						var productVariantIdOrder = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
 						var productVariantOrder = context.ProductVariant
 							.Include(x => x.Product)
-							.Where(x => productVariantIdOrder.Contains(x.ProductVariantId)).ToList();	
+							.Where(x => productVariantIdOrder.Contains(x.ProductVariantId)).ToList();
 
-						bool isProductVariantExisted = productVariantOrder
-							.All(x => productVariantIdOrder.Contains(x.ProductVariantId));
+						bool isProductVariantExisted = productVariantIdOrder.All(id => productVariantOrder.Any(x => x.ProductVariantId == id));
 						if (!isProductVariantExisted)
 						{
 							transaction.Rollback();
@@ -272,7 +267,7 @@ namespace DataAccess.DAOs
 						if (isCustomerBuyTheirOwnProducts)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Customers buy their own products !");
+							return (Constants.RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT, "Customers buy their own products !");
 						}
 
 						//create order
@@ -343,6 +338,7 @@ namespace DataAccess.DAOs
 							};
 							orderDetails.Add(orderDetail);
 
+							// add order detail
 							context.OrderDetail.Add(orderDetail);
 							context.SaveChanges();
 
@@ -370,16 +366,16 @@ namespace DataAccess.DAOs
 									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
 									  c.IsActive && c.Quantity > 0
 									  select c).First();
-							if (coupon.MinTotalOrderValue > totalAmount)
-							{
-								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!");
-							}
-
 							if (coupon == null)
 							{
 								transaction.Rollback();
 								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
+							}
+
+							if (coupon.MinTotalOrderValue > totalAmount)
+							{
+								transaction.Rollback();
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!");
 							}
 							totalCouponDiscount = coupon.PriceDiscount;
 
