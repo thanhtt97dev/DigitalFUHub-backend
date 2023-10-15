@@ -369,7 +369,7 @@ namespace DigitalFUHubApi.Controllers
 		public ActionResult<ResponseData> Register(RegisterShopRequestDTO request)
 		{
 			ResponseData response = new ResponseData();
-			if (!ModelState.IsValid || request.ShopName.Trim() == "" || request.ShopDescription.Trim() == "")
+			if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.ShopName) || string.IsNullOrWhiteSpace(request.ShopDescription))
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
 				response.Status.Message = "Vui lòng kiểm tra lại dữ liệu.";
@@ -588,6 +588,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				if (request == null || request.UserId == 0 || request.StartDate >= request.EndDate
+					|| string.IsNullOrWhiteSpace(request.CouponCode)
 					|| request.PriceDiscount > request.AmountOrderCondition)
 				{
 					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
