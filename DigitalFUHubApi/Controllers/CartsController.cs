@@ -83,6 +83,10 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
+                if (userId == 0)
+                {
+                    return BadRequest(new Status());
+                }
                 return Ok(await _cartRepository.GetCartsByUserId(userId));
             }
             catch (Exception ex)
