@@ -17,7 +17,7 @@ namespace DTOs.Order
 	{
 		public long ProductVariantId { get; set; }
 		public int Quantity { get; set; }
-		public List<string> Coupons { get; set; } = new List<string>();
+		public string Coupon { get; set; } = string.Empty;
 	}
 
 	public class CouponRequestAddOrderDTO

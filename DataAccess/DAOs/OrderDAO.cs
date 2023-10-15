@@ -145,7 +145,7 @@ namespace DataAccess.DAOs
 							OrderId = order.OrderId,
 							PaymentAmount = order.TotalPayment,
 							Note = "Seller refund money",
-							DateCreate = DateTime.Now,	
+							DateCreate = DateTime.Now,
 						};
 						context.TransactionInternal.Add(transactionInternal);
 						context.SaveChanges();
@@ -159,9 +159,9 @@ namespace DataAccess.DAOs
 						admin.AccountBalance = admin.AccountBalance - order.TotalPayment;
 						context.SaveChanges();
 					}
-					transaction.Commit();	
+					transaction.Commit();
 				}
-				catch(Exception ex) 
+				catch (Exception ex)
 				{
 					transaction.Rollback();
 					throw new Exception(ex.Message);
@@ -184,13 +184,13 @@ namespace DataAccess.DAOs
 								x.User.Email.Contains(customerEmail) &&
 								x.ProductVariant.Product.Shop.ShopName.Contains(shopName) &&
 								(orderId == 0 ? true : x.OrderId == orderId) &&
-								(status ==0 ? true : x.OrderStatusId == status)
+								(status == 0 ? true : x.OrderStatusId == status)
 							).OrderByDescending(x => x.OrderDate).ToList();
 			}
 			return orders;
 		}
 
-		internal (string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders , bool isUseCoin)
+		internal (string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders, bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -239,42 +239,55 @@ namespace DataAccess.DAOs
 						}
 
 						//check customers buy their own products 
-						if(userId == product.ShopId)
+						if (userId == product.ShopId)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Customers buy their own products !");
 						}
 
-						//get coupons
+						// caculate total order value
+						long totalOrderValue = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
+
+						//get total coupon discount
 						long totalCouponsDiscount = 0;
-
-						// get list coupon
-						List<Coupon> coupons = new List<Coupon>();
-
-						if (data.Coupons != null && data.Coupons.Count != 0)
+						Coupon? coupon = null;
+						if (!string.IsNullOrEmpty(data.Coupon))
 						{
 							//get coupon
-							coupons = (from coupon in context.Coupon
-									   where data.Coupons.Distinct().Contains(coupon.CouponCode) &&
-									   coupon.StartDate < DateTime.Now && coupon.EndDate > DateTime.Now &&
-									   coupon.IsActive && coupon.Quantity > 0
-									   select coupon).ToList();
-
-							if (coupons.Count != data.Coupons.Count)
+							coupon = (from c in context.Coupon
+									  where
+									  data.Coupon == c.CouponCode &&
+									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
+									  c.IsActive && c.Quantity > 0
+									  select c).First();
+							if (coupon.MinTotalOrderValue > totalOrderValue)
 							{
 								transaction.Rollback();
-                                return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
-                            }
-                            totalCouponsDiscount = coupons.Sum(x => x.PriceDiscount);
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!");
+							}
+
+							if (coupon == null)
+							{
+								transaction.Rollback();
+								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
+							}
+							totalCouponsDiscount = coupon.PriceDiscount;
 						}
-						long totalAmount = (productVariant.Price * data.Quantity * (100 - product.Discount) / 100) - totalCouponsDiscount;
+
+						// caculate totalAmount and totalPayment
+						long totalAmount = totalOrderValue - totalCouponsDiscount;
 						long totalPayment = totalAmount;
+
+						if (totalPayment < 0)
+						{
+							totalPayment = 0;
+						}
 
 						// caculate total coin discount
 						long totalCoinDiscount = 0;
-						if (isUseCoin && customerCoin > 0 && totalPayment > 0) 
+						if (isUseCoin && customerCoin > 0 && totalPayment > 0)
 						{
-							if(totalPayment <= customerCoin)
+							if (totalPayment <= customerCoin)
 							{
 								totalCoinDiscount = totalPayment;
 								totalPayment = 0;
@@ -284,11 +297,6 @@ namespace DataAccess.DAOs
 								totalCoinDiscount = customerCoin;
 								totalPayment = totalPayment - customerCoin;
 							}
-						}
-
-						if (totalPayment < 0)
-						{
-							totalPayment = 0;
 						}
 
 						var order = new Order
@@ -326,7 +334,7 @@ namespace DataAccess.DAOs
 						context.SaveChanges();
 
 						// update customer coin 
-						if(totalCoinDiscount > 0)
+						if (totalCoinDiscount > 0)
 						{
 							customer.Coin = customer.Coin - totalCoinDiscount;
 							context.User.Update(customer);
@@ -352,29 +360,25 @@ namespace DataAccess.DAOs
 						}
 
 						// add orderCoupon and update coupon's status
-						if (coupons.Count != 0)
+						if (coupon != null)
 						{
-							foreach (var coupon in coupons)
+							OrderCoupon orderCoupon = new OrderCoupon()
 							{
-								OrderCoupon orderCoupon = new OrderCoupon()
-								{
-									OrderId = order.OrderId,
-									CouponId = coupon.CouponId,
-									PriceDiscount = coupon.PriceDiscount,
-									UseDate = DateTime.Now
-								};
-								context.OrderCoupon.Add(orderCoupon);
-								context.SaveChanges();
+								OrderId = order.OrderId,
+								CouponId = coupon.CouponId,
+								PriceDiscount = coupon.PriceDiscount,
+								UseDate = DateTime.Now
+							};
+							context.OrderCoupon.Add(orderCoupon);
+							context.SaveChanges();
 
-								coupon.Quantity = coupon.Quantity - 1;
-								context.Coupon.Update(coupon);
-								context.SaveChanges();
-							}
+							coupon.Quantity = coupon.Quantity - 1;
+							context.Coupon.Update(coupon);
+							context.SaveChanges();
 						}
 
-
 						// add new transaction coin
-						if(totalCoinDiscount > 0)
+						if (totalCoinDiscount > 0)
 						{
 							TransactionCoin transactionCoin = new TransactionCoin
 							{
@@ -384,7 +388,7 @@ namespace DataAccess.DAOs
 								Amount = totalCoinDiscount,
 								DateCreate = DateTime.Now,
 							};
-							context.TransactionCoin.Add(transactionCoin); 
+							context.TransactionCoin.Add(transactionCoin);
 							context.SaveChanges();
 						}
 
@@ -443,8 +447,8 @@ namespace DataAccess.DAOs
 									Price = o.Price,
 									Discount = o.Discount,
 									OrderDate = o.OrderDate,
-									TotalAmount = o.TotalAmount,
 									TotalCouponDiscount = o.TotalCouponDiscount,
+									TotalAmount = o.TotalAmount,
 									TotalCoinDiscount = o.TotalCoinDiscount,
 									TotalPayment = o.TotalPayment,
 									Note = o.Note,
@@ -620,7 +624,7 @@ namespace DataAccess.DAOs
 					//update admin profit account balance
 					var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
 					admin.AccountBalance = admin.AccountBalance + adminProfit;
-					
+
 					context.SaveChanges();
 					transaction.Commit();
 				}
@@ -740,13 +744,13 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var orderCoupons = (from orderCoupon in context.OrderCoupon
-									join  coupon in context.Coupon
+									join coupon in context.Coupon
 										on orderCoupon.CouponId equals coupon.CouponId
 									where orderCoupon.OrderId == orderId
-									select new OrderCoupon 
-									{ 
-										PriceDiscount =orderCoupon.PriceDiscount,
-										Coupon = new Coupon { CouponName  = coupon.CouponName },
+									select new OrderCoupon
+									{
+										PriceDiscount = orderCoupon.PriceDiscount,
+										Coupon = new Coupon { CouponName = coupon.CouponName },
 									}).ToList();
 				return orderCoupons;
 			}

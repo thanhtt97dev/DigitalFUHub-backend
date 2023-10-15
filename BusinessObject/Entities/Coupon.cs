@@ -20,9 +20,11 @@ namespace BusinessObject.Entities
         public long Quantity { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public bool IsActive { get; set; }
+		public long MinTotalOrderValue { get; set; }
+		public bool IsActive { get; set; }
+		public bool IsPublic { get; set; }
 
-        [ForeignKey(nameof(ShopId))]
+		[ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
         public virtual List<OrderCoupon>? OrderCoupons { get; set; }
 	}
