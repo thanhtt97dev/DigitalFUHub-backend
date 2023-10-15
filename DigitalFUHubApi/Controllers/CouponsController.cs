@@ -17,7 +17,7 @@ namespace DigitalFUHubApi.Controllers
 	[ApiController]
 	public class CouponsController : ControllerBase
 	{
-		
+
 		private readonly ICouponRepository _couponRepository;
 		private readonly IMapper _mapper;
 
@@ -49,6 +49,24 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
+		}
+		[HttpGet("CheckCouponCodeExist/{couponCode}")]
+		public IActionResult CheckCouponCodeExist(string couponCode)
+		{
+			ResponseData response = new ResponseData();
+			if (string.IsNullOrEmpty(couponCode?.Trim()))
+			{
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				return Ok(response);
+			}
+
+			bool result = _couponRepository.CheckCouponCodeExist(couponCode.Trim());
+			response.Status.Ok = !result;
+			response.Status.Message = result ? "Invalid" : "Success";
+			response.Status.ResponseCode = result ? Constants.RESPONSE_CODE_FAILD : Constants.RESPONSE_CODE_SUCCESS;
+			return Ok(response);
 		}
 	}
 }

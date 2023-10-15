@@ -98,5 +98,13 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+
+		internal bool CheckCouponCodeExist(string couponCode)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Coupon.Any(x => x.CouponCode.ToLower() == couponCode.ToLower());
+			}
+		}
 	}
 }
