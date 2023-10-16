@@ -1,15 +1,8 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
-using DTOs.Shop;
+using Comons;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DataAccess.DAOs
 {
@@ -34,28 +27,27 @@ namespace DataAccess.DAOs
 
 
 
-		internal void CreateShop(RegisterShopRequestDTO request)
+		internal void CreateShop(string shopName, long userId, string shopDescription)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				try
 				{
-					bool userShopExist = context.Shop.Any(x => x.UserId == request.UserId);
-					if (userShopExist) throw new Exception("Đã tồn tại cửa hàng không thể tạo thêm.");
 					Shop shop = new Shop()
 					{
 						DateCreate = DateTime.Now,
-						ShopName = request.ShopName,
+						ShopName = shopName,
 						IsActive = true,
-						Description = request.ShopDescription,
-						UserId = request.UserId,
+						Description = shopDescription,
+						UserId = userId,
 					};
 					context.Shop.Add(shop);
+					User user = context.User.First(x => x.UserId == userId);
+					user.RoleId = Constants.SELLER_ROLE;
 					context.SaveChanges();
 				}
 				catch (Exception e)
 				{
-
 					throw new Exception(e.Message);
 				}
 

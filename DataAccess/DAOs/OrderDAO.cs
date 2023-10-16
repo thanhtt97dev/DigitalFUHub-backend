@@ -3,7 +3,6 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml.Style;
 
 namespace DataAccess.DAOs
 {
@@ -27,39 +26,34 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetAllOrderWaitToConfirm(int days)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				DateTime timeAccept = DateTime.Now.AddDays(-days);
-				var orders = context.Order
-					.Where(x =>
-						x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
-						x.OrderDate < timeAccept
-					)
-					.ToList();
-				return orders;
-			}
-		}
-
-		internal void UpdateStatusOrderToConfirm(List<Order> orders)
+		internal void UpdateStatusOrderToConfirm()
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
+					DateTime timeAccept = DateTime.Now.AddDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER);
+					var orders = context.Order
+						.Where(x =>
+							x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
+							x.OrderDate < timeAccept
+						)
+						.ToList();
+					if (orders.Count() == 0) return;
+
+					
+
 					foreach (var order in orders)
 					{
-						// update order's status to confirmed
-						var orderUpdate = context.Order.First(x => x.OrderId == order.OrderId);
-						orderUpdate.OrderStatusId = Constants.ORDER_CONFIRMED;
+						// update order status
+						order.OrderStatusId = Constants.ORDER_CONFIRMED;
 
 						//get platform fee
 						var fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
+
 						//get sellerId
-						var productId = context.ProductVariant.First(x => x.ProductVariantId == order.ProductVariantId).ProductId;
-						var sellerId = context.Product.First(x => x.ProductId == productId).ShopId;
+						var sellerId = order.ShopId;
 
 						//get profit
 						var adminProfit = order.TotalAmount * fee / 100;
@@ -96,6 +90,7 @@ namespace DataAccess.DAOs
 						};
 						context.TransactionInternal.Add(transactionAdmin);
 					}
+					context.Order.UpdateRange(orders);
 					context.SaveChanges();
 					transaction.Commit();
 				}
@@ -107,33 +102,24 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetAllOrderComplaint(int days)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				DateTime timeAccept = DateTime.Now.AddDays(-days);
-				var orders = context.Order
-					.Where(x =>
-						x.OrderStatusId == Constants.ORDER_COMPLAINT &&
-						x.OrderDate < timeAccept)
-					.ToList();
-				return orders;
-			}
-		}
-
-		internal void UpdateStatusOrderToSellerRefunded(List<Order> orders)
+		internal void UpdateStatusOrderToSellerRefunded()
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					foreach (var item in orders)
+					DateTime timeAccept = DateTime.Now.AddDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER);
+					var orders = context.Order
+						.Where(x =>
+							x.OrderStatusId == Constants.ORDER_COMPLAINT &&
+							x.OrderDate < timeAccept)
+						.ToList();
+
+					foreach (var order in orders)
 					{
 						//update order status
-						var order = context.Order.First(x => x.OrderId == item.OrderId);
 						order.OrderStatusId = Constants.ORDER_SELLER_REFUNDED;
-						context.SaveChanges();
 
 						var customerId = order.UserId;
 
@@ -148,17 +134,31 @@ namespace DataAccess.DAOs
 							DateCreate = DateTime.Now,
 						};
 						context.TransactionInternal.Add(transactionInternal);
-						context.SaveChanges();
+
+						
 
 						// update customer balance
 						var customer = context.User.First(x => x.UserId == customerId);
 						customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
-						context.SaveChanges();
+						//refund coin of customer
+						customer.Coin = customer.Coin + order.TotalCoinDiscount;
+						var transactionCoin = new TransactionCoin
+						{
+							UserId = customerId,
+							TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_REFUND,
+							OrderId = order.OrderId,
+							Amount = order.TotalCoinDiscount,
+							DateCreate = DateTime.Now
+						};
+						context.TransactionCoin.Add(transactionCoin);
+
 						//update admin banance
 						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
 						admin.AccountBalance = admin.AccountBalance - order.TotalPayment;
-						context.SaveChanges();
+
 					}
+					context.Order.UpdateRange(orders);
+					context.SaveChanges();
 					transaction.Commit();
 				}
 				catch (Exception ex)
@@ -176,107 +176,240 @@ namespace DataAccess.DAOs
 			{
 				orders = context.Order
 							.Include(x => x.User)
-							.Include(x => x.ProductVariant)
-							.ThenInclude(x => x.Product)
-							.ThenInclude(x => x.Shop)
+							.Include(x => x.Shop)
+							.Select(o => new Order
+							{
+								OrderId = o.OrderId,
+								OrderDate = o.OrderDate,
+								TotalPayment = o.TotalPayment,	
+								User = new User 
+								{
+									UserId = o.User.UserId,
+									Email = o.User.Email,
+								},
+								Shop = new Shop
+								{
+									UserId = o.ShopId,
+									ShopName = o.Shop.ShopName
+								},
+								OrderStatusId = o.OrderStatusId
+							})
 							.Where(x =>
 								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
 								x.User.Email.Contains(customerEmail) &&
-								x.ProductVariant.Product.Shop.ShopName.Contains(shopName) &&
+								x.Shop.ShopName.Contains(shopName) &&
 								(orderId == 0 ? true : x.OrderId == orderId) &&
 								(status == 0 ? true : x.OrderStatusId == status)
 							).OrderByDescending(x => x.OrderDate).ToList();
+			
 			}
 			return orders;
 		}
 
-		internal (string, string) AddOrder(long userId, List<ProductRequestAddOrderDTO> orders, bool isUseCoin)
+		#region Add order
+		internal (string, string) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
+					// check valid quantity
+					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0))){
+						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!");
+					}
+
+					//check customer existed
+					var isCustomerExisted = context.User.Any(x => x.UserId == userId);
+					if (!isCustomerExisted)
+					{
+						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!");
+					}
+
 					// get bussinsis fee
 					var businessFeeDate = context.BusinessFee.Max(x => x.StartDate);
-					var businessFee = context.BusinessFee.FirstOrDefault(x => x.StartDate == businessFeeDate);
-					if (businessFee == null)
-					{
-						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Business fee not found!");
-					}
+					var businessFee = context.BusinessFee.First(x => x.StartDate == businessFeeDate);
 					long businessFeeId = businessFee.BusinessFeeId;
 					long businessFeeValue = businessFee.Fee;
 
-
-
-					foreach (var data in orders)
+					foreach (var shopProduct in shopProducts)
 					{
+						// check ProductVariant existed
+						var productVariantIdOrder = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
+						var productVariantOrder = context.ProductVariant
+							.Include(x => x.Product)
+							.Where(x => productVariantIdOrder.Contains(x.ProductVariantId)).ToList();
+
+						bool isProductVariantExisted = productVariantIdOrder.All(id => productVariantOrder.Any(x => x.ProductVariantId == id));
+						if (!isProductVariantExisted)
+						{
+							transaction.Rollback();
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!");
+						}
+
+						//check shop existed
+						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId);
+						if (shop == null)
+						{
+							transaction.Rollback();
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!");
+						}
+
+						//check ProductVariant of shop
+						var isAllProductInShop = productVariantOrder
+							.All(x => x.Product.ShopId == shopProduct.ShopId);
+
+						if (!isAllProductInShop)
+						{
+							transaction.Rollback();
+							return (Constants.RESPONSE_CODE_ORDER_PRODUCT_VARIANT_NOT_IN_SHOP, "A product variant not in shop!");
+						}
+
 						//get customer info
 						var customer = context.User
-							.Select(x => new User { UserId = x.UserId, Coin = x.Coin,AccountBalance = x.AccountBalance })
 							.FirstOrDefault(x => x.UserId == userId);
 						if (customer == null)
 						{
+							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
 						}
 						long customerCoin = customer.Coin;
 
-						// get productVariant
-						ProductVariant? productVariant = context.ProductVariant
-							.FirstOrDefault(x => x.ProductVariantId == data.ProductVariantId && x.isActivate);
-						if (productVariant == null)
-						{
-							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not found!");
-						}
-						//get product 
-						Product? product = context.Product
-							.FirstOrDefault(x => x.ProductId == productVariant.ProductId && x.ProductStatusId == Constants.PRODUCT_ACTIVE);
-						if (product == null)
-						{
-							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!");
-						}
-
 						//check customers buy their own products 
-						if (userId == product.ShopId)
+						var isCustomerBuyTheirOwnProducts = productVariantOrder
+							.Any(x => x.Product.ShopId == userId);
+						if (isCustomerBuyTheirOwnProducts)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Customers buy their own products !");
+							return (Constants.RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT, "Customers buy their own products !");
 						}
 
-						// caculate total order value
-						long totalOrderValue = productVariant.Price * data.Quantity * (100 - product.Discount) / 100;
-
-						//get total coupon discount
-						long totalCouponsDiscount = 0;
-						Coupon? coupon = null;
-						if (!string.IsNullOrEmpty(data.Coupon))
+						//create order
+						Order order = new Order()
 						{
-							//get coupon
-							coupon = (from c in context.Coupon
-									  where
-									  data.Coupon == c.CouponCode &&
-									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
-									  c.IsActive && c.Quantity > 0
-									  select c).First();
-							if (coupon.MinTotalOrderValue > totalOrderValue)
+							UserId = userId,
+							ShopId = shopProduct.ShopId,
+							BusinessFeeId = businessFeeId,
+							OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION,
+							OrderDate = DateTime.Now
+						};
+						context.Order.Add(order);
+						context.SaveChanges();
+
+						//create order detail
+						List<OrderDetail> orderDetails = new List<OrderDetail>();	
+						foreach (var item in shopProduct.Products)
+						{
+							// check quantity
+							var assetInformationRemaining = context.AssetInformation
+								.Where(a => a.ProductVariantId == item.ProductVariantId && a.IsActive == true)
+								.Take(item.Quantity);
+							if(assetInformationRemaining.Count() < item.Quantity)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!");
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
 							}
 
+							//get product productVariant info
+							var productVariant =  context.ProductVariant
+								.Include(x => x.Product)
+								.ThenInclude(x => x.Shop)
+								.Select(x => new ProductVariant
+								{
+									ProductVariantId = x.ProductVariantId,	
+									ProductId = x.ProductId,
+									Price = x.Price,
+									isActivate = x.isActivate,
+									Product = new Product
+									{
+										Discount = x.Product.Discount,
+										ProductStatusId = x.Product.ProductStatusId,
+										Shop = new Shop
+										{
+											IsActive = x.Product.Shop.IsActive
+										}
+									}
+								})
+								.First(x => x.ProductVariantId == item.ProductVariantId);
+
+							if(!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_BAN ||
+								productVariant.Product.ProductStatusId == Constants.PRODUCT_HIDE || 
+								!productVariant.Product.Shop.IsActive) 
+							{
+								transaction.Rollback();
+								return (Constants.RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED, "Product has been baned");
+							}
+
+							OrderDetail orderDetail = new OrderDetail
+							{
+								OrderId = order.OrderId,
+								ProductVariantId = item.ProductVariantId,	
+								Quantity = item.Quantity,
+								Price = productVariant.Price,
+								Discount = productVariant.Product.Discount,	
+								TotalAmount = productVariant.Price * item.Quantity * (100 - productVariant.Product.Discount) / 100,
+								IsFeedback = false,
+							};
+							orderDetails.Add(orderDetail);
+
+							// add order detail
+							context.OrderDetail.Add(orderDetail);
+							context.SaveChanges();
+
+							// update asset information
+							foreach (var asset in assetInformationRemaining)
+							{
+								asset.OrderDetailId = orderDetail.OrderDetailId;
+								asset.IsActive = false;
+							}
+							context.AssetInformation.UpdateRange(assetInformationRemaining);
+							context.SaveChanges();
+						}
+
+
+						// cacualte order info
+
+						long totalAmount = orderDetails.Sum(x => x.TotalAmount);
+						// check coupon
+						long totalCouponDiscount = 0;
+						if (!string.IsNullOrEmpty(shopProduct.Coupon))
+						{
+							var coupon = (from c in context.Coupon
+									  where
+									  shopProduct.Coupon == c.CouponCode &&
+									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
+									  c.IsActive && c.Quantity > 0
+									  select c).FirstOrDefault();
 							if (coupon == null)
 							{
 								transaction.Rollback();
 								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
 							}
-							totalCouponsDiscount = coupon.PriceDiscount;
+
+							if (coupon.MinTotalOrderValue > totalAmount)
+							{
+								transaction.Rollback();
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!");
+							}
+							totalCouponDiscount = coupon.PriceDiscount;
+
+							// add orderCoupon and update coupon's quantity
+							OrderCoupon orderCoupon = new OrderCoupon()
+							{
+								OrderId = order.OrderId,
+								CouponId = coupon.CouponId,
+								PriceDiscount = coupon.PriceDiscount,
+								UseDate = DateTime.Now
+							};
+							context.OrderCoupon.Add(orderCoupon);
+							context.SaveChanges();
+
+							coupon.Quantity = coupon.Quantity - 1;
+							context.Coupon.Update(coupon);
+							context.SaveChanges();
 						}
 
-						// caculate totalAmount and totalPayment
-						long totalAmount = totalOrderValue - totalCouponsDiscount;
-						long totalPayment = totalAmount;
+						long totalPayment = totalAmount - totalCouponDiscount;
 
 						if (totalPayment < 0)
 						{
@@ -299,48 +432,6 @@ namespace DataAccess.DAOs
 							}
 						}
 
-						var order = new Order
-						{
-							UserId = userId,
-							ProductVariantId = data.ProductVariantId,
-							BusinessFeeId = businessFeeId,
-							OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION,
-							Quantity = data.Quantity,
-							Price = productVariant.Price,
-							Discount = product.Discount,
-							TotalAmount = totalAmount,
-							TotalCouponDiscount = totalCouponsDiscount,
-							TotalCoinDiscount = totalCoinDiscount,
-							TotalPayment = totalPayment,
-							OrderDate = DateTime.Now,
-						};
-						context.Order.Add(order);
-						context.SaveChanges();
-
-						// update asset info
-						var assetInformations = context.AssetInformation.Where(a => a.ProductVariantId == order.ProductVariantId && a.IsActive == true).Take(order.Quantity).ToList();
-						if (assetInformations.Count != order.Quantity)
-						{
-							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
-						}
-
-						foreach (var asset in assetInformations)
-						{
-							asset.OrderId = order.OrderId;
-							asset.IsActive = false;
-						}
-						context.AssetInformation.UpdateRange(assetInformations);
-						context.SaveChanges();
-
-						// update customer coin 
-						if (totalCoinDiscount > 0)
-						{
-							customer.Coin = customer.Coin - totalCoinDiscount;
-							context.User.Update(customer);
-							context.SaveChanges();
-						}
-
 						//update customer and admin account balance
 						if (totalPayment > 0)
 						{
@@ -350,6 +441,10 @@ namespace DataAccess.DAOs
 								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
 							}
 							customer.AccountBalance = customer.AccountBalance - totalPayment;
+							if (totalCoinDiscount > 0)
+							{
+								customer.Coin = customer.Coin - totalCoinDiscount;
+							}
 
 							//update admin account balance
 							var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
@@ -359,23 +454,14 @@ namespace DataAccess.DAOs
 							context.SaveChanges();
 						}
 
-						// add orderCoupon and update coupon's status
-						if (coupon != null)
-						{
-							OrderCoupon orderCoupon = new OrderCoupon()
-							{
-								OrderId = order.OrderId,
-								CouponId = coupon.CouponId,
-								PriceDiscount = coupon.PriceDiscount,
-								UseDate = DateTime.Now
-							};
-							context.OrderCoupon.Add(orderCoupon);
-							context.SaveChanges();
+						// update order
+						order.TotalAmount = totalAmount;
+						order.TotalCouponDiscount = totalCouponDiscount;
+						order.TotalCoinDiscount = totalCoinDiscount;
+						order.TotalPayment = totalPayment;
 
-							coupon.Quantity = coupon.Quantity - 1;
-							context.Coupon.Update(coupon);
-							context.SaveChanges();
-						}
+						context.Order.Update(order);
+						context.SaveChanges();
 
 						// add new transaction coin
 						if (totalCoinDiscount > 0)
@@ -393,34 +479,37 @@ namespace DataAccess.DAOs
 						}
 
 						// add new transaction internal
-						TransactionInternal newTransaction = new TransactionInternal
+						if(totalPayment > 0)
 						{
-							UserId = order.UserId,
-							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
-							OrderId = order.OrderId,
-							PaymentAmount = order.TotalAmount,
-							Note = "Payment",
-							DateCreate = DateTime.Now
-						};
-						context.TransactionInternal.Add(newTransaction);
-						context.SaveChanges();
-
+							TransactionInternal newTransaction = new TransactionInternal
+							{
+								UserId = order.UserId,
+								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
+								OrderId = order.OrderId,
+								PaymentAmount = order.TotalPayment,
+								Note = "Payment",
+								DateCreate = DateTime.Now
+							};
+							context.TransactionInternal.Add(newTransaction);
+							context.SaveChanges();
+						}
 					}
-					context.SaveChanges();
 					transaction.Commit();
-
 				}
 				catch (Exception ex)
 				{
 					transaction.Rollback();
 					throw new Exception(ex.Message);
 				}
-				return (Constants.RESPONSE_CODE_SUCCESS, "Success!");
 			}
+			return (Constants.RESPONSE_CODE_SUCCESS, "Success!");
 		}
+		#endregion
 
 		internal Order? GetOrder(long orderId)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				Order? order = (from o in context.Order
@@ -490,21 +579,6 @@ namespace DataAccess.DAOs
 										BusinessFeeId = businessFee.BusinessFeeId,
 										Fee = businessFee.Fee,
 									},
-									/*
-									AssetInformations = (from assetInformation in context.AssetInformation
-														 where assetInformation.OrderId == orderId
-														 select new AssetInformation { Asset = assetInformation.Asset }
-														).ToList(),
-									OrderCoupons = (from orderCoupon in context.OrderCoupon
-													join coupon in context.Coupon
-														on orderCoupon.CouponId equals coupon.CouponId
-													where orderCoupon.OrderId == orderId
-													select new OrderCoupon
-													{
-														PriceDiscount = orderCoupon.PriceDiscount,
-													}
-													).ToList(),
-									*/
 								})
 							   .FirstOrDefault();
 
@@ -523,16 +597,20 @@ namespace DataAccess.DAOs
 
 				return order;
 			}
+			*/
 		}
 
 		internal Order? GetSellerOrderDetail(long orderId)
 		{
+			return null;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Order.Include(i => i.AssetInformations)
 					.ThenInclude(ti => ti.ProductVariant).ThenInclude(x => x.Product).Include(x => x.User)
 					.Where(x => x.OrderId == orderId).FirstOrDefault();
 			}
+			*/
 		}
 
 		internal void UpdateOrderStatusSellerViolates(long orderId, string? note)
@@ -585,15 +663,14 @@ namespace DataAccess.DAOs
 				{
 					var order = context.Order
 									.Include(x => x.BusinessFee)
-									.Include(x => x.ProductVariant)
-									.ThenInclude(x => x.Product)
 									.First(x => x.OrderId == orderId);
 					order.OrderStatusId = Constants.ORDER_REJECT_COMPLAINT;
 					order.Note = note;
+					context.Order.Update(order);
 
-					var sellerId = order.ProductVariant.Product.ShopId;
-					var adminProfit = order.TotalPayment * order.BusinessFee.Fee / 100;
-					var sellerProfit = order.TotalPayment - adminProfit;
+					var sellerId = order.ShopId;
+					var adminProfit = order.TotalAmount * order.BusinessFee.Fee / 100;
+					var sellerProfit = order.TotalAmount - adminProfit;
 
 					// add transaction for refund money to seller
 					TransactionInternal transactionInternalSeller = new TransactionInternal()
@@ -637,6 +714,8 @@ namespace DataAccess.DAOs
 		}
 		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
 		{
+			return;
+			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var order = context.Order.First(x => x.OrderId == orderId);
@@ -644,6 +723,7 @@ namespace DataAccess.DAOs
 				order.Note = note;
 				context.SaveChanges();
 			}
+			*/
 		}
 
 		internal Order? GetOrderForCheckingExisted(long orderId)
@@ -651,8 +731,6 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var order = context.Order
-					.Include(x => x.ProductVariant)
-					.ThenInclude(x => x.Product)
 					.FirstOrDefault(x => x.OrderId == orderId);
 				return order;
 			}
@@ -660,25 +738,24 @@ namespace DataAccess.DAOs
 
 		internal List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset)
 		{
+
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				List<Order> orders = context.Order
-					.Include(x => x.Feedback)
-					.Include(x => x.AssetInformations)
-					.Include(x => x.ProductVariant)
+					.Include(x => x.OrderCoupons)
+					.Include(x => x.Shop)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.ThenInclude(x => x.Shop)
 					.Where(x => x.UserId == userId
-						&&
-						(statusId.Count == 1 && statusId[0] == 0
-						? true :
-						statusId.Any(st => st == x.OrderStatusId)))
+						&& (statusId.Count == 1 && statusId[0] == 0 ? true : statusId.Any(st => st == x.OrderStatusId)))
 					.OrderByDescending(x => x.OrderDate)
 					.Skip(offset)
 					.Take(limit)
 					.ToList();
 				return orders;
 			}
+
 		}
 
 		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)
@@ -695,8 +772,8 @@ namespace DataAccess.DAOs
 						if (status == Constants.ORDER_CONFIRMED)
 						{
 							BusinessFee fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId);
-							var adminProfit = order.TotalPayment * fee.Fee / 100;
-							var sellerProfit = order.TotalPayment - adminProfit;
+							var adminProfit = order.TotalAmount * fee.Fee / 100;
+							var sellerProfit = order.TotalAmount - adminProfit;
 							// update blance of seller
 							var seller = context.User.First(x => x.UserId == shopId);
 							seller.AccountBalance = seller.AccountBalance + sellerProfit;
@@ -708,7 +785,7 @@ namespace DataAccess.DAOs
 									DateCreate = DateTime.Now,
 									Note = "Receive Payment",
 									OrderId = order.OrderId,
-									PaymentAmount = order.TotalPayment - (order.TotalPayment * fee.Fee / 100),
+									PaymentAmount = sellerProfit,
 									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
 									UserId = shopId,
 								},
@@ -717,7 +794,7 @@ namespace DataAccess.DAOs
 									DateCreate = DateTime.Now,
 									Note = "Profit",
 									OrderId = order.OrderId,
-									PaymentAmount = order.TotalPayment * fee.Fee / 100,
+									PaymentAmount = adminProfit,
 									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
 									UserId = Constants.ADMIN_USER_ID,
 								},

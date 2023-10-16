@@ -22,33 +22,6 @@ namespace BusinessObject.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("BusinessObject.DataTransfer.SenderConversation", b =>
-                {
-                    b.Property<string>("Avatar")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("ConversationId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Fullname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToView(null);
-                });
-
             modelBuilder.Entity("BusinessObject.Entities.AccessToken", b =>
                 {
                     b.Property<long>("AccessTokenId")
@@ -96,7 +69,7 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("OrderId")
+                    b.Property<long?>("OrderDetailId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("ProductVariantId")
@@ -107,7 +80,7 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("AssetInformationId");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderDetailId");
 
                     b.HasIndex("ProductVariantId");
 
@@ -246,6 +219,9 @@ namespace BusinessObject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("BusinessFeeId"), 1L, 1);
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<long>("Fee")
                         .HasColumnType("bigint");
 
@@ -261,7 +237,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 8, 21, 27, 16, 577, DateTimeKind.Local).AddTicks(1456)
+                            StartDate = new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6734)
                         });
                 });
 
@@ -369,6 +345,12 @@ namespace BusinessObject.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("MinTotalOrderValue")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PriceDiscount")
                         .HasColumnType("bigint");
 
@@ -433,13 +415,19 @@ namespace BusinessObject.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("FeedbackBenefitId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("OrderDetailId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("ProductId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Rate")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("UserId")
@@ -447,11 +435,45 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("FeedbackId");
 
+                    b.HasIndex("FeedbackBenefitId");
+
+                    b.HasIndex("OrderDetailId");
+
                     b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Feedback");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.FeedbackBenefit", b =>
+                {
+                    b.Property<int>("FeedbackBenefitId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeedbackBenefitId"), 1L, 1);
+
+                    b.Property<int>("Coin")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("FeedbackBenefitId");
+
+                    b.ToTable("FeedbackBenefit");
+
+                    b.HasData(
+                        new
+                        {
+                            FeedbackBenefitId = 1,
+                            Coin = 100,
+                            StartDate = new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6761)
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.FeedbackMedia", b =>
@@ -557,12 +579,6 @@ namespace BusinessObject.Migrations
                     b.Property<long>("BusinessFeeId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Discount")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("FeedbackId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -572,16 +588,13 @@ namespace BusinessObject.Migrations
                     b.Property<long>("OrderStatusId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Price")
+                    b.Property<long>("ShopId")
                         .HasColumnType("bigint");
-
-                    b.Property<long>("ProductVariantId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalCoinDiscount")
                         .HasColumnType("bigint");
 
                     b.Property<long>("TotalCouponDiscount")
@@ -597,13 +610,9 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("BusinessFeeId");
 
-                    b.HasIndex("FeedbackId")
-                        .IsUnique()
-                        .HasFilter("[FeedbackId] IS NOT NULL");
-
                     b.HasIndex("OrderStatusId");
 
-                    b.HasIndex("ProductVariantId");
+                    b.HasIndex("ShopId");
 
                     b.HasIndex("UserId");
 
@@ -629,6 +638,44 @@ namespace BusinessObject.Migrations
                     b.HasIndex("CouponId");
 
                     b.ToTable("OrderCoupon");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
+                {
+                    b.Property<long>("OrderDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderDetailId"), 1L, 1);
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsFeedback")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductVariantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("OrderDetailId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductVariantId");
+
+                    b.ToTable("OrderDetail");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.OrderStatus", b =>
@@ -874,9 +921,6 @@ namespace BusinessObject.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Balance")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("DateCreate")
                         .HasColumnType("datetime2");
 
@@ -916,19 +960,96 @@ namespace BusinessObject.Migrations
                     b.ToTable("Tag");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Transaction", b =>
+            modelBuilder.Entity("BusinessObject.Entities.TransactionCoin", b =>
                 {
-                    b.Property<long>("TransactionId")
+                    b.Property<long>("TransactionCoinId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionCoinId"), 1L, 1);
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("DateCreate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("FeedbackId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TransactionCoinTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("TransactionCoinId");
+
+                    b.HasIndex("FeedbackId")
+                        .IsUnique()
+                        .HasFilter("[FeedbackId] IS NOT NULL");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("TransactionCoinTypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TransactionCoin");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.TransactionCoinType", b =>
+                {
+                    b.Property<int>("TransactionCoinTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionCoinTypeId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TransactionCoinTypeId");
+
+                    b.ToTable("TransactionCoinType");
+
+                    b.HasData(
+                        new
+                        {
+                            TransactionCoinTypeId = 1,
+                            Name = "Get coin"
+                        },
+                        new
+                        {
+                            TransactionCoinTypeId = 2,
+                            Name = "Use coin"
+                        },
+                        new
+                        {
+                            TransactionCoinTypeId = 3,
+                            Name = "Refund"
+                        });
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.TransactionInternal", b =>
+                {
+                    b.Property<long>("TransactionInternalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionInternalId"), 1L, 1);
 
                     b.Property<DateTime?>("DateCreate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("OrderId")
@@ -937,58 +1058,58 @@ namespace BusinessObject.Migrations
                     b.Property<long>("PaymentAmount")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("TransactionTypeId")
+                    b.Property<long>("TransactionInternalTypeId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("TransactionId");
+                    b.HasKey("TransactionInternalId");
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("TransactionTypeId");
+                    b.HasIndex("TransactionInternalTypeId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Transaction");
+                    b.ToTable("TransactionInternal");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.TransactionType", b =>
+            modelBuilder.Entity("BusinessObject.Entities.TransactionInternalType", b =>
                 {
-                    b.Property<long>("TransactionTypeId")
+                    b.Property<long>("TransactionInternalTypeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionTypeId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionInternalTypeId"), 1L, 1);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("TransactionTypeId");
+                    b.HasKey("TransactionInternalTypeId");
 
-                    b.ToTable("TransactionType");
+                    b.ToTable("TransactionInternalType");
 
                     b.HasData(
                         new
                         {
-                            TransactionTypeId = 1L,
+                            TransactionInternalTypeId = 1L,
                             Name = "Payment"
                         },
                         new
                         {
-                            TransactionTypeId = 2L,
+                            TransactionInternalTypeId = 2L,
                             Name = "Receive payment"
                         },
                         new
                         {
-                            TransactionTypeId = 3L,
+                            TransactionInternalTypeId = 3L,
                             Name = "Receive refund"
                         },
                         new
                         {
-                            TransactionTypeId = 4L,
+                            TransactionInternalTypeId = 4L,
                             Name = "Profit"
                         });
                 });
@@ -1029,6 +1150,9 @@ namespace BusinessObject.Migrations
                     b.Property<string>("Avatar")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Coin")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -1073,6 +1197,7 @@ namespace BusinessObject.Migrations
                             UserId = 1L,
                             AccountBalance = 0L,
                             Avatar = "",
+                            Coin = 0L,
                             Email = "",
                             Fullname = "Admin",
                             IsConfirm = true,
@@ -1305,9 +1430,9 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.AssetInformation", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                    b.HasOne("BusinessObject.Entities.OrderDetail", "OrderDetail")
                         .WithMany("AssetInformations")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderDetailId");
 
                     b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
                         .WithMany("AssetInformations")
@@ -1315,7 +1440,7 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("OrderDetail");
 
                     b.Navigation("ProductVariant");
                 });
@@ -1363,10 +1488,22 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Feedback", b =>
                 {
+                    b.HasOne("BusinessObject.Entities.FeedbackBenefit", "FeedbackBenefit")
+                        .WithMany()
+                        .HasForeignKey("FeedbackBenefitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.OrderDetail", "OrderDetail")
+                        .WithMany()
+                        .HasForeignKey("OrderDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BusinessObject.Entities.Product", "Product")
                         .WithMany("Feedbacks")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1374,6 +1511,10 @@ namespace BusinessObject.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("FeedbackBenefit");
+
+                    b.Navigation("OrderDetail");
 
                     b.Navigation("Product");
 
@@ -1429,20 +1570,16 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.Feedback", "Feedback")
-                        .WithOne("Order")
-                        .HasForeignKey("BusinessObject.Entities.Order", "FeedbackId");
-
                     b.HasOne("BusinessObject.Entities.OrderStatus", "OrderStatus")
                         .WithMany("Orders")
                         .HasForeignKey("OrderStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
+                    b.HasOne("BusinessObject.Entities.Shop", "Shop")
                         .WithMany("Orders")
-                        .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1453,11 +1590,9 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("BusinessFee");
 
-                    b.Navigation("Feedback");
-
                     b.Navigation("OrderStatus");
 
-                    b.Navigation("ProductVariant");
+                    b.Navigation("Shop");
 
                     b.Navigation("User");
                 });
@@ -1479,6 +1614,25 @@ namespace BusinessObject.Migrations
                     b.Navigation("Coupon");
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
+                {
+                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Product", b =>
@@ -1563,22 +1717,53 @@ namespace BusinessObject.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.Transaction", b =>
+            modelBuilder.Entity("BusinessObject.Entities.TransactionCoin", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("BusinessObject.Entities.Feedback", "Feedback")
+                        .WithOne("TransactionCoin")
+                        .HasForeignKey("BusinessObject.Entities.TransactionCoin", "FeedbackId");
 
-                    b.HasOne("BusinessObject.Entities.TransactionType", "TransactionType")
-                        .WithMany("Transactions")
-                        .HasForeignKey("TransactionTypeId")
+                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                        .WithMany("TransactionCoin")
+                        .HasForeignKey("OrderId");
+
+                    b.HasOne("BusinessObject.Entities.TransactionCoinType", "TransactionCoinType")
+                        .WithMany("TransactionCoin")
+                        .HasForeignKey("TransactionCoinTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessObject.Entities.User", "User")
+                        .WithMany("TransactionCoins")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Feedback");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("TransactionCoinType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.TransactionInternal", b =>
+                {
+                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                        .WithMany("TransactionInternal")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.TransactionInternalType", "TransactionType")
                         .WithMany("Transactions")
+                        .HasForeignKey("TransactionInternalTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.User", "User")
+                        .WithMany("TransactionInternals")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -1719,14 +1904,23 @@ namespace BusinessObject.Migrations
                 {
                     b.Navigation("FeedbackMedias");
 
-                    b.Navigation("Order");
+                    b.Navigation("TransactionCoin");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
-                    b.Navigation("AssetInformations");
-
                     b.Navigation("OrderCoupons");
+
+                    b.Navigation("OrderDetails");
+
+                    b.Navigation("TransactionCoin");
+
+                    b.Navigation("TransactionInternal");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>
+                {
+                    b.Navigation("AssetInformations");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.OrderStatus", b =>
@@ -1751,7 +1945,7 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("Carts");
 
-                    b.Navigation("Orders");
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Role", b =>
@@ -1763,10 +1957,17 @@ namespace BusinessObject.Migrations
                 {
                     b.Navigation("Coupons");
 
+                    b.Navigation("Orders");
+
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("BusinessObject.Entities.TransactionType", b =>
+            modelBuilder.Entity("BusinessObject.Entities.TransactionCoinType", b =>
+                {
+                    b.Navigation("TransactionCoin");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.TransactionInternalType", b =>
                 {
                     b.Navigation("Transactions");
                 });
@@ -1786,7 +1987,9 @@ namespace BusinessObject.Migrations
                     b.Navigation("Shop")
                         .IsRequired();
 
-                    b.Navigation("Transactions");
+                    b.Navigation("TransactionCoins");
+
+                    b.Navigation("TransactionInternals");
 
                     b.Navigation("UserBanks");
 

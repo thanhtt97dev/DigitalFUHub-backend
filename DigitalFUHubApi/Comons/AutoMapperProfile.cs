@@ -52,11 +52,13 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Order, OrdersResponseDTO>()
 				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
-				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.ProductVariant.Product.Shop.UserId))
-				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
+				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
 				.ReverseMap();
+
 			CreateMap<OrderCoupon, OrderDetailOrderCouponsDTO>()
 				.ReverseMap();
+			/*
 			CreateMap<Order, OrderDetailResponseDTO>()
 				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
@@ -77,6 +79,7 @@ namespace DigitalFUHubApi.Comons
 				//.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
 				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductVariant.Product.ProductMedias.Select(x => x.Url).ToList()))
 				.ReverseMap();
+			*/
 			CreateMap<TransactionInternal, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();
@@ -93,7 +96,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Product, ProductResponseDTO>().ReverseMap(); ;
 			CreateMap<ProductVariant, ProductVariantResponseDTO>().ReverseMap(); ;
 			CreateMap<ProductMedia, ProductMediaResponseDTO>().ReverseMap(); ;
-			CreateMap<Tag, TagResponseDTO>().ReverseMap(); ;
+			CreateMap<Tag, TagResponseDTO>().ReverseMap();
 			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
             CreateMap<Cart, CartDTO>().ReverseMap();
             CreateMap<Cart, UpdateCartRequestDTO>().ReverseMap();
