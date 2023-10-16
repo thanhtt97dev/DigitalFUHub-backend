@@ -51,6 +51,7 @@ namespace BusinessObject
 		public virtual DbSet<OrderCoupon> OrderCoupon { get; set; } = null!;
 		public virtual DbSet<Category> Category { get; set; } = null!;
 		public virtual DbSet<Cart> Cart { get; set; } = null!;
+		public virtual DbSet<CartDetail> CartDetail { get; set; } = null!;
 		public virtual DbSet<AssetInformation> AssetInformation { get; set; } = null!;
 		public virtual DbSet<BusinessFee> BusinessFee { get; set; } = null!;
 		public virtual DbSet<TransactionCoin> TransactionCoin { get; set; } = null!;
@@ -67,7 +68,6 @@ namespace BusinessObject
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Cart>().HasKey(x => new { x.UserId, x.ProductVariantId });
 			modelBuilder.Entity<OrderCoupon>().HasKey(x => new { x.OrderId, x.CouponId });
 			modelBuilder.Entity<OrderCoupon>().
 				HasOne(x => x.Order)
@@ -88,6 +88,11 @@ namespace BusinessObject
 				 .HasOne(x => x.User)
 				.WithMany(x => x.Carts)
 				.HasForeignKey(x => x.UserId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<CartDetail>()
+				 .HasOne(x => x.ProductVariant)
+				.WithMany(x => x.CartDetails)
+				.HasForeignKey(x => x.ProductVariantId)
 				.OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<Order>()
 				.HasOne(x => x.User)

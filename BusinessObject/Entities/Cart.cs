@@ -9,13 +9,15 @@ namespace BusinessObject.Entities
 {
 	public class Cart
 	{
+		public long CartId { get; set; }
 		public long UserId { get; set; }
-		public long ProductVariantId { get; set; }
+		public long ShopId { get; set; }
 		public long Quantity { get; set; }
 
-		[ForeignKey(nameof(ProductVariantId))]
-		public virtual ProductVariant ProductVariant { get; set; } = null!;
 		[ForeignKey(nameof(UserId))]
 		public virtual User User { get; set; } = null!;
+		[ForeignKey(nameof(ShopId))]
+		public virtual Shop Shop { get; set; } = null!;
+		public virtual ICollection<CartDetail> CartDetails { get; set; } = null!;
 	}
 }

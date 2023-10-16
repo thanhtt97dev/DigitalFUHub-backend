@@ -20,35 +20,40 @@ namespace DigitalFUHubApi.Controllers
     public class CartsController : ControllerBase
     {
 
-        private readonly IConnectionManager _connectionManager;
-        private readonly ICartRepository _cartRepository;
-        private readonly IMapper _mapper;
-        private readonly IAssetInformationRepository _assetInformationRepository;
+        private readonly IConnectionManager connectionManager;
+        private readonly ICartRepository cartRepository;
+        private readonly IMapper mapper;
+        private readonly IAssetInformationRepository assetInformationRepository;
 
-        public CartsController(IConnectionManager connectionManager,
-            ICartRepository cartRepository, IMapper mapper, IAssetInformationRepository assetInformationRepository)
-        {
-            _connectionManager = connectionManager;
-            _cartRepository = cartRepository;
-            _mapper = mapper;
-            _assetInformationRepository = assetInformationRepository;
-        }
+		public CartsController(IConnectionManager connectionManager, ICartRepository cartRepository, IMapper mapper, IAssetInformationRepository assetInformationRepository)
+		{
+			this.connectionManager = connectionManager;
+			this.cartRepository = cartRepository;
+			this.mapper = mapper;
+			this.assetInformationRepository = assetInformationRepository;
+		}
 
-
-        [HttpPost("addProductToCart")]
+		[HttpPost("addProductToCart")]
         [Authorize]
-        public IActionResult AddProductToCart([FromBody] CartDTO addProductToCartRequest)
+        public IActionResult AddProductToCart([FromBody] CartDTO request)
         {
             try
             {
-                if (addProductToCartRequest == null || addProductToCartRequest.UserId == 0 ||
-                    addProductToCartRequest.ProductVariantId == 0 || addProductToCartRequest.Quantity == 0)
+                if (!ModelState.IsValid)
                 {
-                    return BadRequest(new Status());
+                    return BadRequest();
                 }
-                var resultCheck = _cartRepository.CheckQuantityForCart(addProductToCartRequest.UserId,
-                                                                           addProductToCartRequest.ProductVariantId,
-                                                                           addProductToCartRequest.Quantity);
+
+                // check product in shop
+                if(!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
+                {
+
+                }
+
+                bool isValidQuantity = true;
+                var resultCheck = cartRepository.CheckQuantityForCart(request.UserId,
+                                                                           request.ProductVariantId,
+                                                                           request.Quantity);
                 bool resultBool = resultCheck.Item1;
                 long cartQuantity = resultCheck.Item2;
                 if (!resultBool)
@@ -60,7 +65,7 @@ namespace DigitalFUHubApi.Controllers
                         Ok = resultBool
                     });
                 }
-                _cartRepository.AddProductToCart(addProductToCartRequest);
+                cartRepository.AddProductToCart(request);
 
                 return Ok(new Status
                 {
@@ -87,7 +92,7 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-                return Ok(await _cartRepository.GetCartsByUserId(userId));
+                return Ok(await cartRepository.GetCartsByUserId(userId));
             }
             catch (Exception ex)
             {
@@ -106,17 +111,17 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-                long quantityProductVariant = _assetInformationRepository.GetByProductVariantId(updateCartRequest.ProductVariantId).Count();
+                long quantityProductVariant = assetInformationRepository.GetByProductVariantId(updateCartRequest.ProductVariantId).Count();
                 if (updateCartRequest.Quantity == 0)
                 {
-                    var cart = _cartRepository.GetCart(updateCartRequest.UserId, updateCartRequest.ProductVariantId);
+                    var cart = cartRepository.GetCart(updateCartRequest.UserId, updateCartRequest.ProductVariantId);
                     if (cart != null)
                     {
                         if (cart.Quantity > quantityProductVariant)
                         {
                             
                             updateCartRequest.Quantity = quantityProductVariant;
-                            _cartRepository.UpdateCart(_mapper.Map<Cart>(updateCartRequest));
+                            cartRepository.UpdateCart(mapper.Map<Cart>(updateCartRequest));
                             return Ok(new Status
                             {
                                 ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY,
@@ -143,7 +148,7 @@ namespace DigitalFUHubApi.Controllers
                 if (!resultCheck)
                 {
                     updateCartRequest.Quantity = quantityProductVariant;
-                    _cartRepository.UpdateCart(_mapper.Map<Cart>(updateCartRequest));
+                    cartRepository.UpdateCart(mapper.Map<Cart>(updateCartRequest));
                     return Ok(new Status
                     {
                         ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
@@ -153,7 +158,7 @@ namespace DigitalFUHubApi.Controllers
                     });
                 }
 
-                _cartRepository.UpdateCart(_mapper.Map<Cart>(updateCartRequest));
+                cartRepository.UpdateCart(mapper.Map<Cart>(updateCartRequest));
                 return Ok(new Status
                 {
                     ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS,
@@ -176,7 +181,7 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-                await _cartRepository.DeleteCart(deleteCartRequest.UserId, deleteCartRequest.ProductVariantId);
+                await cartRepository.DeleteCart(deleteCartRequest.UserId, deleteCartRequest.ProductVariantId);
                 return Ok(new Status
                 {
                     Message = "Delete Cart Successfully",

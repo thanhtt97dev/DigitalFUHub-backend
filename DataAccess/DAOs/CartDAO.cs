@@ -35,6 +35,7 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
+                /*
                         var cart = context.Cart
                             .FirstOrDefault(c => c.UserId == addProductToCartRequest.UserId
                             && c.ProductVariantId == addProductToCartRequest.ProductVariantId);
@@ -55,26 +56,33 @@ namespace DataAccess.DAOs
                             context.Cart.Update(cart);
                             context.SaveChanges();
                         }
-                    }
+                 */
+            }
+
         }
 
 
         internal Cart? GetCart(long userId, long productVariantId)
         {
+            return null;
             using (DatabaseContext context = new DatabaseContext())
             {
+                /*
                 var cart = context.Cart.FirstOrDefault(
                         c => c.UserId == userId && c.ProductVariantId == productVariantId
                     );
 
                 return cart;
+                */
             }
         }
 
         internal async Task<List<CartDTO>> GetCartsByUserId(long userId)
         {
+            return new List<CartDTO>();
             using (DatabaseContext context = new DatabaseContext())
             {
+                /*
                 List<CartDTO> cartDTOs = new List<CartDTO>();
                 var carts = await context.Cart.Include(_ => _.User).Where(c => c.UserId == userId).ToListAsync();
                 foreach (var cart in carts)
@@ -110,13 +118,16 @@ namespace DataAccess.DAOs
                 }
               
                 return cartDTOs.OrderBy(c => c.ShopName).ToList();
+                */
             }
         }
 
         internal (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity)
         {
+            return (true, 0);
             using (DatabaseContext context = new DatabaseContext())
             {
+                /*
                 var cart = GetCart(userId, productVariantId);
                 if (cart != null)
                 {
@@ -128,6 +139,7 @@ namespace DataAccess.DAOs
                     }
                 }
                 return (true, cart?.Quantity ?? 0);
+                */
             }
         }
 
@@ -135,11 +147,13 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
+                /*
                 var cart = context.Cart.FirstOrDefault(x => x.UserId == newCart.UserId && x.ProductVariantId == newCart.ProductVariantId);
                 if (cart == null) throw new Exception("Cart's not existed!");
                 cart.ProductVariant = newCart.ProductVariant;
                 cart.Quantity = newCart.Quantity != 0 ? newCart.Quantity : cart.Quantity;
                 context.SaveChanges();
+                */
             }
         }
 
@@ -148,16 +162,46 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
+                /*
                 var cart = await context.Cart.FirstOrDefaultAsync(
                         c => c.UserId == userId && c.ProductVariantId == productVariantId
                     );
                 if (cart == null) throw new ArgumentNullException("Not found cart");
                 context.Cart.Remove(cart);
                 context.SaveChanges();
+                */
             }
         }
 
+        internal bool CheckValidQuantityAddProductToCart(long userId, long shopId, long productVariantId, int quantity)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                // check productVariant in shop
+                bool isProductVariantInShop = context.ProductVariant
+                    .Include(x => x.Product)
+                    .Any(x => x.ProductVariantId == productVariantId && x.Product.ShopId == shopId);
 
-    }
+                if (!isProductVariantInShop)
+                {
+
+                }
+            }
+            return false;
+        }
+
+		internal bool CheckProductVariantInShop(long shopId, long productVariantId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				// check productVariant in shop
+				bool isProductVariantInShop = context.ProductVariant
+					.Include(x => x.Product)
+					.Any(x => x.ProductVariantId == productVariantId && x.Product.ShopId == shopId);
+
+				return isProductVariantInShop;
+			}
+		}
+	}
 }
 

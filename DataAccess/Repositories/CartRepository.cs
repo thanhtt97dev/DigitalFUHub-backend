@@ -44,6 +44,10 @@ namespace DataAccess.Repositories
             return await CartDAO.Instance.GetCartsByUserId(userId);
         }
 
-        public void UpdateCart(Cart newCart) => CartDAO.Instance.UpdateCart(newCart);
+		public bool CheckProductVariantInShop(long shopId, long productVariantId) => CartDAO.Instance.CheckProductVariantInShop(shopId, productVariantId);
+
+		public bool CheckValidQuantityAddProductToCart(long userId, long shopId, long productVariantId, int quantity) => CartDAO.Instance.CheckValidQuantityAddProductToCart(userId,shopId ,productVariantId, quantity);
+
+		public void UpdateCart(Cart newCart) => CartDAO.Instance.UpdateCart(newCart);
     }
 }

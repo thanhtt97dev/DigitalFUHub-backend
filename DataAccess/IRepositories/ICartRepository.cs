@@ -22,5 +22,8 @@ namespace DataAccess.IRepositories
         (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity);
 
         void UpdateCart(Cart newCart);
+
+        bool CheckValidQuantityAddProductToCart(long userId,long shopId ,long productVariantId, int quantity);
+        bool CheckProductVariantInShop(long shopId, long productVariantId);
     }
 }
