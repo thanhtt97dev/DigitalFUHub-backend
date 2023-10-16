@@ -19,7 +19,9 @@ namespace DataAccess.Repositories
 
 		public Product GetProductById(long productId) =>  ShopDAO.Instance.GetProductById(productId);
 
-        public bool ShopHasProduct(long userId, long productId) =>  ShopDAO.Instance.ShopHasProduct(userId, productId);
+		public Shop? GetShopById(long shopId) => ShopDAO.Instance.GetShopById(shopId);
+
+		public bool ShopHasProduct(long userId, long productId) =>  ShopDAO.Instance.ShopHasProduct(userId, productId);
 
 		public bool UserHasShop(long userId) =>  ShopDAO.Instance.UserHasShop(userId);
 	}

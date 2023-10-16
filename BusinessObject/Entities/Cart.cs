@@ -12,7 +12,6 @@ namespace BusinessObject.Entities
 		public long CartId { get; set; }
 		public long UserId { get; set; }
 		public long ShopId { get; set; }
-		public long Quantity { get; set; }
 
 		[ForeignKey(nameof(UserId))]
 		public virtual User User { get; set; } = null!;

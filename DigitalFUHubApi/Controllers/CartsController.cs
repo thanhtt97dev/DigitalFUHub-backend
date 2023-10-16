@@ -20,52 +20,82 @@ namespace DigitalFUHubApi.Controllers
     public class CartsController : ControllerBase
     {
 
-        private readonly IConnectionManager connectionManager;
         private readonly ICartRepository cartRepository;
-        private readonly IMapper mapper;
-        private readonly IAssetInformationRepository assetInformationRepository;
+		private readonly IProductRepository productRepository;
+		private readonly IUserRepository userRepository;
+		private readonly IShopRepository shopRepository;
+		private readonly IAssetInformationRepository assetInformationRepository;
+		private readonly IMapper mapper;
 
-		public CartsController(IConnectionManager connectionManager, ICartRepository cartRepository, IMapper mapper, IAssetInformationRepository assetInformationRepository)
+		public CartsController(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IShopRepository shopRepository, IAssetInformationRepository assetInformationRepository, IMapper mapper)
 		{
-			this.connectionManager = connectionManager;
 			this.cartRepository = cartRepository;
-			this.mapper = mapper;
+			this.productRepository = productRepository;
+			this.userRepository = userRepository;
+			this.shopRepository = shopRepository;
 			this.assetInformationRepository = assetInformationRepository;
+			this.mapper = mapper;
 		}
 
 		[HttpPost("addProductToCart")]
-        [Authorize]
+        //[Authorize]
         public IActionResult AddProductToCart([FromBody] AddProductToCartRequestDTO request)
         {
             try
             {
-                if (!ModelState.IsValid)
+				ResponseData responseData = new ResponseData();
+				ResponseData responseDataNotFound = new ResponseData
+                {
+                    Status = new Status 
+                    { 
+                        ResponseCode= Constants.RESPONSE_CODE_DATA_NOT_FOUND,
+                        Ok = false,
+                        Message = "Data not found!"
+                    }
+                };
+				if (!ModelState.IsValid)
                 {
                     return BadRequest();
                 }
 
-                // check product in shop
-                if(!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
+                if(request.Quantity <= 0 || request.UserId == request.ShopId) 
                 {
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Invalid params!";
+					return Ok(responseData);
+				}
 
-                }
+				//check product, customer, shop existed
+				ProductVariant? productVariant = productRepository.GetProductVariant(request.ProductVariantId);
+                if (productVariant == null) return Ok(responseDataNotFound);
+				User? user = userRepository.GetUserById(request.UserId);
+				if (user == null) return Ok(responseDataNotFound);
+				Shop? shop = shopRepository.GetShopById(request.ShopId);
+				if (shop == null) return Ok(responseDataNotFound);
 
-                bool isValidQuantity = true;
-                var resultCheck = cartRepository.CheckQuantityForCart(request.UserId,
-                                                                           request.ProductVariantId,
-                                                                           request.Quantity);
-                bool resultBool = resultCheck.Item1;
-                long cartQuantity = resultCheck.Item2;
-                if (!resultBool)
+				// check product in shop
+				if (!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
                 {
-                    return Ok(new Status
-                    {
-                        ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
-                        Message = cartQuantity.ToString(),
-                        Ok = resultBool
-                    });
-                }
-                cartRepository.AddProductToCart(request);
+					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Product variant  not existed in shop!";
+					return Ok(responseData);
+				}
+
+				// check valid quantity to add product ti cart
+				(bool isValidQuantityAddProductToCart, int numberAssetInfomation) = cartRepository.CheckValidQuantityAddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
+
+				if (!isValidQuantityAddProductToCart)
+                {
+					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Not enough quantity to add!";
+                    responseData.Result = numberAssetInfomation;
+					return Ok(responseData);
+				}
+
+                cartRepository.AddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
 
                 return Ok(new Status
                 {
@@ -83,7 +113,7 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("GetCartsByUserId/{userId}")]
-        [Authorize]
+        //[Authorize]
         public IActionResult GetCartsByUserId(long userId)
         {
             try
@@ -92,8 +122,10 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-                return Ok(cartRepository.GetCartsByUserId(userId));
+				List<Cart> carts = cartRepository.GetCartsByUserId(userId);
 
+                var result = mapper.Map<List<UserCartResponseDTO>>(carts);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -118,7 +150,8 @@ namespace DigitalFUHubApi.Controllers
                     var cart = cartRepository.GetCart(updateCartRequest.UserId, updateCartRequest.ProductVariantId);
                     if (cart != null)
                     {
-                        if (cart.Quantity > quantityProductVariant)
+                        if(true)
+                        //if (cart.Quantity > quantityProductVariant)
                         {
                             
                             updateCartRequest.Quantity = quantityProductVariant;

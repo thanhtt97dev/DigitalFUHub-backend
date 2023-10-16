@@ -20,5 +20,6 @@ namespace DataAccess.IRepositories
 		string GetProductThumbnail(long productId);
 		List<ProductMedia> GetAllProductMediaById(long productId);
         List<AllProductResponseDTO> GetAllProduct();
-    }
+		ProductVariant? GetProductVariant(long id);
+	}
 }

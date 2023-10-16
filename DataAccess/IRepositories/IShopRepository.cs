@@ -15,6 +15,7 @@ namespace DataAccess.IRepositories
 		Product GetProductById(long productId);
 		bool ShopHasProduct(long userId, long productId);
 		bool UserHasShop(long userId);
+		Shop? GetShopById(long shopId);
 
     }
 }

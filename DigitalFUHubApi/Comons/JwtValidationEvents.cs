@@ -32,18 +32,13 @@ namespace DigitalFUHubApi.Comons
 
 			var dbContext = context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
 			var user = dbContext.User.FirstOrDefault(x => x.UserId == userId);
-			if (user == null) 
+			if (user == null || !user.Status) 
 			{
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
 			}
-			if (!user.Status)
-			{
-				context.Fail("Unauthorized");
-				return base.TokenValidated(context);
-			}
-			var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.IsRevoked == false);
 
+			var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.IsRevoked == false);
 			if (accessToken == null)
 			{
 				//Hanlde revoke all token of this user

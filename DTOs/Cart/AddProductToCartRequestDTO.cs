@@ -11,6 +11,6 @@ namespace DTOs.Cart
 		public long UserId { get; set; } = 0!;
 		public long ShopId { get; set; } = 0!;
 		public long ProductVariantId { get; set; } = 0!;
-		public long Quantity { get; set; } = 0!;
+		public int Quantity { get; set; } = 0!;
 	}
 }

@@ -100,6 +100,14 @@ namespace DataAccess.DAOs
 				return context.Shop.Any(x => x.ShopName.ToLower() == shopName.ToLower());
 			}
 		}
+
+		internal Shop? GetShopById(long shopId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Shop.FirstOrDefault(x => x.UserId == shopId);
+			}
+		}
 	}
 }
 
