@@ -35,11 +35,7 @@ namespace DigitalFUHubApi.Controllers
 
 		[HttpPost("addProductToCart")]
         [Authorize]
-<<<<<<< HEAD
-        public IActionResult AddProductToCart([FromBody] CartDTO request)
-=======
-        public IActionResult AddProductToCart([FromBody] AddProductToCartRequestDTO addProductToCartRequest)
->>>>>>> 8413a5f9ad8791ecc6441a59f62db376271b0da6
+        public IActionResult AddProductToCart([FromBody] AddProductToCartRequestDTO request)
         {
             try
             {
@@ -96,11 +92,8 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-<<<<<<< HEAD
-                return Ok(await cartRepository.GetCartsByUserId(userId));
-=======
-                return Ok(_cartRepository.GetCartsByUserId(userId));
->>>>>>> 8413a5f9ad8791ecc6441a59f62db376271b0da6
+                return Ok(cartRepository.GetCartsByUserId(userId));
+
             }
             catch (Exception ex)
             {

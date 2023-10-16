@@ -79,10 +79,10 @@ namespace DataAccess.DAOs
 
         internal List<CartGroupResponseDTO> GetCartsByUserId(long userId)
         {
-            return new List<CartDTO>();
+            return new List<CartGroupResponseDTO>();
             using (DatabaseContext context = new DatabaseContext())
             {
-                /*
+				/*
                 List<CartDTO> cartDTOs = new List<CartDTO>();
                 var carts = context.Cart.Include(_ => _.User).Where(c => c.UserId == userId).ToList();
                 foreach (var cart in carts)
@@ -117,11 +117,8 @@ namespace DataAccess.DAOs
                     };
                     cartDTOs.Add(cartDTO);
                 }
-<<<<<<< HEAD
               
                 return cartDTOs.OrderBy(c => c.ShopName).ToList();
-                */
-=======
 
                 var groupCart = cartDTOs
                     .GroupBy(x => new { x.UserId, x.ShopId, x.ShopName, x.Coin })
@@ -148,9 +145,11 @@ namespace DataAccess.DAOs
                     }).ToList();
 
                 return groupCart.OrderBy(c => c.ShopName).ToList();
->>>>>>> 8413a5f9ad8791ecc6441a59f62db376271b0da6
-            }
-        }
+                */
+
+
+			}
+		}
 
 
         internal (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity)

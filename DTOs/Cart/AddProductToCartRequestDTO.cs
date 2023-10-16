@@ -8,8 +8,9 @@ namespace DTOs.Cart
 {
     public class AddProductToCartRequestDTO
     {
-        public long UserId { get; set; }
-        public long ProductVariantId { get; set; }
-        public long Quantity { get; set; }
-    }
+		public long UserId { get; set; } = 0!;
+		public long ShopId { get; set; } = 0!;
+		public long ProductVariantId { get; set; } = 0!;
+		public long Quantity { get; set; } = 0!;
+	}
 }
