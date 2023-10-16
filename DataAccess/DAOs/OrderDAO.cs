@@ -3,8 +3,6 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
-using OfficeOpenXml.Style;
 
 namespace DataAccess.DAOs
 {
@@ -92,6 +90,7 @@ namespace DataAccess.DAOs
 						};
 						context.TransactionInternal.Add(transactionAdmin);
 					}
+					context.Order.UpdateRange(orders);
 					context.SaveChanges();
 					transaction.Commit();
 				}
@@ -158,6 +157,7 @@ namespace DataAccess.DAOs
 						admin.AccountBalance = admin.AccountBalance - order.TotalPayment;
 
 					}
+					context.Order.UpdateRange(orders);
 					context.SaveChanges();
 					transaction.Commit();
 				}
