@@ -37,7 +37,7 @@ namespace DigitalFUHubApi.Controllers
 
         [HttpPost("addProductToCart")]
         [Authorize]
-        public IActionResult AddProductToCart([FromBody] CartDTO addProductToCartRequest)
+        public IActionResult AddProductToCart([FromBody] AddProductToCartRequestDTO addProductToCartRequest)
         {
             try
             {
@@ -78,8 +78,8 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("GetCartsByUserId/{userId}")]
-        //[Authorize]
-        public async Task<IActionResult> GetCartsByUserId(long userId)
+        [Authorize]
+        public IActionResult GetCartsByUserId(long userId)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-                return Ok(await _cartRepository.GetCartsByUserId(userId));
+                return Ok(_cartRepository.GetCartsByUserId(userId));
             }
             catch (Exception ex)
             {
