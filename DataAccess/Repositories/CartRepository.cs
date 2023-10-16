@@ -14,7 +14,7 @@ namespace DataAccess.Repositories
     public class CartRepository : ICartRepository
     {
 
-        public void AddProductToCart(CartDTO addProductToCartRequest) => CartDAO.Instance.AddProductToCart(addProductToCartRequest);
+        public void AddProductToCart(AddProductToCartRequestDTO addProductToCartRequest) => CartDAO.Instance.AddProductToCart(addProductToCartRequest);
 
         public (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity) => CartDAO.Instance.CheckQuantityForCart(userId, productVariantId, quantity);
 
@@ -34,15 +34,7 @@ namespace DataAccess.Repositories
 
         public Cart? GetCart(long userId, long productVariantId) => CartDAO.Instance.GetCart(userId, productVariantId);
 
-        public async Task<List<CartDTO>> GetCartsByUserId(long userId)
-        {
-            if (userId == 0)
-            {
-                throw new ArgumentException(nameof(userId), "UserId must be difference from 0");
-            }
-
-            return await CartDAO.Instance.GetCartsByUserId(userId);
-        }
+        public List<CartGroupResponseDTO> GetCartsByUserId(long userId) => CartDAO.Instance.GetCartsByUserId(userId);
 
 		public bool CheckProductVariantInShop(long shopId, long productVariantId) => CartDAO.Instance.CheckProductVariantInShop(shopId, productVariantId);
 

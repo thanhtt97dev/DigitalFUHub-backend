@@ -31,7 +31,7 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal void AddProductToCart(CartDTO addProductToCartRequest)
+        internal void AddProductToCart(AddProductToCartRequestDTO addProductToCartRequest)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
@@ -77,25 +77,29 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal async Task<List<CartDTO>> GetCartsByUserId(long userId)
+        internal List<CartGroupResponseDTO> GetCartsByUserId(long userId)
         {
             return new List<CartDTO>();
             using (DatabaseContext context = new DatabaseContext())
             {
                 /*
                 List<CartDTO> cartDTOs = new List<CartDTO>();
-                var carts = await context.Cart.Include(_ => _.User).Where(c => c.UserId == userId).ToListAsync();
+                var carts = context.Cart.Include(_ => _.User).Where(c => c.UserId == userId).ToList();
                 foreach (var cart in carts)
                 {
-                    var productVariant = await context.ProductVariant.FirstOrDefaultAsync(p => p.ProductVariantId == cart.ProductVariantId);
+                    var productVariant = context.ProductVariant.FirstOrDefault(p => p.ProductVariantId == cart.ProductVariantId);
                     if (productVariant == null) throw new ArgumentNullException("Not found product variant");
-                    var product = await context.Product.Include(_ => _.Shop).FirstOrDefaultAsync(p => p.ProductId == productVariant.ProductId);
+                    var product = context.Product.Include(_ => _.Shop).FirstOrDefault(p => p.ProductId == productVariant.ProductId);
                     //long price = productVariant.Price * cart.Quantity;
                     CartDTO cartDTO = new CartDTO()
                     {
-                        ProductVariantId = cart.ProductVariantId,
+                  
                         UserId = cart.UserId,
+                        ShopName = product?.Shop.ShopName ?? "",
+                        ShopId = product?.Shop.UserId ?? 0,
+                        Coin = cart.User.Coin,
                         Quantity = cart.Quantity,
+                        ProductVariantId = cart.ProductVariantId,
                         Product = new ProductCartResponseDTO
                         {
                             ProductId = product?.ProductId ?? 0,
@@ -109,18 +113,45 @@ namespace DataAccess.DAOs
                             Price = productVariant.Price,
                             PriceDiscount = productVariant.Price - (productVariant.Price * (product?.Discount ?? 1) / 100),
                             Quantity = context.AssetInformation.Count(x => x.ProductVariantId == cart.ProductVariantId)
-                        },
-                        ShopName = product?.Shop.ShopName ?? "",
-                        ShopId = product?.Shop.UserId ?? 0,
-                        Coin = cart.User.Coin
+                        }
                     };
                     cartDTOs.Add(cartDTO);
                 }
+<<<<<<< HEAD
               
                 return cartDTOs.OrderBy(c => c.ShopName).ToList();
                 */
+=======
+
+                var groupCart = cartDTOs
+                    .GroupBy(x => new { x.UserId, x.ShopId, x.ShopName, x.Coin })
+                    .Select(group => new CartGroupResponseDTO
+                    {
+                        UserId = group.Key.UserId,
+                        ShopId = group.Key.ShopId,
+                        ShopName = group.Key.ShopName,
+                        Coin = group.Key.Coin,
+                        Products = group.Select(x => new ProductCartGroupResponseDTO
+                        {
+                            Quantity = x.Quantity,
+                            ProductVariantId = x.ProductVariantId,
+                            ProductVariantName = x.ProductVariant?.ProductVariantName ?? "",
+                            Price = x.ProductVariant?.Price ?? 0,
+                            PriceDiscount = x.ProductVariant?.PriceDiscount ?? 0,
+                            ProductVariantQuantity = x.ProductVariant?.Quantity ?? 0,
+                            ProductId = x.Product?.ProductId ?? 0,
+                            Thumbnail = x.Product?.Thumbnail ?? "",
+                            ProductName = x.Product?.ProductName ?? "",
+                            Discount = x.Product?.Discount ?? 0
+             
+                        }).ToList()
+                    }).ToList();
+
+                return groupCart.OrderBy(c => c.ShopName).ToList();
+>>>>>>> 8413a5f9ad8791ecc6441a59f62db376271b0da6
             }
         }
+
 
         internal (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity)
         {

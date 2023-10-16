@@ -11,11 +11,11 @@ namespace DataAccess.IRepositories
 {
     public interface ICartRepository
     {
-        void AddProductToCart(CartDTO addProductRequest);
+        void AddProductToCart(AddProductToCartRequestDTO addProductToCartRequest);
 
         Cart? GetCart(long userId, long productVariantId);
 
-        Task<List<CartDTO>> GetCartsByUserId(long userId);
+        List<CartGroupResponseDTO> GetCartsByUserId(long userId);
 
         Task DeleteCart(long userId, long productVariantId);
 
