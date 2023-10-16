@@ -20,17 +20,21 @@ namespace DigitalFUHubApi.Controllers
     public class CartsController : ControllerBase
     {
 
-        private readonly IConnectionManager connectionManager;
         private readonly ICartRepository cartRepository;
-        private readonly IMapper mapper;
-        private readonly IAssetInformationRepository assetInformationRepository;
+		private readonly IProductRepository productRepository;
+		private readonly IUserRepository userRepository;
+		private readonly IShopRepository shopRepository;
+		private readonly IAssetInformationRepository assetInformationRepository;
+		private readonly IMapper mapper;
 
-		public CartsController(IConnectionManager connectionManager, ICartRepository cartRepository, IMapper mapper, IAssetInformationRepository assetInformationRepository)
+		public CartsController(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IShopRepository shopRepository, IAssetInformationRepository assetInformationRepository, IMapper mapper)
 		{
-			this.connectionManager = connectionManager;
 			this.cartRepository = cartRepository;
-			this.mapper = mapper;
+			this.productRepository = productRepository;
+			this.userRepository = userRepository;
+			this.shopRepository = shopRepository;
 			this.assetInformationRepository = assetInformationRepository;
+			this.mapper = mapper;
 		}
 
 		[HttpPost("addProductToCart")]
@@ -40,13 +44,38 @@ namespace DigitalFUHubApi.Controllers
             try
             {
 				ResponseData responseData = new ResponseData();
+				ResponseData responseDataNotFound = new ResponseData
+                {
+                    Status = new Status 
+                    { 
+                        ResponseCode= Constants.RESPONSE_CODE_DATA_NOT_FOUND,
+                        Ok = false,
+                        Message = "Data not found!"
+                    }
+                };
 				if (!ModelState.IsValid)
                 {
                     return BadRequest();
                 }
 
-                // check product in shop
-                if(!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
+                if(request.Quantity <= 0 || request.UserId == request.ShopId) 
+                {
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Invalid params!";
+					return Ok(responseData);
+				}
+
+				//check product, customer, shop existed
+				ProductVariant? productVariant = productRepository.GetProductVariant(request.ProductVariantId);
+                if (productVariant == null) return Ok(responseDataNotFound);
+				User? user = userRepository.GetUserById(request.UserId);
+				if (user == null) return Ok(responseDataNotFound);
+				Shop? shop = shopRepository.GetShopById(request.ShopId);
+				if (shop == null) return Ok(responseDataNotFound);
+
+				// check product in shop
+				if (!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
                 {
 					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
 					responseData.Status.Ok = false;
@@ -54,12 +83,15 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-                // check valid quantity to add product ti cart
-                if(cartRepository.CheckValidQuantityAddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity))
+				// check valid quantity to add product ti cart
+				(bool isValidQuantityAddProductToCart, int numberAssetInfomation) = cartRepository.CheckValidQuantityAddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
+
+				if (!isValidQuantityAddProductToCart)
                 {
 					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY;
 					responseData.Status.Ok = false;
-					responseData.Status.Message = (request.Quantity - 1).ToString();
+					responseData.Status.Message = "Not enough quantity to add!";
+                    responseData.Result = numberAssetInfomation;
 					return Ok(responseData);
 				}
 

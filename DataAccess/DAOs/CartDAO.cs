@@ -219,21 +219,29 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal bool CheckValidQuantityAddProductToCart(long userId, long shopId, long productVariantId, int quantity)
+        internal (bool, int) CheckValidQuantityAddProductToCart(long userId, long shopId, long productVariantId, int quantity)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                // check productVariant in shop
-                bool isProductVariantInShop = context.ProductVariant
-                    .Include(x => x.Product)
-                    .Any(x => x.ProductVariantId == productVariantId && x.Product.ShopId == shopId);
+                // get cart detail
+                var cart = context.Cart
+                    .FirstOrDefault(x => x.UserId == userId && x.ShopId == shopId);
+                // get number asset infomation with productVariantId is activate
+                var numberAssetInfomation = context.AssetInformation.Count(x => x.ProductVariantId == productVariantId && x.IsActive);
 
-                if (!isProductVariantInShop)
+                int totalQuantity = quantity;
+                if(cart != null) 
                 {
-
+                    // get cart detail with productVariantId
+                    var cartDetail = context.CartDetail.FirstOrDefault(x => x.ProductVariantId == productVariantId);
+                    if (cartDetail != null) totalQuantity += cartDetail.Quantity;
+				}
+                if(totalQuantity > numberAssetInfomation)
+                {
+                    return (false, numberAssetInfomation);
                 }
-            }
-            return false;
+			}
+			return (true,0);
         }
 
 		internal bool CheckProductVariantInShop(long shopId, long productVariantId)

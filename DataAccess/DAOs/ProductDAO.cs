@@ -348,6 +348,14 @@ namespace DataAccess.DAOs
 				return context.ProductMedia.Where(x => x.ProductId == productId).ToList();
 			}
 		}
+
+		internal ProductVariant? GetProductVariant(long id)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.ProductVariant.FirstOrDefault(x => x.ProductVariantId == id);
+			}
+		}
 	}
 }
 

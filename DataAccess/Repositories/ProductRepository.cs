@@ -29,5 +29,8 @@ namespace DataAccess.Repositories
 		public string GetProductThumbnail(long productId) => ProductDAO.Instance.GetProductThumbnail(productId);
 
 		public List<ProductMedia> GetAllProductMediaById(long productId) => ProductDAO.Instance.GetAllProductMediaById(productId);
+
+		public ProductVariant? GetProductVariant(long id) => ProductDAO.Instance.GetProductVariant(id);
+
 	}
 }
