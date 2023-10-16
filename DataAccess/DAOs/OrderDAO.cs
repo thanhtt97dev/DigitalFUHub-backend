@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using OfficeOpenXml.Style;
 
 namespace DataAccess.DAOs
@@ -27,36 +28,32 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetAllOrderWaitToConfirm(int days)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				DateTime timeAccept = DateTime.Now.AddDays(-days);
-				var orders = context.Order
-					.Where(x =>
-						x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
-						x.OrderDate < timeAccept
-					)
-					.ToList();
-				return orders;
-			}
-		}
-
-		internal void UpdateStatusOrderToConfirm(List<Order> orders)
+		internal void UpdateStatusOrderToConfirm()
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
+					DateTime timeAccept = DateTime.Now.AddDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER);
+					var orders = context.Order
+						.Where(x =>
+							x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
+							x.OrderDate < timeAccept
+						)
+						.ToList();
+					if (orders.Count() == 0) return;
+
+					
+
 					foreach (var order in orders)
 					{
-						// update order's status to confirmed
-						var orderUpdate = context.Order.First(x => x.OrderId == order.OrderId);
-						orderUpdate.OrderStatusId = Constants.ORDER_CONFIRMED;
+						// update order status
+						order.OrderStatusId = Constants.ORDER_CONFIRMED;
 
 						//get platform fee
 						var fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
+
 						//get sellerId
 						var sellerId = order.ShopId;
 
@@ -106,33 +103,24 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetAllOrderComplaint(int days)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				DateTime timeAccept = DateTime.Now.AddDays(-days);
-				var orders = context.Order
-					.Where(x =>
-						x.OrderStatusId == Constants.ORDER_COMPLAINT &&
-						x.OrderDate < timeAccept)
-					.ToList();
-				return orders;
-			}
-		}
-
-		internal void UpdateStatusOrderToSellerRefunded(List<Order> orders)
+		internal void UpdateStatusOrderToSellerRefunded()
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					foreach (var item in orders)
+					DateTime timeAccept = DateTime.Now.AddDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER);
+					var orders = context.Order
+						.Where(x =>
+							x.OrderStatusId == Constants.ORDER_COMPLAINT &&
+							x.OrderDate < timeAccept)
+						.ToList();
+
+					foreach (var order in orders)
 					{
 						//update order status
-						var order = context.Order.First(x => x.OrderId == item.OrderId);
 						order.OrderStatusId = Constants.ORDER_SELLER_REFUNDED;
-						context.SaveChanges();
 
 						var customerId = order.UserId;
 
@@ -147,17 +135,30 @@ namespace DataAccess.DAOs
 							DateCreate = DateTime.Now,
 						};
 						context.TransactionInternal.Add(transactionInternal);
-						context.SaveChanges();
+
+						
 
 						// update customer balance
 						var customer = context.User.First(x => x.UserId == customerId);
 						customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
-						context.SaveChanges();
+						//refund coin of customer
+						customer.Coin = customer.Coin + order.TotalCoinDiscount;
+						var transactionCoin = new TransactionCoin
+						{
+							UserId = customerId,
+							TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_REFUND,
+							OrderId = order.OrderId,
+							Amount = order.TotalCoinDiscount,
+							DateCreate = DateTime.Now
+						};
+						context.TransactionCoin.Add(transactionCoin);
+
 						//update admin banance
 						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
 						admin.AccountBalance = admin.AccountBalance - order.TotalPayment;
-						context.SaveChanges();
+
 					}
+					context.SaveChanges();
 					transaction.Commit();
 				}
 				catch (Exception ex)

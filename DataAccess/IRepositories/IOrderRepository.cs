@@ -10,10 +10,8 @@ namespace DataAccess.IRepositories
 {
 	public interface IOrderRepository
 	{
-		List<Order> GetAllOrderWaitToConfirm(int days);
-		void UpdateStatusOrderToConfirm(List<Order> orders);
-		List<Order> GetAllOrderComplaint(int days);
-		void UpdateStatusOrderToSellerRefunded(List<Order> orders);
+		void UpdateStatusOrderToConfirm();
+		void UpdateStatusOrderToSellerRefunded();
 		List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status);
 		(string, string) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin);
 		Order? GetOrder(long orderId);
