@@ -47,7 +47,7 @@
 
 
 		//SignalR
-		public const string SIGNAL_R_CHAT_HUB = "chat";
+		public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
 

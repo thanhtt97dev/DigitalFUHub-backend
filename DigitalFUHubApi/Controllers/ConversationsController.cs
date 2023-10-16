@@ -14,6 +14,7 @@ using DTOs.Conversation;
 using DigitalFUHubApi.Services;
 using Azure.Core;
 using Azure;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -48,6 +49,8 @@ namespace DigitalFUHubApi.Controllers
             string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
             List<string> urlImages = new List<string>();
             List<HashSet<string>?> connections = new List<HashSet<string>?>();
+
+            // user recipient
             foreach (long userId in request.RecipientIds)
             {
                 int recipientId = unchecked((int)userId);
@@ -55,60 +58,100 @@ namespace DigitalFUHubApi.Controllers
                         .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
                 connections.Add(connection);
             }
-            
+
+            // user sender
+            int senderId = unchecked((int)request.UserId);
+            HashSet<string>? connectionSender = _connectionManager
+               .GetConnections(senderId, Constants.SIGNAL_R_CHAT_HUB);
+            connections.Add(connectionSender);
+
             try
             {
                 if (request.Images != null) {
-                if (request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))) {
-                    Console.WriteLine("File không hợp lệ");
-                    return Ok(new Status {
-                        Ok = false,
-                        ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
-                        Message = ""
-                    });
+                    if (request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))) {
+                        Console.WriteLine("File không hợp lệ");
+                        return Ok(new Status {
+                            Ok = false,
+                            ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
+                            Message = ""
+                        });
+                    }
+
+                    DateTime now;
+                    string filename;
+
+                    foreach (IFormFile file in request.Images)
+                    {
+                        now = DateTime.Now;
+                        filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+                        string url = await _storageService.UploadFileToAzureAsync(file, filename);
+                        urlImages.Add(url);
+                    }
                 }
 
-                DateTime now;
-                string filename;
+                // Create message
+                Message newMessage;
+                List<Message> messages = new List<Message>();
 
-                foreach (IFormFile file in request.Images)
+                if (urlImages != null && urlImages.Count > 0)
                 {
-                    now = DateTime.Now;
-                    filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-                    string url = await _storageService.UploadFileToAzureAsync(file, filename);
-                    urlImages.Add(url);
+                    foreach (string url in urlImages)
+                    {
+                        newMessage = new Message
+                        {
+                            UserId = request.UserId,
+                            ConversationId = request.ConversationId,
+                            Content = url,
+                            MessageType = Constants.MESSAGE_TYPE_CONVERSATION_IMAGE,
+                            DateCreate = request.DateCreate,
+                            IsDelete = false
+                        };
+                        messages.Add(newMessage);
+                    }
                 }
-            }
+
+                if (!string.IsNullOrEmpty(request.Content))
+                {
+                    newMessage = new Message
+                    {
+                        UserId = request.UserId,
+                        ConversationId = request.ConversationId,
+                        Content = request.Content,
+                        MessageType = Constants.MESSAGE_TYPE_CONVERSATION_TEXT,
+                        DateCreate = request.DateCreate,
+                        IsDelete = false
+                    };
+                    messages.Add(newMessage);
+                }
+
+                await _conversationRepository.SendMessageConversation(messages);
+
+                List<MessageConversationResponseDTO> messageConversations = _mapper.Map<List<MessageConversationResponseDTO>>(messages);
 
 
-           
+              
+                if (connections.Count > 0)
+                {
+                    
+                    for(int i = 0; i < connections.Count; i++)
+                    {
+                        var elementConnection = connections.ElementAt(i);
+                        if (elementConnection != null)
+                        {
+                            foreach (var item in elementConnection)
+                            {
+                                foreach(var msg in messageConversations)
+                                {
+                                    await _hubContext.Clients.Clients(item)
+                                   .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, msg);
+                                }
+       
+                            }
+                        }
+                    }
+                }
 
 
-                //if (!string.IsNullOrEmpty(sendChatMessageRequest.Content))
-                //{
-                //    int recipientId = unchecked((int)sendChatMessageRequest.RecipientId);
-                //    HashSet<string>? connections = _connectionManager
-                //        .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
-
-                //    MessageResponseDTO messageResponse = new MessageResponseDTO
-                //    {
-                //        UserId = sendChatMessageRequest.SenderId,
-                //        ConversationId = sendChatMessageRequest.ConversationId,
-                //        Content = sendChatMessageRequest.Content,
-                //        DateCreate = sendChatMessageRequest.DateCreate,
-                //        MessageType = sendChatMessageRequest.MessageType
-                //    };
-                //    if (connections != null)
-                //    {
-                //        foreach (var connection in connections)
-                //        {
-                //            await _hubContext.Clients.Clients(connection)
-                //                .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, messageResponse);
-                //        }
-                //    }
-                //}
-
-                await _conversationRepository.SendMessageConversation(request, urlImages);
                 return Ok();
             }
             catch (ArgumentException ex)

@@ -166,41 +166,15 @@ namespace DataAccess.DAOs
 
 
 
-        internal async Task SendMessageConversation(SendMessageConversationRequestDTO request, List<string> urlImages)
+        internal async Task SendMessageConversation(List<Message> messages)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
                 var transaction = context.Database.BeginTransaction();
                 try
                 {
-                    Message newMessage;
-                    if (urlImages != null && urlImages.Count > 0)
-                    {
-                        foreach (string url in urlImages)
-                        {
-                            newMessage = new Message
-                            {
-                                UserId = request.UserId,
-                                ConversationId = request.ConversationId,
-                                Content = url,
-                                MessageType = Constants.MESSAGE_TYPE_CONVERSATION_IMAGE,
-                                DateCreate = request.DateCreate,
-                                IsDelete = false
-                            };
-                            context.Messages.Add(newMessage);
-                        }
-                    }
-                    newMessage = new Message
-                    {
-                        UserId = request.UserId,
-                        ConversationId = request.ConversationId,
-                        Content = request.Content,
-                        MessageType = Constants.MESSAGE_TYPE_CONVERSATION_TEXT,
-                        DateCreate = request.DateCreate,
-                        IsDelete = false
-                    };
-                    context.Messages.Add(newMessage);
-
+                    context.Messages.AddRange(messages);
+                   
                     await context.SaveChangesAsync();
                     transaction.Commit();
                 } catch (Exception ex)
@@ -217,7 +191,8 @@ namespace DataAccess.DAOs
             using (DatabaseContext context = new DatabaseContext())
             {
                 List<Message> result = context.Messages
-                    .Where(m => m.ConversationId == conversationId)
+                    .Include(_ => _.User)
+                    .Where(m => m.ConversationId == conversationId && m.IsDelete == false)
                     .ToList();
 
                 return result;

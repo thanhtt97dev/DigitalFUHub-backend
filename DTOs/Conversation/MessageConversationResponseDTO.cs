@@ -10,10 +10,10 @@ namespace DTOs.Conversation
     {
         public long MessageId { get; set; }
         public long UserId { get; set; }
+        public string Avatar { get; set; } = string.Empty;
         public long ConversationId { get; set; }
         public string Content { get; set; } = string.Empty;
         public string MessageType { get; set; } = string.Empty;
         public DateTime DateCreate { get; set; }
-        public bool IsDelete { get; set; }
     }
 }

@@ -36,7 +36,7 @@ namespace DataAccess.Repositories
             return result;
         }
 
-        public async Task SendMessageConversation(SendMessageConversationRequestDTO request, List<string> urlImages) => await ConversationDAO.Instance.SendMessageConversation(request, urlImages);
+        public async Task SendMessageConversation(List<Message> messages) => await ConversationDAO.Instance.SendMessageConversation(messages);
 
         public long AddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.AddConversation(addConversation);
 
