@@ -14,9 +14,9 @@ namespace DataAccess.Repositories
     public class CartRepository : ICartRepository
     {
 
-        public void AddProductToCart(AddProductToCartRequestDTO addProductToCartRequest) => CartDAO.Instance.AddProductToCart(addProductToCartRequest);
+        public void AddProductToCart(long userId, long shopId, long productVariantId, int quantity) => CartDAO.Instance.AddProductToCart(userId, shopId, productVariantId, quantity);
 
-        public (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity) => CartDAO.Instance.CheckQuantityForCart(userId, productVariantId, quantity);
+        //public (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity) => CartDAO.Instance.CheckQuantityForCart(userId, productVariantId, quantity);
 
         public async Task DeleteCart(long userId, long productVariantId)
         {
@@ -34,7 +34,7 @@ namespace DataAccess.Repositories
 
         public Cart? GetCart(long userId, long productVariantId) => CartDAO.Instance.GetCart(userId, productVariantId);
 
-        public List<CartGroupResponseDTO> GetCartsByUserId(long userId) => CartDAO.Instance.GetCartsByUserId(userId);
+        public List<Cart> GetCartsByUserId(long userId) => CartDAO.Instance.GetCartsByUserId(userId);
 
 		public bool CheckProductVariantInShop(long shopId, long productVariantId) => CartDAO.Instance.CheckProductVariantInShop(shopId, productVariantId);
 

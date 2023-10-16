@@ -44,6 +44,7 @@
 		public const string CART_RESPONSE_CODE_SUCCESS = "CART_00";
 		public const string CART_RESPONSE_CODE_INVALID_QUANTITY = "CART_01";
 		public const string CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
+		public const string CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP = "CART_03";
 
 
 		//SignalR

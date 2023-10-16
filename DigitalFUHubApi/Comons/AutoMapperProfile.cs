@@ -14,6 +14,7 @@ using DTOs.Admin;
 using DTOs.Order;
 using DTOs.Coupon;
 using DTOs.Conversation;
+using Comons;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -80,6 +81,22 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductVariant.Product.ProductMedias.Select(x => x.Url).ToList()))
 				.ReverseMap();
 			*/
+			CreateMap<CartDetail, UserCartProductResponseDTO>()
+				.ForMember(des => des.ProductVariantId, act => act.MapFrom(src => src.ProductVariant.ProductVariantId))
+				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))
+				.ForMember(des => des.ProductVariantPrice, act => act.MapFrom(src => src.ProductVariant.Price))
+				.ForMember(des => des.ProductVariantActivate, act => act.MapFrom(src => src.ProductVariant.isActivate))
+				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductVariant.Product.ProductId))
+				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductVariant.Product.ProductName))
+				.ForMember(des => des.ProductDiscount, act => act.MapFrom(src => src.ProductVariant.Product.Discount))
+				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.ProductVariant.Product.Thumbnail))
+				.ForMember(des => des.ProductActivate, act => act.MapFrom(src => src.ProductVariant.Product.ProductStatusId == Constants.PRODUCT_ACTIVE))
+				.ReverseMap();
+			CreateMap<Cart, UserCartResponseDTO>()
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.Products, act => act.MapFrom(src => src.CartDetails))
+				.ReverseMap();
 			CreateMap<TransactionInternal, HistoryTransactionInternalResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
 				.ReverseMap();

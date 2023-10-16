@@ -34,12 +34,13 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 		[HttpPost("addProductToCart")]
-        [Authorize]
+        //[Authorize]
         public IActionResult AddProductToCart([FromBody] AddProductToCartRequestDTO request)
         {
             try
             {
-                if (!ModelState.IsValid)
+				ResponseData responseData = new ResponseData();
+				if (!ModelState.IsValid)
                 {
                     return BadRequest();
                 }
@@ -47,25 +48,22 @@ namespace DigitalFUHubApi.Controllers
                 // check product in shop
                 if(!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
                 {
+					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Product variant  not existed in shop!";
+					return Ok(responseData);
+				}
 
-                }
-
-                bool isValidQuantity = true;
-                var resultCheck = cartRepository.CheckQuantityForCart(request.UserId,
-                                                                           request.ProductVariantId,
-                                                                           request.Quantity);
-                bool resultBool = resultCheck.Item1;
-                long cartQuantity = resultCheck.Item2;
-                if (!resultBool)
+                // check valid quantity to add product ti cart
+                if(cartRepository.CheckValidQuantityAddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity))
                 {
-                    return Ok(new Status
-                    {
-                        ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
-                        Message = cartQuantity.ToString(),
-                        Ok = resultBool
-                    });
-                }
-                cartRepository.AddProductToCart(request);
+					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = (request.Quantity - 1).ToString();
+					return Ok(responseData);
+				}
+
+                cartRepository.AddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
 
                 return Ok(new Status
                 {
@@ -83,7 +81,7 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("GetCartsByUserId/{userId}")]
-        [Authorize]
+        //[Authorize]
         public IActionResult GetCartsByUserId(long userId)
         {
             try
@@ -92,8 +90,10 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-                return Ok(cartRepository.GetCartsByUserId(userId));
+				List<Cart> carts = cartRepository.GetCartsByUserId(userId);
 
+                var result = mapper.Map<List<UserCartResponseDTO>>(carts);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -118,7 +118,8 @@ namespace DigitalFUHubApi.Controllers
                     var cart = cartRepository.GetCart(updateCartRequest.UserId, updateCartRequest.ProductVariantId);
                     if (cart != null)
                     {
-                        if (cart.Quantity > quantityProductVariant)
+                        if(true)
+                        //if (cart.Quantity > quantityProductVariant)
                         {
                             
                             updateCartRequest.Quantity = quantityProductVariant;
