@@ -25,5 +25,6 @@ namespace DataAccess.IRepositories
 		void UpdateBalance(long id, long newAccountBalance);
 		List<User> GetUsers(long userId, string email, string fullName, int roleId, int status);
 		User? GetUserInfo (int id);
+		bool CheckUsersExisted(List<long> userIds);
 	}
 }

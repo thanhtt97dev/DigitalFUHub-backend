@@ -15,8 +15,8 @@ namespace DataAccess.Repositories
 {
 	public class OrderRepository : IOrderRepository
 	{
-		public void UpdateStatusOrderToConfirm() => OrderDAO.Instance.UpdateStatusOrderToConfirm();
-		public void UpdateStatusOrderToSellerRefunded() => OrderDAO.Instance.UpdateStatusOrderToSellerRefunded();
+		public void UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(int days) => OrderDAO.Instance.UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(days);
+		public void UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(int days) => OrderDAO.Instance.UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(days);
 
 		public List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopName, fromDate, toDate, status);
 

@@ -5,18 +5,32 @@ namespace DigitalFUHubApi.Managers
 	public class ConnectionManager : IConnectionManager	
 	{
 		//Save Hub type with connectionIds of a user
-		private static Dictionary<int, Dictionary<string, HashSet<string>>> data = new Dictionary<int, Dictionary<string, HashSet<string>>>();
+		private static Dictionary<long, Dictionary<string, HashSet<string>>> data = new Dictionary<long, Dictionary<string, HashSet<string>>>();
 
-		public void AddConnection(int userId,string hubName , string connectionId)
+		public void AddConnection(long userId,string hubName , string connectionId)
 		{
 			lock (data)
 			{
 				if(!data.ContainsKey(userId)) 
 				{
 					data[userId] = new Dictionary<string, HashSet<string>>();
+					HashSet<string> connections = new HashSet<string> { connectionId };
+					data[userId].Add(hubName, connections);
 				}
-				HashSet<string> connections = new HashSet<string> { connectionId };	
-				data[userId].Add(hubName, connections);
+				else
+				{
+					if (data[userId].ContainsKey(hubName))
+					{
+						if (!data[userId][hubName].Contains(connectionId))
+						{
+							data[userId][hubName].Add(connectionId);	
+						}
+					}
+					else
+					{
+						data[userId].Add(hubName, new HashSet<string> { connectionId });
+					}
+				}
 			}
 		}
 
@@ -41,7 +55,7 @@ namespace DigitalFUHubApi.Managers
 			}
 		}
 
-		public HashSet<string>? GetConnections(int userId, string hubName)
+		public HashSet<string>? GetConnections(long userId, string hubName)
 		{
 			var connections = new HashSet<string>();
 			try

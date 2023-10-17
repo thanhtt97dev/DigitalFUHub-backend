@@ -26,14 +26,14 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void UpdateStatusOrderToConfirm()
+		internal void UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(int days)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					DateTime timeAccept = DateTime.Now.AddDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER);
+					DateTime timeAccept = DateTime.Now.AddDays(days);
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
@@ -102,14 +102,14 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void UpdateStatusOrderToSellerRefunded()
+		internal void UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(int days)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					DateTime timeAccept = DateTime.Now.AddDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER);
+					DateTime timeAccept = DateTime.Now.AddDays(days);
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_COMPLAINT &&

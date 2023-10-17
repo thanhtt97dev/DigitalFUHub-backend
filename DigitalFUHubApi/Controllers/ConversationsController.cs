@@ -103,7 +103,7 @@ namespace DigitalFUHubApi.Controllers
                             ConversationId = request.ConversationId,
                             Content = url,
                             MessageType = Constants.MESSAGE_TYPE_CONVERSATION_IMAGE,
-                            DateCreate = request.DateCreate,
+                            DateCreate = DateTime.Now,
                             IsDelete = false
                         };
                         messages.Add(newMessage);
@@ -118,7 +118,7 @@ namespace DigitalFUHubApi.Controllers
                         ConversationId = request.ConversationId,
                         Content = request.Content,
                         MessageType = Constants.MESSAGE_TYPE_CONVERSATION_TEXT,
-                        DateCreate = request.DateCreate,
+                        DateCreate = DateTime.Now,
                         IsDelete = false
                     };
                     messages.Add(newMessage);
@@ -144,6 +144,7 @@ namespace DigitalFUHubApi.Controllers
                 await _conversationRepository.SendMessageConversation(messages);
 
                 messageConversations = _mapper.Map<List<MessageConversationResponseDTO>>(messages);
+
               
                 if (connections.Count > 0)
                 {

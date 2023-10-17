@@ -14,7 +14,6 @@ namespace DTOs.Chat
         public string Content { get; set; } = string.Empty;
         public IEnumerable<IFormFile>? Images { get; set; }
         public IEnumerable<long> RecipientIds { get; set; } = null!;
-        public DateTime DateCreate { get; set; }
     }
 }
 

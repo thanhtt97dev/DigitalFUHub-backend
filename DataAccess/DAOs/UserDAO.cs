@@ -188,5 +188,13 @@ namespace DataAccess.DAOs
 				return user;	
 			}
 		}
+
+		internal bool CheckUsersExisted(List<long> userIds)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.User.Any(x => !userIds.Contains(x.UserId));
+			}
+		}
 	}
 }
