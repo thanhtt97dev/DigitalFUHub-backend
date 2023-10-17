@@ -14,9 +14,23 @@ namespace DigitalFUHubApi.Managers
 				if(!data.ContainsKey(userId)) 
 				{
 					data[userId] = new Dictionary<string, HashSet<string>>();
+					HashSet<string> connections = new HashSet<string> { connectionId };
+					data[userId].Add(hubName, connections);
 				}
-				HashSet<string> connections = new HashSet<string> { connectionId };	
-				data[userId].Add(hubName, connections);
+				else
+				{
+					if (data[userId].ContainsKey(hubName))
+					{
+						if (!data[userId][hubName].Contains(connectionId))
+						{
+							data[userId][hubName].Add(connectionId);	
+						}
+					}
+					else
+					{
+						data[userId].Add(hubName, new HashSet<string> { connectionId });
+					}
+				}
 			}
 		}
 
