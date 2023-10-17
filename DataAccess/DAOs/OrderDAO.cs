@@ -302,7 +302,7 @@ namespace DataAccess.DAOs
 						{
 							// check quantity
 							var assetInformationRemaining = context.AssetInformation
-								.Where(a => a.ProductVariantId == item.ProductVariantId && a.IsActive == true)
+								.Where(a => a.ProductVariantId == item.ProductVariantId && a.IsActive == true);
 							if(assetInformationRemaining.Count() < item.Quantity)
 							{
 								transaction.Rollback();
