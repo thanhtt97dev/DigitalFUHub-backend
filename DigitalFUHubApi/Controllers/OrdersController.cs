@@ -52,11 +52,16 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				(string responseCode, string message) = orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
+				(string responseCode, string message, int numberQuantityAvailable) = orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status.Message = message;
+
+				if(responseCode == Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY)
+				{
+					responseData.Result = numberQuantityAvailable;
+				}
 				return Ok(responseData);
 			}
 			catch (Exception ex)
@@ -136,8 +141,7 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Message = "Invalid";
 				return Ok(response);
 			}
-			else if (true)
-			//} else if(order.ProductVariant.Product.Shop.UserId != request.ShopId)
+			else if(order.ShopId != request.ShopId)
 			{
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
 				response.Status.Ok = false;
