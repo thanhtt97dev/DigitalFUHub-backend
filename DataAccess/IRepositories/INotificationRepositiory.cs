@@ -11,6 +11,10 @@ namespace DataAccess.IRepositories
 	{
 		List<Notification> GetNotifications(int userId);
 
-		void AddNotification(Notification notification);
-	}
+        Notification GetNotificationById(int notificationId);
+
+        void AddNotification(Notification notification);
+
+        void EditNotificationIsReaded(int notificationId);
+    }
 }
