@@ -189,20 +189,6 @@ namespace DataAccess.DAOs
         }
         */
 
-		internal void UpdateCart(Cart newCart)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                /*
-                var cart = context.Cart.FirstOrDefault(x => x.UserId == newCart.UserId && x.ProductVariantId == newCart.ProductVariantId);
-                if (cart == null) throw new Exception("Cart's not existed!");
-                cart.ProductVariant = newCart.ProductVariant;
-                cart.Quantity = newCart.Quantity != 0 ? newCart.Quantity : cart.Quantity;
-                context.SaveChanges();
-                */
-            }
-        }
-
 
         internal async Task DeleteCart(long userId, long productVariantId)
         {
@@ -254,6 +240,48 @@ namespace DataAccess.DAOs
 					.Any(x => x.ProductVariantId == productVariantId && x.Product.ShopId == shopId);
 
 				return isProductVariantInShop;
+			}
+		}
+
+		internal CartDetail? GetCartDetail(long cartDetailId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+                return context.CartDetail.FirstOrDefault(x => x.CartDetailId == cartDetailId);
+			}
+		}
+
+		internal void UpdateQuantityCartDetail(long cartDetailId, int quantity)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var cartDetail = context.CartDetail.FirstOrDefault(x => x.CartDetailId == cartDetailId);
+                if (cartDetail == null) return;
+                cartDetail.Quantity = quantity;
+                context.CartDetail.Update(cartDetail);
+			}
+		}
+
+		internal void RemoveCartDetail(long cartDetailId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var cartDetail = context.CartDetail.FirstOrDefault(x => x.CartDetailId == cartDetailId);
+				if (cartDetail == null) return;
+                var cart = context.Cart
+                    .Include(x => x.CartDetails)
+                    .Select(x => new Cart { CartId = x.CartId, CartDetails = x.CartDetails })
+                    .First(x => x.CartId == cartDetail.CartId);
+                if(cart.CartDetails.Count() == 1)
+                {
+                    context.CartDetail.Remove(cartDetail);
+                    context.Cart.Remove(cart);
+                }
+                else
+                {
+					context.CartDetail.Remove(cartDetail);
+				}
+                context.SaveChanges();
 			}
 		}
 	}

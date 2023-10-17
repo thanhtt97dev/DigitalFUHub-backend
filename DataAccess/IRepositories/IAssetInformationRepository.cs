@@ -10,5 +10,7 @@ namespace DataAccess.IRepositories
     public interface IAssetInformationRepository
     {
         List<AssetInformation> GetByProductVariantId(long productVariantId);
-    }
+        int GetQuantityAssetInformationProductVariantAvailable(long productVariantId);  
+
+	}
 }

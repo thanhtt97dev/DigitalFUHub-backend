@@ -12,17 +12,11 @@ namespace DataAccess.IRepositories
     public interface ICartRepository
     {
 		void AddProductToCart(long userId, long shopId, long productVariantId, int quantity);
-
-		Cart? GetCart(long userId, long productVariantId);
-
         List<Cart> GetCartsByUserId(long userId);
-
-        Task DeleteCart(long userId, long productVariantId);
-
-        //(bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity);
-
-        void UpdateCart(Cart newCart);
-        (bool, int) CheckValidQuantityAddProductToCart(long userId,long shopId ,long productVariantId, int quantity);
+        CartDetail? GetCartDetail(long CartDetailId);
+        void UpdateQuantityCartDetail(long cartDetailId, int quantity);
+		void RemoveCartDetail(long cartDetailId);
+		(bool, int) CheckValidQuantityAddProductToCart(long userId,long shopId ,long productVariantId, int quantity);
         bool CheckProductVariantInShop(long shopId, long productVariantId);
     }
 }

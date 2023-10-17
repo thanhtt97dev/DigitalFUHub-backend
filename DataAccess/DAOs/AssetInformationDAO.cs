@@ -38,5 +38,15 @@ namespace DataAccess.DAOs
                 return assetInformations;
             }
         }
-    }
+
+		internal int GetQuantityAssetInformationProductVariantAvailable(long productVariantId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+                var quantity = context.AssetInformation.Where(a => a.ProductVariantId == productVariantId && a.IsActive == true).Count();
+
+				return quantity;
+			}
+		}
+	}
 }
