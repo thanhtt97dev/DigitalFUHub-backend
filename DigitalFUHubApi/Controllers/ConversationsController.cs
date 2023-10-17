@@ -22,55 +22,75 @@ namespace DigitalFUHubApi.Controllers
     [ApiController]
     public class ConversationsController : ControllerBase
     {
-        private readonly IHubContext<ChatHub> _hubContext;
-        private readonly IConnectionManager _connectionManager;
-        private readonly IConversationRepository _conversationRepository;
-        private readonly IMapper _mapper;
-        private readonly StorageService _storageService;
+        private readonly IHubContext<ChatHub> hubContext;
+        private readonly IConnectionManager connectionManager;
+        private readonly IConversationRepository conversationRepository;
+        private readonly IMapper mapper;
+        private readonly StorageService storageService;
+        private readonly IUserRepository userRepository;
 
-        public ConversationsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, 
-            IConversationRepository conversationRepository, IMapper mapper, StorageService storageService)
+        public ConversationsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, StorageService storageService, IUserRepository userRepository)
         {
-            _hubContext = hubContext;
-            _connectionManager = connectionManager;
-            _conversationRepository = conversationRepository;
-            _mapper = mapper;
-            _storageService = storageService;
+            this.hubContext = hubContext;
+            this.connectionManager = connectionManager;
+            this.conversationRepository = conversationRepository;
+            this.mapper = mapper;
+            this.storageService = storageService;
+            this.userRepository = userRepository;
         }
 
         [HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage([FromForm] SendMessageConversationRequestDTO request)
         {
-            if (request == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new Status());
+                return BadRequest();
+            }
+            ResponseData responseData = new ResponseData();
+
+            //check users recipient and user sender existed
+            List<long> userIdInConverstion = new List<long>();
+            userIdInConverstion.Add(request.UserId);
+            userIdInConverstion.AddRange(request.RecipientIds);
+
+            if (!userRepository.CheckUsersExisted(userIdInConverstion))
+            {
+                responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                responseData.Status.Ok = false;
+                responseData.Status.Message = "Data not found!";
             }
 
             string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
             List<string> urlImages = new List<string>();
-            List<HashSet<string>?> connections = new List<HashSet<string>?>();
-            List<MessageConversationResponseDTO> messageConversations;
+            List<string> connections = new List<string>();
 
-            // user recipient
-            foreach (long userId in request.RecipientIds)
+            //get connectionId of user recipient
+            foreach (long recipientId in request.RecipientIds)
             {
-                int recipientId = unchecked((int)userId);
-                HashSet<string>? connection = _connectionManager
+                HashSet<string>? connectionIds = connectionManager
                         .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
-                connections.Add(connection);
+                if (connectionIds == null) continue;
+                connections.AddRange(connectionIds.ToList());
             }
 
-            // user sender
-            int senderId = unchecked((int)request.UserId);
-            HashSet<string>? connectionSender = _connectionManager
+            //get connection Id of user sender
+            long senderId = request.UserId;
+            HashSet<string>? connectionIdsSender = connectionManager
                .GetConnections(senderId, Constants.SIGNAL_R_CHAT_HUB);
+            if (connectionIdsSender != null)
+            {
+                connections.AddRange(connectionIdsSender.ToList());
+            }
 
             try
             {
-                if (request.Images != null) {
-                    if (request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))) {
+                if (request.Images != null)
+                {
+                    if (request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf(".")))))
+                    {
                         Console.WriteLine("File không hợp lệ");
-                        return Ok(new Status {
+                        return Ok(new Status
+                        {
                             Ok = false,
                             ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
                             Message = ""
@@ -84,7 +104,7 @@ namespace DigitalFUHubApi.Controllers
                     {
                         now = DateTime.Now;
                         filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-                        string url = await _storageService.UploadFileToAzureAsync(file, filename);
+                        string url = await storageService.UploadFileToAzureAsync(file, filename);
                         urlImages.Add(url);
                     }
                 }
@@ -93,7 +113,7 @@ namespace DigitalFUHubApi.Controllers
                 Message newMessage;
                 List<Message> messages = new List<Message>();
 
-                if (urlImages != null && urlImages.Count > 0)
+                if (urlImages.Count > 0)
                 {
                     foreach (string url in urlImages)
                     {
@@ -124,55 +144,27 @@ namespace DigitalFUHubApi.Controllers
                     messages.Add(newMessage);
                 }
 
+                await conversationRepository.SendMessageConversation(messages);
 
-                // send message to user sender
-                messageConversations = _mapper.Map<List<MessageConversationResponseDTO>>(messages);
+                List<MessageConversationResponseDTO> messageConversations = mapper.Map<List<MessageConversationResponseDTO>>(messages);
 
-                if (connectionSender != null)
+                if (connections.Count > 0)
                 {
-                    foreach (var item in connectionSender)
+                    foreach (var connectionId in connections)
                     {
                         foreach (var msg in messageConversations)
                         {
-                            await _hubContext.Clients.Clients(item)
+                            await hubContext.Clients.Clients(connectionId)
                            .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, msg);
                         }
-
                     }
                 }
-
-                await _conversationRepository.SendMessageConversation(messages);
-
-                messageConversations = _mapper.Map<List<MessageConversationResponseDTO>>(messages);
-
-              
-                if (connections.Count > 0)
-                {
-                    
-                    for(int i = 0; i < connections.Count; i++)
-                    {
-                        var elementConnection = connections.ElementAt(i);
-                        if (elementConnection != null)
-                        {
-                            foreach (var item in elementConnection)
-                            {
-                                foreach(var msg in messageConversations)
-                                {
-                                    await _hubContext.Clients.Clients(item)
-                                   .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, msg);
-                                }
-       
-                            }
-                        }
-                    }
-                }
-
 
                 return Ok();
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
 
         }
@@ -186,10 +178,11 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-                List<ConversationResponseDTO> userConversations = _conversationRepository.GetUsersConversations(userId);
+                List<ConversationResponseDTO> userConversations = conversationRepository.GetUsersConversations(userId);
 
                 return Ok(userConversations);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 return BadRequest(new Status());
@@ -197,17 +190,17 @@ namespace DigitalFUHubApi.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddConversation ([FromBody] AddConversationRequestDTO addConversation)
+        public IActionResult AddConversation([FromBody] AddConversationRequestDTO addConversation)
         {
             try
             {
-                (bool, string) result = _conversationRepository.ValidateAddConversation(addConversation);
+                (bool, string) result = conversationRepository.ValidateAddConversation(addConversation);
                 if (!result.Item1)
                 {
                     Console.WriteLine(result.Item2);
-                    return BadRequest(new Status()); 
+                    return BadRequest(new Status());
                 }
-                long conversationId = _conversationRepository.AddConversation(addConversation);
+                long conversationId = conversationRepository.AddConversation(addConversation);
 
                 return Ok(conversationId);
             }
@@ -220,7 +213,7 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("getMessages")]
-        public IActionResult GetMessages (long conversationId)
+        public IActionResult GetMessages(long conversationId)
         {
             try
             {
@@ -228,8 +221,8 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return BadRequest(new Status());
                 }
-                List<MessageConversationResponseDTO> messages = _mapper
-                    .Map<List<MessageConversationResponseDTO>>(_conversationRepository.GetMessages(conversationId));
+                List<MessageConversationResponseDTO> messages = mapper
+                    .Map<List<MessageConversationResponseDTO>>(conversationRepository.GetMessages(conversationId));
                 return Ok(messages);
             }
             catch (ArgumentException ex)
@@ -245,7 +238,7 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-                return Ok(_conversationRepository.GetUserConversation(senderId, recipientId));
+                return Ok(conversationRepository.GetUserConversation(senderId, recipientId));
             }
             catch (ArgumentException ex)
             {
