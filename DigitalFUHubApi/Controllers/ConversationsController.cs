@@ -61,27 +61,24 @@ namespace DigitalFUHubApi.Controllers
 
 			string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
             List<string> urlImages = new List<string>();
-            List<string> connect = new List<string>();
-            List<HashSet<string>?> connections = new List<HashSet<string>?>();
+            List<string> connections = new List<string>();
 
-			// user recipient
+			//get connectionId of user recipient
 			foreach (long recipientId in request.RecipientIds)
             {
-                HashSet<string>? connection = connectionManager
+                HashSet<string>? connectionIds = connectionManager
                         .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
-                //connections.Add(connection);
-                if (connection == null) continue;
-				connect.AddRange(connection.ToList());
+                if (connectionIds == null) continue;
+				connections.AddRange(connectionIds.ToList());
 			}
 			
-			// user sender
+			//get connection Id of user sender
 			long senderId = request.UserId;
-            HashSet<string>? connectionSender = connectionManager
+            HashSet<string>? connectionIdsSender = connectionManager
                .GetConnections(senderId, Constants.SIGNAL_R_CHAT_HUB);
-            connections.Add(connectionSender);
-			if (connectionSender != null)
+			if (connectionIdsSender != null)
             {
-				connect.AddRange(connectionSender.ToList());
+				connections.AddRange(connectionIdsSender.ToList());
 			}
 
 			try
@@ -147,9 +144,9 @@ namespace DigitalFUHubApi.Controllers
 
                 List<MessageConversationResponseDTO> messageConversations = mapper.Map<List<MessageConversationResponseDTO>>(messages);
 
-                if(connect.Count > 0)
+                if(connections.Count > 0)
                 {
-                    foreach (var connectionId in connect)
+                    foreach (var connectionId in connections)
                     {
 						foreach (var msg in messageConversations)
 						{
