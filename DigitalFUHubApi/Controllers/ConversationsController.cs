@@ -49,6 +49,7 @@ namespace DigitalFUHubApi.Controllers
             string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
             List<string> urlImages = new List<string>();
             List<HashSet<string>?> connections = new List<HashSet<string>?>();
+            List<MessageConversationResponseDTO> messageConversations;
 
             // user recipient
             foreach (long userId in request.RecipientIds)
@@ -63,7 +64,6 @@ namespace DigitalFUHubApi.Controllers
             int senderId = unchecked((int)request.UserId);
             HashSet<string>? connectionSender = _connectionManager
                .GetConnections(senderId, Constants.SIGNAL_R_CHAT_HUB);
-            connections.Add(connectionSender);
 
             try
             {
@@ -124,11 +124,26 @@ namespace DigitalFUHubApi.Controllers
                     messages.Add(newMessage);
                 }
 
+
+                // send message to user sender
+                messageConversations = _mapper.Map<List<MessageConversationResponseDTO>>(messages);
+
+                if (connectionSender != null)
+                {
+                    foreach (var item in connectionSender)
+                    {
+                        foreach (var msg in messageConversations)
+                        {
+                            await _hubContext.Clients.Clients(item)
+                           .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, msg);
+                        }
+
+                    }
+                }
+
                 await _conversationRepository.SendMessageConversation(messages);
 
-                List<MessageConversationResponseDTO> messageConversations = _mapper.Map<List<MessageConversationResponseDTO>>(messages);
-
-
+                messageConversations = _mapper.Map<List<MessageConversationResponseDTO>>(messages);
               
                 if (connections.Count > 0)
                 {
