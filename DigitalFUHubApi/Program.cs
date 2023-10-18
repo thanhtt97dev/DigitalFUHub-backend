@@ -109,8 +109,9 @@ namespace DigitalFUHubApi
             builder.Services.AddSingleton<ICouponRepository, CouponRepository>();
 			builder.Services.AddSingleton<IBusinessFeeRepository, BusinessFeeRepositoty>();
 			builder.Services.AddSingleton<ITransactionRepository, TransactionRepository>();
+            builder.Services.AddSingleton<IUserConversationRepository, UserConversationRepository>();
 
-			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubConnectionService>();

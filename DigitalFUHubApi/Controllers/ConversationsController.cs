@@ -15,6 +15,8 @@ using DigitalFUHubApi.Services;
 using Azure.Core;
 using Azure;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Collections.Generic;
+using DTOs.UserConversation;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -28,8 +30,9 @@ namespace DigitalFUHubApi.Controllers
         private readonly IMapper mapper;
         private readonly StorageService storageService;
         private readonly IUserRepository userRepository;
+        private readonly IUserConversationRepository userConversationRepository;
 
-        public ConversationsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, StorageService storageService, IUserRepository userRepository)
+        public ConversationsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, StorageService storageService, IUserRepository userRepository, IUserConversationRepository userConversationRepository)
         {
             this.hubContext = hubContext;
             this.connectionManager = connectionManager;
@@ -37,6 +40,7 @@ namespace DigitalFUHubApi.Controllers
             this.mapper = mapper;
             this.storageService = storageService;
             this.userRepository = userRepository;
+            this.userConversationRepository = userConversationRepository;
         }
 
         [HttpPost("SendMessage")]
@@ -143,9 +147,11 @@ namespace DigitalFUHubApi.Controllers
                     };
                     messages.Add(newMessage);
                 }
-
+               
                 await conversationRepository.SendMessageConversation(messages);
 
+
+                //send to signR connections
                 List<MessageConversationResponseDTO> messageConversations = mapper.Map<List<MessageConversationResponseDTO>>(messages);
 
                 if (connections.Count > 0)
@@ -194,13 +200,36 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
+
                 (bool, string) result = conversationRepository.ValidateAddConversation(addConversation);
                 if (!result.Item1)
                 {
                     Console.WriteLine(result.Item2);
                     return BadRequest(new Status());
                 }
+
                 long conversationId = conversationRepository.AddConversation(addConversation);
+
+                //get connectionId of user recipient
+                foreach (long recipientId in addConversation.RecipientIds)
+                {
+                    List<ConversationResponseDTO> conversationResponse = conversationRepository
+                                                                        .GetUsersConversations(recipientId);
+                    ConversationResponseDTO? conversation = conversationResponse.FirstOrDefault(x => x.ConversationId == conversationId);
+                    if (conversation != null)
+                    {
+                        HashSet<string>? connectionIds = connectionManager
+                                                            .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
+                        if (connectionIds != null)
+                        {
+                            foreach (string connectionId in connectionIds)
+                            {
+                                hubContext.Clients.Clients(connectionId)
+                                    .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, conversation);
+                            }
+                        }
+                    }
+                }
 
                 return Ok(conversationId);
             }
@@ -231,20 +260,5 @@ namespace DigitalFUHubApi.Controllers
                 return BadRequest(new Status());
             }
         }
-
-
-        [HttpGet("existUserConversation")]
-        public IActionResult ExistUserConversation(long senderId, long recipientId)
-        {
-            try
-            {
-                return Ok(conversationRepository.GetUserConversation(senderId, recipientId));
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
     }
 }

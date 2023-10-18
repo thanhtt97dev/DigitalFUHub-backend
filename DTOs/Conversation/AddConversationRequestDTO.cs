@@ -10,6 +10,7 @@ namespace DTOs.Conversation
     {
         public string? ConversationName { get; set; }
         public DateTime DateCreate { get; set; }
-        public List<long> UserIds { get; set; } = new List<long>();
+        public long UserId { get; set; }
+        public List<long> RecipientIds { get; set; } = new List<long>();
     }
 }

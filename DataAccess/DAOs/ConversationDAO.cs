@@ -50,13 +50,16 @@ namespace DataAccess.DAOs
                                                 .ToList();
 
                 var groupedConversations = conversations
-                    .GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate })
+                    .GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate, x.IsRead })
                     .Select(group => new ConversationResponseDTO
                     {
                         ConversationId = group.Key.ConversationId,
                         ConversationName = group.Key.ConversationName,
                         DateCreate = group.Key.DateCreate,
                         IsActivate = group.Key.IsActivate,
+                        IsRead = group.Key.IsRead,
+                        LatestMessage = context.Messages.OrderByDescending(x => x.DateCreate)
+                        .FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.Content ?? "",
                         Users = group.Select(uc => new UserConversationResponseDTO {
                             UserId = uc.User.UserId,
                             RoleId = uc.User.RoleId,
@@ -74,7 +77,10 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                List<long> listUserId = addConversation.UserIds;
+                List<long> listUserId = new List<long>();
+                listUserId.AddRange(addConversation.RecipientIds);
+                listUserId.Add(addConversation.UserId);
+
                 var userConversation = context.UserConversation.ToList();
                 if (userConversation != null) {
                     var groupUserConversation = userConversation
@@ -109,6 +115,7 @@ namespace DataAccess.DAOs
                         ConversationName = addConversation.ConversationName ?? null,
                         DateCreate = addConversation.DateCreate,
                         IsActivate = true,
+       
                     };
                     context.Conversations.Add(conversation);
                     context.SaveChanges();
@@ -119,6 +126,7 @@ namespace DataAccess.DAOs
                         {
                             UserId = userId,
                             ConversationId = conversationId,
+                            IsRead = Constants.USER_CONVERSATION_TYPE_INITIAL
                         };
                         context.UserConversation.Add(newUserConversation);
                     }
@@ -137,7 +145,11 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                List<long> listUserId = addConversation.UserIds;
+
+                List<long> listUserId = new List<long>();
+                listUserId.AddRange(addConversation.RecipientIds);
+                listUserId.Add(addConversation.UserId);
+
                 if (listUserId == null || listUserId.Count < 2
                     || (listUserId.Count == 2 && !string.IsNullOrEmpty(addConversation.ConversationName))
                     || (listUserId.Count > 2 && string.IsNullOrEmpty(addConversation.ConversationName)))

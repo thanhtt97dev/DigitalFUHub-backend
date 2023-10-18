@@ -100,5 +100,10 @@
         //Message Type
         public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
         public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
-	}
+
+        //User Conversation Type
+        public const int USER_CONVERSATION_TYPE_INITIAL = 1;
+        public const int USER_CONVERSATION_TYPE_UN_READ = 2;
+        public const int USER_CONVERSATION_TYPE_IS_READ = 3;
+    }
 }
