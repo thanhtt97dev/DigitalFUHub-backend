@@ -41,5 +41,7 @@ namespace DataAccess.Repositories
         public long AddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.AddConversation(addConversation);
 
         public (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.ValidateAddConversation(addConversation);
-    }
+
+		public List<UserConversationDTO> GetRecipientUserIdHasConversation(long userId) => ConversationDAO.Instance.GetRecipientUserIdHasConversation(userId);
+	}
 }

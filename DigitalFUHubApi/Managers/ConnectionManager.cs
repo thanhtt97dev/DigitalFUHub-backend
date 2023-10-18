@@ -71,5 +71,10 @@ namespace DigitalFUHubApi.Managers
 			}
 			return connections;
 		}
+
+		public bool CheckUserConnectd(long userId)
+		{
+			return data.ContainsKey(userId);
+		}
 	}
 }

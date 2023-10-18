@@ -49,6 +49,9 @@
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
 
+		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userHub";
+		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS = "ReceiveUserOnlineStatus";
+
 		//User config
 		public const int ADMIN_USER_ID = 1;
 		public const int ADMIN_ROLE = 1;

@@ -51,5 +51,7 @@ namespace DataAccess.Repositories
 
 		public bool CheckUsersExisted(List<long> userIds) => UserDAO.Instance.CheckUsersExisted(userIds);
 
+		
+
 	}
 }
