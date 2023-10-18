@@ -122,7 +122,11 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<StorageService>();
 
 			//Add SignalR
-			builder.Services.AddSignalR();
+			builder.Services.AddSignalR(c => {
+                    c.EnableDetailedErrors = true;
+                    c.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+                    c.KeepAliveInterval = TimeSpan.FromSeconds(15);
+                });
 
 			//Add rate limit request
 			builder.Services.Configure<IpRateLimitOptions>(options =>
