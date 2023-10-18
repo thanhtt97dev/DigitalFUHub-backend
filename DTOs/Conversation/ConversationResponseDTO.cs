@@ -12,6 +12,8 @@ namespace DTOs.Conversation
         public string? ConversationName { get; set; }
         public DateTime DateCreate { get; set; }
         public bool IsActivate { get; set; }
+        public int IsRead { get; set; }
+        public string LatestMessage { get; set; } = string.Empty;
         public ICollection<UserConversationResponseDTO>? Users { get; set; }
 
     }

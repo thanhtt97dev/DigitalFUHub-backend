@@ -15,6 +15,7 @@ namespace BusinessObject.Entities
         public long UserConversationId { get; set; }
         public long UserId { get; set; }
         public long ConversationId { get; set; }
+        public int IsRead { get; set; }  
 
         [ForeignKey(nameof(ConversationId))]
         public virtual Conversation Conversation { get; set; } = null!;
