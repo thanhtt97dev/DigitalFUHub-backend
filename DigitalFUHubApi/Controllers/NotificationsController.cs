@@ -37,7 +37,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 		#region Send notification to a user
-		[Authorize]
+		//[Authorize]
 		[HttpPost("sendNotification/{userId}")]
 		public async Task<IActionResult> SendNotification([FromRoute] int userId, NotificationRequest notificationRequest)
 		{
@@ -51,7 +51,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = userId,
 					Title = notificationRequest.Title,
 					Content = notificationRequest.Content,
-					Link = "",
+					Link = "/history/order",
 					DateCreated = DateTime.Now,
 					IsReaded = false,
 				};
