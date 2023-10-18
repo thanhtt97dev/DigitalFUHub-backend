@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DataAccess.DAOs
 {
@@ -207,23 +208,25 @@ namespace DataAccess.DAOs
 		}
 
 		#region Add order
-		internal (string, string, int) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
+		internal (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
+					int numberQuantityAvailable = 0;
+					Order orderResult = new Order();
 					// check valid quantity
 					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0))){
-						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", 0);
+						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", numberQuantityAvailable, orderResult);
 					}
 
 					//check customer existed
 					var isCustomerExisted = context.User.Any(x => x.UserId == userId);
 					if (!isCustomerExisted)
 					{
-						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!", 0);
+						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!", numberQuantityAvailable, orderResult);
 					}
 
 					// get bussinsis fee
@@ -244,7 +247,7 @@ namespace DataAccess.DAOs
 						if (!isProductVariantExisted)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!", 0);
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!", numberQuantityAvailable, orderResult);
 						}
 
 						//check shop existed
@@ -252,7 +255,7 @@ namespace DataAccess.DAOs
 						if (shop == null)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!", 0);
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!", numberQuantityAvailable, orderResult);
 						}
 
 						//check ProductVariant of shop
@@ -262,7 +265,7 @@ namespace DataAccess.DAOs
 						if (!isAllProductInShop)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_ORDER_PRODUCT_VARIANT_NOT_IN_SHOP, "A product variant not in shop!", 0);
+							return (Constants.RESPONSE_CODE_ORDER_PRODUCT_VARIANT_NOT_IN_SHOP, "A product variant not in shop!", numberQuantityAvailable, orderResult);
 						}
 
 						//get customer info
@@ -271,7 +274,7 @@ namespace DataAccess.DAOs
 						if (customer == null)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!", 0);
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!", numberQuantityAvailable, orderResult);
 						}
 						long customerCoin = customer.Coin;
 
@@ -281,7 +284,7 @@ namespace DataAccess.DAOs
 						if (isCustomerBuyTheirOwnProducts)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT, "Customers buy their own products !", 0);
+							return (Constants.RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT, "Customers buy their own products !", numberQuantityAvailable, orderResult);
 						}
 
 						//create order
@@ -306,7 +309,8 @@ namespace DataAccess.DAOs
 							if(assetInformationRemaining.Count() < item.Quantity)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!", assetInformationRemaining.Count());
+								numberQuantityAvailable = assetInformationRemaining.Count();
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!", numberQuantityAvailable, orderResult);
 							}
 							assetInformationRemaining = assetInformationRemaining.Take(item.Quantity);
 
@@ -337,7 +341,7 @@ namespace DataAccess.DAOs
 								!productVariant.Product.Shop.IsActive) 
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED, "Product has been baned", 0);
+								return (Constants.RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED, "Product has been baned", numberQuantityAvailable, orderResult);
 							}
 
 							OrderDetail orderDetail = new OrderDetail
@@ -383,13 +387,13 @@ namespace DataAccess.DAOs
 							if (coupon == null)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", 0);
+								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
 							}
 
 							if (coupon.MinTotalOrderValue > totalAmount)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!",0);
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!",numberQuantityAvailable, orderResult);
 							}
 							totalCouponDiscount = coupon.PriceDiscount;
 
@@ -438,7 +442,7 @@ namespace DataAccess.DAOs
 							if (customer.AccountBalance < totalPayment)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!", 0);
+								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!", numberQuantityAvailable, orderResult);
 							}
 							customer.AccountBalance = customer.AccountBalance - totalPayment;
 							if (totalCoinDiscount > 0)
@@ -493,8 +497,10 @@ namespace DataAccess.DAOs
 							context.TransactionInternal.Add(newTransaction);
 							context.SaveChanges();
 						}
+						orderResult = order;
 					}
 					transaction.Commit();
+					return (Constants.RESPONSE_CODE_SUCCESS, "Success!", numberQuantityAvailable, orderResult);
 				}
 				catch (Exception ex)
 				{
@@ -502,7 +508,7 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
-			return (Constants.RESPONSE_CODE_SUCCESS, "Success!", 0);
+			
 		}
 		#endregion
 

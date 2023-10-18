@@ -2,7 +2,7 @@
 {
 	public static class Constants
 	{
-
+		
 		//MB bank config
 		public const string BANK_ID_MB_BANK = "970422";
 		public const int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 15;
@@ -13,12 +13,6 @@
 		public const string MB_BANK_RESPONE_CODE_SAME_URI_IN_SAME_TIME = "GW485";
 		public const string MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND = "MC201";
 		public const string MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR = "MC231";
-
-		//User config
-		public const int ADMIN_USER_ID = 1;
-		public const int ADMIN_ROLE = 1;
-		public const int CUSTOMER_ROLE = 2;
-		public const int SELLER_ROLE = 3;
 
 		//Respone code
 		public const string RESPONSE_CODE_SUCCESS = "00";
@@ -41,20 +35,25 @@
 		public const string RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED = "ORDER_06";
 		public const string RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT = "ORDER_07";
 
-		public const string CART_RESPONSE_CODE_SUCCESS = "CART_00";
-		public const string CART_RESPONSE_CODE_INVALID_QUANTITY = "CART_01";
-		public const string CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
-		public const string CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP = "CART_03";
+		public const string RESPONSE_CODE_CART_SUCCESS = "CART_00";
+		public const string RESPONSE_CODE_CART_INVALID_QUANTITY = "CART_01";
+		public const string RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
+		public const string RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP = "CART_03";
 
 
 		//SignalR
 		public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
-
 		public const string SIGNAL_R_NOTIFICATION_HUB = "notification";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
+
+		//User config
+		public const int ADMIN_USER_ID = 1;
+		public const int ADMIN_ROLE = 1;
+		public const int CUSTOMER_ROLE = 2;
+		public const int SELLER_ROLE = 3;
 
 		//Azure
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
@@ -70,7 +69,6 @@
 		public const int WITHDRAW_TRANSACTION_PAID = 2;
 		public const int WITHDRAW_TRANSACTION_REJECT = 3;
 		public static int[] WITHDRAW_TRANSACTION_STATUS = new int[] { WITHDRAW_TRANSACTION_IN_PROCESSING, WITHDRAW_TRANSACTION_PAID, WITHDRAW_TRANSACTION_REJECT };
-
 
         //Order Status
         public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
@@ -100,5 +98,8 @@
         //Message Type
         public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
         public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
+
+		//Link notification
+		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order";
 	}
 }

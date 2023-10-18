@@ -77,7 +77,7 @@ namespace DigitalFUHubApi.Controllers
 				// check product in shop
 				if (!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
                 {
-					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
 					responseData.Status.Ok = false;
 					responseData.Status.Message = "Product variant  not existed in shop!";
 					return Ok(responseData);
@@ -88,7 +88,7 @@ namespace DigitalFUHubApi.Controllers
 
 				if (!isValidQuantityAddProductToCart)
                 {
-					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
 					responseData.Status.Ok = false;
 					responseData.Status.Message = "Not enough quantity to add!";
                     responseData.Result = numberAssetInfomation;
@@ -98,7 +98,7 @@ namespace DigitalFUHubApi.Controllers
                 cartRepository.AddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
 
 
-				responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS;
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
                 responseData.Status.Ok = true;
 				responseData.Status.Message = "Success!";
 				return Ok(responseData);
@@ -146,7 +146,7 @@ namespace DigitalFUHubApi.Controllers
 
                 if(request.Quantity <= 0)
                 {
-					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY;
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_INVALID_QUANTITY;
 					responseData.Status.Ok = false;
 					responseData.Status.Message = "Invalid quantity!";
 					return Ok(responseData);
@@ -173,7 +173,7 @@ namespace DigitalFUHubApi.Controllers
                     .GetQuantityAssetInformationProductVariantAvailable(request.ProductVariantId);
                 if(numberQuantityProductVariantAvailable < request.Quantity)
                 {
-					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
 					responseData.Status.Ok = false;
 					responseData.Status.Message = "Not enough quantity to update!";
 					responseData.Result = numberQuantityProductVariantAvailable;
@@ -183,7 +183,7 @@ namespace DigitalFUHubApi.Controllers
                 // update quantity in cart
                 cartRepository.UpdateQuantityCartDetail(request.CartDetailId, request.Quantity);
 
-				responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS;
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
 				responseData.Status.Ok = true;
 				responseData.Status.Message = "Success!";
 				return Ok(responseData);
@@ -215,7 +215,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 				cartRepository.RemoveCartDetail(cartDetailId);
 				
-				responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS;
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
 				responseData.Status.Ok = true;
 				responseData.Status.Message = "Success!";
 				return Ok(responseData);

@@ -19,20 +19,20 @@ namespace DigitalFUHubApi.Controllers
 	[ApiController]
 	public class OrdersController : ControllerBase
 	{
-		private readonly IMapper mapper;
 		private readonly IOrderRepository orderRepository;
 		private readonly JwtTokenService jwtTokenService;
+		private readonly HubService hubService;
 
-		public OrdersController(IMapper mapper, IOrderRepository orderRepository, JwtTokenService jwtTokenService)
+		public OrdersController(IOrderRepository orderRepository, JwtTokenService jwtTokenService, HubService hubService)
 		{
-			this.mapper = mapper;
 			this.orderRepository = orderRepository;
 			this.jwtTokenService = jwtTokenService;
+			this.hubService = hubService;
 		}
 
-		[Authorize("Customer,Seller")]
+		//[Authorize("Customer,Seller")]
 		[HttpPost("AddOrder")]
-		public IActionResult AddOrder(AddOrderRequestDTO request)
+		public async Task<IActionResult> AddOrder(AddOrderRequestDTO request)
 		{
 			try
 			{
@@ -52,7 +52,8 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				(string responseCode, string message, int numberQuantityAvailable) = orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
+				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) = 
+					orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
@@ -62,6 +63,16 @@ namespace DigitalFUHubApi.Controllers
 				{
 					responseData.Result = numberQuantityAvailable;
 				}
+
+				if(responseCode == Constants.RESPONSE_CODE_SUCCESS)
+				{
+					// send notification
+					var title = "Mua hàng thành công";
+					var content = $"Mã đơn số {orderInfo.OrderId} đã mua thành công với tổng giá trị đơn hàng {orderInfo.TotalPayment}đ";
+					var link = Constants.FRONT_END_HISTORY_ORDER_URL;
+					await hubService.SendNotification(request.UserId, title, content, link);
+				}
+
 				return Ok(responseData);
 			}
 			catch (Exception ex)
