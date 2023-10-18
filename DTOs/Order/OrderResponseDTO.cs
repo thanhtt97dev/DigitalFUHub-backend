@@ -38,6 +38,8 @@ namespace DTOs.Order
 		public long Price { get; set; }
 		public long Discount { get; set; }
 		public long TotalAmount { get; set; }
+		public List<string> AssetInformations { get; set; } = null!;
+		public int FeebackRate { get; set; }
 		public bool IsFeedback { get; set; }
 	}
 }

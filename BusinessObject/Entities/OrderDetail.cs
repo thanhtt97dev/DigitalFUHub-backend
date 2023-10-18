@@ -26,5 +26,6 @@ namespace BusinessObject.Entities
 		[ForeignKey(nameof(ProductVariantId))]
 		public virtual ProductVariant ProductVariant { get; set; } = null!;
 		public virtual List<AssetInformation> AssetInformations { get; set; } = null!;
+		public Feedback? Feedback { get; set; } = null!;
 	}
 }

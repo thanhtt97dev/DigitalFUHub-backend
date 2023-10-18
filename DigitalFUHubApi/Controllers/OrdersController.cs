@@ -52,19 +52,19 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) = 
+				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
 					orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status.Message = message;
 
-				if(responseCode == Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY)
+				if (responseCode == Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY)
 				{
 					responseData.Result = numberQuantityAvailable;
 				}
 
-				if(responseCode == Constants.RESPONSE_CODE_SUCCESS)
+				if (responseCode == Constants.RESPONSE_CODE_SUCCESS)
 				{
 					// send notification
 					var title = "Mua hàng thành công";
@@ -135,63 +135,104 @@ namespace DigitalFUHubApi.Controllers
 		}
 		[Authorize("Customer,Seller")]
 		[HttpPost("Edit/Status")]
-		public IActionResult UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
+		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
 		{
-			ResponseData response = new ResponseData();
 			if (!ModelState.IsValid)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
-			Order? order = orderRepository.GetOrder(request.OrderId);
+			var accessToken = Util.GetAccessToken(HttpContext);
+			var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+			if (request.UserId != userIdFromAccessToken)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
+			}
+			Order? order = orderRepository.GetOrderCustomer(request.OrderId);
 			if (order == null)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
-			else if(order.ShopId != request.ShopId)
+			else if (order.ShopId != request.ShopId)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
 			else if (order.UserId != request.UserId)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
 			else if (order.OrderStatusId == Constants.ORDER_CONFIRMED)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
 			else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
 			try
 			{
 				orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
+
+				string title = $"{(request.StatusId == Constants.ORDER_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
+				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
+				string link = Constants.FRONT_END_HISTORY_ORDER_URL;
+				await hubService.SendNotification(request.UserId, title, content, link);
 			}
 			catch (Exception e)
 			{
 				return Conflict(e.Message);
 			}
-			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-			response.Status.Ok = true;
-			response.Status.Message = "Success";
-			return Ok(response);
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+		}
+		[Authorize("Customer,Seller")]
+		[HttpGet("User/{userId}/{orderId}")]
+		public IActionResult GetOrderDetailCustomer(long userId, long orderId)
+		{
+			var accessToken = Util.GetAccessToken(HttpContext);
+			var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+			if (userId != userIdFromAccessToken)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
+			}
+			Order? order = orderRepository.GetOrderCustomer(orderId);
+			if (order == null)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+			}
+
+			else if (order.UserId != userId)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+			}
+			OrderProductResponseDTO responseData = new OrderProductResponseDTO
+			{
+				OrderId = order.OrderId,
+				Note = order.Note ?? "",
+				OrderDate = order.OrderDate,
+				ShopId = order.ShopId,
+				ShopName = order.Shop.ShopName,
+				StatusId = order.OrderStatusId,
+				TotalAmount = order.TotalAmount,
+				TotalCoinDiscount = order.TotalCoinDiscount,
+				TotalCouponDiscount = order.TotalCouponDiscount,
+				TotalPayment = order.TotalPayment,
+				OrderDetails = order.OrderDetails.Select(od => new OrderDetailProductResponseDTO
+				{
+					Discount = od.Discount,
+					IsFeedback = od.IsFeedback,
+					OrderDetailId = od.OrderDetailId,
+					Price = od.Price,
+					ProductId = od.ProductVariant.ProductId,
+					ProductName = od.ProductVariant?.Product?.ProductName ?? "",
+					ProductVariantId = od.ProductVariantId,
+					ProductVariantName = od.ProductVariant?.Name ?? "",
+					Quantity = od.Quantity,
+					Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
+					TotalAmount = od.TotalAmount,
+					AssetInformations = od.AssetInformations.Select(x => x.Asset ?? "").ToList(),
+					FeebackRate = od?.Feedback?.Rate ?? 0
+				}).ToList(),
+			};
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, responseData));
 		}
 	}
 

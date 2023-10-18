@@ -237,7 +237,11 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
+<<<<<<< HEAD
                             StartDate = new DateTime(2023, 10, 18, 16, 44, 10, 912, DateTimeKind.Local).AddTicks(3023)
+=======
+                            StartDate = new DateTime(2023, 10, 18, 19, 29, 52, 118, DateTimeKind.Local).AddTicks(55)
+>>>>>>> 443636f64cb1120563f59e063c59b65478f6b7f0
                         });
                 });
 
@@ -506,7 +510,11 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 100,
+<<<<<<< HEAD
                             StartDate = new DateTime(2023, 10, 18, 16, 44, 10, 912, DateTimeKind.Local).AddTicks(3046)
+=======
+                            StartDate = new DateTime(2023, 10, 18, 19, 29, 52, 118, DateTimeKind.Local).AddTicks(76)
+>>>>>>> 443636f64cb1120563f59e063c59b65478f6b7f0
                         });
                 });
 

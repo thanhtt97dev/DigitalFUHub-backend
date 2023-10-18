@@ -60,7 +60,8 @@ namespace BusinessObject.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ConversationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActivate = table.Column<bool>(type: "bit", nullable: false)
+                    IsActivate = table.Column<bool>(type: "bit", nullable: false),
+                    IsGroup = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -411,6 +412,31 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cart",
+                columns: table => new
+                {
+                    CartId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    ShopId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cart", x => x.CartId);
+                    table.ForeignKey(
+                        name: "FK_Cart_Shop_ShopId",
+                        column: x => x.ShopId,
+                        principalTable: "Shop",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Cart_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Coupon",
                 columns: table => new
                 {
@@ -716,27 +742,29 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cart",
+                name: "CartDetail",
                 columns: table => new
                 {
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    CartDetailId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CartId = table.Column<long>(type: "bigint", nullable: false),
                     ProductVariantId = table.Column<long>(type: "bigint", nullable: false),
-                    Quantity = table.Column<long>(type: "bigint", nullable: false)
+                    Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cart", x => new { x.UserId, x.ProductVariantId });
+                    table.PrimaryKey("PK_CartDetail", x => x.CartDetailId);
                     table.ForeignKey(
-                        name: "FK_Cart_ProductVariant_ProductVariantId",
-                        column: x => x.ProductVariantId,
-                        principalTable: "ProductVariant",
-                        principalColumn: "ProductVariantId",
+                        name: "FK_CartDetail_Cart_CartId",
+                        column: x => x.CartId,
+                        principalTable: "Cart",
+                        principalColumn: "CartId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Cart_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "UserId");
+                        name: "FK_CartDetail_ProductVariant_ProductVariantId",
+                        column: x => x.ProductVariantId,
+                        principalTable: "ProductVariant",
+                        principalColumn: "ProductVariantId");
                 });
 
             migrationBuilder.CreateTable(
@@ -924,7 +952,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "BusinessFee",
                 columns: new[] { "BusinessFeeId", "EndDate", "Fee", "StartDate" },
-                values: new object[] { 1L, null, 5L, new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6734) });
+                values: new object[] { 1L, null, 5L, new DateTime(2023, 10, 18, 19, 29, 52, 118, DateTimeKind.Local).AddTicks(55) });
 
             migrationBuilder.InsertData(
                 table: "Category",
@@ -941,7 +969,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "FeedbackBenefit",
                 columns: new[] { "FeedbackBenefitId", "Coin", "EndDate", "StartDate" },
-                values: new object[] { 1, 100, null, new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6761) });
+                values: new object[] { 1, 100, null, new DateTime(2023, 10, 18, 19, 29, 52, 118, DateTimeKind.Local).AddTicks(76) });
 
             migrationBuilder.InsertData(
                 table: "OrderStatus",
@@ -1034,8 +1062,23 @@ namespace BusinessObject.Migrations
                 column: "ProductVariantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cart_ProductVariantId",
+                name: "IX_Cart_ShopId",
                 table: "Cart",
+                column: "ShopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cart_UserId",
+                table: "Cart",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartDetail_CartId",
+                table: "CartDetail",
+                column: "CartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartDetail_ProductVariantId",
+                table: "CartDetail",
                 column: "ProductVariantId");
 
             migrationBuilder.CreateIndex(
@@ -1255,7 +1298,7 @@ namespace BusinessObject.Migrations
                 name: "AssetInformation");
 
             migrationBuilder.DropTable(
-                name: "Cart");
+                name: "CartDetail");
 
             migrationBuilder.DropTable(
                 name: "DepositTransaction");
@@ -1295,6 +1338,9 @@ namespace BusinessObject.Migrations
 
             migrationBuilder.DropTable(
                 name: "WithdrawTransactionBill");
+
+            migrationBuilder.DropTable(
+                name: "Cart");
 
             migrationBuilder.DropTable(
                 name: "Coupon");
