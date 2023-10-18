@@ -34,7 +34,7 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					DateTime timeAccept = DateTime.Now.AddDays(days);
+					DateTime timeAccept = DateTime.Now.AddDays(-days);
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
@@ -110,7 +110,7 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					DateTime timeAccept = DateTime.Now.AddDays(days);
+					DateTime timeAccept = DateTime.Now.AddDays(-days);
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_COMPLAINT &&
