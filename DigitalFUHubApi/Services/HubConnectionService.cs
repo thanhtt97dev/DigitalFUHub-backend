@@ -5,10 +5,10 @@ namespace DigitalFUHubApi.Services
 {
 	public class HubConnectionService
 	{
-		private IConnectionManager _connectionManager;
+		private IConnectionManager connectionManager;
 		public HubConnectionService(IConnectionManager connectionManager)
 		{
-			_connectionManager = connectionManager;
+			this.connectionManager = connectionManager;
 		}
 
 		public void AddConnection(HubCallerContext hubCallerContext, string hubName)
@@ -21,13 +21,18 @@ namespace DigitalFUHubApi.Services
 
 			int userId;
 			int.TryParse(userIdRaw, out userId);
-			_connectionManager.AddConnection(userId,hubName, hubCallerContext.ConnectionId);
+			connectionManager.AddConnection(userId,hubName, hubCallerContext.ConnectionId);
 		}
 
 		public void RemoveConnection(HubCallerContext hubCallerContext, string hubName)
 		{
 			var connectionId = hubCallerContext.ConnectionId;
-			_connectionManager.RemoveConnection(connectionId, hubName);
+			connectionManager.RemoveConnection(connectionId, hubName);
+		}
+
+		public bool CheckUserConnected(long userId) 
+		{
+			return connectionManager.CheckUserConnectd(userId);	
 		}
 
 		public int GetUserIdFromHubCaller(HubCallerContext hubCallerContext)

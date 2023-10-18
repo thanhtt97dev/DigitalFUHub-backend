@@ -77,7 +77,7 @@ namespace DigitalFUHubApi.Controllers
 				// check product in shop
 				if (!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
                 {
-					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
 					responseData.Status.Ok = false;
 					responseData.Status.Message = "Product variant  not existed in shop!";
 					return Ok(responseData);
@@ -88,7 +88,7 @@ namespace DigitalFUHubApi.Controllers
 
 				if (!isValidQuantityAddProductToCart)
                 {
-					responseData.Status.ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY;
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
 					responseData.Status.Ok = false;
 					responseData.Status.Message = "Not enough quantity to add!";
                     responseData.Result = numberAssetInfomation;
@@ -97,12 +97,11 @@ namespace DigitalFUHubApi.Controllers
 
                 cartRepository.AddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
 
-                return Ok(new Status
-                {
-                    ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS,
-                    Message = "",
-                    Ok = true
-                });
+
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
+                responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+				return Ok(responseData);
             }
             catch (Exception ex)
             {
@@ -129,111 +128,102 @@ namespace DigitalFUHubApi.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ex.Message });
-            }
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
         }
 
         [HttpPut("Update")]
         [Authorize]
-        public IActionResult UpdateCart(UpdateCartRequestDTO? updateCartRequest)
+        public IActionResult UpdateCart(UpdateCartRequestDTO request)
         {
             try
             {
-                if (updateCartRequest == null || updateCartRequest.UserId == 0 ||
-                        updateCartRequest.ProductVariantId == 0)
+				ResponseData responseData = new ResponseData();
+				if(!ModelState.IsValid) 
                 {
-                    return BadRequest(new Status());
-                }
-                long quantityProductVariant = assetInformationRepository.GetByProductVariantId(updateCartRequest.ProductVariantId).Count();
-                if (updateCartRequest.Quantity == 0)
-                {
-                    var cart = cartRepository.GetCart(updateCartRequest.UserId, updateCartRequest.ProductVariantId);
-                    if (cart != null)
-                    {
-                        if(true)
-                        //if (cart.Quantity > quantityProductVariant)
-                        {
-                            
-                            updateCartRequest.Quantity = quantityProductVariant;
-                            cartRepository.UpdateCart(mapper.Map<Cart>(updateCartRequest));
-                            return Ok(new Status
-                            {
-                                ResponseCode = Constants.CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY,
-                                Message = $"Rất tiếc, bạn chỉ có thể mua số lượng tối đa {quantityProductVariant} sản phẩm " +
-                                $"(Số lượng sản phẩm trong giỏ hàng của bạn đã được thay đổi)",
-                                Ok = false
-                            });
-                        } else {
-                            return Ok(new Status
-                            {
-                                ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS,
-                                Message = "",
-                                Ok = true
-                            });
-                        }
-                    }
-                    else
-                    {
-                        return NotFound(new Status());
-                    }
+                    return BadRequest();
                 }
 
-                var resultCheck = !(updateCartRequest.Quantity > quantityProductVariant);
-                if (!resultCheck)
+                if(request.Quantity <= 0)
                 {
-                    updateCartRequest.Quantity = quantityProductVariant;
-                    cartRepository.UpdateCart(mapper.Map<Cart>(updateCartRequest));
-                    return Ok(new Status
-                    {
-                        ResponseCode = Constants.CART_RESPONSE_CODE_INVALID_QUANTITY,
-                        Message = $"Sản phẩm này đang có số lượng tối đa là {quantityProductVariant} " +
-                        $"(số lượng sản phẩm trong giỏ hàng của bạn đã được thay đổi thành {quantityProductVariant})",
-                        Ok = resultCheck
-                    });
-                }
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_INVALID_QUANTITY;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Invalid quantity!";
+					return Ok(responseData);
+				}
 
-                cartRepository.UpdateCart(mapper.Map<Cart>(updateCartRequest));
-                return Ok(new Status
+				var cartDetail = cartRepository.GetCartDetail(request.CartDetailId);
+                if (cartDetail == null)
                 {
-                    ResponseCode = Constants.CART_RESPONSE_CODE_SUCCESS,
-                    Message = "",
-                    Ok = true
-                });
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Cart detail not found!";
+					return Ok(responseData);
+				}
 
+                if (cartDetail.ProductVariantId != request.ProductVariantId) 
+                {
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Invalid cart detail with product variant!";
+					return Ok(responseData);
+				}
 
-            }
+				int numberQuantityProductVariantAvailable = assetInformationRepository
+                    .GetQuantityAssetInformationProductVariantAvailable(request.ProductVariantId);
+                if(numberQuantityProductVariantAvailable < request.Quantity)
+                {
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Not enough quantity to update!";
+					responseData.Result = numberQuantityProductVariantAvailable;
+					return Ok(responseData);
+				}
+
+                // update quantity in cart
+                cartRepository.UpdateQuantityCartDetail(request.CartDetailId, request.Quantity);
+
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
+				responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+				return Ok(responseData);
+			}
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return BadRequest(new Status());
-            }
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
         }
 
         [HttpPost("DeleteCart")]
         [Authorize]
-        public async Task<IActionResult> DeleteCart([FromBody] DeleteCartRequestDTO deleteCartRequest)
+        public IActionResult DeleteCart(int cartDetailId)
         {
             try
             {
-                await cartRepository.DeleteCart(deleteCartRequest.UserId, deleteCartRequest.ProductVariantId);
-                return Ok(new Status
-                {
-                    Message = "Delete Cart Successfully",
-                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
-                    Ok = true
-                });
-            }
+				ResponseData responseData = new ResponseData();
+				if (!ModelState.IsValid) 
+				{
+					return BadRequest();
+				}
+
+				var cartDetail = cartRepository.GetCartDetail(cartDetailId);
+				if(cartDetail == null) 
+				{
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Cart detail not found!";
+				}
+				cartRepository.RemoveCartDetail(cartDetailId);
+				
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
+				responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+				return Ok(responseData);
+			}
             catch (Exception ex)
             {
-                return BadRequest(new Status
-                {
-                    Message = ex.Message
-                    ,
-                    ResponseCode = Constants.RESPONSE_CODE_FAILD
-                    ,
-                    Ok = false
-                });
-            }
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
         }
     }
 }

@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace DataAccess.DAOs
 {
@@ -33,7 +34,7 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					DateTime timeAccept = DateTime.Now.AddDays(days);
+					DateTime timeAccept = DateTime.Now.AddDays(-days);
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
@@ -42,7 +43,7 @@ namespace DataAccess.DAOs
 						.ToList();
 					if (orders.Count() == 0) return;
 
-					
+
 
 					foreach (var order in orders)
 					{
@@ -109,7 +110,7 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					DateTime timeAccept = DateTime.Now.AddDays(days);
+					DateTime timeAccept = DateTime.Now.AddDays(-days);
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_COMPLAINT &&
@@ -135,7 +136,7 @@ namespace DataAccess.DAOs
 						};
 						context.TransactionInternal.Add(transactionInternal);
 
-						
+
 
 						// update customer balance
 						var customer = context.User.First(x => x.UserId == customerId);
@@ -181,8 +182,8 @@ namespace DataAccess.DAOs
 							{
 								OrderId = o.OrderId,
 								OrderDate = o.OrderDate,
-								TotalPayment = o.TotalPayment,	
-								User = new User 
+								TotalPayment = o.TotalPayment,
+								User = new User
 								{
 									UserId = o.User.UserId,
 									Email = o.User.Email,
@@ -201,29 +202,32 @@ namespace DataAccess.DAOs
 								(orderId == 0 ? true : x.OrderId == orderId) &&
 								(status == 0 ? true : x.OrderStatusId == status)
 							).OrderByDescending(x => x.OrderDate).ToList();
-			
+
 			}
 			return orders;
 		}
 
 		#region Add order
-		internal (string, string) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
+		internal (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
+					int numberQuantityAvailable = 0;
+					Order orderResult = new Order();
 					// check valid quantity
-					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0))){
-						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!");
+					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0)))
+					{
+						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", numberQuantityAvailable, orderResult);
 					}
 
 					//check customer existed
 					var isCustomerExisted = context.User.Any(x => x.UserId == userId);
 					if (!isCustomerExisted)
 					{
-						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!");
+						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!", numberQuantityAvailable, orderResult);
 					}
 
 					// get bussinsis fee
@@ -244,7 +248,7 @@ namespace DataAccess.DAOs
 						if (!isProductVariantExisted)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!");
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!", numberQuantityAvailable, orderResult);
 						}
 
 						//check shop existed
@@ -252,7 +256,7 @@ namespace DataAccess.DAOs
 						if (shop == null)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!");
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!", numberQuantityAvailable, orderResult);
 						}
 
 						//check ProductVariant of shop
@@ -262,7 +266,7 @@ namespace DataAccess.DAOs
 						if (!isAllProductInShop)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_ORDER_PRODUCT_VARIANT_NOT_IN_SHOP, "A product variant not in shop!");
+							return (Constants.RESPONSE_CODE_ORDER_PRODUCT_VARIANT_NOT_IN_SHOP, "A product variant not in shop!", numberQuantityAvailable, orderResult);
 						}
 
 						//get customer info
@@ -271,7 +275,7 @@ namespace DataAccess.DAOs
 						if (customer == null)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!");
+							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!", numberQuantityAvailable, orderResult);
 						}
 						long customerCoin = customer.Coin;
 
@@ -281,7 +285,7 @@ namespace DataAccess.DAOs
 						if (isCustomerBuyTheirOwnProducts)
 						{
 							transaction.Rollback();
-							return (Constants.RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT, "Customers buy their own products !");
+							return (Constants.RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT, "Customers buy their own products !", numberQuantityAvailable, orderResult);
 						}
 
 						//create order
@@ -297,26 +301,27 @@ namespace DataAccess.DAOs
 						context.SaveChanges();
 
 						//create order detail
-						List<OrderDetail> orderDetails = new List<OrderDetail>();	
+						List<OrderDetail> orderDetails = new List<OrderDetail>();
 						foreach (var item in shopProduct.Products)
 						{
 							// check quantity
 							var assetInformationRemaining = context.AssetInformation
-								.Where(a => a.ProductVariantId == item.ProductVariantId && a.IsActive == true)
-								.Take(item.Quantity);
-							if(assetInformationRemaining.Count() < item.Quantity)
+								.Where(a => a.ProductVariantId == item.ProductVariantId && a.IsActive == true);
+							if (assetInformationRemaining.Count() < item.Quantity)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!");
+								numberQuantityAvailable = assetInformationRemaining.Count();
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY, "Buy more than available quantity!", numberQuantityAvailable, orderResult);
 							}
+							assetInformationRemaining = assetInformationRemaining.Take(item.Quantity);
 
 							//get product productVariant info
-							var productVariant =  context.ProductVariant
+							var productVariant = context.ProductVariant
 								.Include(x => x.Product)
 								.ThenInclude(x => x.Shop)
 								.Select(x => new ProductVariant
 								{
-									ProductVariantId = x.ProductVariantId,	
+									ProductVariantId = x.ProductVariantId,
 									ProductId = x.ProductId,
 									Price = x.Price,
 									isActivate = x.isActivate,
@@ -332,21 +337,21 @@ namespace DataAccess.DAOs
 								})
 								.First(x => x.ProductVariantId == item.ProductVariantId);
 
-							if(!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_BAN ||
-								productVariant.Product.ProductStatusId == Constants.PRODUCT_HIDE || 
-								!productVariant.Product.Shop.IsActive) 
+							if (!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_BAN ||
+								productVariant.Product.ProductStatusId == Constants.PRODUCT_HIDE ||
+								!productVariant.Product.Shop.IsActive)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED, "Product has been baned");
+								return (Constants.RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED, "Product has been baned", numberQuantityAvailable, orderResult);
 							}
 
 							OrderDetail orderDetail = new OrderDetail
 							{
 								OrderId = order.OrderId,
-								ProductVariantId = item.ProductVariantId,	
+								ProductVariantId = item.ProductVariantId,
 								Quantity = item.Quantity,
 								Price = productVariant.Price,
-								Discount = productVariant.Product.Discount,	
+								Discount = productVariant.Product.Discount,
 								TotalAmount = productVariant.Price * item.Quantity * (100 - productVariant.Product.Discount) / 100,
 								IsFeedback = false,
 							};
@@ -375,21 +380,21 @@ namespace DataAccess.DAOs
 						if (!string.IsNullOrEmpty(shopProduct.Coupon))
 						{
 							var coupon = (from c in context.Coupon
-									  where
-									  shopProduct.Coupon == c.CouponCode &&
-									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
-									  c.IsActive && c.Quantity > 0
-									  select c).FirstOrDefault();
+										  where
+										  shopProduct.Coupon == c.CouponCode &&
+										  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
+										  c.IsActive && c.Quantity > 0
+										  select c).FirstOrDefault();
 							if (coupon == null)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!");
+								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
 							}
 
 							if (coupon.MinTotalOrderValue > totalAmount)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!");
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!", numberQuantityAvailable, orderResult);
 							}
 							totalCouponDiscount = coupon.PriceDiscount;
 
@@ -438,7 +443,7 @@ namespace DataAccess.DAOs
 							if (customer.AccountBalance < totalPayment)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!");
+								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!", numberQuantityAvailable, orderResult);
 							}
 							customer.AccountBalance = customer.AccountBalance - totalPayment;
 							if (totalCoinDiscount > 0)
@@ -479,7 +484,7 @@ namespace DataAccess.DAOs
 						}
 
 						// add new transaction internal
-						if(totalPayment > 0)
+						if (totalPayment > 0)
 						{
 							TransactionInternal newTransaction = new TransactionInternal
 							{
@@ -493,8 +498,10 @@ namespace DataAccess.DAOs
 							context.TransactionInternal.Add(newTransaction);
 							context.SaveChanges();
 						}
+						orderResult = order;
 					}
 					transaction.Commit();
+					return (Constants.RESPONSE_CODE_SUCCESS, "Success!", numberQuantityAvailable, orderResult);
 				}
 				catch (Exception ex)
 				{
@@ -502,7 +509,7 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
-			return (Constants.RESPONSE_CODE_SUCCESS, "Success!");
+
 		}
 		#endregion
 
@@ -830,6 +837,23 @@ namespace DataAccess.DAOs
 										Coupon = new Coupon { CouponName = coupon.CouponName },
 									}).ToList();
 				return orderCoupons;
+			}
+		}
+
+		internal Order? GetOrderCustomer(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+					.Include(x => x.OrderCoupons)
+					.Include(x => x.Shop)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.AssetInformations)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.OrderId == orderId);
 			}
 		}
 	}

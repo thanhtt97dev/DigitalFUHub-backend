@@ -13,7 +13,7 @@ namespace DataAccess.IRepositories
 		void UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(int days);
 		void UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(int days);
 		List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status);
-		(string, string) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin);
+		(string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin);
 		Order? GetOrder(long orderId);
 		Order? GetOrderForCheckingExisted(long orderId);
 		Order? GetSellerOrderDetail(long orderId);
@@ -23,5 +23,6 @@ namespace DataAccess.IRepositories
 		void UpdateOrderStatusCustomer(long orderId,long shopId, int status);
 		List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset);
 		List<OrderCoupon> GetCouponsInOrder(long orderId);
+		Order? GetOrderCustomer(long orderId);
 	}
 }

@@ -10,6 +10,8 @@ using DigitalFUHubApi.Comons;
 using BusinessObject.Entities;
 using DTOs.Notification;
 using Comons;
+using DataAccess.Repositories;
+using DTOs.User;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -35,7 +37,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 		#region Send notification to a user
-		[Authorize]
+		//[Authorize]
 		[HttpPost("sendNotification/{userId}")]
 		public async Task<IActionResult> SendNotification([FromRoute] int userId, NotificationRequest notificationRequest)
 		{
@@ -49,7 +51,7 @@ namespace DigitalFUHubApi.Controllers
 					UserId = userId,
 					Title = notificationRequest.Title,
 					Content = notificationRequest.Content,
-					Link = "",
+					Link = "/history/order",
 					DateCreated = DateTime.Now,
 					IsReaded = false,
 				};
@@ -72,6 +74,25 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(500);
 			}
 		}
-		#endregion
-	}
+        #endregion
+
+        #region Edit notification isreaded
+        [Authorize]
+        [HttpPut("editNotificationIsReaded/{id}")]
+        public IActionResult EditNotificationIsReaded(int id)
+        {
+            try
+            {
+                Notification? notification = _notificationRepositiory.GetNotificationById(id);
+                if (notification == null) return Conflict();
+                _notificationRepositiory.EditNotificationIsReaded(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+    }
 }

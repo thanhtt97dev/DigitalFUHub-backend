@@ -223,5 +223,38 @@ namespace DataAccess.DAOs
             }
 
         }
-    }
+
+		internal List<UserConversationDTO> GetRecipientUserIdHasConversation(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var userConversations = (from userConversation in context.UserConversation
+                                         join conversation in context.Conversations
+                                            on userConversation.ConversationId equals conversation.ConversationId
+										 where
+										 userConversation.UserId != userId &&
+										 (from us in context.UserConversation
+										  where us.UserId == userId
+										  select us.ConversationId
+										  ).ToList()
+										  .Contains(userConversation.UserConversationId)
+										 select new UserConversationDTO
+										 {
+											 UserId = userConversation.UserId,
+											 ConversationId = userConversation.ConversationId,
+                                             IsGroup = conversation.IsGroup,
+                                             MembersInGroup = conversation.IsGroup ?
+											                 (from member in context.UserConversation
+                                                              where member.ConversationId == userConversation.ConversationId &&
+                                                                    member.UserId != userId
+                                                              select member.UserId).ToList()
+                                                              :
+                                                              new List<long>(),
+										 }
+										  ).ToList();
+				return userConversations;
+
+			}
+		}
+	}
 }

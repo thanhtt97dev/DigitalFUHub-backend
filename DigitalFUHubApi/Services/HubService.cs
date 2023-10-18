@@ -1,0 +1,60 @@
+﻿using AutoMapper;
+using BusinessObject.Entities;
+using Comons;
+using DataAccess.IRepositories;
+using DigitalFUHubApi.Hubs;
+using DigitalFUHubApi.Managers;
+using DTOs.Notification;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using Quartz.Util;
+
+namespace DigitalFUHubApi.Services
+{
+	public class HubService
+	{
+
+		private readonly IConnectionManager connectionManager;
+		private readonly IMapper mapper;
+		private readonly IHubContext<NotificationHub> notificationHub;
+		private readonly INotificationRepositiory notificationRepositiory;
+
+		public HubService(IConnectionManager connectionManager, IMapper mapper, IHubContext<NotificationHub> notificationHub, INotificationRepositiory notificationRepositiory)
+		{
+			this.connectionManager = connectionManager;
+			this.mapper = mapper;
+			this.notificationHub = notificationHub;
+			this.notificationRepositiory = notificationRepositiory;
+		}
+
+		public async Task SendNotification(long userId, string title, string content, string link)
+		{
+			HashSet<string>? connections = connectionManager
+				.GetConnections(userId, Constants.SIGNAL_R_NOTIFICATION_HUB);
+
+			Notification notification = new Notification()
+			{
+				UserId = userId,
+				Title = title,
+				Content = content,
+				Link = link,
+				DateCreated = DateTime.Now,
+				IsReaded = false,
+			};
+
+			notificationRepositiory.AddNotification(notification);
+
+			if (connections != null)
+			{
+				foreach (var connection in connections)
+				{
+					await notificationHub.Clients.Clients(connection)
+						.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION,
+						JsonConvert.SerializeObject(mapper.Map<NotificationRespone>(notification)));
+				}
+			}
+		}
+
+	}
+}

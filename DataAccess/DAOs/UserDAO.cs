@@ -196,5 +196,27 @@ namespace DataAccess.DAOs
 				return context.User.Any(x => !userIds.Contains(x.UserId));
 			}
 		}
+
+		internal void UpdateUserOnlineStatus(long userId, bool isOnline)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var user = context.User.FirstOrDefault(x => x.UserId == userId);
+				if(user == null) return;
+				if(user.Status == false) return;
+				if(isOnline && user.Status == isOnline) return;
+				if(!isOnline && user.Status == isOnline) return;
+				if (isOnline)
+				{
+					user.IsOnline = true;
+				}
+				else
+				{
+					user.IsOnline = false;
+					user.LastTimeOnline = DateTime.Now;
+				}
+				context.SaveChanges();
+			}
+		}
 	}
 }

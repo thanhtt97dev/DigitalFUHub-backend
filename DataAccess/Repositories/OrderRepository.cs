@@ -20,7 +20,7 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopName, fromDate, toDate, status);
 
-		public (string, string) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin) => OrderDAO.Instance.AddOrder(userId, orders, isUseCoin);
+		public (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin) => OrderDAO.Instance.AddOrder(userId, orders, isUseCoin);
 
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 
@@ -36,12 +36,11 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId,statusId, limit, offset);
 
-		public void UpdateOrderStatusCustomer(long orderId,long shopId, int status)
-		{
-			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
-		}
+		public void UpdateOrderStatusCustomer(long orderId,long shopId, int status) => OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
+		
 
 		public List<OrderCoupon> GetCouponsInOrder(long orderId) => OrderDAO.Instance.GetCouponsInOrder(orderId);
 
+		public Order? GetOrderCustomer(long orderId) => OrderDAO.Instance.GetOrderCustomer(orderId);
 	}
 }

@@ -40,7 +40,17 @@ namespace DataAccess.DAOs
 			return notifications;	
 		}
 
-		internal void AddNotification(Notification notification)
+        internal Notification GetNotificationById(int notificationId)
+        {
+            Notification notification = new Notification();
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				notification = context.Notification.First(x => x.NotificationId == notificationId);
+            }
+            return notification;
+        }
+
+        internal void AddNotification(Notification notification)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -48,5 +58,15 @@ namespace DataAccess.DAOs
 				context.SaveChanges();
 			}
 		}
-	}
+
+        internal void EditNotificationIsReaded(int notificationId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var notification = context.Notification.First(x => x.NotificationId == notificationId);
+				notification.IsReaded = true;
+                context.SaveChanges();
+            }
+        }
+    }
 }

@@ -13,5 +13,8 @@ namespace DataAccess.Repositories
     {
         public List<AssetInformation> GetByProductVariantId(long productVariantId) 
             => AssetInformationDAO.Instance.GetByProductVariantId(productVariantId);
-    }
+
+        public int GetQuantityAssetInformationProductVariantAvailable(long productVariantId) => AssetInformationDAO.Instance.GetQuantityAssetInformationProductVariantAvailable(productVariantId);
+
+	}
 }

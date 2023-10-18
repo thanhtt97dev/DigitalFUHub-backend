@@ -16,30 +16,17 @@ namespace DataAccess.Repositories
 
         public void AddProductToCart(long userId, long shopId, long productVariantId, int quantity) => CartDAO.Instance.AddProductToCart(userId, shopId, productVariantId, quantity);
 
-        //public (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity) => CartDAO.Instance.CheckQuantityForCart(userId, productVariantId, quantity);
-
-        public async Task DeleteCart(long userId, long productVariantId)
-        {
-            if (userId == 0)
-            {
-                throw new ArgumentException(nameof(userId), "UserId must be difference from 0");
-            }
-            if (productVariantId == 0)
-            {
-                throw new ArgumentException(nameof(userId), "ProductVariantId must be difference from 0");
-            }
-
-            await CartDAO.Instance.DeleteCart(userId, productVariantId);
-        }
-
-        public Cart? GetCart(long userId, long productVariantId) => CartDAO.Instance.GetCart(userId, productVariantId);
-
         public List<Cart> GetCartsByUserId(long userId) => CartDAO.Instance.GetCartsByUserId(userId);
 
 		public bool CheckProductVariantInShop(long shopId, long productVariantId) => CartDAO.Instance.CheckProductVariantInShop(shopId, productVariantId);
 
 		public (bool, int) CheckValidQuantityAddProductToCart(long userId, long shopId, long productVariantId, int quantity) => CartDAO.Instance.CheckValidQuantityAddProductToCart(userId,shopId ,productVariantId, quantity);
 
-		public void UpdateCart(Cart newCart) => CartDAO.Instance.UpdateCart(newCart);
-    }
+		public CartDetail? GetCartDetail(long cartDetailId) => CartDAO.Instance.GetCartDetail(cartDetailId);
+
+		public void UpdateQuantityCartDetail(long cartDetailId, int quantity) => CartDAO.Instance.UpdateQuantityCartDetail(cartDetailId, quantity);
+
+		public void RemoveCartDetail(long cartDetailId) => CartDAO.Instance.RemoveCartDetail(cartDetailId);
+
+	}
 }

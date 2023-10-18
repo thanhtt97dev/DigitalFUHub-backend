@@ -13,7 +13,11 @@ namespace DataAccess.Repositories
 	{
 		public List<Notification> GetNotifications(int userId) => NotificationDAO.Instance.GetNotifications(userId);
 
-		public void AddNotification(Notification notification) => NotificationDAO.Instance.AddNotification(notification);
+        public Notification GetNotificationById(int notificationId) => NotificationDAO.Instance.GetNotificationById(notificationId);
 
-	}
+        public void AddNotification(Notification notification) => NotificationDAO.Instance.AddNotification(notification);
+
+        public void EditNotificationIsReaded(int notificationId) => NotificationDAO.Instance.EditNotificationIsReaded(notificationId);
+
+    }
 }

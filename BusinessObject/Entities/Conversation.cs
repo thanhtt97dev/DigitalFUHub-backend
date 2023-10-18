@@ -16,8 +16,9 @@ namespace BusinessObject.Entities
         public string? ConversationName { get; set; }
         public DateTime DateCreate { get; set; }
         public bool IsActivate { get; set; }
+		public bool IsGroup { get; set; }
 
-        public virtual ICollection<UserConversation>? UserConversations { get; set; }
+		public virtual ICollection<UserConversation>? UserConversations { get; set; }
         public virtual ICollection<Message>? Messages { get; set; }
     }
 }

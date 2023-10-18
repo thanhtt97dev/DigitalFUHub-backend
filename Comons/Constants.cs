@@ -14,12 +14,6 @@
 		public const string MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND = "MC201";
 		public const string MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR = "MC231";
 
-		//User config
-		public const int ADMIN_USER_ID = 1;
-		public const int ADMIN_ROLE = 1;
-		public const int CUSTOMER_ROLE = 2;
-		public const int SELLER_ROLE = 3;
-
 		//Respone code
 		public const string RESPONSE_CODE_SUCCESS = "00";
 		public const string RESPONSE_CODE_NOT_ACCEPT = "01";
@@ -41,20 +35,28 @@
 		public const string RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED = "ORDER_06";
 		public const string RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT = "ORDER_07";
 
-		public const string CART_RESPONSE_CODE_SUCCESS = "CART_00";
-		public const string CART_RESPONSE_CODE_INVALID_QUANTITY = "CART_01";
-		public const string CART_RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
-		public const string CART_RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP = "CART_03";
+		public const string RESPONSE_CODE_CART_SUCCESS = "CART_00";
+		public const string RESPONSE_CODE_CART_INVALID_QUANTITY = "CART_01";
+		public const string RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
+		public const string RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP = "CART_03";
 
 
 		//SignalR
 		public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
-
 		public const string SIGNAL_R_NOTIFICATION_HUB = "notification";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
+
+		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userHub";
+		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS = "ReceiveUserOnlineStatus";
+
+		//User config
+		public const int ADMIN_USER_ID = 1;
+		public const int ADMIN_ROLE = 1;
+		public const int CUSTOMER_ROLE = 2;
+		public const int SELLER_ROLE = 3;
 
 		//Azure
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
@@ -71,9 +73,8 @@
 		public const int WITHDRAW_TRANSACTION_REJECT = 3;
 		public static int[] WITHDRAW_TRANSACTION_STATUS = new int[] { WITHDRAW_TRANSACTION_IN_PROCESSING, WITHDRAW_TRANSACTION_PAID, WITHDRAW_TRANSACTION_REJECT };
 
-
-        //Order Status
-        public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
+		//Order Status
+		public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
 		public const int NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER = NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER + 3;
 		public const int ORDER_ALL = 0;
 		public const int ORDER_WAIT_CONFIRMATION = 1;
@@ -83,27 +84,29 @@
 		public const int ORDER_DISPUTE = 5;
 		public const int ORDER_REJECT_COMPLAINT = 6;
 		public const int ORDER_SELLER_VIOLATES = 7;
-		public static int[] ORDER_STATUS = new int[] { ORDER_WAIT_CONFIRMATION, ORDER_CONFIRMED, ORDER_COMPLAINT, ORDER_SELLER_REFUNDED,ORDER_DISPUTE, ORDER_REJECT_COMPLAINT, ORDER_SELLER_VIOLATES };
+		public static int[] ORDER_STATUS = new int[] { ORDER_WAIT_CONFIRMATION, ORDER_CONFIRMED, ORDER_COMPLAINT, ORDER_SELLER_REFUNDED, ORDER_DISPUTE, ORDER_REJECT_COMPLAINT, ORDER_SELLER_VIOLATES };
 
 		//Transaction internal Type
 		public const int TRANSACTION_TYPE_INTERNAL_PAYMENT = 1;
 		public const int TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT = 2;
 		public const int TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND = 3;
 		public const int TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT = 4;
-		public static int[] TRANSACTION_STATUS = new int[] { TRANSACTION_TYPE_INTERNAL_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND, TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT};
+		public static int[] TRANSACTION_STATUS = new int[] { TRANSACTION_TYPE_INTERNAL_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND, TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT };
 
 		//Transaction coin Type
 		public const int TRANSACTION_COIN_TYPE_RECEIVE = 1;
 		public const int TRANSACTION_COIN_TYPE_USE = 2;
 		public const int TRANSACTION_COIN_TYPE_REFUND = 3;
 
-        //Message Type
-        public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
-        public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
+		//Message Type
+		public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
+		public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
 
-        //User Conversation Type
-        public const int USER_CONVERSATION_TYPE_INITIAL = 1;
-        public const int USER_CONVERSATION_TYPE_UN_READ = 2;
-        public const int USER_CONVERSATION_TYPE_IS_READ = 3;
-    }
+		public const int USER_CONVERSATION_TYPE_INITIAL = 1;
+		public const int USER_CONVERSATION_TYPE_UN_READ = 2;
+		public const int USER_CONVERSATION_TYPE_IS_READ = 3;
+
+		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order";
+	}
 }
+
