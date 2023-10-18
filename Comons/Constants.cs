@@ -45,11 +45,11 @@
 		public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
-		public const string SIGNAL_R_NOTIFICATION_HUB = "notification";
+		public const string SIGNAL_R_NOTIFICATION_HUB = "notificationHub";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
 
-		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userHub";
+		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userOnlineStatusHub";
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS = "ReceiveUserOnlineStatus";
 
 		//User config
