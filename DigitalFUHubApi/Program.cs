@@ -212,6 +212,7 @@ namespace DigitalFUHubApi
 			{
 				endpoints.MapHub<NotificationHub>("/notificationHub");
 				endpoints.MapHub<ChatHub>("/chatHub");
+				endpoints.MapHub<UserOnlineStatusHub>("/userOnlineStatusHub");
 			});
 
 			// Add https
