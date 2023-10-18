@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231015164703_updateDB")]
+    [Migration("20231018122952_updateDB")]
     partial class updateDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -239,26 +239,57 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6734)
+                            StartDate = new DateTime(2023, 10, 18, 19, 29, 52, 118, DateTimeKind.Local).AddTicks(55)
                         });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Cart", b =>
                 {
+                    b.Property<long>("CartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CartId"), 1L, 1);
+
+                    b.Property<long>("ShopId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CartId");
+
+                    b.HasIndex("ShopId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Cart");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.CartDetail", b =>
+                {
+                    b.Property<long>("CartDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CartDetailId"), 1L, 1);
+
+                    b.Property<long>("CartId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("ProductVariantId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Quantity")
-                        .HasColumnType("bigint");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
-                    b.HasKey("UserId", "ProductVariantId");
+                    b.HasKey("CartDetailId");
+
+                    b.HasIndex("CartId");
 
                     b.HasIndex("ProductVariantId");
 
-                    b.ToTable("Cart");
+                    b.ToTable("CartDetail");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Category", b =>
@@ -319,6 +350,9 @@ namespace BusinessObject.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActivate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsGroup")
                         .HasColumnType("bit");
 
                     b.HasKey("ConversationId");
@@ -474,7 +508,7 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 100,
-                            StartDate = new DateTime(2023, 10, 15, 23, 47, 3, 116, DateTimeKind.Local).AddTicks(6761)
+                            StartDate = new DateTime(2023, 10, 18, 19, 29, 52, 118, DateTimeKind.Local).AddTicks(76)
                         });
                 });
 
@@ -1449,9 +1483,9 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Cart", b =>
                 {
-                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
+                    b.HasOne("BusinessObject.Entities.Shop", "Shop")
                         .WithMany("Carts")
-                        .HasForeignKey("ProductVariantId")
+                        .HasForeignKey("ShopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1461,9 +1495,28 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ProductVariant");
+                    b.Navigation("Shop");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.CartDetail", b =>
+                {
+                    b.HasOne("BusinessObject.Entities.Cart", "Cart")
+                        .WithMany("CartDetails")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.ProductVariant", "ProductVariant")
+                        .WithMany("CartDetails")
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Coupon", b =>
@@ -1885,6 +1938,11 @@ namespace BusinessObject.Migrations
                     b.Navigation("Orders");
                 });
 
+            modelBuilder.Entity("BusinessObject.Entities.Cart", b =>
+                {
+                    b.Navigation("CartDetails");
+                });
+
             modelBuilder.Entity("BusinessObject.Entities.Category", b =>
                 {
                     b.Navigation("Products");
@@ -1945,7 +2003,7 @@ namespace BusinessObject.Migrations
                 {
                     b.Navigation("AssetInformations");
 
-                    b.Navigation("Carts");
+                    b.Navigation("CartDetails");
 
                     b.Navigation("OrderDetails");
                 });
@@ -1957,6 +2015,8 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Shop", b =>
                 {
+                    b.Navigation("Carts");
+
                     b.Navigation("Coupons");
 
                     b.Navigation("Orders");

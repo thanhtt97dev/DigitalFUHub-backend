@@ -43,7 +43,7 @@ namespace DataAccess.DAOs
 						.ToList();
 					if (orders.Count() == 0) return;
 
-					
+
 
 					foreach (var order in orders)
 					{
@@ -136,7 +136,7 @@ namespace DataAccess.DAOs
 						};
 						context.TransactionInternal.Add(transactionInternal);
 
-						
+
 
 						// update customer balance
 						var customer = context.User.First(x => x.UserId == customerId);
@@ -182,8 +182,8 @@ namespace DataAccess.DAOs
 							{
 								OrderId = o.OrderId,
 								OrderDate = o.OrderDate,
-								TotalPayment = o.TotalPayment,	
-								User = new User 
+								TotalPayment = o.TotalPayment,
+								User = new User
 								{
 									UserId = o.User.UserId,
 									Email = o.User.Email,
@@ -202,7 +202,7 @@ namespace DataAccess.DAOs
 								(orderId == 0 ? true : x.OrderId == orderId) &&
 								(status == 0 ? true : x.OrderStatusId == status)
 							).OrderByDescending(x => x.OrderDate).ToList();
-			
+
 			}
 			return orders;
 		}
@@ -218,7 +218,8 @@ namespace DataAccess.DAOs
 					int numberQuantityAvailable = 0;
 					Order orderResult = new Order();
 					// check valid quantity
-					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0))){
+					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0)))
+					{
 						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", numberQuantityAvailable, orderResult);
 					}
 
@@ -300,13 +301,13 @@ namespace DataAccess.DAOs
 						context.SaveChanges();
 
 						//create order detail
-						List<OrderDetail> orderDetails = new List<OrderDetail>();	
+						List<OrderDetail> orderDetails = new List<OrderDetail>();
 						foreach (var item in shopProduct.Products)
 						{
 							// check quantity
 							var assetInformationRemaining = context.AssetInformation
 								.Where(a => a.ProductVariantId == item.ProductVariantId && a.IsActive == true);
-							if(assetInformationRemaining.Count() < item.Quantity)
+							if (assetInformationRemaining.Count() < item.Quantity)
 							{
 								transaction.Rollback();
 								numberQuantityAvailable = assetInformationRemaining.Count();
@@ -315,12 +316,12 @@ namespace DataAccess.DAOs
 							assetInformationRemaining = assetInformationRemaining.Take(item.Quantity);
 
 							//get product productVariant info
-							var productVariant =  context.ProductVariant
+							var productVariant = context.ProductVariant
 								.Include(x => x.Product)
 								.ThenInclude(x => x.Shop)
 								.Select(x => new ProductVariant
 								{
-									ProductVariantId = x.ProductVariantId,	
+									ProductVariantId = x.ProductVariantId,
 									ProductId = x.ProductId,
 									Price = x.Price,
 									isActivate = x.isActivate,
@@ -336,9 +337,9 @@ namespace DataAccess.DAOs
 								})
 								.First(x => x.ProductVariantId == item.ProductVariantId);
 
-							if(!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_BAN ||
-								productVariant.Product.ProductStatusId == Constants.PRODUCT_HIDE || 
-								!productVariant.Product.Shop.IsActive) 
+							if (!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_BAN ||
+								productVariant.Product.ProductStatusId == Constants.PRODUCT_HIDE ||
+								!productVariant.Product.Shop.IsActive)
 							{
 								transaction.Rollback();
 								return (Constants.RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED, "Product has been baned", numberQuantityAvailable, orderResult);
@@ -347,10 +348,10 @@ namespace DataAccess.DAOs
 							OrderDetail orderDetail = new OrderDetail
 							{
 								OrderId = order.OrderId,
-								ProductVariantId = item.ProductVariantId,	
+								ProductVariantId = item.ProductVariantId,
 								Quantity = item.Quantity,
 								Price = productVariant.Price,
-								Discount = productVariant.Product.Discount,	
+								Discount = productVariant.Product.Discount,
 								TotalAmount = productVariant.Price * item.Quantity * (100 - productVariant.Product.Discount) / 100,
 								IsFeedback = false,
 							};
@@ -379,11 +380,11 @@ namespace DataAccess.DAOs
 						if (!string.IsNullOrEmpty(shopProduct.Coupon))
 						{
 							var coupon = (from c in context.Coupon
-									  where
-									  shopProduct.Coupon == c.CouponCode &&
-									  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
-									  c.IsActive && c.Quantity > 0
-									  select c).FirstOrDefault();
+										  where
+										  shopProduct.Coupon == c.CouponCode &&
+										  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
+										  c.IsActive && c.Quantity > 0
+										  select c).FirstOrDefault();
 							if (coupon == null)
 							{
 								transaction.Rollback();
@@ -393,7 +394,7 @@ namespace DataAccess.DAOs
 							if (coupon.MinTotalOrderValue > totalAmount)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!",numberQuantityAvailable, orderResult);
+								return (Constants.RESPONSE_CODE_ORDER_NOT_ELIGIBLE, "Orders are not eligible to apply the coupons!", numberQuantityAvailable, orderResult);
 							}
 							totalCouponDiscount = coupon.PriceDiscount;
 
@@ -483,7 +484,7 @@ namespace DataAccess.DAOs
 						}
 
 						// add new transaction internal
-						if(totalPayment > 0)
+						if (totalPayment > 0)
 						{
 							TransactionInternal newTransaction = new TransactionInternal
 							{
@@ -508,7 +509,7 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 			}
-			
+
 		}
 		#endregion
 
@@ -836,6 +837,23 @@ namespace DataAccess.DAOs
 										Coupon = new Coupon { CouponName = coupon.CouponName },
 									}).ToList();
 				return orderCoupons;
+			}
+		}
+
+		internal Order? GetOrderCustomer(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+					.Include(x => x.OrderCoupons)
+					.Include(x => x.Shop)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.AssetInformations)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.OrderId == orderId);
 			}
 		}
 	}

@@ -36,12 +36,11 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId,statusId, limit, offset);
 
-		public void UpdateOrderStatusCustomer(long orderId,long shopId, int status)
-		{
-			OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
-		}
+		public void UpdateOrderStatusCustomer(long orderId,long shopId, int status) => OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
+		
 
 		public List<OrderCoupon> GetCouponsInOrder(long orderId) => OrderDAO.Instance.GetCouponsInOrder(orderId);
 
+		public Order? GetOrderCustomer(long orderId) => OrderDAO.Instance.GetOrderCustomer(orderId);
 	}
 }
