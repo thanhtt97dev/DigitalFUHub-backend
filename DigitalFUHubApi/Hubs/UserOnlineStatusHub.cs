@@ -17,12 +17,14 @@ namespace DigitalFUHubApi.Hubs
 		private readonly HubConnectionService hubConnectionService;
 		private readonly IConnectionManager connectionManager;
 		private readonly IConversationRepository conversationRepository;
+		private readonly IUserRepository userRepository;
 
-		public UserOnlineStatusHub(HubConnectionService hubConnectionService, IConnectionManager connectionManager, IConversationRepository conversationRepository)
+		public UserOnlineStatusHub(HubConnectionService hubConnectionService, IConnectionManager connectionManager, IConversationRepository conversationRepository, IUserRepository userRepository)
 		{
 			this.hubConnectionService = hubConnectionService;
 			this.connectionManager = connectionManager;
 			this.conversationRepository = conversationRepository;
+			this.userRepository = userRepository;
 		}
 
 		public override async Task OnConnectedAsync()
@@ -51,6 +53,7 @@ namespace DigitalFUHubApi.Hubs
 			}
 
 			//Update DB User
+			userRepository.UpdateUserOnlineStatus(userId, true);
 		}
 
 		public override async Task OnDisconnectedAsync(Exception? exception)
@@ -99,7 +102,7 @@ namespace DigitalFUHubApi.Hubs
 			}
 
 			//Update DB User
-
+			userRepository.UpdateUserOnlineStatus(userId, false);
 
 			return;
 		}

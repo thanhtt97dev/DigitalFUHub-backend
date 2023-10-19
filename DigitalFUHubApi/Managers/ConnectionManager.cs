@@ -48,7 +48,11 @@ namespace DigitalFUHubApi.Managers
 						}
 						if (data[userId][hubName].Count() == 0)
 						{
-							data.Remove(userId);
+							data[userId].Remove(hubName);
+							if (data[userId].Count() == 0)
+							{
+								data.Remove(userId);	
+							}
 						}
 					}
 				}catch { }
