@@ -204,8 +204,8 @@ namespace DataAccess.DAOs
 				var user = context.User.FirstOrDefault(x => x.UserId == userId);
 				if(user == null) return;
 				if(user.Status == false) return;
-				if(isOnline && user.Status == isOnline) return;
-				if(!isOnline && user.Status == isOnline) return;
+				if(isOnline && user.IsOnline == isOnline) return;
+				if(!isOnline && user.IsOnline == isOnline) return;
 				if (isOnline)
 				{
 					user.IsOnline = true;

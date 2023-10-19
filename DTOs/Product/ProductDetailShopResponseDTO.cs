@@ -14,5 +14,7 @@ namespace DTOs.Product
         public long FeedbackNumber { get; set; }
         public long ProductNumber { get; set; }
         public DateTime DateCreate { get; set; }
-    }
+		public bool IsOnline { get; set; }
+		public DateTime LastTimeOnline { get; set; }
+	}
 }
