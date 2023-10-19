@@ -29,7 +29,6 @@ namespace DigitalFUHubApi.Hubs
 
 		public override async Task OnConnectedAsync()
 		{
-
 			var userId = hubService.GetUserIdFromHubCaller(Context);
 			// check user has been open in orther divice
 			var isUserConnectd = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
@@ -37,7 +36,7 @@ namespace DigitalFUHubApi.Hubs
 
 			// add new connection
 			var currentConnectionId = hubService.GetConnectionIdFromHubCaller(Context);
-			connectionManager.AddConnection(userId, currentConnectionId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+			connectionManager.AddConnection(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB, currentConnectionId);
 
 			// get all user has conversation with current user
 			List<UserConversationDTO> recipients = conversationRepository.GetRecipientUserIdHasConversation(userId);
@@ -49,7 +48,7 @@ namespace DigitalFUHubApi.Hubs
 				if (connectionIds == null || connectionIds.Count == 0) continue;
 				foreach (var connectionId in connectionIds)
 				{
-				 	await SendUserOnlineStatus(recipient.ConversationId, true, connectionId);
+				 	await SendUserOnlineStatus(recipient.ConversationId, true, connectionId, userId);
 				}
 			}
 
@@ -62,7 +61,7 @@ namespace DigitalFUHubApi.Hubs
 			var userId = hubService.GetUserIdFromHubCaller(Context);
 			var currentConnectionId = hubService.GetConnectionIdFromHubCaller(Context);
 			//remove connection
-			connectionManager.RemoveConnection(userId, currentConnectionId , Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS);
+			connectionManager.RemoveConnection(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB, currentConnectionId);
 
 			// check user has been open in orther divice
 			var isUserConnectd = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
@@ -73,22 +72,22 @@ namespace DigitalFUHubApi.Hubs
 			// send status online to all recipients online
 			foreach (var recipient in recipients)
 			{
-				var connectionIds = connectionManager.GetConnections(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+				var connectionIds = connectionManager.GetConnections(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 				if (connectionIds == null || connectionIds.Count == 0) continue;
 				if (recipient.IsGroup)
 				{
 					int numberMemeberInGroupOnline = 0;
 					// count number user remaning existed online
-					foreach (var member in recipient.MembersInGroup)
+					foreach (var memberUserId in recipient.MembersInGroup)
 					{
-						var isMemberOnline = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+						var isMemberOnline = connectionManager.CheckUserConnected(memberUserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 						if(isMemberOnline) numberMemeberInGroupOnline++;	
 					}
-					if(numberMemeberInGroupOnline == 0) 
+					if(numberMemeberInGroupOnline <= 1) 
 					{
 						foreach (var connectionId in connectionIds)
 						{
-							await SendUserOnlineStatus(recipient.ConversationId, false, connectionId);
+							await SendUserOnlineStatus(recipient.ConversationId, false, connectionId, userId);
 						}
 					}
 				}
@@ -96,7 +95,7 @@ namespace DigitalFUHubApi.Hubs
 				{
 					foreach (var connectionId in connectionIds)
 					{
-						await SendUserOnlineStatus(recipient.ConversationId, false, connectionId);
+						await SendUserOnlineStatus(recipient.ConversationId, false, connectionId, userId);
 					}
 				}
 				
@@ -108,13 +107,14 @@ namespace DigitalFUHubApi.Hubs
 			return;
 		}
 
-		private async Task SendUserOnlineStatus(long conversationId, bool isOnline, string connectionId)
+		private async Task SendUserOnlineStatus(long conversationId, bool isOnline, string connectionId, long userId)
 		{
 			await Clients.Clients(connectionId)
 				.SendAsync(Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS,
 					JsonConvert.SerializeObject(
 						new UserOnlineStatusHubDTO { 
 							ConversationId = conversationId,
+							UserId = userId,
 							IsOnline = isOnline,	
 						})
 				);
