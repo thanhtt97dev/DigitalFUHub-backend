@@ -30,6 +30,10 @@ namespace DigitalFUHubApi.Hubs
 		public override async Task OnConnectedAsync()
 		{
 			var userId = hubService.GetUserIdFromHubCaller(Context);
+
+			//Update DB User
+			userRepository.UpdateUserOnlineStatus(userId, true);
+
 			// check user has been open in orther divice
 			var isUserConnectd = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 			if (isUserConnectd) return;
@@ -55,8 +59,7 @@ namespace DigitalFUHubApi.Hubs
 				}
 			}
 
-			//Update DB User
-			userRepository.UpdateUserOnlineStatus(userId, true);
+			
 		}
 
 		public override async Task OnDisconnectedAsync(Exception? exception)
