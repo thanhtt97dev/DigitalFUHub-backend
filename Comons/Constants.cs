@@ -2,7 +2,7 @@
 {
 	public static class Constants
 	{
-		
+
 		//MB bank config
 		public const string BANK_ID_MB_BANK = "970422";
 		public const int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 15;
@@ -45,11 +45,11 @@
 		public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
-		public const string SIGNAL_R_NOTIFICATION_HUB = "notification";
+		public const string SIGNAL_R_NOTIFICATION_HUB = "notificationHub";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
 
-		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userHub";
+		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userOnlineStatusHub";
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS = "ReceiveUserOnlineStatus";
 
 		//User config
@@ -73,8 +73,8 @@
 		public const int WITHDRAW_TRANSACTION_REJECT = 3;
 		public static int[] WITHDRAW_TRANSACTION_STATUS = new int[] { WITHDRAW_TRANSACTION_IN_PROCESSING, WITHDRAW_TRANSACTION_PAID, WITHDRAW_TRANSACTION_REJECT };
 
-        //Order Status
-        public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
+		//Order Status
+		public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
 		public const int NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER = NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER + 3;
 		public const int ORDER_ALL = 0;
 		public const int ORDER_WAIT_CONFIRMATION = 1;
@@ -84,25 +84,29 @@
 		public const int ORDER_DISPUTE = 5;
 		public const int ORDER_REJECT_COMPLAINT = 6;
 		public const int ORDER_SELLER_VIOLATES = 7;
-		public static int[] ORDER_STATUS = new int[] { ORDER_WAIT_CONFIRMATION, ORDER_CONFIRMED, ORDER_COMPLAINT, ORDER_SELLER_REFUNDED,ORDER_DISPUTE, ORDER_REJECT_COMPLAINT, ORDER_SELLER_VIOLATES };
+		public static int[] ORDER_STATUS = new int[] { ORDER_WAIT_CONFIRMATION, ORDER_CONFIRMED, ORDER_COMPLAINT, ORDER_SELLER_REFUNDED, ORDER_DISPUTE, ORDER_REJECT_COMPLAINT, ORDER_SELLER_VIOLATES };
 
 		//Transaction internal Type
 		public const int TRANSACTION_TYPE_INTERNAL_PAYMENT = 1;
 		public const int TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT = 2;
 		public const int TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND = 3;
 		public const int TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT = 4;
-		public static int[] TRANSACTION_STATUS = new int[] { TRANSACTION_TYPE_INTERNAL_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND, TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT};
+		public static int[] TRANSACTION_STATUS = new int[] { TRANSACTION_TYPE_INTERNAL_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT, TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND, TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT };
 
 		//Transaction coin Type
 		public const int TRANSACTION_COIN_TYPE_RECEIVE = 1;
 		public const int TRANSACTION_COIN_TYPE_USE = 2;
 		public const int TRANSACTION_COIN_TYPE_REFUND = 3;
 
-        //Message Type
-        public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
-        public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
+		//Message Type
+		public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
+		public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
 
-		//Link notification
+		public const int USER_CONVERSATION_TYPE_INITIAL = 1;
+		public const int USER_CONVERSATION_TYPE_UN_READ = 2;
+		public const int USER_CONVERSATION_TYPE_IS_READ = 3;
+
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order";
 	}
 }
+

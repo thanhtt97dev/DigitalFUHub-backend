@@ -28,8 +28,10 @@ namespace BusinessObject.Entities
 		public long Coin { get; set; }
 		public bool SignInGoogle { get; set; }
         public bool IsConfirm { get; set; }
+		public DateTime LastTimeOnline { get; set; }
+		public bool IsOnline { get; set; }
 
-        [ForeignKey(nameof(RoleId))]
+		[ForeignKey(nameof(RoleId))]
         public virtual Role Role { get; set; } = null!;
         public virtual Shop Shop { get; set; } = null!;
         public virtual ICollection<AccessToken>? AccessTokens { get; set; }

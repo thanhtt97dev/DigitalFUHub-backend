@@ -67,39 +67,39 @@ namespace DataAccess.DAOs
 			}
 		}
 
-        internal List<AllProductResponseDTO> GetAllProduct()
-        {
-            List<AllProductResponseDTO> result = new List<AllProductResponseDTO>();
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                var products = context.Product.ToList();
-                foreach (var product in products)
-                {
-                    var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
-                    List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
-                    foreach (var variant in productVariants)
-                    {
-                        variants.Add(new ProductDetailVariantResponeDTO()
-                        {
-                            ProductVariantId = variant.ProductVariantId,
-                            Price = variant.Price
-                        });
-                    }
-                    AllProductResponseDTO productResponeDTO = new AllProductResponseDTO()
+		internal List<AllProductResponseDTO> GetAllProduct()
+		{
+			List<AllProductResponseDTO> result = new List<AllProductResponseDTO>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var products = context.Product.ToList();
+				foreach (var product in products)
+				{
+					var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
+					List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
+					foreach (var variant in productVariants)
+					{
+						variants.Add(new ProductDetailVariantResponeDTO()
+						{
+							ProductVariantId = variant.ProductVariantId,
+							Price = variant.Price
+						});
+					}
+					AllProductResponseDTO productResponeDTO = new AllProductResponseDTO()
 					{
 						ProductId = product.ProductId,
 						ProductName = product.ProductName,
 						Discount = product.Discount,
-                        Thumbnail = product.Thumbnail,
-                        ProductVariants = variants
-                    };
-                    result.Add(productResponeDTO);
-                }
-                return result;
-            }
-        }
+						Thumbnail = product.Thumbnail,
+						ProductVariants = variants
+					};
+					result.Add(productResponeDTO);
+				}
+				return result;
+			}
+		}
 
-        internal List<ProductDetailVariantResponeDTO> GetProductVariants(int productId)
+		internal List<ProductDetailVariantResponeDTO> GetProductVariants(int productId)
 		{
 			List<ProductDetailVariantResponeDTO> result = new List<ProductDetailVariantResponeDTO>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -126,8 +126,8 @@ namespace DataAccess.DAOs
 			{
 				var product = context.Product.Include(_ => _.Shop).FirstOrDefault(x => x.ProductId == productId);
 				if (product == null) return null;
-                long productQuantity = 0;
-                List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
+				long productQuantity = 0;
+				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
 				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
 				List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
 				List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
@@ -165,25 +165,26 @@ namespace DataAccess.DAOs
 				var productOfShop = context.Product.Where(x => x.ShopId == shopId);
 				long productNumber = productOfShop.Count();
 				long feedbachNumber = 0;
-                foreach (Product item in productOfShop)
-                {
+				foreach (Product item in productOfShop)
+				{
 					feedbachNumber += context.Feedback.Where(x => x.ProductId == item.ProductId).Count();
-                }
+				}
+				
+				var sellerInfo = context.User.First(x => x.UserId == shopId);	
 
-
-
-                ProductDetailShopResponseDTO shop = new ProductDetailShopResponseDTO
+				ProductDetailShopResponseDTO shop = new ProductDetailShopResponseDTO
 				{
 					ShopId = product.Shop.UserId,
 					Avatar = "",
-                    ShopName = product.Shop.ShopName,
-                    DateCreate = product.Shop.DateCreate,
-                    FeedbackNumber = feedbachNumber,
-                    ProductNumber = productNumber
-                };
+					ShopName = product.Shop.ShopName,
+					DateCreate = product.Shop.DateCreate,
+					FeedbackNumber = feedbachNumber,
+					ProductNumber = productNumber,
+					IsOnline = sellerInfo.IsOnline,
+					LastTimeOnline = sellerInfo.LastTimeOnline
+				};
 
-
-        ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
+				ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
 				{
 					ProductId = product.ProductId,
 					ProductName = product.ProductName,

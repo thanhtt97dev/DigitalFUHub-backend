@@ -18,24 +18,6 @@ namespace DataAccess.Repositories
 
         public List<ConversationResponseDTO> GetUsersConversations(long userId) => ConversationDAO.Instance.GetSenderConversations(userId);
 
-
-
-        public bool GetUserConversation(long senderId, long recipientId)
-        {
-            if (senderId == 0 || recipientId == 0)
-            {
-                throw new ArgumentException("senderId or recipientId invalid");
-            }
-            bool result = false;
-            List<UserConversation> userConversations = ConversationDAO.Instance.GetUserConversation(senderId, recipientId);
-            if (userConversations.Count == 2)
-            {
-                result = true;
-            }
-
-            return result;
-        }
-
         public async Task SendMessageConversation(List<Message> messages) => await ConversationDAO.Instance.SendMessageConversation(messages);
 
         public long AddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.AddConversation(addConversation);

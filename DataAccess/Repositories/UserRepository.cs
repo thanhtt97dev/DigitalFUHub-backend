@@ -51,7 +51,6 @@ namespace DataAccess.Repositories
 
 		public bool CheckUsersExisted(List<long> userIds) => UserDAO.Instance.CheckUsersExisted(userIds);
 
-		
-
+		public void UpdateUserOnlineStatus(long userId, bool isOnline) => UserDAO.Instance.UpdateUserOnlineStatus(userId, isOnline);
 	}
 }

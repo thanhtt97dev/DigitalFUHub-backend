@@ -17,9 +17,6 @@ namespace DataAccess.IRepositories
         Task SendMessageConversation(List<Message> messages);
 
         List<Message> GetMessages (long conversationId);
-
-        bool GetUserConversation(long senderId, long recipientId);
-
         long AddConversation(AddConversationRequestDTO addConversation);
         (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation);
 

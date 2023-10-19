@@ -109,11 +109,11 @@ namespace DigitalFUHubApi
             builder.Services.AddSingleton<ICouponRepository, CouponRepository>();
 			builder.Services.AddSingleton<IBusinessFeeRepository, BusinessFeeRepositoty>();
 			builder.Services.AddSingleton<ITransactionRepository, TransactionRepository>();
+            builder.Services.AddSingleton<IUserConversationRepository, UserConversationRepository>();
 
-			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
 			builder.Services.AddSingleton<JwtTokenService>(); 
-			builder.Services.AddSingleton<HubConnectionService>();
 			builder.Services.AddSingleton<HubService>();
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 			builder.Services.AddSingleton<MailService>();
@@ -121,7 +121,11 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<StorageService>();
 
 			//Add SignalR
-			builder.Services.AddSignalR();
+			builder.Services.AddSignalR(c => {
+                    c.EnableDetailedErrors = true;
+                    c.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+                    c.KeepAliveInterval = TimeSpan.FromSeconds(15);
+                });
 
 			//Add rate limit request
 			builder.Services.Configure<IpRateLimitOptions>(options =>
@@ -210,6 +214,7 @@ namespace DigitalFUHubApi
 			//Mapping hubs
 			app.UseEndpoints(endpoints =>
 			{
+				endpoints.MapHub<UserOnlineStatusHub>("/userOnlineStatusHub");
 				endpoints.MapHub<NotificationHub>("/notificationHub");
 				endpoints.MapHub<ChatHub>("/chatHub");
 			});

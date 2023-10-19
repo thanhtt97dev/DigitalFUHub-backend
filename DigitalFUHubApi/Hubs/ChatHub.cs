@@ -1,27 +1,34 @@
 ﻿using DigitalFUHubApi.Services;
 using Microsoft.AspNetCore.SignalR;
 using Comons;
+using DigitalFUHubApi.Managers;
 
 namespace DigitalFUHubApi.Hubs
 {
     public class ChatHub : Hub
     {
-        private readonly HubConnectionService _hubConnectionService;
+        private readonly HubService hubService;
+        private readonly IConnectionManager connectionManager;
 
-        public ChatHub(HubConnectionService hubConnectionService) {
-            _hubConnectionService = hubConnectionService;
+		public ChatHub(HubService hubService, IConnectionManager connectionManager)
+		{
+			this.hubService = hubService;
+			this.connectionManager = connectionManager;
+		}
 
-        }
-
-        public override Task OnConnectedAsync()
+		public override Task OnConnectedAsync()
         {
-            _hubConnectionService.AddConnection(Context, Constants.SIGNAL_R_CHAT_HUB);
+			var userId = hubService.GetUserIdFromHubCaller(Context);
+			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
+			connectionManager.AddConnection(userId, Constants.SIGNAL_R_CHAT_HUB, connectionId);
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            _hubConnectionService.RemoveConnection(Context, Constants.SIGNAL_R_CHAT_HUB);
+			var userId = hubService.GetUserIdFromHubCaller(Context);
+			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
+			connectionManager.RemoveConnection(userId, Constants.SIGNAL_R_CHAT_HUB, connectionId);
             return base.OnDisconnectedAsync(exception);
         }
     }

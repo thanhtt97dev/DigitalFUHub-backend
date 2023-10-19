@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using BusinessObject.Entities;
+using System.Linq;
 
 namespace DigitalFUHubApi.Managers
 {
@@ -34,24 +35,29 @@ namespace DigitalFUHubApi.Managers
 			}
 		}
 
-		public void RemoveConnection(string connectionId, string hubName)
+		public void RemoveConnection(long userId, string hubName, string connectionId)
 		{
 			lock (data)
 			{
 				try
 				{
-					foreach (var userId in data.Keys)
+					if (!data.ContainsKey(userId)) return;
+					if (!data[userId].ContainsKey(hubName)) return;
+					if (data[userId][hubName].Count() == 0) return;
+					if (data[userId][hubName].Contains(connectionId))
 					{
-						if (data[userId][hubName].Contains(connectionId))
-						{
-							data[userId][hubName].Remove(connectionId);
-						}
+						data[userId][hubName].Remove(connectionId);
 						if (data[userId][hubName].Count() == 0)
 						{
-							data.Remove(userId);
+							data[userId].Remove(hubName);
+							if (data[userId].Count() == 0)
+							{
+								data.Remove(userId);
+							}
 						}
 					}
-				}catch { }
+				}
+				catch { }
 			}
 		}
 
@@ -72,9 +78,11 @@ namespace DigitalFUHubApi.Managers
 			return connections;
 		}
 
-		public bool CheckUserConnectd(long userId)
+		public bool CheckUserConnected(long userId, string hubName)
 		{
-			return data.ContainsKey(userId);
+			if (!data.ContainsKey(userId)) return false;
+			if (!data[userId].ContainsKey(hubName)) return false;
+			return true;
 		}
 	}
 }
