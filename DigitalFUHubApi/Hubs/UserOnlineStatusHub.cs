@@ -44,6 +44,9 @@ namespace DigitalFUHubApi.Hubs
 			// send status online to all recipients online
 			foreach (var recipient in recipients)
 			{
+				var isRecipientConnectd = connectionManager.CheckUserConnected(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+				if (!isRecipientConnectd) continue;
+
 				var connectionIds = connectionManager.GetConnections(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 				if (connectionIds == null || connectionIds.Count == 0) continue;
 				foreach (var connectionId in connectionIds)
