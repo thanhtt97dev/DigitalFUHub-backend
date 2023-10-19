@@ -10,11 +10,11 @@ namespace DTOs.UserConversation
     {
         public long ConversationId { get; set; }
         public int IsRead { get; set; }
-        public List<long> RecipientIds { get; set; } = new List<long>();
+        public long UserId { get; set; }
 
         public bool IsValid()
         {
-            return (RecipientIds != null && RecipientIds.Count > 0) && ConversationId > 0 && IsRead > 0;
+            return UserId > 0 && ConversationId > 0 && IsRead > 0;
         }
     }
 }
