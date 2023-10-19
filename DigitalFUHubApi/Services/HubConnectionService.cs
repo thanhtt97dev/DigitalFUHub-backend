@@ -27,12 +27,12 @@ namespace DigitalFUHubApi.Services
 		public void RemoveConnection(HubCallerContext hubCallerContext, string hubName)
 		{
 			var connectionId = hubCallerContext.ConnectionId;
-			connectionManager.RemoveConnection(connectionId, hubName);
+			connectionManager.RemoveConnection(1,connectionId, hubName);
 		}
 
-		public bool CheckUserConnected(long userId) 
+		public bool CheckUserConnected(long userId, string hubName) 
 		{
-			return connectionManager.CheckUserConnectd(userId);	
+			return connectionManager.CheckUserConnected(userId, hubName);	
 		}
 
 		public int GetUserIdFromHubCaller(HubCallerContext hubCallerContext)

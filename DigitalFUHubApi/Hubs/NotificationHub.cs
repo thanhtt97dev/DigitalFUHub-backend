@@ -15,40 +15,43 @@ namespace DigitalFUHubApi.Hubs
     public class NotificationHub : Hub
 	{
 
-		private readonly INotificationRepositiory _notificationRepositiory;
+		private readonly INotificationRepositiory notificationRepositiory;
+		private readonly IMapper mapper;
+		private readonly HubService hubService;
+		private readonly IConnectionManager connectionManager;
 
-		private readonly IMapper _mapper;
-
-		private readonly HubConnectionService _hubConnectionService;
-
-		public NotificationHub( INotificationRepositiory notificationRepositiory, IMapper mapper, 
-			HubConnectionService hubConnectionService)
+		public NotificationHub(INotificationRepositiory notificationRepositiory, IMapper mapper, HubService hubService, IConnectionManager connectionManager)
 		{
-			_notificationRepositiory = notificationRepositiory;
-			_mapper = mapper;
-			_hubConnectionService = hubConnectionService;
+			this.notificationRepositiory = notificationRepositiory;
+			this.mapper = mapper;
+			this.hubService = hubService;
+			this.connectionManager = connectionManager;
 		}
 
 		public override async Task OnConnectedAsync()
 		{
-			_hubConnectionService.AddConnection(Context, Constants.SIGNAL_R_NOTIFICATION_HUB);
+			var userId = hubService.GetUserIdFromHubCaller(Context);
+			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
+			connectionManager.AddConnection(userId, connectionId, Constants.SIGNAL_R_NOTIFICATION_HUB);
 			await SendAllNotificationToUserCaller();
 		}
 
 		public override Task OnDisconnectedAsync(Exception? exception)
 		{
-			_hubConnectionService.RemoveConnection(Context, Constants.SIGNAL_R_NOTIFICATION_HUB);
+			var userId = hubService.GetUserIdFromHubCaller(Context);
+			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
+			connectionManager.RemoveConnection(userId, connectionId, Constants.SIGNAL_R_NOTIFICATION_HUB);
 			return base.OnDisconnectedAsync(exception);
 		}
 
 		private async Task SendAllNotificationToUserCaller()
 		{
-			var userId = _hubConnectionService.GetUserIdFromHubCaller(Context);
+			var userId = hubService.GetUserIdFromHubCaller(Context);
 			if (userId == 0) return;
 
-			var notifications = _notificationRepositiory.GetNotifications(userId);
+			var notifications = notificationRepositiory.GetNotifications(userId);
 			await Clients.Caller.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION,
-						JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(notifications)));
+						JsonConvert.SerializeObject(mapper.Map<List<NotificationRespone>>(notifications)));
 		}
 
     }

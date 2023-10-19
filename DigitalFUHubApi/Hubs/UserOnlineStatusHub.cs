@@ -14,29 +14,30 @@ namespace DigitalFUHubApi.Hubs
 {
 	public class UserOnlineStatusHub : Hub
 	{
-		private readonly HubConnectionService hubConnectionService;
 		private readonly IConnectionManager connectionManager;
 		private readonly IConversationRepository conversationRepository;
 		private readonly IUserRepository userRepository;
+		private readonly HubService hubService;
 
-		public UserOnlineStatusHub(HubConnectionService hubConnectionService, IConnectionManager connectionManager, IConversationRepository conversationRepository, IUserRepository userRepository)
+		public UserOnlineStatusHub(IConnectionManager connectionManager, IConversationRepository conversationRepository, IUserRepository userRepository, HubService hubService)
 		{
-			this.hubConnectionService = hubConnectionService;
 			this.connectionManager = connectionManager;
 			this.conversationRepository = conversationRepository;
 			this.userRepository = userRepository;
+			this.hubService = hubService;
 		}
 
 		public override async Task OnConnectedAsync()
 		{
 
-			var userId = hubConnectionService.GetUserIdFromHubCaller(Context);
+			var userId = hubService.GetUserIdFromHubCaller(Context);
 			// check user has been open in orther divice
-			var isUserConnectd = hubConnectionService.CheckUserConnected(userId);
+			var isUserConnectd = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 			if (isUserConnectd) return;
 
 			// add new connection
-			hubConnectionService.AddConnection(Context, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+			var currentConnectionId = hubService.GetConnectionIdFromHubCaller(Context);
+			connectionManager.AddConnection(userId, currentConnectionId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 
 			// get all user has conversation with current user
 			List<UserConversationDTO> recipients = conversationRepository.GetRecipientUserIdHasConversation(userId);
@@ -44,7 +45,7 @@ namespace DigitalFUHubApi.Hubs
 			// send status online to all recipients online
 			foreach (var recipient in recipients)
 			{
-				var connectionIds = connectionManager.GetConnections(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+				var connectionIds = connectionManager.GetConnections(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 				if (connectionIds == null || connectionIds.Count == 0) continue;
 				foreach (var connectionId in connectionIds)
 				{
@@ -58,13 +59,13 @@ namespace DigitalFUHubApi.Hubs
 
 		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
+			var userId = hubService.GetUserIdFromHubCaller(Context);
+			var currentConnectionId = hubService.GetConnectionIdFromHubCaller(Context);
 			//remove connection
-			hubConnectionService.RemoveConnection(Context, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS);
-
-			var userId = hubConnectionService.GetUserIdFromHubCaller(Context);
+			connectionManager.RemoveConnection(userId, currentConnectionId , Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS);
 
 			// check user has been open in orther divice
-			var isUserConnectd = hubConnectionService.CheckUserConnected(userId);
+			var isUserConnectd = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 			if (isUserConnectd) return;
 
 			// get all user has conversation with current user
@@ -80,7 +81,7 @@ namespace DigitalFUHubApi.Hubs
 					// count number user remaning existed online
 					foreach (var member in recipient.MembersInGroup)
 					{
-						var isMemberOnline = hubConnectionService.CheckUserConnected(userId);
+						var isMemberOnline = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 						if(isMemberOnline) numberMemeberInGroupOnline++;	
 					}
 					if(numberMemeberInGroupOnline == 0) 
