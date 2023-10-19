@@ -520,7 +520,7 @@
 				if (user == null) return NotFound();
 
 				string username = user.Email.Split('@')[0];
-				user.Email = Util.HideCharacters(user.Email, username.Length - 2);
+				user.Email = Util.HideCharacters(user.Email, 5);
 
 				return Ok(_mapper.Map<UserResponeDTO>(user));
 			}
