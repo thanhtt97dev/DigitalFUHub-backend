@@ -20,7 +20,7 @@ namespace DigitalFUHubApi.Hubs
         {
 			var userId = hubService.GetUserIdFromHubCaller(Context);
 			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
-			connectionManager.AddConnection(userId, connectionId, Constants.SIGNAL_R_CHAT_HUB);
+			connectionManager.AddConnection(userId, Constants.SIGNAL_R_CHAT_HUB, connectionId);
             return base.OnConnectedAsync();
         }
 
@@ -28,7 +28,7 @@ namespace DigitalFUHubApi.Hubs
         {
 			var userId = hubService.GetUserIdFromHubCaller(Context);
 			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
-			connectionManager.RemoveConnection(userId, connectionId, Constants.SIGNAL_R_CHAT_HUB);
+			connectionManager.RemoveConnection(userId, Constants.SIGNAL_R_CHAT_HUB, connectionId);
             return base.OnDisconnectedAsync(exception);
         }
     }

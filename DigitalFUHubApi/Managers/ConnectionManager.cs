@@ -35,7 +35,7 @@ namespace DigitalFUHubApi.Managers
 			}
 		}
 
-		public void RemoveConnection(long userId, string connectionId, string hubName)
+		public void RemoveConnection(long userId, string hubName, string connectionId)
 		{
 			lock (data)
 			{

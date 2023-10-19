@@ -9,6 +9,7 @@ namespace DTOs.User
 	public class UserOnlineStatusHubDTO
 	{
 		public long ConversationId { get; set; }
+		public long UserId { get; set; }
 		public bool IsOnline { get; set; }
 	}
 }
