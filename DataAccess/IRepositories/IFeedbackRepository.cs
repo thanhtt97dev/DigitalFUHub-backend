@@ -9,6 +9,7 @@ namespace DataAccess.IRepositories
 {
     public interface IFeedbackRepository
     {
-        List<FeedbackResponseDTO> GetFeedbacks(long productId);
+		void FeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages);
+		List<FeedbackResponseDTO> GetFeedbacks(long productId);
     }
 }

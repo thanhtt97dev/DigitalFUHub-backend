@@ -7,11 +7,14 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.Admin;
 using DTOs.Cart;
 using DTOs.Order;
+using DTOs.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -19,17 +22,20 @@ namespace DigitalFUHubApi.Controllers
 	[ApiController]
 	public class OrdersController : ControllerBase
 	{
-		private readonly IOrderRepository orderRepository;
-		private readonly JwtTokenService jwtTokenService;
-		private readonly HubService hubService;
+		private readonly IOrderRepository _orderRepository;
+		private readonly JwtTokenService _jwtTokenService;
+		private readonly IMapper _mapper;
+		private readonly HubService _hubService;
 
-		public OrdersController(IOrderRepository orderRepository, JwtTokenService jwtTokenService, HubService hubService)
+		public OrdersController(IOrderRepository orderRepository, JwtTokenService jwtTokenService, HubService hubService, IMapper mapper)
 		{
-			this.orderRepository = orderRepository;
-			this.jwtTokenService = jwtTokenService;
-			this.hubService = hubService;
+			_orderRepository = orderRepository;
+			_jwtTokenService = jwtTokenService;
+			_hubService = hubService;
+			_mapper = mapper;
 		}
 
+		#region Add order customer
 		//[Authorize("Customer,Seller")]
 		[HttpPost("AddOrder")]
 		public async Task<IActionResult> AddOrder(AddOrderRequestDTO request)
@@ -43,7 +49,7 @@ namespace DigitalFUHubApi.Controllers
 
 				ResponseData responseData = new ResponseData();
 				var accessToken = Util.GetAccessToken(HttpContext);
-				var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+				var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 				if (request.UserId != userIdFromAccessToken)
 				{
 					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
@@ -53,7 +59,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
-					orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
+					_orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
 
 				responseData.Status.ResponseCode = responseCode;
 				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
@@ -70,7 +76,7 @@ namespace DigitalFUHubApi.Controllers
 					var title = "Mua hàng thành công";
 					var content = $"Mã đơn số {orderInfo.OrderId} đã mua thành công với tổng giá trị đơn hàng {orderInfo.TotalPayment}đ";
 					var link = Constants.FRONT_END_HISTORY_ORDER_URL;
-					await hubService.SendNotification(request.UserId, title, content, link);
+					await _hubService.SendNotification(request.UserId, title, content, link);
 				}
 
 				return Ok(responseData);
@@ -80,9 +86,11 @@ namespace DigitalFUHubApi.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
+		#endregion
 
+		#region Get all order of customer
 		[Authorize("Customer,Seller")]
-		[HttpPost("All")]
+		[HttpPost("All/Customer")]
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
@@ -91,13 +99,13 @@ namespace DigitalFUHubApi.Controllers
 			}
 
 			var accessToken = Util.GetAccessToken(HttpContext);
-			var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+			var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 			if (request.UserId != userIdFromAccessToken)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
 			}
 
-			List<Order> orders = orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
+			List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 			OrderResponseDTO orderResponse = new OrderResponseDTO()
 			{
 				NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
@@ -133,6 +141,9 @@ namespace DigitalFUHubApi.Controllers
 			};
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, orderResponse));
 		}
+		#endregion
+
+		#region Update status order customer
 		[Authorize("Customer,Seller")]
 		[HttpPost("Edit/Status")]
 		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
@@ -142,12 +153,12 @@ namespace DigitalFUHubApi.Controllers
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
 			var accessToken = Util.GetAccessToken(HttpContext);
-			var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+			var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 			if (request.UserId != userIdFromAccessToken)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
 			}
-			Order? order = orderRepository.GetOrderCustomer(request.OrderId);
+			Order? order = _orderRepository.GetOrderCustomer(request.OrderId);
 			if (order == null)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
@@ -170,12 +181,12 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
+				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
 
 				string title = $"{(request.StatusId == Constants.ORDER_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
 				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
 				string link = Constants.FRONT_END_HISTORY_ORDER_URL;
-				await hubService.SendNotification(request.UserId, title, content, link);
+				await _hubService.SendNotification(request.UserId, title, content, link);
 			}
 			catch (Exception e)
 			{
@@ -183,17 +194,20 @@ namespace DigitalFUHubApi.Controllers
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 		}
+		#endregion
+
+		#region Get order detail of customer
 		[Authorize("Customer,Seller")]
-		[HttpGet("User/{userId}/{orderId}")]
+		[HttpGet("Customer/{userId}/{orderId}")]
 		public IActionResult GetOrderDetailCustomer(long userId, long orderId)
 		{
 			var accessToken = Util.GetAccessToken(HttpContext);
-			var userIdFromAccessToken = jwtTokenService.GetUserIdByAccessToken(accessToken);
+			var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
 			if (userId != userIdFromAccessToken)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
 			}
-			Order? order = orderRepository.GetOrderCustomer(orderId);
+			Order? order = _orderRepository.GetOrderCustomer(orderId);
 			if (order == null)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
@@ -234,6 +248,122 @@ namespace DigitalFUHubApi.Controllers
 			};
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, responseData));
 		}
+		#endregion
+
+		#region Get list orders seller
+		[Authorize("Seller")]
+		[HttpPost("All/Seller")]
+		public IActionResult GetOrdersSeller(SellerOrdersRequestDTO request)
+		{
+			if (request == null || request.OrderId == null ||
+				request.CustomerEmail == null || request.UserId == 0 ||
+				request.ToDate == null || request.FromDate == null) return BadRequest();
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
+			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
+			{
+				status.Message = "Invalid order status!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+
+			try
+			{
+
+				DateTime fromDate;
+				DateTime toDate;
+				string format = "M/d/yyyy";
+				try
+				{
+					fromDate = DateTime.ParseExact(request.FromDate, format, CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(request.ToDate, format, CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				long orderId;
+				long.TryParse(request.OrderId, out orderId);
+
+				List<Order> orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, "",
+					fromDate, toDate, request.Status)
+					.Where(x => x.ShopId == request.UserId)
+					.ToList();
+				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get order detail seller
+		[Authorize("Seller")]
+		[HttpGet("{orderId}/Seller")]
+		public IActionResult GetOrderDetailSeller(long orderId)
+		{
+			ResponseData response = new ResponseData();
+			if (orderId == 0)
+			{
+				return BadRequest();
+			}
+
+			Order? orderRaw = _orderRepository.GetSellerOrderDetail(orderId);
+
+			if (orderRaw == null)
+			{
+				response.Status.Ok = false;
+				response.Status.Message = "Not found.";
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+				return Ok(response);
+			}
+			SellerOrderDetailResponseDTO order = new SellerOrderDetailResponseDTO
+			{
+				/*
+				EmailCustomer = orderRaw.User.Email,
+				IsFeedbacked = orderRaw.IsFeedback,
+				OrderDate = orderRaw.OrderDate,
+				OrderId = orderId,
+				OrderStatusId = orderRaw.OrderStatusId,
+				Price = orderRaw.Price,
+				Quantity = orderRaw.Quantity,
+				ProductName = orderRaw.ProductVariant.Product?.ProductName ?? "",
+				ProductVariantName = orderRaw.ProductVariant?.Name ?? "",
+				Thumbnail = orderRaw.ProductVariant?.Product?.Thumbnail ?? ""
+				*/
+			};
+			response.Status.Ok = true;
+			response.Status.Message = "Success";
+			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+			response.Result = order;
+			return Ok(response);
+		}
+		#endregion
 	}
 
 }
