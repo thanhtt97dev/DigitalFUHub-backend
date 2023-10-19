@@ -15,10 +15,10 @@ namespace DigitalFUHubApi.Hubs
 	public class UserOnlineStatusHub : Hub
 	{
 		private readonly HubConnectionService hubConnectionService;
-		private readonly ConnectionManager connectionManager;
-		private readonly ConversationRepository conversationRepository;
+		private readonly IConnectionManager connectionManager;
+		private readonly IConversationRepository conversationRepository;
 
-		public UserOnlineStatusHub(HubConnectionService hubConnectionService, ConnectionManager connectionManager, ConversationRepository conversationRepository)
+		public UserOnlineStatusHub(HubConnectionService hubConnectionService, IConnectionManager connectionManager, IConversationRepository conversationRepository)
 		{
 			this.hubConnectionService = hubConnectionService;
 			this.connectionManager = connectionManager;
