@@ -39,7 +39,10 @@ namespace DataAccess.DAOs
         {
                 using (DatabaseContext context = new DatabaseContext())
                 {
-                var conversationIds = context.UserConversation.Where(x => x.UserId == userId)
+                var userConversations = context.UserConversation.Where(x => x.UserId == userId)
+                    .ToList();
+
+                var conversationIds = userConversations
                     .Select(x => x.ConversationId)                            
                     .ToList();
 
@@ -50,14 +53,14 @@ namespace DataAccess.DAOs
                                                 .ToList();
 
                 var groupedConversations = conversations
-                    .GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate, x.IsRead })
+                    .GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate })
                     .Select(group => new ConversationResponseDTO
                     {
                         ConversationId = group.Key.ConversationId,
                         ConversationName = group.Key.ConversationName,
                         DateCreate = group.Key.DateCreate,
                         IsActivate = group.Key.IsActivate,
-                        IsRead = group.Key.IsRead,
+                        IsRead = userConversations.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.IsRead ?? 1,
                         LatestMessage = context.Messages.OrderByDescending(x => x.DateCreate)
                         .FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.Content ?? "",
                         Users = group.Select(uc => new UserConversationResponseDTO {

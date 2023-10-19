@@ -17,6 +17,7 @@ using Azure;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Collections.Generic;
 using DTOs.UserConversation;
+using System.Threading;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -149,6 +150,18 @@ namespace DigitalFUHubApi.Controllers
                 }
                
                 await conversationRepository.SendMessageConversation(messages);
+
+                // update un read for user recipient
+                UpdateUserConversationRequestDTO requestUpdate = new UpdateUserConversationRequestDTO {
+                    ConversationId = request.ConversationId,
+                    IsRead = Constants.USER_CONVERSATION_TYPE_UN_READ,
+                };
+
+                foreach (long userId in request.RecipientIds)
+                {
+                    requestUpdate.UserId = userId;
+                    userConversationRepository.Update(requestUpdate);
+                }
 
 
                 //send to signR connections
