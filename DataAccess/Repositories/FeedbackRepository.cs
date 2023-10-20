@@ -12,6 +12,9 @@ namespace DataAccess.Repositories
 {
 	public class FeedbackRepository : IFeedbackRepository
 	{
+		public Order? FeedbackDetail(long orderId, long userId)
+		=> FeedbackDAO.Instance.FeedbackOrder(orderId, userId);
+
 		public void FeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
 		=> FeedbackDAO.Instance.FeedbackOrder(userId, orderId, orderDetailId, content, rate, urlImages);
 
