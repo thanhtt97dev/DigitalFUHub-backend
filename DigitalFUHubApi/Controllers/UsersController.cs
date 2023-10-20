@@ -16,8 +16,9 @@
 	using System.Net;
     using global::Comons;
 	using static QRCoder.PayloadGenerator;
+	using Google.Apis.Auth;
 
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -77,32 +78,38 @@
 		}
 		#endregion
 
-		#region SignInGoogle
+		#region SignIn Google
 		[HttpPost("SignInGoogle")]
-		public async Task<IActionResult> SignInGoogle(UserSignInGoogleRequestDTO userSignIn)
+		public async Task<IActionResult> SignInGoogle([FromBody] UserSignInGoogleRequestDTO request)
 		{
-			if (!ModelState.IsValid)
+			if (string.IsNullOrWhiteSpace(request.GToken))
 			{
 				return UnprocessableEntity();
 			}
 			try
 			{
-				User? user = _userRepository.GetUserByEmail(userSignIn.Email);
+				GoogleJsonWebSignature.Payload payload = await GoogleJsonWebSignature.ValidateAsync(request.GToken);
+				if(payload == null)
+				{
+					return Conflict();
+				} 
+				
+				User? user = _userRepository.GetUserByEmail(payload.Email);
 
 				if (user == null)
 				{
 					User newUser = new User
 					{
-						Email = userSignIn.Email,
+						Email = payload.Email,
 						TwoFactorAuthentication = false,
-						RoleId = 2,
+						RoleId = Constants.CUSTOMER_ROLE,
 						SignInGoogle = true,
 						Status = true,
 						IsConfirm = true,
-						Fullname = userSignIn.Fullname
+						Fullname = payload.Name
 					};
 					_userRepository.AddUser(newUser);
-					user = _userRepository.GetUserByEmail(userSignIn.Email);
+					user = _userRepository.GetUserByEmail(payload.Email);
 				}
 				else
 				{

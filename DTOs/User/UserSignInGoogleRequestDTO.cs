@@ -9,15 +9,7 @@ namespace DTOs.User
 {
     public class UserSignInGoogleRequestDTO
     {
-		public UserSignInGoogleRequestDTO(string email, string fullname)
-		{
-			Email = email;
-			Fullname = fullname;
-		}
-
-		[Required]
-        public string Email { get; set; }
-		[Required]
-		public string Fullname { get; set; }
+        [Required]
+        public string GToken { get; set; } = null!;
     }
 }

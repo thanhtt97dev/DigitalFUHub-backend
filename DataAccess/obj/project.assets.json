@@ -2697,23 +2697,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ASUS\\.nuget\\packages\\": {},
+    "C:\\Users\\dell\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DataAccess\\DataAccess.csproj",
+      "projectUniqueName": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
       "projectName": "DataAccess",
-      "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DataAccess\\DataAccess.csproj",
-      "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-      "outputPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DataAccess\\obj\\",
+      "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\DataAccess.csproj",
+      "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+      "outputPath": "D:\\FU\\Capstone Project\\Back-end\\DataAccess\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2728,14 +2728,14 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj": {
-              "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\BusinessObject\\BusinessObject.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\BusinessObject\\BusinessObject.csproj"
             },
-            "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\Comons\\Comons.csproj": {
-              "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\Comons\\Comons.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\Comons\\Comons.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\Comons\\Comons.csproj"
             },
-            "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj": {
-              "projectPath": "D:\\fu-workspace\\Semester 9\\SEP490\\src-final\\be-1\\DTOs\\DTOs.csproj"
+            "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj": {
+              "projectPath": "D:\\FU\\Capstone Project\\Back-end\\DTOs\\DTOs.csproj"
             }
           }
         }
@@ -2765,7 +2765,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using DTOs.User;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DataAccess.DAOs
 {
@@ -93,8 +94,9 @@ namespace DataAccess.DAOs
 					Order? order = context.Order.Include(x => x.OrderDetails).ThenInclude(x => x.ProductVariant)
 						.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId
 						&& x.OrderDetails.Any(od => od.OrderDetailId == orderDetailId));
-
 					if (order == null) throw new Exception("Order not found!");
+
+					User user = context.User.First(x => x.UserId == userId);
 
 					OrderDetail orderDetail = order.OrderDetails.First(x => x.OrderDetailId == orderDetailId);
 
@@ -110,7 +112,9 @@ namespace DataAccess.DAOs
 						Content = content,
 						Rate = rate,
 						FeedbackBenefitId = feedbackBenefit.FeedbackBenefitId,
-						ProductId = product.ProductId
+						ProductId = product.ProductId,
+						UserId = userId,
+						UpdateDate = DateTime.Now,
 					};
 					if(urlImages.Count > 0)
 					{
@@ -119,6 +123,8 @@ namespace DataAccess.DAOs
 							Url = x,
 						}).ToList();
 					}
+					user.Coin += feedbackBenefit.Coin;
+					orderDetail.IsFeedback = true;
 					context.Feedback.Add(feedback);
 					context.SaveChanges();
 				}
@@ -126,6 +132,23 @@ namespace DataAccess.DAOs
 				{
 					throw new Exception(e.Message);
 				}
+			}
+		}
+
+		internal Order? FeedbackOrder(long orderId, long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Order? order = context.Order
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
+					.ThenInclude(x => x.FeedbackMedias)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId);
+				return order;
+
 			}
 		}
 	}
