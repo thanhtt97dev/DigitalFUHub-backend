@@ -68,8 +68,10 @@ namespace DataAccess.DAOs
 							UserId = uc.User.UserId,
 							RoleId = uc.User.RoleId,
 							Fullname = uc.User.Fullname,
-							Avatar = uc.User.Avatar
-						}).Distinct().ToList()
+							Avatar = uc.User.Avatar,
+							LastTimeOnline = uc.User.LastTimeOnline,
+                            IsOnline = uc.User.IsOnline,
+                        }).Distinct().ToList()
 					}).ToList();
 
 				return groupedConversations;
