@@ -75,7 +75,7 @@ namespace DigitalFUHubApi.Controllers
 					// send notification
 					var title = "Mua hàng thành công";
 					var content = $"Mã đơn số {orderInfo.OrderId} đã mua thành công với tổng giá trị đơn hàng {orderInfo.TotalPayment}đ";
-					var link = Constants.FRONT_END_HISTORY_ORDER_URL;
+					var link = Constants.FRONT_END_HISTORY_ORDER_URL + orderInfo.OrderId;
 					await _hubService.SendNotification(request.UserId, title, content, link);
 				}
 
@@ -185,7 +185,7 @@ namespace DigitalFUHubApi.Controllers
 
 				string title = $"{(request.StatusId == Constants.ORDER_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
 				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
-				string link = Constants.FRONT_END_HISTORY_ORDER_URL;
+				string link = Constants.FRONT_END_HISTORY_ORDER_URL + request.OrderId;
 				await _hubService.SendNotification(request.UserId, title, content, link);
 			}
 			catch (Exception e)
