@@ -15,246 +15,251 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-    public class ConversationDAO
-    {
-        private static ConversationDAO? instance;
-        private static readonly object instanceLock = new object();
+	public class ConversationDAO
+	{
+		private static ConversationDAO? instance;
+		private static readonly object instanceLock = new object();
 
-        public static ConversationDAO Instance
-        {
-            get
-            {
-                lock (instanceLock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new ConversationDAO();
-                    }
-                }
-                return instance;
-            }
-        }
+		public static ConversationDAO Instance
+		{
+			get
+			{
+				lock (instanceLock)
+				{
+					if (instance == null)
+					{
+						instance = new ConversationDAO();
+					}
+				}
+				return instance;
+			}
+		}
 
-        internal List<ConversationResponseDTO> GetSenderConversations(long userId)
-        {
-                using (DatabaseContext context = new DatabaseContext())
-                {
-                var userConversations = context.UserConversation.Where(x => x.UserId == userId)
-                    .ToList();
+		internal List<ConversationResponseDTO> GetSenderConversations(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var userConversations = context.UserConversation.Where(x => x.UserId == userId)
+					.ToList();
 
-                var conversationIds = userConversations
-                    .Select(x => x.ConversationId)                            
-                    .ToList();
+				var conversationIds = userConversations
+					.Select(x => x.ConversationId)
+					.ToList();
 
-                var conversations = context.UserConversation
-                                                .Include(_ => _.User)
-                                                .Include(_ => _.Conversation)
-                                                .Where(x => x.UserId != userId && conversationIds.Contains(x.ConversationId))
-                                                .ToList();
+				var conversations = context.UserConversation
+												.Include(_ => _.User)
+												.Include(_ => _.Conversation)
+												.Where(x => x.UserId != userId && conversationIds.Contains(x.ConversationId))
+												.ToList();
 
-                var groupedConversations = conversations
-                    .GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate })
-                    .Select(group => new ConversationResponseDTO
-                    {
-                        ConversationId = group.Key.ConversationId,
-                        ConversationName = group.Key.ConversationName,
-                        DateCreate = group.Key.DateCreate,
-                        IsActivate = group.Key.IsActivate,
-                        IsRead = userConversations.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.IsRead ?? 1,
-                        LatestMessage = context.Messages.OrderByDescending(x => x.DateCreate)
-                        .FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.Content ?? "",
-                        Users = group.Select(uc => new UserConversationResponseDTO {
-                            UserId = uc.User.UserId,
-                            RoleId = uc.User.RoleId,
-                            Fullname = uc.User.Fullname,
-                            Avatar = uc.User.Avatar
+				var groupedConversations = conversations
+					.GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate })
+					.Select(group => new ConversationResponseDTO
+					{
+						ConversationId = group.Key.ConversationId,
+						ConversationName = group.Key.ConversationName,
+						DateCreate = group.Key.DateCreate,
+						IsActivate = group.Key.IsActivate,
+						IsRead = userConversations.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.IsRead ?? 1,
+						LatestMessage = context.Messages.OrderByDescending(x => x.DateCreate)
+						.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.Content ?? "",
+						Users = group.Select(uc => new UserConversationResponseDTO
+						{
+							UserId = uc.User.UserId,
+							RoleId = uc.User.RoleId,
+							Fullname = uc.User.Fullname,
+							Avatar = uc.User.Avatar,
+							LastTimeOnline = uc.User.LastTimeOnline,
+                            IsOnline = uc.User.IsOnline,
                         }).Distinct().ToList()
-                    }).ToList();
+					}).ToList();
 
-                return groupedConversations;
-                }
-       
-        }
+				return groupedConversations;
+			}
 
-        internal long AddConversation (AddConversationRequestDTO addConversation)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                List<long> listUserId = new List<long>();
-                listUserId.AddRange(addConversation.RecipientIds);
-                listUserId.Add(addConversation.UserId);
+		}
 
-                var userConversation = context.UserConversation.ToList();
-                if (userConversation != null) {
-                    var groupUserConversation = userConversation
-                     .GroupBy(x => x.ConversationId)
-                     .Select(group => new
-                     {
-                         ConversationId = group.Key,
-                         Count = group.Distinct().Count()
-                     }).ToList();
+		internal long AddConversation(AddConversationRequestDTO addConversation)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				List<long> listUserId = new List<long>();
+				listUserId.AddRange(addConversation.RecipientIds);
+				listUserId.Add(addConversation.UserId);
 
-                    if (groupUserConversation != null && groupUserConversation.Count > 0)
-                    {
-                        foreach (var item in groupUserConversation)
-                        {
-                            if (item.Count == listUserId.Count)
-                            {
-                                long conversationId = item.ConversationId;
-                                var findUserConversation = context.UserConversation.Where(x => x.ConversationId == conversationId && listUserId.Contains(x.UserId)).ToList();
-                                if (findUserConversation.Count == item.Count)
-                                {
-                                    return conversationId;
-                                }
-                            }
-                        }
-                    }
-                }
-                var transaction = context.Database.BeginTransaction();
-                try
-                {
-                    Conversation conversation = new Conversation
-                    {
-                        ConversationName = addConversation.ConversationName ?? null,
-                        DateCreate = addConversation.DateCreate,
-                        IsActivate = true,
-       
-                    };
-                    context.Conversations.Add(conversation);
-                    context.SaveChanges();
-                    long conversationId = conversation.ConversationId;
-                    foreach (long userId in listUserId)
-                    {
-                        UserConversation newUserConversation = new UserConversation
-                        {
-                            UserId = userId,
-                            ConversationId = conversationId,
-                            IsRead = Constants.USER_CONVERSATION_TYPE_INITIAL
-                        };
-                        context.UserConversation.Add(newUserConversation);
-                    }
-                    context.SaveChanges();
-                    transaction.Commit();
-                    return conversationId;
-                } catch (Exception ex) {
-                    transaction.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
+				var userConversation = context.UserConversation.ToList();
+				if (userConversation != null)
+				{
+					var groupUserConversation = userConversation
+					 .GroupBy(x => x.ConversationId)
+					 .Select(group => new
+					 {
+						 ConversationId = group.Key,
+						 Count = group.Distinct().Count()
+					 }).ToList();
 
-        }
+					if (groupUserConversation != null && groupUserConversation.Count > 0)
+					{
+						foreach (var item in groupUserConversation)
+						{
+							if (item.Count == listUserId.Count)
+							{
+								long conversationId = item.ConversationId;
+								var findUserConversation = context.UserConversation.Where(x => x.ConversationId == conversationId && listUserId.Contains(x.UserId)).ToList();
+								if (findUserConversation.Count == item.Count)
+								{
+									return conversationId;
+								}
+							}
+						}
+					}
+				}
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					Conversation conversation = new Conversation
+					{
+						ConversationName = addConversation.ConversationName ?? null,
+						DateCreate = addConversation.DateCreate,
+						IsActivate = true,
 
-        internal (bool, string) ValidateAddConversation (AddConversationRequestDTO addConversation)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+					};
+					context.Conversations.Add(conversation);
+					context.SaveChanges();
+					long conversationId = conversation.ConversationId;
+					foreach (long userId in listUserId)
+					{
+						UserConversation newUserConversation = new UserConversation
+						{
+							UserId = userId,
+							ConversationId = conversationId,
+							IsRead = Constants.USER_CONVERSATION_TYPE_INITIAL
+						};
+						context.UserConversation.Add(newUserConversation);
+					}
+					context.SaveChanges();
+					transaction.Commit();
+					return conversationId;
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+			}
 
-                List<long> listUserId = new List<long>();
-                listUserId.AddRange(addConversation.RecipientIds);
-                listUserId.Add(addConversation.UserId);
+		}
 
-                if (listUserId == null || listUserId.Count < 2
-                    || (listUserId.Count == 2 && !string.IsNullOrEmpty(addConversation.ConversationName))
-                    || (listUserId.Count > 2 && string.IsNullOrEmpty(addConversation.ConversationName)))
-                {
-                    return (false, "Missing name conversation or invalid number of Users");
-                }
-                var duplicates = listUserId
-                      .GroupBy(x => x)
-                      .Where(group => group.Count() > 1)
-                      .Select(group => group.Key)
-                      .ToList();
-                if (duplicates.Count > 0)
-                {
-                    return (false, "Elements appear more than once");
-                }
-                var users = context.User.Where(x => listUserId.Contains(x.UserId)).ToList();
-                if (users.Count != listUserId.Count)
-                {
-                    return (false, "Appears that the user does not exist in the system");
-                }
+		internal (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 
-                return (true, "Success");
-            }
-        }
+				List<long> listUserId = new List<long>();
+				listUserId.AddRange(addConversation.RecipientIds);
+				listUserId.Add(addConversation.UserId);
 
+				if (listUserId == null || listUserId.Count < 2
+					|| (listUserId.Count == 2 && !string.IsNullOrEmpty(addConversation.ConversationName))
+					|| (listUserId.Count > 2 && string.IsNullOrEmpty(addConversation.ConversationName)))
+				{
+					return (false, "Missing name conversation or invalid number of Users");
+				}
+				var duplicates = listUserId
+					  .GroupBy(x => x)
+					  .Where(group => group.Count() > 1)
+					  .Select(group => group.Key)
+					  .ToList();
+				if (duplicates.Count > 0)
+				{
+					return (false, "Elements appear more than once");
+				}
+				var users = context.User.Where(x => listUserId.Contains(x.UserId)).ToList();
+				if (users.Count != listUserId.Count)
+				{
+					return (false, "Appears that the user does not exist in the system");
+				}
 
-
-
-        internal async Task SendMessageConversation(List<Message> messages)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                var transaction = context.Database.BeginTransaction();
-                try
-                {
-                    context.Messages.AddRange(messages);
-                   
-                    await context.SaveChangesAsync();
-                    transaction.Commit();
-                } catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
+				return (true, "Success");
+			}
+		}
 
 
-        internal List<Message> GetMessages(long conversationId)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                List<Message> result = context.Messages
-                    .Include(_ => _.User)
-                    .Where(m => m.ConversationId == conversationId && m.IsDelete == false)
-                    .ToList();
 
-                return result;
-            }
-        }
 
-        internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                List<UserConversation> result = context.UserConversation
-                    .Where(u => u.UserId == senderId || u.UserId == recipientId)
-                    .ToList();
+		internal async Task SendMessageConversation(List<Message> messages)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					context.Messages.AddRange(messages);
 
-                return result;
-            }
+					await context.SaveChangesAsync();
+					transaction.Commit();
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+			}
+		}
 
-        }
+
+		internal List<Message> GetMessages(long conversationId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				List<Message> result = context.Messages
+					.Include(_ => _.User)
+					.Where(m => m.ConversationId == conversationId && m.IsDelete == false)
+					.ToList();
+
+				return result;
+			}
+		}
+
+		internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				List<UserConversation> result = context.UserConversation
+					.Where(u => u.UserId == senderId || u.UserId == recipientId)
+					.ToList();
+
+				return result;
+			}
+
+		}
 
 		internal List<UserConversationDTO> GetRecipientUserIdHasConversation(long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var userConversations = (from userConversation in context.UserConversation
-                                         join conversation in context.Conversations
-                                            on userConversation.ConversationId equals conversation.ConversationId
-										 where
-										 userConversation.UserId != userId &&
-										 (from us in context.UserConversation
-										  where us.UserId == userId
-										  select us.ConversationId
-										  ).ToList()
-										  .Contains(userConversation.UserConversationId)
-										 select new UserConversationDTO
-										 {
-											 UserId = userConversation.UserId,
-											 ConversationId = userConversation.ConversationId,
-                                             IsGroup = conversation.IsGroup,
-                                             MembersInGroup = conversation.IsGroup ?
-											                 (from member in context.UserConversation
-                                                              where member.ConversationId == userConversation.ConversationId &&
-                                                                    member.UserId != userId
-                                                              select member.UserId).ToList()
-                                                              :
-                                                              new List<long>(),
-										 }
-										  ).ToList();
+							  join conversation in context.Conversations
+								 on userConversation.ConversationId equals conversation.ConversationId
+							  where userConversation.UserId != userId &&
+								 (from us in context.UserConversation
+								  where us.UserId == userId
+								  select us.ConversationId
+								 ).Contains(userConversation.ConversationId)
+							  select new UserConversationDTO
+							  {
+								  ConversationId = userConversation.ConversationId,
+								  UserId = userConversation.UserId,
+								  IsGroup = conversation.IsGroup,
+								  MembersInGroup = conversation.IsGroup ?
+													(from member in context.UserConversation
+													where member.ConversationId == userConversation.ConversationId &&
+														member.UserId != userId
+													select member.UserId).ToList()
+													:
+													new List<long>(),
+							  }
+							  ).ToList();
 				return userConversations;
 
 			}

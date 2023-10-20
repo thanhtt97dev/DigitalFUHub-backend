@@ -536,10 +536,30 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Get Customer Balance
-		[Authorize]
+        #region Get online status user
+        [Authorize]
+        [HttpGet("GetOnlineStatusUser/{id}")]
+        public IActionResult GetOnlineStatusUser(int id)
+        {
+            if (id == 0) return BadRequest();
+            try
+            {
+                var user = _userRepository.GetUserById(id);
+                if (user == null) return NotFound();
+
+                return Ok(_mapper.Map<UserOnlineStatusResponseDTO>(user));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+        #region Get Customer Balance
+        [Authorize]
 		[HttpGet("GetCustomerBalance/{id}")]
 		public IActionResult GetCustomerBalanceById(int id)
 		{

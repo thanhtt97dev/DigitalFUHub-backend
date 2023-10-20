@@ -4,6 +4,7 @@ using BusinessObject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20231019105557_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,11 +239,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-<<<<<<< HEAD
                             StartDate = new DateTime(2023, 10, 19, 17, 55, 56, 783, DateTimeKind.Local).AddTicks(2110)
-=======
-                            StartDate = new DateTime(2023, 10, 19, 16, 34, 19, 842, DateTimeKind.Local).AddTicks(1902)
->>>>>>> dbc9091679c78a6f910458bba123d5f5432a492b
                         });
                 });
 
@@ -511,11 +509,7 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 100,
-<<<<<<< HEAD
                             StartDate = new DateTime(2023, 10, 19, 17, 55, 56, 783, DateTimeKind.Local).AddTicks(2173)
-=======
-                            StartDate = new DateTime(2023, 10, 19, 16, 34, 19, 842, DateTimeKind.Local).AddTicks(1929)
->>>>>>> dbc9091679c78a6f910458bba123d5f5432a492b
                         });
                 });
 

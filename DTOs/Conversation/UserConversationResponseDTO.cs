@@ -12,5 +12,7 @@ namespace DTOs.Conversation
         public long RoleId { get; set; }
         public string Fullname { get; set; } = string.Empty;
         public string Avatar { get; set; } = string.Empty;
+        public DateTime LastTimeOnline { get; set; }
+        public bool IsOnline { get; set; }
     }
 }

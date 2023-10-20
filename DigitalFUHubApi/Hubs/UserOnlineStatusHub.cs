@@ -53,9 +53,30 @@ namespace DigitalFUHubApi.Hubs
 
 				var connectionIds = connectionManager.GetConnections(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 				if (connectionIds == null || connectionIds.Count == 0) continue;
-				foreach (var connectionId in connectionIds)
+				if (recipient.IsGroup)
 				{
-				 	await SendUserOnlineStatus(recipient.ConversationId, true, connectionId, userId);
+					int numberMemeberInGroupOnline = 0;
+					// count number user remaning existed online
+					foreach (var memberUserId in recipient.MembersInGroup)
+					{
+						var isMemberOnline = connectionManager.CheckUserConnected(memberUserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+						if (isMemberOnline) numberMemeberInGroupOnline++;
+					}
+					if (numberMemeberInGroupOnline > 1)
+					{
+						foreach (var connectionId in connectionIds)
+						{
+							await SendUserOnlineStatus(recipient.ConversationId, true, connectionId, userId);
+						}
+					}
+				}
+				else
+				{
+					if (connectionIds == null || connectionIds.Count == 0) continue;
+					foreach (var connectionId in connectionIds)
+					{
+						await SendUserOnlineStatus(recipient.ConversationId, true, connectionId, userId);
+					}
 				}
 			}
 
