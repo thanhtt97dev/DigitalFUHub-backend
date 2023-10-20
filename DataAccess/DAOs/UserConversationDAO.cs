@@ -37,7 +37,7 @@ namespace DataAccess.DAOs
             {
                 var userConversation = context
                     .UserConversation
-                    .Where(x => request.RecipientIds.Contains(x.UserId) && x.ConversationId == request.ConversationId);
+                    .Where(x => request.UserId == x.UserId && x.ConversationId == request.ConversationId);
                 if (userConversation == null) throw new ArgumentNullException("Not found user Conversation");
                 var message = context.Messages.Where(x => x.ConversationId == request.ConversationId).ToList();
                 if (message.Count() > 0)
