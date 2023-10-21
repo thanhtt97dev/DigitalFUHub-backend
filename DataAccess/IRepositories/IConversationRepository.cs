@@ -1,6 +1,5 @@
 ﻿
 using BusinessObject.Entities;
-using DTOs.Chat;
 using DTOs.Conversation;
 using System;
 using System.Collections.Generic;

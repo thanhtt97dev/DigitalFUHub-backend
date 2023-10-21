@@ -2,7 +2,6 @@
 using BusinessObject.Entities;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
-using DTOs.Chat;
 using DTOs.Conversation;
 using System;
 using System.Collections.Generic;

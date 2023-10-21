@@ -2,7 +2,6 @@
 
 using BusinessObject.Entities;
 using Comons;
-using DTOs.Chat;
 using DTOs.Conversation;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +52,7 @@ namespace DataAccess.DAOs
 												.ToList();
 
 				var groupedConversations = conversations
-					.GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate })
+					.GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate, x.Conversation.IsGroup })
 					.Select(group => new ConversationResponseDTO
 					{
 						ConversationId = group.Key.ConversationId,
@@ -63,6 +62,7 @@ namespace DataAccess.DAOs
 						IsRead = userConversations.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.IsRead ?? 1,
 						LatestMessage = context.Messages.OrderByDescending(x => x.DateCreate)
 						.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.Content ?? "",
+						IsGroup = group.Key.IsGroup,
 						Users = group.Select(uc => new UserConversationResponseDTO
 						{
 							UserId = uc.User.UserId,
@@ -122,8 +122,8 @@ namespace DataAccess.DAOs
 						ConversationName = addConversation.ConversationName ?? null,
 						DateCreate = addConversation.DateCreate,
 						IsActivate = true,
-
-					};
+                        IsGroup = addConversation.RecipientIds.Count > 1 ? true : false
+                    };
 					context.Conversations.Add(conversation);
 					context.SaveChanges();
 					long conversationId = conversation.ConversationId;
@@ -159,7 +159,7 @@ namespace DataAccess.DAOs
 				listUserId.AddRange(addConversation.RecipientIds);
 				listUserId.Add(addConversation.UserId);
 
-				if (listUserId == null || listUserId.Count < 2
+				if (listUserId.Count == 0 || listUserId.Count < 2
 					|| (listUserId.Count == 2 && !string.IsNullOrEmpty(addConversation.ConversationName))
 					|| (listUserId.Count > 2 && string.IsNullOrEmpty(addConversation.ConversationName)))
 				{
