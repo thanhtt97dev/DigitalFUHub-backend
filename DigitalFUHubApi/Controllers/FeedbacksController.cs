@@ -47,7 +47,7 @@ namespace DigitalFUHubApi.Controllers
 		#region add feedback order
 		[Authorize("Customer,Seller")]
 		[HttpPost("Add")]
-		public async Task<IActionResult> FeedbackOrder([FromForm] CustomerFeedbackOrderRequestDTO request)
+		public async Task<IActionResult> AddFeedbackOrder([FromForm] CustomerFeedbackOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -78,7 +78,7 @@ namespace DigitalFUHubApi.Controllers
 
 				}
 
-				_feedbackRepository.FeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				_feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 			}
 			catch (Exception)
 			{
@@ -88,24 +88,28 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region add feedback order
-		//[Authorize("Customer,Seller")]
+		#region get feedback detail
+		[Authorize("Customer,Seller")]
 		[HttpPost("Detail")]
 		public IActionResult FeedbackDetailOrder(CustomerFeedbackDetailOrderRequestDTO request)
 		{
-			Order? order = _feedbackRepository.FeedbackDetail(request.OrderId, request.UserId);
+			Order? order = _feedbackRepository.GetFeedbackDetail(request.OrderId, request.UserId);
 			if (order == null)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
 			}
 			List<CustomerFeedbackDetailOrderResponseDTO> response = order.OrderDetails.Where(x => x.IsFeedback == true).Select(x => new CustomerFeedbackDetailOrderResponseDTO
 			{
+				Fullname = order.User.Fullname,
+				Avatar = order.User.Avatar,
 				ProductName = x.ProductVariant.Product.ProductName ?? "",
 				ProductVariantName = x.ProductVariant.Name ?? "",
 				Content = x?.Feedback?.Content ?? "",
 				Rate = x.Feedback?.Rate ?? 0,
+				Quantity = x.Quantity,
+				Date = x.Feedback?.UpdateDate ?? new DateTime(),
 				Thumbnail = x.ProductVariant.Product.Thumbnail ?? "",
-				urlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
+				UrlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
 			}).ToList();
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
 		}

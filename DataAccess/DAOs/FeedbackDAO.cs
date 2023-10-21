@@ -85,7 +85,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void FeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
+		internal void AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -135,11 +135,12 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Order? FeedbackOrder(long orderId, long userId)
+		internal Order? GetFeedbackDetail(long orderId, long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				Order? order = context.Order
+					.Include(x => x.User)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.Feedback)
 					.ThenInclude(x => x.FeedbackMedias)

@@ -304,7 +304,7 @@ namespace DigitalFUHubApi.Controllers
 
 				List<Order> orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, "",
 					fromDate, toDate, request.Status)
-					.Where(x => x.ShopId == request.UserId)
+					.Where(x => x.Shop.UserId == request.UserId)
 					.ToList();
 				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
 
