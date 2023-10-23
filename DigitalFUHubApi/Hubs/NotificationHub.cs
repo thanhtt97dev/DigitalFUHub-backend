@@ -11,7 +11,7 @@ using Comons;
 
 namespace DigitalFUHubApi.Hubs
 {
-
+	[Authorize]
     public class NotificationHub : Hub
 	{
 

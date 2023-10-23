@@ -4,8 +4,21 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace DigitalFUHubApi.Comons
 {
-    public class JwtValidationEvents : JwtBearerEvents
+    public class JwtBearerValidationEvents : JwtBearerEvents
 	{
+
+		public override Task MessageReceived(MessageReceivedContext context)
+		{
+			// If the request is for our hub...
+			var path = context.HttpContext.Request.Path.ToString();
+			if (path.Contains("/hubs/"))
+			{
+				var accessToken = context.Request.Query["access_token"];
+				context.Token = accessToken;
+			}
+			return Task.CompletedTask;
+		}
+
 		public override Task TokenValidated(TokenValidatedContext context)
 		{
 			// Retrieve user's info from token claims
@@ -16,16 +29,6 @@ namespace DigitalFUHubApi.Comons
 				jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
 				userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
 			}
-
-			/*
-			// Get cookie
-			var jwtId = string.Empty;
-			var httpContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IHttpContextAccessor>();
-			if (httpContextAccessor != null)
-			{
-				jwtId = httpContextAccessor.HttpContext.Request.Cookies["_tid"];
-			}
-			*/
 
 			int userId;
 			int.TryParse(userIdStr, out userId);

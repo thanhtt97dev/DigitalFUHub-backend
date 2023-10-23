@@ -7,11 +7,13 @@ using DigitalFUHubApi.Services;
 using DTOs.Conversation;
 using DTOs.Notification;
 using DTOs.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 
 namespace DigitalFUHubApi.Hubs
 {
+	[Authorize]
 	public class UserOnlineStatusHub : Hub
 	{
 		private readonly IConnectionManager connectionManager;
