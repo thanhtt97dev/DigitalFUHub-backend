@@ -12,17 +12,12 @@ namespace DataAccess.Repositories
 {
 	public class ShopRepository : IShopRepository
 	{
-		public bool CheckShopNameExisted(string shopName) => ShopDAO.Instance.CheckShopNameExisted(shopName);
+		public bool IsExistShopName(string shopName) => ShopDAO.Instance.IsExistShopName(shopName);
 
-
-		public void CreateShop(string shopName, long userId, string shopDescription) => ShopDAO.Instance.CreateShop(shopName, userId, shopDescription);
-
-		public Product GetProductById(long productId) =>  ShopDAO.Instance.GetProductById(productId);
+		public void AddShop(string shopName, long userId, string shopDescription) => ShopDAO.Instance.AddShop(shopName, userId, shopDescription);
 
 		public Shop? GetShopById(long shopId) => ShopDAO.Instance.GetShopById(shopId);
 
-		public bool ShopHasProduct(long userId, long productId) =>  ShopDAO.Instance.ShopHasProduct(userId, productId);
-
-		public bool UserHasShop(long userId) =>  ShopDAO.Instance.UserHasShop(userId);
+		public bool IsExistShop(long userId) =>  ShopDAO.Instance.IsExistShop(userId);
 	}
 }

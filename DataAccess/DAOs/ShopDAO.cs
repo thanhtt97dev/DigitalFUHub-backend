@@ -27,12 +27,14 @@ namespace DataAccess.DAOs
 
 
 
-		internal void CreateShop(string shopName, long userId, string shopDescription)
+		internal void AddShop(string shopName, long userId, string shopDescription)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				try
 				{
+					if (context.Shop.Any(x => x.UserId == userId)) throw new Exception("ERROR");
+					if (context.Shop.Any(x => x.ShopName.ToLower() == shopName.ToLower())) throw new Exception("ERROR");
 					Shop shop = new Shop()
 					{
 						DateCreate = DateTime.Now,
@@ -54,7 +56,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal bool UserHasShop(long userId)
+		internal bool IsExistShop(long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -62,14 +64,6 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal bool ShopHasProduct(long userId, long productId)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				return context.Shop.Include(i => i.Products)
-					.Any(x => x.UserId == userId && x.Products.Any(x => x.ProductId == productId));
-			}
-		}
 
 		internal Product GetProductById(long productId)
 		{
@@ -93,7 +87,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal bool CheckShopNameExisted(string shopName)
+		internal bool IsExistShopName(string shopName)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{

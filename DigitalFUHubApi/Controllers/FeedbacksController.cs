@@ -57,32 +57,28 @@ namespace DigitalFUHubApi.Controllers
 			{
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				List<string> urlImages = new List<string>();
-				if (request.ImageFiles != null || request?.ImageFiles?.Count > 0)
+				if (request.ImageFiles != null
+					&&
+					request?.ImageFiles?.Count > 0
+					&&
+					!request.ImageFiles.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf(".")))))
 				{
-					if (request.ImageFiles.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf(".")))))
+					string filename;
+					DateTime now;
+					foreach (IFormFile file in request.ImageFiles)
 					{
-						throw new Exception("File extension not accept.");
+						now = DateTime.Now;
+						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+						string path = await _storageService.UploadFileToAzureAsync(file, filename);
+						urlImages.Add(path);
 					}
-					else
-					{
-						string filename;
-						DateTime now;
-						foreach (IFormFile file in request.ImageFiles)
-						{
-							now = DateTime.Now;
-							filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-							string path = await _storageService.UploadFileToAzureAsync(file, filename);
-							urlImages.Add(path);
-						}
-					}
-
 				}
 
 				_feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "ERROR", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 		}

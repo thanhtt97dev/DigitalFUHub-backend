@@ -14,7 +14,7 @@
 	using BusinessObject.Entities;
 	using DTOs.User;
 	using System.Net;
-    using global::Comons;
+	using global::Comons;
 	using static QRCoder.PayloadGenerator;
 	using Google.Apis.Auth;
 
@@ -89,11 +89,11 @@
 			try
 			{
 				GoogleJsonWebSignature.Payload payload = await GoogleJsonWebSignature.ValidateAsync(request.GToken);
-				if(payload == null)
+				if (payload == null)
 				{
 					return Conflict();
-				} 
-				
+				}
+
 				User? user = _userRepository.GetUserByEmail(payload.Email);
 
 				if (user == null)
@@ -178,20 +178,13 @@
 		{
 			try
 			{
-				bool result = _jwtTokenService.CheckTokenConfirmEmail(token);
-				return result ? Ok("Y") : Ok("N");
+				bool result = _jwtTokenService.ValidateTokenConfirmEmail(token);
+				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_FAILD, 
+					result ? "SUCCESS" : "INVALID", result, new()));
 			}
-			catch (NullReferenceException)
+			catch (Exception e)
 			{
-				return NotFound();
-			}
-			catch (ArgumentOutOfRangeException)
-			{
-				return Conflict();
-			}
-			catch (Exception)
-			{
-				return Conflict();
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
 			}
 
 		}
@@ -203,7 +196,7 @@
 		{
 			if (string.IsNullOrWhiteSpace(email))
 			{
-				return UnprocessableEntity();
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			else
 			{
@@ -212,15 +205,15 @@
 					User? user = _userRepository.GetUserByEmail(email.Trim());
 					if (user == null)
 					{
-						return NotFound();
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 					}
 					if (!user.IsConfirm)
 					{
-						return Conflict();
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM, "INVALID", false, new()));
 					}
-					if (user.SignInGoogle)
+					if (string.IsNullOrEmpty(user.Username))
 					{
-						return Conflict();
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE, "INVALID", false, new()));
 					}
 					string newPassword = Util.Instance.RandomPassword8Chars();
 					string passwordHash = Util.Instance.Sha256Hash(newPassword);
@@ -246,13 +239,13 @@
 			User? user = _userRepository.GetUserByEmail(email);
 			if (user == null)
 			{
-				return NotFound();
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 			}
 			else
 			{
 				if (user.IsConfirm)
 				{
-					return Conflict();
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_CONFIRM_PASSWORD_IS_CONFIRMED, "INVALID", false, new()));
 				}
 				else
 				{
@@ -260,7 +253,7 @@
 					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
 				}
 			}
-			return Ok();
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 		}
 		#endregion
 
@@ -536,30 +529,30 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Get online status user
-        [Authorize]
-        [HttpGet("GetOnlineStatusUser/{id}")]
-        public IActionResult GetOnlineStatusUser(int id)
-        {
-            if (id == 0) return BadRequest();
-            try
-            {
-                var user = _userRepository.GetUserById(id);
-                if (user == null) return NotFound();
+		#region Get online status user
+		[Authorize]
+		[HttpGet("GetOnlineStatusUser/{id}")]
+		public IActionResult GetOnlineStatusUser(int id)
+		{
+			if (id == 0) return BadRequest();
+			try
+			{
+				var user = _userRepository.GetUserById(id);
+				if (user == null) return NotFound();
 
-                return Ok(_mapper.Map<UserOnlineStatusResponseDTO>(user));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        #endregion
+				return Ok(_mapper.Map<UserOnlineStatusResponseDTO>(user));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
-        #region Get Customer Balance
-        [Authorize]
+		#region Get Customer Balance
+		[Authorize]
 		[HttpGet("GetCustomerBalance/{id}")]
 		public IActionResult GetCustomerBalanceById(int id)
 		{
@@ -602,61 +595,61 @@
 		#region Update balance
 		//[Authorize]
 		[HttpPut("UpdateBalance/{id}")]
-        public IActionResult UpdateBalance(long id, UpdateAccountBalanceRequestDTO updateAccountBalanceRequest)
-        {
-            try
-            {
-                _userRepository.UpdateBalance(id, updateAccountBalanceRequest.AccountBalance);
-                return Ok(new Status
-                {
-                    Message = "Update Account Balance Successfully",
-                    ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
-                    Ok = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new Status
-                {
-                    Message = ex.Message,
-                    ResponseCode = Constants.RESPONSE_CODE_FAILD,
-                    Ok = false
-                });
-            }
-        }
-        #endregion
+		public IActionResult UpdateBalance(long id, UpdateAccountBalanceRequestDTO updateAccountBalanceRequest)
+		{
+			try
+			{
+				_userRepository.UpdateBalance(id, updateAccountBalanceRequest.AccountBalance);
+				return Ok(new Status
+				{
+					Message = "Update Account Balance Successfully",
+					ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
+					Ok = true
+				});
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new Status
+				{
+					Message = ex.Message,
+					ResponseCode = Constants.RESPONSE_CODE_FAILD,
+					Ok = false
+				});
+			}
+		}
+		#endregion
 
 		#region Check Exist Email
-		[HttpGet("CheckExistEmail/{email}")]
+		[HttpGet("IsExistEmail/{email}")]
 		public IActionResult CheckExistEmail(string email)
 		{
-			if(string.IsNullOrWhiteSpace(email))
+			if (string.IsNullOrWhiteSpace(email))
 			{
-				return Ok("Y");
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			User? user = _userRepository.GetUserByEmail(email);
 			if (user == null)
 			{
-				return Ok("N");
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
-			return Ok("Y");
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 		}
 		#endregion
 
 		#region Check Exist Username
-		[HttpGet("CheckExistUsername/{username}")]
+		[HttpGet("IsExistUsername/{username}")]
 		public IActionResult CheckExistUsername(string username)
 		{
 			if (string.IsNullOrWhiteSpace(username))
 			{
-				return Ok("Y");
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			User? user = _userRepository.GetUserByUsername(username);
 			if (user == null)
 			{
-				return Ok("N");
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
-			return Ok("Y");
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 		}
 		#endregion
 

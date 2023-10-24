@@ -259,19 +259,11 @@ namespace DigitalFUHubApi.Controllers
 				request.CustomerEmail == null || request.UserId == 0 ||
 				request.ToDate == null || request.FromDate == null) return BadRequest();
 
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-
 			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
 			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
 			{
-				status.Message = "Invalid order status!";
-				status.Ok = false;
-				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
-
 			try
 			{
 
@@ -284,20 +276,12 @@ namespace DigitalFUHubApi.Controllers
 					toDate = DateTime.ParseExact(request.ToDate, format, CultureInfo.InvariantCulture).AddDays(1);
 					if (fromDate > toDate)
 					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
 					}
 				}
 				catch (FormatException)
 				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID DATE", false, new()));
 				}
 				long orderId;
 				long.TryParse(request.OrderId, out orderId);
@@ -308,16 +292,11 @@ namespace DigitalFUHubApi.Controllers
 					.ToList();
 				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
 			}
-			catch (Exception ex)
+			catch (Exception e)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
 			}
 		}
 		#endregion

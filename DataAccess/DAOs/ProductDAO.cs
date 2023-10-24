@@ -169,8 +169,8 @@ namespace DataAccess.DAOs
 				{
 					feedbachNumber += context.Feedback.Where(x => x.ProductId == item.ProductId).Count();
 				}
-				
-				var sellerInfo = context.User.First(x => x.UserId == shopId);	
+
+				var sellerInfo = context.User.First(x => x.UserId == shopId);
 
 				ProductDetailShopResponseDTO shop = new ProductDetailShopResponseDTO
 				{
@@ -355,6 +355,37 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.ProductVariant.FirstOrDefault(x => x.ProductVariantId == id);
+			}
+		}
+
+		internal Product? GetProductByShop(long userId, long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Product? product = context.Product.Where(x => x.ProductId == productId && x.ShopId == userId)
+						.Select(x => new Product
+						{
+							ProductId = productId,
+							CategoryId = x.CategoryId,
+							Description = x.Description,
+							Discount = x.Discount,
+							ProductMedias = x.ProductMedias,
+							ProductName = x.ProductName,
+							ProductStatusId = x.ProductStatusId,
+							Tags = x.Tags,
+							Thumbnail = x.Thumbnail,
+							ProductVariants = context.ProductVariant.Include(i => i.AssetInformations.Where(x => x.IsActive == true)).Where(x => x.ProductId == productId && x.isActivate == true).ToList(),
+						}).FirstOrDefault();
+				return product;
+			}
+		}
+
+		internal bool IsExistProductByShop(long userId, long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Shop.Include(i => i.Products)
+					.Any(x => x.UserId == userId && x.Products.Any(x => x.ProductId == productId));
 			}
 		}
 	}

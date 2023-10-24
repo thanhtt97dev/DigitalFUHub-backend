@@ -40,6 +40,11 @@
 		public const string RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY = "CART_02";
 		public const string RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP = "CART_03";
 
+		public const string RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM = "RS_01";
+		public const string RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE = "RS_02";
+
+		public const string RESPONSE_CODE_CONFIRM_PASSWORD_IS_CONFIRMED = "CF_01";
+
 
 		//SignalR
 		public const string SIGNAL_R_CHAT_HUB = "chatHub";

@@ -21,5 +21,7 @@ namespace DataAccess.IRepositories
 		List<ProductMedia> GetAllProductMediaById(long productId);
         List<AllProductResponseDTO> GetAllProduct();
 		ProductVariant? GetProductVariant(long id);
+		Product? GetProductByShop(long userId, long productId);
+		bool IsExistProductByShop(long userId, long productId);
 	}
 }

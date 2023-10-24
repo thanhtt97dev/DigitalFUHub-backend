@@ -24,65 +24,38 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 
-		//[Authorize]
-		[HttpGet("CheckExistShopName/{shopName}")]
+		[Authorize]
+		[HttpGet("IsExistShopName/{shopName}")]
 		public IActionResult CheckExistShopName(string shopName)
 		{
-			ResponseData response = new ResponseData();
-			if (string.IsNullOrEmpty(shopName))
+			if (string.IsNullOrWhiteSpace(shopName))
 			{
-				response.Status.Message = "Invalid";
-				response.Status.Ok = false;
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
-			bool result = _shopRepository.CheckShopNameExisted(shopName.Trim());
-			response.Status.Message = !result ? "Success" : "Invalid";
-			response.Status.Ok = !result;
-			response.Status.ResponseCode = !result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_FAILD;
-			return Ok(response);
+			bool result = _shopRepository.IsExistShopName(shopName.Trim());
+			return Ok(new ResponseData(!result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_NOT_ACCEPT, !result ? "SUCCESS" : "INVALID", !result, new()));
 		}
 
 		#region register seller
 		[Authorize("Customer")]
 		[HttpPost("Register")]
-		public ActionResult<ResponseData> Register(RegisterShopRequestDTO request)
+		public IActionResult Register(RegisterShopRequestDTO request)
 		{
-			ResponseData response = new ResponseData();
-			if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.ShopName) || string.IsNullOrWhiteSpace(request.ShopDescription))
+			if (!ModelState.IsValid
+				|| string.IsNullOrWhiteSpace(request.ShopName)
+				|| string.IsNullOrWhiteSpace(request.ShopDescription))
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				response.Status.Message = "Vui lòng kiểm tra lại dữ liệu.";
-				response.Status.Ok = false;
-				return response;
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
-			User? user;
 			try
 			{
-				user = _userRepository.GetUserById(request.UserId);
-				if (user == null) throw new Exception("Người dùng không khả dụng.");
-
-				bool userShopExist = _shopRepository.UserHasShop(request.UserId);
-				if (userShopExist) throw new Exception("Đã tồn tại cửa hàng không thể tạo thêm.");
-
-				bool shopNameExist = _shopRepository.CheckShopNameExisted(request.ShopName.Trim());
-				if (shopNameExist) throw new Exception("Tên cửa hàng đã tồn tại.");
-
-				_shopRepository.CreateShop(request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
+				_shopRepository.AddShop(request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			catch (Exception e)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Message = e.Message;
-				response.Status.Ok = false;
-				return response;
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
 			}
-
-
-			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-			response.Status.Message = "Đăng ký cửa hàng thành công.";
-			response.Status.Ok = true;
-			return response;
 		}
 		#endregion
 
