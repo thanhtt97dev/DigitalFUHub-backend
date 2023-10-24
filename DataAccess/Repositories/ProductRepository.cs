@@ -32,5 +32,8 @@ namespace DataAccess.Repositories
 
 		public ProductVariant? GetProductVariant(long id) => ProductDAO.Instance.GetProductVariant(id);
 
+		public Product? GetProductByShop(long userId, long productId) => ProductDAO.Instance.GetProductByShop(userId, productId);
+
+		public bool IsExistProductByShop(long userId, long productId) => ProductDAO.Instance.IsExistProductByShop(userId, productId);
 	}
 }

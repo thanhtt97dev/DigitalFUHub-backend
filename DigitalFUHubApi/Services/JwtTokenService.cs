@@ -196,7 +196,7 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Check token confirm email
-		internal bool CheckTokenConfirmEmail(string token)
+		internal bool ValidateTokenConfirmEmail(string token)
 		{
 
 			JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
@@ -218,21 +218,21 @@ namespace DigitalFUHubApi.Services
 			{
 				bool result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512,
 					StringComparison.InvariantCultureIgnoreCase);
-				if (!result) throw new NullReferenceException("invalid");
+				if (!result) throw new Exception("INVALID");
 			}
 
 			string? username = tokenVerification.Claims.First(x => x.Type == ClaimTypes.Name).Value;
 			string? email = tokenVerification.Claims.First(x => x.Type == ClaimTypes.Email).Value;
 			string? fullname = tokenVerification.Claims.First(x => x.Type == ClaimTypes.GivenName).Value;
-			if (fullname == null || username == null || email == null) throw new NullReferenceException("invalid");
+			if (fullname == null || username == null || email == null) throw new Exception("INVALID");
 			User? user = _userRepository.GetUser(email, username, fullname);
-			if (user == null) throw new NullReferenceException("invalid");
+			if (user == null) throw new Exception("INVALID");
 			if (user.IsConfirm) return false;
 			long utcExpireDate = long.Parse(tokenVerification.Claims.First(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 			DateTime expireDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			expireDate = expireDate.AddSeconds(utcExpireDate).ToUniversalTime();
 
-			if (expireDate < DateTime.UtcNow) throw new ArgumentOutOfRangeException("expired");
+			if (expireDate < DateTime.UtcNow) throw new Exception("INVALID");
 
 			user.IsConfirm = true;
 			_userRepository.UpdateUser(user);

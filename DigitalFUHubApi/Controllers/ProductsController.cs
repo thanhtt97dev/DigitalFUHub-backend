@@ -13,10 +13,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalFUHubApi.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProductsController : ControllerBase
-    {
+	[Route("api/[controller]")]
+	[ApiController]
+	public class ProductsController : ControllerBase
+	{
 		private readonly IConfiguration _configuration;
 		private readonly IProductRepository _productRepository;
 		private readonly StorageService _storageService;
@@ -43,28 +43,28 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 		[HttpGet("GetById/{productId}")]
-        public IActionResult GetById(long productId)
-        {
-            try
-            {
-                if (productId == 0)
-                {
-                    return BadRequest(new Status());
-                }
+		public IActionResult GetById(long productId)
+		{
+			try
+			{
+				if (productId == 0)
+				{
+					return BadRequest(new Status());
+				}
 
-                var product = _productRepository.GetProductById(productId);
-                if (product == null)
-                {
-                    return NotFound(new Status());
-                }
-                return Ok(product);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return BadRequest(new Status());
-            }
-        }
+				var product = _productRepository.GetProductById(productId);
+				if (product == null)
+				{
+					return NotFound(new Status());
+				}
+				return Ok(product);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				return BadRequest(new Status());
+			}
+		}
 		#region Get All Product with shopId (userId)
 		[Authorize("Seller")]
 		[HttpGet("All/Seller/{id}")]
@@ -85,89 +85,49 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get All Product 
 		[HttpGet("GetAllProduct")]
-        public IActionResult GetAllProduct()
-        {
-            try
-            {
-                var products = _productRepository.GetAllProduct();
-                return Ok(products);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
+		public IActionResult GetAllProduct()
+		{
+			try
+			{
+				var products = _productRepository.GetAllProduct();
+				return Ok(products);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new { Message = ex.Message });
+			}
+		}
 		#endregion
 
 		#region Get Product Of Seller
 		[Authorize("Seller")]
 		[HttpGet("{productId}/Seller/{userId}")]
-		public ActionResult<ResponseData> GetProduct(long userId, long productId)
+		public IActionResult GetProduct(long userId, long productId)
 		{
-			ResponseData response = new ResponseData();
-			// check user have shop
-			bool existShop = _shopRepository.UserHasShop(userId);
-			if (!existShop)
+			Product? product = _productRepository.GetProductByShop(userId, productId);
+			if (product == null)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				response.Status.Ok = false;
-				response.Status.Message = "Cửa hàng không tồn tại.";
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+			}
+			else if (product.ProductStatusId == Constants.PRODUCT_BAN || product.ProductStatusId == Constants.PRODUCT_HIDE)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
 			else
 			{
-				// check shop have product
-				bool existProduct = _shopRepository.ShopHasProduct(userId, productId);
-				if (!existProduct)
-				{
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					response.Status.Ok = false;
-					response.Status.Message = "Cửa hàng không tồn tại sản phẩm này.";
-				}
-				else
-				{
-					// get product
-					Product product = _shopRepository.GetProductById(productId);
-					if (product.ProductStatusId == Constants.PRODUCT_BAN)
-					{
-						response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-						response.Status.Ok = false;
-						response.Status.Message = "Sản phẩm đã vi phạm chính sách của sàn.";
-					}
-					else if (product.ProductStatusId == Constants.PRODUCT_HIDE)
-					{
-						response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-						response.Status.Ok = false;
-						response.Status.Message = "Sản phẩm đã bị xóa.";
-					}
-					else
-					{
-						response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-						response.Status.Ok = true;
-						response.Status.Message = "";
-						response.Result = _mapper.Map<ProductResponseDTO>(product);
-					}
-				}
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<ProductResponseDTO>(product)));
 			}
-			return response;
 		}
 		#endregion
 
 		#region Add new product
 		[Authorize("Seller")]
 		[HttpPost("Add")]
-		public async Task<ActionResult<ResponseData>> AddProduct([FromForm] AddProductRequestDTO request)
+		public async Task<IActionResult> AddProduct([FromForm] AddProductRequestDTO request)
 		{
-			ResponseData response = new ResponseData();
 			if (!ModelState.IsValid)
 			{
-				response.Status = new Status
-				{
-					Ok = false,
-					ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
-					Message = "Dữ liệu không hợp lệ"
-				};
-				response.Result = new();
-				return response;
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 			if (request.DataVariants.Any(x => !x.FileName.Contains(".xlsx"))
@@ -176,14 +136,7 @@ namespace DigitalFUHubApi.Controllers
 				||
 				!fileExtension.Contains(request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf("."))))
 			{
-				response.Status = new Status
-				{
-					Ok = false,
-					ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
-					Message = "File không hợp lệ."
-				};
-				response.Result = new();
-				return response;
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			try
 			{
@@ -242,45 +195,30 @@ namespace DigitalFUHubApi.Controllers
 				};
 
 				_productRepository.AddProduct(product);
-				response.Status = new Status
-				{
-					Ok = true,
-					ResponseCode = Constants.RESPONSE_CODE_SUCCESS,
-					Message = ""
-				};
-				response.Result = new();
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+
 			}
 			catch (Exception e)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
 			}
-			return response;
 		}
 		#endregion
 
 		#region Edit product
 		[Authorize("Seller")]
-		[HttpPut("Edit/{productId}")]
-		public async Task<ActionResult<ResponseData>> EditProduct(long productId, [FromForm] EditProductRequestDTO request)
+		[HttpPost("Edit")]
+		public async Task<IActionResult> EditProduct([FromForm] EditProductRequestDTO request)
 		{
-			ResponseData response = new ResponseData();
-			if (productId != request.ProductId)
-			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				response.Status.Ok = false;
-				response.Status.Message = "Sản phẩm không hợp lệ.";
-				return response;
-			}
-			bool isHasProduct = _shopRepository.ShopHasProduct(request.UserId, request.ProductId);
-			if (!isHasProduct)
-			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				response.Status.Ok = false;
-				response.Status.Message = "Sản phẩm không hợp lệ.";
-				return response;
-			}
 			try
 			{
+				bool isExistProduct = _productRepository.IsExistProductByShop(request.UserId, request.ProductId);
+				if (!isExistProduct)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+				}
+
 				string filename = "";
 				DateTime now;
 				List<Tag> tags = new List<Tag>();
@@ -362,18 +300,12 @@ namespace DigitalFUHubApi.Controllers
 						await _storageService.RemoveFileFromAzureAsync(media.Url.Substring(media.Url.LastIndexOf("/") + 1));
 					}
 				}
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-				response.Status.Ok = false;
-				response.Status.Message = "Đã có lỗi xảy ra.";
-				return response;
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
 			}
-			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-			response.Status.Ok = true;
-			response.Status.Message = "";
-			return response;
 		}
 		#endregion
 	}

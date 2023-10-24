@@ -114,7 +114,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal bool CheckCouponCodeExist(string couponCode)
+		internal bool IsExistCouponCode(string couponCode)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{

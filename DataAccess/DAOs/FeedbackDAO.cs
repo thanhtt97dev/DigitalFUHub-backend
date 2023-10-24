@@ -94,7 +94,8 @@ namespace DataAccess.DAOs
 					Order? order = context.Order.Include(x => x.OrderDetails).ThenInclude(x => x.ProductVariant)
 						.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId
 						&& x.OrderDetails.Any(od => od.OrderDetailId == orderDetailId));
-					if (order == null) throw new Exception("Order not found!");
+					if (order == null) throw new Exception("NOT FOUND.");
+					if(DateTime.Now.Subtract(order.OrderDate) > TimeSpan.FromDays(7)) throw new Exception("EXCEED TIME TO FEEDBACK.");
 
 					User user = context.User.First(x => x.UserId == userId);
 
