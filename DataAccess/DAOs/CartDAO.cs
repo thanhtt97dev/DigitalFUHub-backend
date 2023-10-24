@@ -259,6 +259,7 @@ namespace DataAccess.DAOs
                 if (cartDetail == null) return;
                 cartDetail.Quantity = quantity;
                 context.CartDetail.Update(cartDetail);
+                context.SaveChanges();
 			}
 		}
 
