@@ -29,20 +29,35 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Coupon> GetCoupons(long shopId, string couponCode)
+		internal List<Coupon> GetCouponPublic(long shopId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var coupons = context.Coupon.Where(c => c.ShopId == shopId
 															&& c.IsActive == true
-															&& c.CouponCode.Equals(couponCode)
+															&& c.IsPublic == true
 															&& c.EndDate > DateTime.Now).ToList();
 
 				return coupons;
 			}
 		}
 
-		internal List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate, bool? isPublic)
+        internal Coupon? GetCouponByCode(string couponCode)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var coupon = context
+								.Coupon
+								.FirstOrDefault(c => c.CouponCode.ToLower().Equals(couponCode.ToLower())
+                                            && c.IsActive == true
+                                            && c.IsPublic == false
+                                            && c.EndDate > DateTime.Now);
+
+                return coupon;
+            }
+        }
+
+        internal List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate, bool? isPublic)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{

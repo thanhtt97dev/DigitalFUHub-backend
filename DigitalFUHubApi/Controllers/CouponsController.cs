@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
@@ -44,33 +45,72 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 		}
 
-		[HttpGet("getCoupons")]
-		public IActionResult GetCoupons(long shopId, string couponCode)
+        #region Get coupon public (customer)
+        [HttpGet("GetCouponPublic")]
+		public IActionResult GetCouponPublic(long shopId)
 		{
-			try
+            ResponseData response = new ResponseData();
+            try
 			{
-				if (shopId == 0)
+                if (shopId == 0)
 				{
-					return BadRequest(new Status());
-				}
-				if (string.IsNullOrEmpty(couponCode))
-				{
-					return BadRequest(new Status());
-				}
+                    response.Status.Ok = false;
+                    response.Status.Message = "Invalid";
+                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    return Ok(response);
+                }
 
-				List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetCoupons(shopId, couponCode));
+                List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetCouponPublic(shopId));
+                response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                response.Status.Message = "Success";
+                response.Status.Ok = true;
+                response.Result = coupons;
 
-				return Ok(coupons);
-			}
+            }
 			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}
-		}
 
-		#region Get list coupons
+            return Ok(response);
+        }
+        #endregion
 
-		[Authorize("Seller")]
+
+        #region Get coupon by code
+        [HttpGet("GetCouponByCode")]
+        public IActionResult GetCouponByCode(string couponCode)
+        {
+            ResponseData response = new ResponseData();
+            try
+            {
+                if (string.IsNullOrEmpty(couponCode))
+                {
+                    response.Status.Ok = false;
+                    response.Status.Message = "Invalid";
+                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    return Ok(response);
+                }
+
+                CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponByCode(couponCode));
+                response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                response.Status.Message = "Success";
+                response.Status.Ok = true;
+                response.Result = coupon;
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(response);
+        }
+        #endregion
+
+        #region Get list coupons
+
+        [Authorize("Seller")]
 		[HttpPost("List/Seller")]
 		public IActionResult GetListCouponsSeller(SellerCouponRequestDTO request)
 		{

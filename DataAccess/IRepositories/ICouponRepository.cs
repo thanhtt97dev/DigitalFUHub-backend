@@ -11,8 +11,9 @@ namespace DataAccess.IRepositories
     {
 		void AddCoupon(Coupon coupon);
 		bool CheckCouponCodeExist(string couponCode);
-		List<Coupon> GetCoupons (long shopId, string couponCode);
-		Coupon? GetCoupons(long couponId);
+		List<Coupon> GetCouponPublic(long shopId);
+        Coupon? GetCouponByCode(string couponCode);
+        Coupon? GetCoupons(long couponId);
 		List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate, bool? isPublic);
 		void UpdateCoupon(Coupon coupon);
 	}

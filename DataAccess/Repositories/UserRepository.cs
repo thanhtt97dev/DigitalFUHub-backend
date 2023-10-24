@@ -34,16 +34,6 @@ namespace DataAccess.Repositories
 		public User? GetUser(string email, string username, string fullname) =>  UserDAO.Instance.GetUser(email, username, fullname);
 
 		public void UpdateUser(User user) => UserDAO.Instance.UpdateUser(user);
-		public void UpdateBalance(long id, long newAccountBalance)
-        {
-			var user = UserDAO.Instance.GetUserById(id);
-			if (user == null) {
-				throw new NullReferenceException("Could not find user with ID = " + id);
-			}
-			user.AccountBalance = newAccountBalance;
-
-             UserDAO.Instance.UpdateUser(user);
-        }
 
 		public List<User> GetUsers(long userId, string email, string fullName, int roleId, int status) => UserDAO.Instance.GetUsers(userId, email, fullName, roleId, status);
 
