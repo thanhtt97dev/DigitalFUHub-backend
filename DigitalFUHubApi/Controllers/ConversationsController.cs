@@ -4,7 +4,6 @@ using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Managers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using DTOs.Chat;
 using DataAccess.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Comons;

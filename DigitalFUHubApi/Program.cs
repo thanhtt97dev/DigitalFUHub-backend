@@ -43,7 +43,7 @@ namespace DigitalFUHubApi
 				.AddJwtBearer(options =>
 				{
 					options.TokenValidationParameters = new JwtValidationParameters();
-					options.Events = new JwtValidationEvents();
+					options.Events = new JwtBearerValidationEvents();
 				});
 
 			//Add for more Policy Authorization
@@ -214,9 +214,9 @@ namespace DigitalFUHubApi
 			//Mapping hubs
 			app.UseEndpoints(endpoints =>
 			{
-				endpoints.MapHub<UserOnlineStatusHub>("/userOnlineStatusHub");
-				endpoints.MapHub<NotificationHub>("/notificationHub");
-				endpoints.MapHub<ChatHub>("/chatHub");
+				endpoints.MapHub<UserOnlineStatusHub>("/hubs/userOnlineStatus");
+				endpoints.MapHub<NotificationHub>("/hubs/notification");
+				endpoints.MapHub<ChatHub>("/hubs/chat");
 			});
 
 			// Add https

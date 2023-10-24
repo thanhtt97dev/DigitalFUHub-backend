@@ -196,7 +196,7 @@ namespace DigitalFUHubApi.Controllers
 
         [HttpPost("DeleteCart")]
         [Authorize]
-        public IActionResult DeleteCart(int cartDetailId)
+        public IActionResult DeleteCart([FromBody] int cartDetailId)
         {
             try
             {

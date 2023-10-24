@@ -14,6 +14,7 @@ namespace DTOs.Conversation
         public bool IsActivate { get; set; }
         public int IsRead { get; set; }
         public string LatestMessage { get; set; } = string.Empty;
+        public bool IsGroup { get; set; }
         public ICollection<UserConversationResponseDTO>? Users { get; set; }
 
     }

@@ -6,7 +6,6 @@ using BusinessObject.Entities;
 using DTOs.Bank;
 using DTOs.User;
 using DTOs.Notification;
-using DTOs.Chat;
 using DTOs.Product;
 using DTOs.Tag;
 using DTOs.Cart;
@@ -39,7 +38,7 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 			CreateMap<Message, MessageConversationResponseDTO>()
 				.ForMember(des => des.Avatar, act => act.MapFrom(src => src.User.Avatar)).ReverseMap();
-			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
+            CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, HistoryWithdrawResponsetDTO>()
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
 				.ForMember(des => des.CreditAccountName, act => act.MapFrom(src => src.UserBank.CreditAccountName))
