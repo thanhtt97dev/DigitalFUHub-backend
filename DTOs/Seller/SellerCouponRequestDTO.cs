@@ -10,8 +10,8 @@ namespace DTOs.Seller
 	{
 		public long UserId { get; set; }
 		public string CouponCode { get; set; } = string.Empty;
-		public string StartDate { get; set; } = null!;
-		public string EndDate { get; set; } = null!;
+		public string? StartDate { get; set; } = null!;
+		public string? EndDate { get; set; } = null!;
 		public bool? Status { get; set; }
 	}
 }

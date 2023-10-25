@@ -14,6 +14,7 @@ using DTOs.Order;
 using DTOs.Coupon;
 using DTOs.Conversation;
 using Comons;
+using DTOs.Seller;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -120,6 +121,7 @@ namespace DigitalFUHubApi.Comons
             CreateMap<Cart, UpdateCartRequestDTO>().ReverseMap();
             CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
             CreateMap<Coupon, CouponResponseDTO>().ReverseMap();
+			CreateMap<Coupon, SellerCouponResponseDTO>().ReverseMap();
 
 
         }
