@@ -285,6 +285,40 @@ namespace DataAccess.DAOs
                 context.SaveChanges();
 			}
 		}
+
+		internal void RemoveCart(List<DeleteCartRequestDTO> deleteCartRequestDTO)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+                var transaction = context.Database.BeginTransaction();
+                try
+                {
+                    foreach (var item in deleteCartRequestDTO)
+                    {
+                        var cart = context.Cart.FirstOrDefault(x => x.CartId == item.CartId);
+                        if(cart == null) continue;
+                        foreach (var cartDetailId in item.CartDetailIds)
+                        {
+                            var cartDetail = context.CartDetail.FirstOrDefault(x => x.CartDetailId == cartDetailId);
+                            if(cartDetail == null) continue;
+                            context.CartDetail.Remove(cartDetail);
+                        }
+                        var numberCartDetailRemaing = context.CartDetail.Where(x => x.CartId == item.CartId).Count();   
+                        if(numberCartDetailRemaing == 0)
+                        {
+                            context.Cart.Remove(cart);
+                        }
+                    }
+                    context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception(ex.Message);
+                }
+			}
+		}
 	}
 }
 

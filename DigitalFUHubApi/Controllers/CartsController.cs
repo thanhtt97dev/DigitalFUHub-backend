@@ -194,9 +194,9 @@ namespace DigitalFUHubApi.Controllers
 			}
         }
 
-        [HttpPost("DeleteCart")]
+        [HttpPost("DeleteCartDetail")]
         [Authorize]
-        public IActionResult DeleteCart([FromBody] int cartDetailId)
+        public IActionResult DeleteCartDetail([FromBody] int cartDetailId)
         {
             try
             {
@@ -225,5 +225,30 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
         }
-    }
+
+		[HttpPost("DeleteCart")]
+		[Authorize]
+		public IActionResult DeleteCart(List<DeleteCartRequestDTO> requestDTO)
+		{
+			try
+			{
+				ResponseData responseData = new ResponseData();
+				if (!ModelState.IsValid)
+				{
+					return BadRequest();
+				}
+
+				cartRepository.RemoveCart(requestDTO);
+
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
+				responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+	}
 }

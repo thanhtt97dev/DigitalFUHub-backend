@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DTOs.Cart
 {
-    public class DeleteCartRequestDTO
-    {
-        public long UserId { get; set; }
-        public long ProductVariantId { get; set; }
-    }
+	public class DeleteCartRequestDTO
+	{
+		public long CartId { get; set; }	
+		public List<long> CartDetailIds { get; set; }  = new List<long>();	
+	}
 }

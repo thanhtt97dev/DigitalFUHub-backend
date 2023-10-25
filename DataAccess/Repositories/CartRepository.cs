@@ -28,5 +28,7 @@ namespace DataAccess.Repositories
 
 		public void RemoveCartDetail(long cartDetailId) => CartDAO.Instance.RemoveCartDetail(cartDetailId);
 
+		public void RemoveCart(List<DeleteCartRequestDTO> deleteCartRequestDTO) => CartDAO.Instance.RemoveCart(deleteCartRequestDTO);
+
 	}
 }
