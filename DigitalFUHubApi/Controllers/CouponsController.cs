@@ -11,6 +11,7 @@ using DTOs.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Globalization;
 using System.Reflection.Metadata;
 
@@ -45,93 +46,94 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 		}
 
-        #region Get coupon public (customer)
-        [HttpGet("GetCouponPublic")]
+		#region Get coupon public (customer)
+		[HttpGet("GetCouponPublic")]
 		public IActionResult GetCouponPublic(long shopId)
 		{
-            ResponseData response = new ResponseData();
-            try
+			ResponseData response = new ResponseData();
+			try
 			{
-                if (shopId == 0)
+				if (shopId == 0)
 				{
-                    response.Status.Ok = false;
-                    response.Status.Message = "Invalid";
-                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    return Ok(response);
-                }
+					response.Status.Ok = false;
+					response.Status.Message = "Invalid";
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					return Ok(response);
+				}
 
-                List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetCouponPublic(shopId));
-                response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                response.Status.Message = "Success";
-                response.Status.Ok = true;
-                response.Result = coupons;
+				List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetCouponPublic(shopId));
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				response.Status.Message = "Success";
+				response.Status.Ok = true;
+				response.Result = coupons;
 
-            }
+			}
 			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}
 
-            return Ok(response);
-        }
-        #endregion
+			return Ok(response);
+		}
+		#endregion
 
 
-        #region Get coupon by code
-        [HttpGet("GetCouponByCode")]
-        public IActionResult GetCouponByCode(string couponCode)
-        {
-            ResponseData response = new ResponseData();
-            try
-            {
-                if (string.IsNullOrEmpty(couponCode))
-                {
-                    response.Status.Ok = false;
-                    response.Status.Message = "Invalid";
-                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    return Ok(response);
-                }
-
-                CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponByCode(couponCode));
-                response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                response.Status.Message = "Success";
-                response.Status.Ok = true;
-                response.Result = coupon;
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            return Ok(response);
-        }
-        #endregion
-
-        #region Get list coupons
-
-        [Authorize("Seller")]
-		[HttpPost("List/Seller")]
-		public IActionResult GetListCouponsSeller(SellerCouponRequestDTO request)
+		#region Get coupon by code
+		[HttpGet("GetCouponByCode")]
+		public IActionResult GetCouponByCode(string couponCode)
 		{
 			ResponseData response = new ResponseData();
 			try
 			{
-				if (request == null || request.UserId == 0)
+				if (string.IsNullOrEmpty(couponCode))
 				{
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
 					response.Status.Ok = false;
 					response.Status.Message = "Invalid";
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
 					return Ok(response);
 				}
 
-				bool isShop = _shopRepository.IsExistShop(request.UserId);
-				if (!isShop)
+				CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponByCode(couponCode));
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				response.Status.Message = "Success";
+				response.Status.Ok = true;
+				response.Result = coupon;
+
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+
+			return Ok(response);
+		}
+		#endregion
+
+		#region Get coupon of seller by Id
+		[Authorize("Seller")]
+		[HttpGet("{userId}/{couponId}")]
+		public IActionResult GetCouponById(long userId, long couponId)
+		{
+			Coupon? coupon = _couponRepository.GetCoupon(couponId, userId);
+			if (coupon == null)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+			}
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<SellerCouponResponseDTO>(coupon)));
+		}
+		#endregion
+
+		#region Get list coupons
+
+		[Authorize("Seller")]
+		[HttpPost("List/Seller")]
+		public IActionResult GetListCouponsSeller(SellerCouponRequestDTO request)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
 				{
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					response.Status.Ok = false;
-					response.Status.Message = "Invalid";
-					return Ok(response);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
 
 				string formatDate = "M/d/yyyy";
@@ -140,29 +142,24 @@ namespace DigitalFUHubApi.Controllers
 				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(), formatDate, provider);
 
 				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(request.UserId, request.CouponCode.Trim(), startDate, endDate, request.Status);
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				response.Status.Message = "Success";
-				response.Status.Ok = true;
-				response.Result = coupons.Select(x => new SellerCouponResponseDTO
-				{
-					CouponId = x.CouponId,
-					CouponCode = x.CouponCode,
-					StartDate = x.StartDate,
-					EndDate = x.EndDate,
-					Quantity = x.Quantity,
-					PriceDiscount = x.PriceDiscount,
-					AmountOrderCondition = x.MinTotalOrderValue,
-					IsPublic = x.IsPublic
-				}).ToList();
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
+					coupons.Select(x => new SellerCouponResponseDTO
+					{
+						CouponId = x.CouponId,
+						CouponCode = x.CouponCode,
+						StartDate = x.StartDate,
+						EndDate = x.EndDate,
+						Quantity = x.Quantity,
+						PriceDiscount = x.PriceDiscount,
+						MinTotalOrderValue = x.MinTotalOrderValue,
+						IsPublic = x.IsPublic
+					}).ToList()));
 			}
 			catch (Exception)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "FAIL", false, new()));
 			}
-			return Ok(response);
 		}
 		#endregion
 
@@ -173,34 +170,68 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request == null || request.UserId == 0 || request.StartDate >= request.EndDate
+				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
-					|| request.PriceDiscount > request.AmountOrderCondition)
+					|| string.IsNullOrWhiteSpace(request.CouponName))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
-
-				bool isShop = _shopRepository.IsExistShop(request.UserId);
-				bool couponCodeExist = _couponRepository.IsExistCouponCode(request.CouponCode.Trim());
-				if (!isShop || couponCodeExist)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
-				}
-
+				DateTime startDT = DateTime.Parse(request.StartDate);
+				DateTime endDT = DateTime.Parse(request.EndDate);
 				Coupon coupon = new Coupon
 				{
 					IsPublic = request.IsPublic,
 					IsActive = true,
-					StartDate = request.StartDate,
-					EndDate = request.EndDate,
-					CouponName = $"Discount {request.PriceDiscount}đ for amount order at least {request.AmountOrderCondition}đ.",
+					StartDate = startDT.AddSeconds(-startDT.Second),
+					EndDate = endDT.AddSeconds(-endDT.Second),
+					CouponName = request.CouponName,
 					CouponCode = request.CouponCode,
 					PriceDiscount = request.PriceDiscount,
-					MinTotalOrderValue = request.AmountOrderCondition,
+					MinTotalOrderValue = request.MinTotalOrderValue,
 					Quantity = request.Quantity,
 					ShopId = request.UserId
 				};
 				_couponRepository.AddCoupon(coupon);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			}
+			catch (Exception)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", true, new()));
+			}
+		}
+		#endregion
+
+		#region Edit coupon
+		[Authorize("Seller")]
+		[HttpPost("Edit")]
+		public IActionResult UpdateCoupon(SellerEditCouponRequestDTO request)
+		{
+			try
+			{
+				if (!ModelState.IsValid
+					|| string.IsNullOrWhiteSpace(request.CouponCode)
+					|| string.IsNullOrWhiteSpace(request.CouponName)
+					)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				}
+				DateTime startDT = DateTime.Parse(request.StartDate);
+				DateTime endDT = DateTime.Parse(request.EndDate);
+				Coupon coupon = new Coupon
+				{
+					CouponId = request.CouponId,
+					IsPublic = request.IsPublic,
+					StartDate = startDT,
+					EndDate = endDT,
+					CouponName = request.CouponName.Trim(),
+					CouponCode = request.CouponCode.Trim(),
+					PriceDiscount = request.PriceDiscount,
+					MinTotalOrderValue = request.MinTotalOrderValue,
+					Quantity = request.Quantity,
+					ShopId = request.UserId
+				};
+				_couponRepository.UpdateCoupon(coupon);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
@@ -218,23 +249,18 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request == null || request.UserId == 0)
+				if (!ModelState.IsValid)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
 
-				bool isShop = _shopRepository.IsExistShop(request.UserId);
-				if (!isShop)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
-				}
-				Coupon? coupon = _couponRepository.GetCoupons(request.CouponId);
+				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
 				}
 				coupon.IsPublic = request.IsPublic;
-				_couponRepository.UpdateCoupon(coupon);
+				_couponRepository.UpdateStatusCoupon(coupon);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
@@ -253,23 +279,18 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request == null || request.UserId == 0)
+				if (!ModelState.IsValid)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
 
-				bool isShop = _shopRepository.IsExistShop(request.UserId);
-				if (!isShop)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
-				}
-				Coupon? coupon = _couponRepository.GetCoupons(request.CouponId);
+				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
 				}
 				coupon.IsActive = false;
-				_couponRepository.UpdateCoupon(coupon);
+				_couponRepository.UpdateStatusCoupon(coupon);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
@@ -281,16 +302,16 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 
-
-		[HttpGet("IsExistCouponCode/{couponCode}")]
-		public IActionResult CheckCouponCodeExist(string couponCode)
+		[Authorize("Seller")]
+		[HttpGet("IsExistCouponCode/{userId}/{couponCode}")]
+		public IActionResult CheckCouponCodeExist(long userId, string couponCode)
 		{
 			if (string.IsNullOrWhiteSpace(couponCode))
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 
-			bool result = _couponRepository.IsExistCouponCode(couponCode.Trim());
+			bool result = _couponRepository.IsExistCouponCode(userId, couponCode.Trim());
 			return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_FAILD : Constants.RESPONSE_CODE_SUCCESS,
 				result ? "INVALID" : "SUCCESS",
 				!result,

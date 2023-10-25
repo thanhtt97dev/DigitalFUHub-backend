@@ -233,7 +233,7 @@ namespace DataAccess.DAOs
 					try
 					{
 						Product? productE = context.Product.Where(p => p.ProductId == product.ProductId).FirstOrDefault();
-						if (productE == null) throw new Exception("product not found");
+						if (productE == null) throw new Exception("Product not found");
 						productE.UpdateDate = DateTime.Now;
 						productE.CategoryId = product.CategoryId;
 						productE.ProductName = product.ProductName;

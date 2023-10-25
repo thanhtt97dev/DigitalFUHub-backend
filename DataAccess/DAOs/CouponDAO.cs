@@ -42,22 +42,22 @@ namespace DataAccess.DAOs
 			}
 		}
 
-        internal Coupon? GetCouponByCode(string couponCode)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                var coupon = context
+		internal Coupon? GetCouponByCode(string couponCode)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var coupon = context
 								.Coupon
 								.FirstOrDefault(c => c.CouponCode.ToLower().Equals(couponCode.ToLower())
-                                            && c.IsActive == true
-                                            && c.IsPublic == false
-                                            && c.EndDate > DateTime.Now);
+											&& c.IsActive == true
+											&& c.IsPublic == false
+											&& c.EndDate > DateTime.Now);
 
-                return coupon;
-            }
-        }
+				return coupon;
+			}
+		}
 
-        internal List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate, bool? isPublic)
+		internal List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate, bool? isPublic)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -80,6 +80,10 @@ namespace DataAccess.DAOs
 			{
 				try
 				{
+					Shop? shop = context.Shop.FirstOrDefault(x => x.UserId == coupon.ShopId);
+					Coupon? coup = context.Coupon.FirstOrDefault(x => x.CouponCode.ToLower() == coupon.CouponCode.ToLower().Trim());
+
+					if (shop == null || coup != null || coupon.StartDate >= coupon.EndDate) throw new Exception("INVALID");
 					context.Coupon.Add(coupon);
 					context.SaveChanges();
 				}
@@ -90,15 +94,15 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Coupon? GetCoupon(long couponId)
+		internal Coupon? GetCoupon(long couponId, long shopId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Coupon.FirstOrDefault(x => x.CouponId == couponId);
+				return context.Coupon.FirstOrDefault(x => x.CouponId == couponId && x.ShopId == shopId && x.IsActive == true);
 			}
 		}
 
-		internal void UpdateCoupon(Coupon coupon)
+		internal void UpdateStatusCoupon(Coupon coupon)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -114,11 +118,38 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal bool IsExistCouponCode(string couponCode)
+		internal bool IsExistCouponCode(long shopId, string couponCode)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Coupon.Any(x => x.CouponCode.ToLower() == couponCode.ToLower());
+				return context.Coupon.Any(x => x.CouponCode.ToLower() == couponCode.ToLower() && (shopId == 0 ? true : x.ShopId != shopId));
+			}
+		}
+
+		internal void UpdateCoupon(Coupon coupon)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				try
+				{
+					Coupon? coup = context.Coupon.FirstOrDefault(x => x.CouponId == coupon.CouponId && x.ShopId == coupon.ShopId && x.IsActive == true);
+					if (coup == null || coupon.StartDate >= coupon.EndDate) throw new Exception("INVALID");
+					coup.StartDate = coupon.StartDate;
+					coup.EndDate = coupon.EndDate;
+					coup.CouponCode = coupon.CouponCode;
+					coup.CouponName = coupon.CouponName;
+					coup.IsPublic = coupon.IsPublic;
+					coup.PriceDiscount = coupon.PriceDiscount;
+					coup.MinTotalOrderValue = coupon.MinTotalOrderValue;
+					coup.Quantity = coupon.Quantity;
+
+					context.Coupon.Update(coup);
+					context.SaveChanges();
+				}
+				catch (Exception e)
+				{
+					throw new Exception(e.Message);
+				}
 			}
 		}
 	}
