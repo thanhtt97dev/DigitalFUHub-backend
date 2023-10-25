@@ -16,6 +16,7 @@ namespace DataAccess.IRepositories
         CartDetail? GetCartDetail(long CartDetailId);
         void UpdateQuantityCartDetail(long cartDetailId, int quantity);
 		void RemoveCartDetail(long cartDetailId);
+        void RemoveCart(List<DeleteCartRequestDTO> deleteCartRequestDTO);
 		(bool, int) CheckValidQuantityAddProductToCart(long userId,long shopId ,long productVariantId, int quantity);
         bool CheckProductVariantInShop(long shopId, long productVariantId);
     }
