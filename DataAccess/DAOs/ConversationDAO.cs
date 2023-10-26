@@ -264,5 +264,67 @@ namespace DataAccess.DAOs
 
 			}
 		}
+
+		internal long GetConversation(long shopId, long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var conversationIdOfSeller = context.UserConversation
+					.Where(x => x.UserId == shopId).ToList();
+				foreach (var item in conversationIdOfSeller)
+				{
+					var conversationId = (from userConversation in context.UserConversation
+										  join conversation in context.Conversations
+											  on userConversation.ConversationId equals conversation.ConversationId
+										  where conversation.IsGroup == false &&
+												userConversation.UserId == userId
+										  select userConversation.ConversationId).FirstOrDefault();
+					if(conversationId != 0)
+					{
+						return conversationId;
+					}
+				}
+
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					// add new conversation
+					Conversation newConversation = new Conversation
+					{
+						DateCreate = DateTime.Now,
+						IsGroup = false,
+						IsActivate = true
+					};
+					context.Conversations.Add(newConversation);
+					context.SaveChanges();
+
+					var sellerConversation = new UserConversation
+					{
+						UserId = shopId,
+						ConversationId = newConversation.ConversationId
+					};
+
+					var customerConversation = new UserConversation
+					{
+						UserId = userId,
+						ConversationId = newConversation.ConversationId
+					};
+
+					context.UserConversation.AddRange(sellerConversation, customerConversation);
+					context.SaveChanges();
+
+					transaction.Commit();
+
+					return newConversation.ConversationId;
+				}
+				catch(Exception ex) 
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+
+				
+			}
+		}
 	}
 }

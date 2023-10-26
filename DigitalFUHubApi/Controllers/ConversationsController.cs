@@ -187,7 +187,31 @@ namespace DigitalFUHubApi.Controllers
 
         }
 
-        [HttpGet("getUsers")]
+		[HttpPost("GetConversation")]
+		public IActionResult GetConversation(GetConversationIdRequestDTO request)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			ResponseData responseData = new ResponseData();
+            var conversationId = conversationRepository.GetConversation(request.ShopId, request.UserId);
+            try 
+            {
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+                responseData.Result = conversationId;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+
+		}
+
+		[HttpGet("getUsers")]
         public IActionResult GetUsersConversation(long userId)
         {
             try
