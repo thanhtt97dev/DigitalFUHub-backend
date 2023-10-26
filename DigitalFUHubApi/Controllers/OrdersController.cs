@@ -147,7 +147,7 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Update status order customer
 		[Authorize("Customer,Seller")]
-		[HttpPost("/Customer/Edit/Status")]
+		[HttpPost("Customer/Edit/Status")]
 		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
