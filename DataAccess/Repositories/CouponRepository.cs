@@ -13,7 +13,7 @@ namespace DataAccess.Repositories
 	{
 		public void AddCoupon(Coupon coupon) => CouponDAO.Instance.AddCoupon(coupon);
 
-		public bool IsExistCouponCode(long shopId, string couponCode,char action) => CouponDAO.Instance.IsExistCouponCode(shopId, couponCode, action);
+		public bool IsExistCouponCode(long shopId, string couponCode,string action) => CouponDAO.Instance.IsExistCouponCode(shopId, couponCode, action);
 
         public Coupon? GetCouponPrivate(string couponCode, long shopId) => CouponDAO.Instance.GetCouponPrivate(couponCode, shopId);
 

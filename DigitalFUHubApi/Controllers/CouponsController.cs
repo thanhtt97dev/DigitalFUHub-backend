@@ -320,9 +320,9 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 
-		[Authorize("Seller")]
-		[HttpGet("IsExistCouponCode/{action}/{couponCode}")]
-		public IActionResult CheckCouponCodeExist(char action, string couponCode)
+		//[Authorize("Seller")]
+		[HttpGet("IsExistCouponCode/{actionMode}/{couponCode}")]
+		public IActionResult CheckCouponCodeExist(string actionMode, string couponCode)
 		{
 			if (string.IsNullOrWhiteSpace(couponCode))
 			{
@@ -330,7 +330,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				bool result = _couponRepository.IsExistCouponCode(Util.Instance.GetUserId(User), couponCode.Trim(), action);
+				bool result = _couponRepository.IsExistCouponCode(Util.Instance.GetUserId(User), couponCode.Trim(), actionMode);
 				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_FAILD : Constants.RESPONSE_CODE_SUCCESS,
 					result ? "INVALID" : "SUCCESS",
 					!result,

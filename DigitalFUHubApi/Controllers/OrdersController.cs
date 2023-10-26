@@ -48,15 +48,15 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				ResponseData responseData = new ResponseData();
-				var accessToken = Util.GetAccessToken(HttpContext);
-				var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
-				if (request.UserId != userIdFromAccessToken)
-				{
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Not have permission!";
-					return Ok(responseData);
-				}
+				//var accessToken = Util.GetAccessToken(HttpContext);
+				//var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
+				//if (request.UserId != userIdFromAccessToken)
+				//{
+				//	responseData.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
+				//	responseData.Status.Ok = false;
+				//	responseData.Status.Message = "Not have permission!";
+				//	return Ok(responseData);
+				//}
 
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
 					_orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
