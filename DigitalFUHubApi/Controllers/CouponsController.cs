@@ -8,12 +8,15 @@ using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.Coupon;
 using DTOs.Seller;
+using Google.Apis.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata;
+using System.Security.Claims;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -111,15 +114,24 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get coupon of seller by Id
 		[Authorize("Seller")]
-		[HttpGet("{userId}/{couponId}")]
-		public IActionResult GetCouponById(long userId, long couponId)
+		[HttpGet("{couponId}")]
+		public IActionResult GetCouponById(long couponId)
 		{
-			Coupon? coupon = _couponRepository.GetCoupon(couponId, userId);
-			if (coupon == null)
+			try
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+				Coupon? coupon = _couponRepository.GetCoupon(couponId, Util.Instance.GetUserId(User));
+				if (coupon == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+				}
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<SellerCouponResponseDTO>(coupon)));
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<SellerCouponResponseDTO>(coupon)));
+			catch (Exception)
+			{
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
+			}
+
 		}
 		#endregion
 
@@ -140,8 +152,7 @@ namespace DigitalFUHubApi.Controllers
 				CultureInfo provider = CultureInfo.InvariantCulture;
 				DateTime? startDate = string.IsNullOrEmpty(request.StartDate) ? null : DateTime.ParseExact(request.StartDate.Trim(), formatDate, provider);
 				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(), formatDate, provider);
-
-				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(request.UserId, request.CouponCode.Trim(), startDate, endDate, request.Status);
+				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(Util.Instance.GetUserId(User), request.CouponCode.Trim(), startDate, endDate, request.Status);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
 					coupons.Select(x => new SellerCouponResponseDTO
@@ -303,19 +314,26 @@ namespace DigitalFUHubApi.Controllers
 
 
 		[Authorize("Seller")]
-		[HttpGet("IsExistCouponCode/{userId}/{couponCode}")]
-		public IActionResult CheckCouponCodeExist(long userId, string couponCode)
+		[HttpGet("IsExistCouponCode/{action}/{couponCode}")]
+		public IActionResult CheckCouponCodeExist(char action, string couponCode)
 		{
 			if (string.IsNullOrWhiteSpace(couponCode))
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
+			try
+			{
+				bool result = _couponRepository.IsExistCouponCode(Util.Instance.GetUserId(User), couponCode.Trim(), action);
+				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_FAILD : Constants.RESPONSE_CODE_SUCCESS,
+					result ? "INVALID" : "SUCCESS",
+					!result,
+					new()));
+			}
+			catch (Exception)
+			{
 
-			bool result = _couponRepository.IsExistCouponCode(userId, couponCode.Trim());
-			return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_FAILD : Constants.RESPONSE_CODE_SUCCESS,
-				result ? "INVALID" : "SUCCESS",
-				!result,
-				new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
+			}
 		}
 	}
 }

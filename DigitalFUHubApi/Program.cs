@@ -64,7 +64,7 @@ namespace DigitalFUHubApi
 			{
 				options.AddDefaultPolicy(policy =>
 				{
-					policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+					policy.WithOrigins("http://localhost:3000/").AllowAnyHeader().AllowAnyMethod();
 				});
 			});
 
@@ -200,14 +200,13 @@ namespace DigitalFUHubApi
 				app.UseSwaggerUI();
 			}
 
-
 			app.UseIpRateLimiting();
+
+			app.UseRouting();
 
 			app.UseCors();
 
 			app.UseAuthentication();
-
-			app.UseRouting();
 
 			app.UseAuthorization();
 

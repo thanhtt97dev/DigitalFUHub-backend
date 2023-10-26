@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace DigitalFUHubApi.Comons
 {
-    public class JwtBearerValidationEvents : JwtBearerEvents
+	public class JwtBearerValidationEvents : JwtBearerEvents
 	{
 
 		public override Task MessageReceived(MessageReceivedContext context)
@@ -35,7 +35,7 @@ namespace DigitalFUHubApi.Comons
 
 			var dbContext = context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
 			var user = dbContext.User.FirstOrDefault(x => x.UserId == userId);
-			if (user == null || !user.Status) 
+			if (user == null || !user.Status)
 			{
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
@@ -52,30 +52,20 @@ namespace DigitalFUHubApi.Comons
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
 			}
+
+			JwtSecurityToken? securityToken = context.SecurityToken as JwtSecurityToken;
+			if (securityToken == null)
+			{
+				context.Fail("Unauthorized");
+			}
+			string algorithm = securityToken?.Header?.Alg ?? "";
+
+			if (!string.Equals(algorithm, "HS512", StringComparison.OrdinalIgnoreCase))
+			{
+				context.Fail("Unauthorized");
+			}
 			return base.TokenValidated(context);
 		}
 
-		//other events
-		/*
-		public override Task AuthenticationFailed(AuthenticationFailedContext context)
-		{
-			return base.AuthenticationFailed(context);
-		}
-
-		public override Task Challenge(JwtBearerChallengeContext context)
-		{
-			return base.Challenge(context);
-		}
-
-		public override Task Forbidden(ForbiddenContext context)
-		{
-			return base.Forbidden(context);
-		}
-
-		public override Task MessageReceived(MessageReceivedContext context)
-		{
-			return base.MessageReceived(context);
-		}
-		*/
 	}
 }

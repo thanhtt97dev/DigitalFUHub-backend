@@ -41,6 +41,8 @@ namespace DataAccess.Repositories
 
 		public List<OrderCoupon> GetCouponsInOrder(long orderId) => OrderDAO.Instance.GetCouponsInOrder(orderId);
 
-		public Order? GetOrderCustomer(long orderId) => OrderDAO.Instance.GetOrderCustomer(orderId);
+		public Order? GetOrderCustomer(long orderId,long customerId, long shopId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId, shopId);
+
+		public Order? GetOrderCustomer(long orderId, long customerId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId);
 	}
 }

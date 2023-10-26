@@ -1,5 +1,6 @@
 ﻿using BusinessObject.Entities;
 using OfficeOpenXml;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -33,6 +34,20 @@ namespace DigitalFUHubApi.Comons
 			var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			dateTimeInterval = dateTimeInterval.AddSeconds(utcExpireDate ?? 0).ToUniversalTime();
 			return dateTimeInterval;
+		}
+		#endregion
+
+		#region get user id request
+		public long GetUserId(ClaimsPrincipal user)
+		{
+			try
+			{
+				return long.Parse(user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+			}
+			catch (Exception)
+			{
+				throw new Exception("INVALID");
+			}
 		}
 		#endregion
 
@@ -218,7 +233,7 @@ namespace DigitalFUHubApi.Comons
 			}
 			return result;
 		}
-        #endregion
+		#endregion
 
-    }
+	}
 }
