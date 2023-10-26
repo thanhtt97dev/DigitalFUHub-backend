@@ -87,13 +87,13 @@ namespace DigitalFUHubApi.Controllers
 
 		#region get feedback detail
 		[Authorize("Customer,Seller")]
-		[HttpPost("Customer/Detail")]
-		public IActionResult FeedbackDetailOrder(CustomerFeedbackDetailOrderRequestDTO request)
+		[HttpGet("Customer/{orderId}")]
+		public IActionResult GetFeedbackDetailOrder(long orderId)
 		{
 			try
 			{
 				long userId = Util.Instance.GetUserId(User);
-				Order? order = _feedbackRepository.GetFeedbackDetail(request.OrderId, userId);
+				Order? order = _feedbackRepository.GetFeedbackDetail(orderId, userId);
 				if (order == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));

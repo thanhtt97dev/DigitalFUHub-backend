@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace DigitalFUHubApi.Comons
@@ -54,13 +55,15 @@ namespace DigitalFUHubApi.Comons
 			}
 
 			JwtSecurityToken? securityToken = context.SecurityToken as JwtSecurityToken;
-			if (securityToken == null)
+			StringValues headerValues;
+			context.Request.Headers.TryGetValue("session-userid",out headerValues);
+			if (securityToken == null || headerValues.FirstOrDefault() == null)
 			{
 				context.Fail("Unauthorized");
 			}
 			string algorithm = securityToken?.Header?.Alg ?? "";
 
-			if (!string.Equals(algorithm, "HS512", StringComparison.OrdinalIgnoreCase))
+			if (!string.Equals(algorithm, "HS512", StringComparison.OrdinalIgnoreCase) || !string.Equals(userId.ToString(), headerValues.FirstOrDefault()))
 			{
 				context.Fail("Unauthorized");
 			}
