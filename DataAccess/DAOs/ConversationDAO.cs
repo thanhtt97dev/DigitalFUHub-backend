@@ -265,24 +265,30 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal long GetConversation(long shopId, long userId)
+		internal long GetConversation(long shopId, long userId, bool isGroup)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var conversationIdOfSeller = context.UserConversation
 					.Where(x => x.UserId == shopId).ToList();
+
 				foreach (var item in conversationIdOfSeller)
 				{
 					var conversationId = (from userConversation in context.UserConversation
 										  join conversation in context.Conversations
 											  on userConversation.ConversationId equals conversation.ConversationId
-										  where conversation.IsGroup == false &&
+										  where conversation.IsGroup == isGroup &&
 												userConversation.UserId == userId
 										  select userConversation.ConversationId).FirstOrDefault();
-					if(conversationId != 0)
+					if (conversationId != 0)
 					{
 						return conversationId;
 					}
+				}
+
+				if (isGroup)
+				{
+					return 0;
 				}
 
 				var transaction = context.Database.BeginTransaction();

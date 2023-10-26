@@ -194,10 +194,16 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return BadRequest();
 			}
-			ResponseData responseData = new ResponseData();
-            var conversationId = conversationRepository.GetConversation(request.ShopId, request.UserId);
-            try 
-            {
+			try
+			{
+				ResponseData responseData = new ResponseData();
+                var conversationId = conversationRepository.GetConversation(request.ShopId, request.UserId, request.IsGroup);
+                if(conversationId == 0)
+                {
+					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status.Ok = false;
+					responseData.Status.Message = "Data not found!";
+				}
 				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status.Ok = true;
 				responseData.Status.Message = "Success!";
