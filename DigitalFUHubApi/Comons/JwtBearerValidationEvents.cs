@@ -1,6 +1,7 @@
 ﻿using BusinessObject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace DigitalFUHubApi.Comons
@@ -27,6 +28,10 @@ namespace DigitalFUHubApi.Comons
 			string? userIdStr = string.Empty;
 			if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
 			{
+				if(!string.Equals(jwtSecurityToken.Header.Alg, SecurityAlgorithms.HmacSha512, StringComparison.OrdinalIgnoreCase))
+				{
+					context.Fail("Unauthorized");
+				}
 				jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
 				userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
 			}
@@ -54,16 +59,9 @@ namespace DigitalFUHubApi.Comons
 				return base.TokenValidated(context);
 			}
 
-			JwtSecurityToken? securityToken = context.SecurityToken as JwtSecurityToken;
 			StringValues headerValues;
 			context.Request.Headers.TryGetValue("session-userid",out headerValues);
-			if (securityToken == null || headerValues.FirstOrDefault() == null)
-			{
-				context.Fail("Unauthorized");
-			}
-			string algorithm = securityToken?.Header?.Alg ?? "";
-
-			if (!string.Equals(algorithm, "HS512", StringComparison.OrdinalIgnoreCase) || !string.Equals(userId.ToString(), headerValues.FirstOrDefault()))
+			if ( headerValues.FirstOrDefault() == null || !string.Equals(userId.ToString(), headerValues.FirstOrDefault()))
 			{
 				context.Fail("Unauthorized");
 			}
