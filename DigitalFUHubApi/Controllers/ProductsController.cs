@@ -67,7 +67,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#region Get All Product with shopId (userId)
 		[Authorize("Seller")]
-		[HttpGet("All/Seller/{id}")]
+		[HttpGet("Seller/All/{id}")]
 		public IActionResult GetAllProduct(int id)
 		{
 			try
@@ -101,22 +101,23 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get Product Of Seller
 		[Authorize("Seller")]
-		[HttpGet("{productId}/Seller/{userId}")]
-		public IActionResult GetProduct(long userId, long productId)
+		[HttpGet("Seller/{productId}")]
+		public IActionResult GetProduct(long productId)
 		{
-			Product? product = _productRepository.GetProductByShop(userId, productId);
-			if (product == null)
+			try
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
-			}
-			else if (product.ProductStatusId == Constants.PRODUCT_BAN || product.ProductStatusId == Constants.PRODUCT_HIDE)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
-			else
-			{
+				Product? product = _productRepository.GetProductByShop(Util.Instance.GetUserId(User), productId);
+				if (product == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+				}
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<ProductResponseDTO>(product)));
 			}
+			catch (Exception)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
+			}
+
 		}
 		#endregion
 
@@ -140,6 +141,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
+				long userId = Util.Instance.GetUserId(User);
 				DateTime now;
 				string filename;
 				List<Tag> tags = new List<Tag>();
@@ -168,7 +170,7 @@ namespace DigitalFUHubApi.Controllers
 				foreach (IFormFile file in request.Images)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 					string url = await _storageService.UploadFileToAzureAsync(file, filename);
 					productMedias.Add(new ProductMedia
 					{
@@ -177,7 +179,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				now = DateTime.Now;
-				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf(".")));
+				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf(".")));
 				string urlThumbnail = await _storageService.UploadFileToAzureAsync(request.Thumbnail, filename);
 				Product product = new Product()
 				{
@@ -185,7 +187,7 @@ namespace DigitalFUHubApi.Controllers
 					Description = request.Description,
 					Discount = request.Discount,
 					ProductName = request.ProductName,
-					ShopId = request.UserId,
+					ShopId = userId,
 					Tags = tags,
 					Thumbnail = urlThumbnail,
 					ProductVariants = productVariants,
@@ -213,7 +215,8 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				bool isExistProduct = _productRepository.IsExistProductByShop(request.UserId, request.ProductId);
+				long userId = Util.Instance.GetUserId(User);
+				bool isExistProduct = _productRepository.IsExistProductByShop(userId, request.ProductId);
 				if (!isExistProduct)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
@@ -231,7 +234,7 @@ namespace DigitalFUHubApi.Controllers
 				foreach (var file in request.ProductImagesNew)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 					string url = await _storageService.UploadFileToAzureAsync(file, filename);
 					productMediaNew.Add(new ProductMedia
 					{
@@ -269,7 +272,7 @@ namespace DigitalFUHubApi.Controllers
 				if (request.ProductThumbnail != null)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.ProductThumbnail.FileName.Substring(request.ProductThumbnail.FileName.LastIndexOf(".")));
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.ProductThumbnail.FileName.Substring(request.ProductThumbnail.FileName.LastIndexOf(".")));
 					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnail, filename);
 				}
 

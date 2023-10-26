@@ -13,7 +13,5 @@ namespace DTOs.Shop
         public string ShopName { get; set; } = string.Empty!;
         [Required]
         public string ShopDescription { get; set; } = string.Empty!;
-		[Required]
-		public long UserId { get; set; }
     }
 }

@@ -362,7 +362,9 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				Product? product = context.Product.Where(x => x.ProductId == productId && x.ShopId == userId)
+				Product? product = context.Product
+					.Where(x => x.ProductId == productId && x.ShopId == userId
+							&& x.ProductStatusId != Constants.PRODUCT_BAN && x.ProductStatusId != Constants.PRODUCT_HIDE)
 						.Select(x => new Product
 						{
 							ProductId = productId,

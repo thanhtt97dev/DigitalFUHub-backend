@@ -37,7 +37,7 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Add order customer
 		//[Authorize("Customer,Seller")]
-		[HttpPost("AddOrder")]
+		[HttpPost("Customer/AddOrder")]
 		public async Task<IActionResult> AddOrder(AddOrderRequestDTO request)
 		{
 			try
@@ -90,103 +90,89 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get all order of customer
 		[Authorize("Customer,Seller")]
-		[HttpPost("All/Customer")]
+		[HttpPost("Customer/All")]
 		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
-
-			var accessToken = Util.GetAccessToken(HttpContext);
-			var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
-			if (request.UserId != userIdFromAccessToken)
+			try
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
+				long userId = Util.Instance.GetUserId(User);
+				List<Order> orders = _orderRepository.GetAllOrderByUser(userId, request.StatusId, request.Limit, request.Offset);
+				OrderResponseDTO orderResponse = new OrderResponseDTO()
+				{
+					NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
+
+					Orders = orders.Select(x => new OrderProductResponseDTO
+					{
+						OrderId = x.OrderId,
+						Note = x.Note ?? "",
+						OrderDate = x.OrderDate,
+						ShopId = x.ShopId,
+						ShopName = x.Shop.ShopName,
+						StatusId = x.OrderStatusId,
+						TotalAmount = x.TotalAmount,
+						TotalCoinDiscount = x.TotalCoinDiscount,
+						TotalCouponDiscount = x.TotalCouponDiscount,
+						TotalPayment = x.TotalPayment,
+						OrderDetails = x.OrderDetails.Select(od => new OrderDetailProductResponseDTO
+						{
+							Discount = od.Discount,
+							IsFeedback = od.IsFeedback,
+							OrderDetailId = od.OrderDetailId,
+							Price = od.Price,
+							ProductId = od.ProductVariant.ProductId,
+							ProductName = od.ProductVariant?.Product?.ProductName ?? "",
+							ProductVariantId = od.ProductVariantId,
+							ProductVariantName = od.ProductVariant?.Name ?? "",
+							Quantity = od.Quantity,
+							Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
+							TotalAmount = od.TotalAmount
+						}).ToList(),
+					}).ToList()
+
+				};
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, orderResponse));
+			}
+			catch (Exception)
+			{
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
 			}
 
-			List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
-			OrderResponseDTO orderResponse = new OrderResponseDTO()
-			{
-				NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
-
-				Orders = orders.Select(x => new OrderProductResponseDTO
-				{
-					OrderId = x.OrderId,
-					Note = x.Note ?? "",
-					OrderDate = x.OrderDate,
-					ShopId = x.ShopId,
-					ShopName = x.Shop.ShopName,
-					StatusId = x.OrderStatusId,
-					TotalAmount = x.TotalAmount,
-					TotalCoinDiscount = x.TotalCoinDiscount,
-					TotalCouponDiscount = x.TotalCouponDiscount,
-					TotalPayment = x.TotalPayment,
-					OrderDetails = x.OrderDetails.Select(od => new OrderDetailProductResponseDTO
-					{
-						Discount = od.Discount,
-						IsFeedback = od.IsFeedback,
-						OrderDetailId = od.OrderDetailId,
-						Price = od.Price,
-						ProductId = od.ProductVariant.ProductId,
-						ProductName = od.ProductVariant?.Product?.ProductName ?? "",
-						ProductVariantId = od.ProductVariantId,
-						ProductVariantName = od.ProductVariant?.Name ?? "",
-						Quantity = od.Quantity,
-						Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
-						TotalAmount = od.TotalAmount
-					}).ToList(),
-				}).ToList()
-
-			};
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, orderResponse));
 		}
 		#endregion
 
 		#region Update status order customer
 		[Authorize("Customer,Seller")]
-		[HttpPost("Edit/Status")]
+		[HttpPost("/Customer/Edit/Status")]
 		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 			}
-			var accessToken = Util.GetAccessToken(HttpContext);
-			var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
-			if (request.UserId != userIdFromAccessToken)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
-			}
-			Order? order = _orderRepository.GetOrderCustomer(request.OrderId);
-			if (order == null)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
-			else if (order.ShopId != request.ShopId)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
-			else if (order.UserId != request.UserId)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
-			else if (order.OrderStatusId == Constants.ORDER_CONFIRMED)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
-			else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
 			try
 			{
+				long customerId = Util.Instance.GetUserId(User);
+				Order? order = _orderRepository.GetOrderCustomer(request.OrderId, customerId, request.ShopId);
+				if (order == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+				}
+				else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+				}
+
 				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
 
 				string title = $"{(request.StatusId == Constants.ORDER_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
 				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
 				string link = Constants.FRONT_END_HISTORY_ORDER_URL + request.OrderId;
-				await _hubService.SendNotification(request.UserId, title, content, link);
+				await _hubService.SendNotification(customerId, title, content, link);
 			}
 			catch (Exception e)
 			{
@@ -198,65 +184,65 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get order detail of customer
 		[Authorize("Customer,Seller")]
-		[HttpGet("Customer/{userId}/{orderId}")]
-		public IActionResult GetOrderDetailCustomer(long userId, long orderId)
+		[HttpGet("Customer/{orderId}")]
+		public IActionResult GetOrderDetailCustomer(long orderId)
 		{
-			var accessToken = Util.GetAccessToken(HttpContext);
-			var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
-			if (userId != userIdFromAccessToken)
+			try
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "ACCESS DENIED", false, new()));
+				long customerId = Util.Instance.GetUserId(User);
+				Order? order = _orderRepository.GetOrderCustomer(orderId, customerId);
+				if(order == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+
+				}
+				OrderProductResponseDTO responseData = new OrderProductResponseDTO
+				{
+					OrderId = order.OrderId,
+					Note = order.Note ?? "",
+					OrderDate = order.OrderDate,
+					ShopId = order.ShopId,
+					ShopName = order.Shop.ShopName,
+					StatusId = order.OrderStatusId,
+					TotalAmount = order.TotalAmount,
+					TotalCoinDiscount = order.TotalCoinDiscount,
+					TotalCouponDiscount = order.TotalCouponDiscount,
+					TotalPayment = order.TotalPayment,
+					OrderDetails = order.OrderDetails.Select(od => new OrderDetailProductResponseDTO
+					{
+						Discount = od.Discount,
+						IsFeedback = od.IsFeedback,
+						OrderDetailId = od.OrderDetailId,
+						Price = od.Price,
+						ProductId = od.ProductVariant.ProductId,
+						ProductName = od.ProductVariant?.Product?.ProductName ?? "",
+						ProductVariantId = od.ProductVariantId,
+						ProductVariantName = od.ProductVariant?.Name ?? "",
+						Quantity = od.Quantity,
+						Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
+						TotalAmount = od.TotalAmount,
+						AssetInformations = od.AssetInformations.Select(x => x.Asset ?? "").ToList(),
+						FeebackRate = od?.Feedback?.Rate ?? 0
+					}).ToList(),
+				};
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, responseData));
 			}
-			Order? order = _orderRepository.GetOrderCustomer(orderId);
-			if (order == null)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
 			}
 
-			else if (order.UserId != userId)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
-			OrderProductResponseDTO responseData = new OrderProductResponseDTO
-			{
-				OrderId = order.OrderId,
-				Note = order.Note ?? "",
-				OrderDate = order.OrderDate,
-				ShopId = order.ShopId,
-				ShopName = order.Shop.ShopName,
-				StatusId = order.OrderStatusId,
-				TotalAmount = order.TotalAmount,
-				TotalCoinDiscount = order.TotalCoinDiscount,
-				TotalCouponDiscount = order.TotalCouponDiscount,
-				TotalPayment = order.TotalPayment,
-				OrderDetails = order.OrderDetails.Select(od => new OrderDetailProductResponseDTO
-				{
-					Discount = od.Discount,
-					IsFeedback = od.IsFeedback,
-					OrderDetailId = od.OrderDetailId,
-					Price = od.Price,
-					ProductId = od.ProductVariant.ProductId,
-					ProductName = od.ProductVariant?.Product?.ProductName ?? "",
-					ProductVariantId = od.ProductVariantId,
-					ProductVariantName = od.ProductVariant?.Name ?? "",
-					Quantity = od.Quantity,
-					Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
-					TotalAmount = od.TotalAmount,
-					AssetInformations = od.AssetInformations.Select(x => x.Asset ?? "").ToList(),
-					FeebackRate = od?.Feedback?.Rate ?? 0
-				}).ToList(),
-			};
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, responseData));
 		}
 		#endregion
 
 		#region Get list orders seller
 		[Authorize("Seller")]
-		[HttpPost("All/Seller")]
+		[HttpPost("Seller/All")]
 		public IActionResult GetOrdersSeller(SellerOrdersRequestDTO request)
 		{
 			if (request == null || request.OrderId == null ||
-				request.CustomerEmail == null || request.UserId == 0 ||
+				request.CustomerEmail == null ||
 				request.ToDate == null || request.FromDate == null) return BadRequest();
 
 			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
@@ -285,10 +271,10 @@ namespace DigitalFUHubApi.Controllers
 				}
 				long orderId;
 				long.TryParse(request.OrderId, out orderId);
-
+				long userId = Util.Instance.GetUserId(User);
 				List<Order> orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, "",
 					fromDate, toDate, request.Status)
-					.Where(x => x.Shop.UserId == request.UserId)
+					.Where(x => x.Shop.UserId == userId)
 					.ToList();
 				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
 
@@ -303,7 +289,7 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get order detail seller
 		[Authorize("Seller")]
-		[HttpGet("{orderId}/Seller")]
+		[HttpGet("Seller/{orderId}")]
 		public IActionResult GetOrderDetailSeller(long orderId)
 		{
 			ResponseData response = new ResponseData();

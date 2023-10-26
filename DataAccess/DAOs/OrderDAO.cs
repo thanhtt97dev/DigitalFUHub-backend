@@ -840,7 +840,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Order? GetOrderCustomer(long orderId)
+		internal Order? GetOrderCustomer(long orderId, long customerId, long shopId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -853,7 +853,25 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.AssetInformations)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.FirstOrDefault(x => x.OrderId == orderId);
+					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId && x.ShopId == shopId
+					&& x.OrderStatusId != Constants.ORDER_CONFIRMED);
+			}
+		}
+
+		internal Order? GetOrderCustomer(long orderId, long customerId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+					.Include(x => x.OrderCoupons)
+					.Include(x => x.Shop)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.AssetInformations)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId );
 			}
 		}
 	}
