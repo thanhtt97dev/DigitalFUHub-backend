@@ -121,12 +121,12 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal bool IsExistCouponCode(long shopId, string couponCode, char action)
+		internal bool IsExistCouponCode(long shopId, string couponCode, string action)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Coupon.Any(x => x.CouponCode.ToLower() == couponCode.ToLower() 
-				&& (action == 'U' || action == 'u' ? x.ShopId != shopId : true));
+				&& (action.ToLower() == "u" ? x.ShopId != shopId : true));
 			}
 		}
 
