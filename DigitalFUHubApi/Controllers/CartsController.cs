@@ -228,7 +228,7 @@ namespace DigitalFUHubApi.Controllers
 
 		[HttpPost("DeleteCart")]
 		[Authorize]
-		public IActionResult DeleteCart(List<DeleteCartRequestDTO> requestDTO)
+		public IActionResult DeleteCart([FromBody] List<DeleteCartRequestDTO> requestDTO)
 		{
 			try
 			{

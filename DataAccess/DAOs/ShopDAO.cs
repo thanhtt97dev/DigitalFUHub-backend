@@ -33,8 +33,8 @@ namespace DataAccess.DAOs
 			{
 				try
 				{
-					if (context.Shop.Any(x => x.UserId == userId)) throw new Exception("ERROR");
-					if (context.Shop.Any(x => x.ShopName.ToLower() == shopName.ToLower())) throw new Exception("ERROR");
+					if (context.Shop.Any(x => x.UserId == userId)) throw new Exception("INVALID");
+					if (context.Shop.Any(x => x.ShopName.ToLower() == shopName.ToLower())) throw new Exception("INVALID");
 					Shop shop = new Shop()
 					{
 						DateCreate = DateTime.Now,

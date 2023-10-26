@@ -10,12 +10,13 @@ namespace DTOs.Seller
 	public class SellerCouponResponseDTO
 	{
 		public long CouponId { get; set; }
+		public string CouponName { get; set; } = string.Empty;
 		public string CouponCode { get; set; } = string.Empty;
 		public DateTime StartDate { get; set; }
 		public DateTime EndDate { get; set; }
 		public long Quantity { get; set; }
 		public long PriceDiscount { get; set; }
-		public long AmountOrderCondition { get; set; }
+		public long MinTotalOrderValue { get; set; }
 		public bool IsPublic { get; set; }
 	}
 }
