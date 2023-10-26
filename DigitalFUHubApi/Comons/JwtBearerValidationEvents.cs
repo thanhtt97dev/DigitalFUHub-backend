@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -16,7 +17,9 @@ namespace DigitalFUHubApi.Comons
 			if (path.Contains("/hubs/"))
 			{
 				var accessToken = context.Request.Query["access_token"];
+				var userid = context.Request.Query["userid"];
 				context.Token = accessToken;
+				context.Request.Headers.Add("session-userid", userid);
 			}
 			return Task.CompletedTask;
 		}
@@ -60,11 +63,12 @@ namespace DigitalFUHubApi.Comons
 			}
 
 			StringValues headerValues;
-			context.Request.Headers.TryGetValue("session-userid",out headerValues);
-			if ( headerValues.FirstOrDefault() == null || !string.Equals(userId.ToString(), headerValues.FirstOrDefault()))
+			context.Request.Headers.TryGetValue("session-userid", out headerValues);
+			if (headerValues.FirstOrDefault() == null || !string.Equals(userId.ToString(), headerValues.FirstOrDefault()))
 			{
 				context.Fail("Unauthorized");
 			}
+
 			return base.TokenValidated(context);
 		}
 
