@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
 
 		public bool IsExistCouponCode(long shopId, string couponCode,char action) => CouponDAO.Instance.IsExistCouponCode(shopId, couponCode, action);
 
-        public Coupon? GetCouponByCode(string couponCode) => CouponDAO.Instance.GetCouponByCode(couponCode);
+        public Coupon? GetCouponPrivate(string couponCode, long shopId) => CouponDAO.Instance.GetCouponPrivate(couponCode, shopId);
 
         public List<Coupon> GetCouponPublic (long shopId) => CouponDAO.Instance.GetCouponPublic(shopId);
 

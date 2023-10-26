@@ -36,22 +36,25 @@ namespace DataAccess.DAOs
 				var coupons = context.Coupon.Where(c => c.ShopId == shopId
 															&& c.IsActive == true
 															&& c.IsPublic == true
-															&& c.EndDate > DateTime.Now).ToList();
+															&& c.EndDate > DateTime.Now
+                                                            && c.StartDate < DateTime.Now).ToList();
 
 				return coupons;
 			}
 		}
 
-		internal Coupon? GetCouponByCode(string couponCode)
+		internal Coupon? GetCouponPrivate(string couponCode, long shopId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var coupon = context
 								.Coupon
 								.FirstOrDefault(c => c.CouponCode.ToLower().Equals(couponCode.ToLower())
-											&& c.IsActive == true
-											&& c.IsPublic == false
-											&& c.EndDate > DateTime.Now);
+											&& c.ShopId == shopId
+                                            && c.IsActive == true
+                                            && c.IsPublic == false
+                                            && c.EndDate > DateTime.Now
+											&& c.StartDate < DateTime.Now);
 
 				return coupon;
 			}

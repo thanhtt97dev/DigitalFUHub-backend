@@ -438,7 +438,7 @@ namespace DataAccess.DAOs
 						}
 
 						//update customer and admin account balance
-						if (totalPayment > 0)
+						if (totalPayment >= 0)
 						{
 							if (customer.AccountBalance < totalPayment)
 							{
@@ -453,7 +453,7 @@ namespace DataAccess.DAOs
 
 							//update admin account balance
 							var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-							admin.AccountBalance = admin.AccountBalance + totalPayment;
+							admin.AccountBalance += totalPayment == 0 ? totalCoinDiscount : totalPayment;
 
 							context.User.UpdateRange(admin, customer);
 							context.SaveChanges();

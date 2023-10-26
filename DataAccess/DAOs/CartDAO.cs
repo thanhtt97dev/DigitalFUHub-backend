@@ -303,6 +303,7 @@ namespace DataAccess.DAOs
                             if(cartDetail == null) continue;
                             context.CartDetail.Remove(cartDetail);
                         }
+                        context.SaveChanges();
                         var numberCartDetailRemaing = context.CartDetail.Where(x => x.CartId == item.CartId).Count();   
                         if(numberCartDetailRemaing == 0)
                         {

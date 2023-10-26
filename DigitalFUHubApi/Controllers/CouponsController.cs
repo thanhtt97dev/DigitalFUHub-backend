@@ -80,10 +80,9 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-
-		#region Get coupon by code
-		[HttpGet("GetCouponByCode")]
-		public IActionResult GetCouponByCode(string couponCode)
+		#region Get coupon private
+		[HttpGet("GetCouponPrivate")]
+		public IActionResult GetCouponPrivate(string couponCode, long shopId)
 		{
 			ResponseData response = new ResponseData();
 			try
@@ -96,7 +95,15 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(response);
 				}
 
-				CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponByCode(couponCode));
+                if (shopId == 0)
+                {
+                    response.Status.Ok = false;
+                    response.Status.Message = "Invalid";
+                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    return Ok(response);
+                }
+
+                CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponPrivate(couponCode, shopId));
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				response.Status.Message = "Success";
 				response.Status.Ok = true;
