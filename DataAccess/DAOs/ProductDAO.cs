@@ -34,12 +34,12 @@ namespace DataAccess.DAOs
 				return instance;
 			}
 		}
-		internal List<SellerProductResponseDTO> GetAllProduct(int shopId)
+		internal List<SellerProductResponseDTO> GetAllProduct(long shopId)
 		{
 			List<SellerProductResponseDTO> result = new List<SellerProductResponseDTO>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var products = context.Product.Where(x => x.ShopId == shopId && x.ProductStatusId == Constants.PRODUCT_ACTIVE).ToList();
+				var products = context.Product.Where(x => x.ShopId == shopId && (x.ProductStatusId == Constants.PRODUCT_ACTIVE || x.ProductStatusId == Constants.PRODUCT_HIDE)).ToList();
 				foreach (var product in products)
 				{
 					var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
@@ -239,6 +239,7 @@ namespace DataAccess.DAOs
 						productE.ProductName = product.ProductName;
 						productE.Description = product.Description;
 						productE.Discount = product.Discount;
+						productE.ProductStatusId = product.ProductStatusId;
 						if (product.Thumbnail != null)
 						{
 							productE.Thumbnail = product.Thumbnail;
@@ -364,7 +365,7 @@ namespace DataAccess.DAOs
 			{
 				Product? product = context.Product
 					.Where(x => x.ProductId == productId && x.ShopId == userId
-							&& x.ProductStatusId != Constants.PRODUCT_BAN && x.ProductStatusId != Constants.PRODUCT_HIDE)
+							&& (x.ProductStatusId == Constants.PRODUCT_ACTIVE || x.ProductStatusId == Constants.PRODUCT_HIDE))
 						.Select(x => new Product
 						{
 							ProductId = productId,

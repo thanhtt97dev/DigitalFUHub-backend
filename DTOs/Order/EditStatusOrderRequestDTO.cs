@@ -10,7 +10,6 @@ namespace DTOs.Order
 	{
 		public long ShopId { get; set; }
 		public long OrderId { get; set;}
-		public long UserId { get; set;}
 		public int StatusId { get; set;}
 	}
 }

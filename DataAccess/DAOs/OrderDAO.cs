@@ -183,6 +183,8 @@ namespace DataAccess.DAOs
 								OrderId = o.OrderId,
 								OrderDate = o.OrderDate,
 								TotalPayment = o.TotalPayment,
+								TotalAmount = o.TotalAmount,
+								TotalCouponDiscount = o.TotalCouponDiscount,
 								User = new User
 								{
 									UserId = o.User.UserId,
@@ -338,7 +340,7 @@ namespace DataAccess.DAOs
 								.First(x => x.ProductVariantId == item.ProductVariantId);
 
 							if (!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_BAN ||
-								productVariant.Product.ProductStatusId == Constants.PRODUCT_HIDE ||
+								productVariant.Product.ProductStatusId == Constants.PRODUCT_REMOVE ||
 								!productVariant.Product.Shop.IsActive)
 							{
 								transaction.Rollback();

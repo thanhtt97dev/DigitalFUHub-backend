@@ -25,5 +25,6 @@ namespace DTOs.Seller
 		public List<long> ProductVariantPriceNew { get; set; } = new();
 		public List<IFormFile> ProductVariantFileNew { get; set; } = new();
 		public List<string> Tags { get; set; } = new();
+		public bool IsActiveProduct { get; set; }
 	}
 }

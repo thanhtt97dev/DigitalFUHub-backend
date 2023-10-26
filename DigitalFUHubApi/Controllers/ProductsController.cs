@@ -67,13 +67,12 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#region Get All Product with shopId (userId)
 		[Authorize("Seller")]
-		[HttpGet("Seller/All/{id}")]
-		public IActionResult GetAllProduct(int id)
+		[HttpGet("Seller/All")]
+		public IActionResult GetAllProductSeller()
 		{
 			try
 			{
-				if (id == 0) return BadRequest();
-				var products = _productRepository.GetAllProduct(id);
+				var products = _productRepository.GetAllProduct(Util.Instance.GetUserId(User));
 				return Ok(products);
 			}
 			catch (Exception ex)
@@ -102,7 +101,7 @@ namespace DigitalFUHubApi.Controllers
 		#region Get Product Of Seller
 		[Authorize("Seller")]
 		[HttpGet("Seller/{productId}")]
-		public IActionResult GetProduct(long productId)
+		public IActionResult GetProductSeller(long productId)
 		{
 			try
 			{
@@ -216,8 +215,8 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				long userId = Util.Instance.GetUserId(User);
-				bool isExistProduct = _productRepository.IsExistProductByShop(userId, request.ProductId);
-				if (!isExistProduct)
+				Product? prod = _productRepository.GetProductByShop(userId, request.ProductId);
+				if (prod == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 				}
@@ -283,7 +282,8 @@ namespace DigitalFUHubApi.Controllers
 					Description = request.ProductDescription,
 					Discount = request.Discount,
 					CategoryId = request.CategoryId,
-					Thumbnail = request.ProductThumbnail == null ? null : urlThumbnailNew
+					Thumbnail = request.ProductThumbnail == null ? null : urlThumbnailNew,
+					ProductStatusId = request.IsActiveProduct ? Constants.PRODUCT_ACTIVE : Constants.PRODUCT_HIDE
 				};
 				List<ProductMedia> productMedia = _productRepository.GetAllProductMediaById(request.ProductId);
 
