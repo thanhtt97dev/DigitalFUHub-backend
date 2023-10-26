@@ -8,7 +8,6 @@ namespace DTOs.Feedback
 {
 	public class CustomerFeedbackDetailOrderRequestDTO
 	{
-        public long UserId { get; set; }
         public long OrderId { get; set; }
     }
 	public class CustomerFeedbackDetailOrderResponseDTO

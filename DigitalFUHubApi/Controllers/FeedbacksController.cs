@@ -46,7 +46,7 @@ namespace DigitalFUHubApi.Controllers
 
 		#region add feedback order
 		[Authorize("Customer,Seller")]
-		[HttpPost("Add")]
+		[HttpPost("Customer/Add")]
 		public async Task<IActionResult> AddFeedbackOrder([FromForm] CustomerFeedbackOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
@@ -55,6 +55,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
+				long userId = Util.Instance.GetUserId(User);
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				List<string> urlImages = new List<string>();
 				if (request.ImageFiles != null
@@ -68,13 +69,13 @@ namespace DigitalFUHubApi.Controllers
 					foreach (IFormFile file in request.ImageFiles)
 					{
 						now = DateTime.Now;
-						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 						string path = await _storageService.UploadFileToAzureAsync(file, filename);
 						urlImages.Add(path);
 					}
 				}
 
-				_feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				_feedbackRepository.AddFeedbackOrder(userId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 			}
 			catch (Exception e)
 			{
@@ -86,28 +87,37 @@ namespace DigitalFUHubApi.Controllers
 
 		#region get feedback detail
 		[Authorize("Customer,Seller")]
-		[HttpPost("Detail")]
+		[HttpPost("Customer/Detail")]
 		public IActionResult FeedbackDetailOrder(CustomerFeedbackDetailOrderRequestDTO request)
 		{
-			Order? order = _feedbackRepository.GetFeedbackDetail(request.OrderId, request.UserId);
-			if (order == null)
+			try
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
+				long userId = Util.Instance.GetUserId(User);
+				Order? order = _feedbackRepository.GetFeedbackDetail(request.OrderId, userId);
+				if (order == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
+				}
+				List<CustomerFeedbackDetailOrderResponseDTO> response = order.OrderDetails.Where(x => x.IsFeedback == true).Select(x => new CustomerFeedbackDetailOrderResponseDTO
+				{
+					Fullname = order.User.Fullname,
+					Avatar = order.User.Avatar,
+					ProductName = x.ProductVariant.Product.ProductName ?? "",
+					ProductVariantName = x.ProductVariant.Name ?? "",
+					Content = x?.Feedback?.Content ?? "",
+					Rate = x.Feedback?.Rate ?? 0,
+					Quantity = x.Quantity,
+					Date = x.Feedback?.UpdateDate ?? new DateTime(),
+					Thumbnail = x.ProductVariant.Product.Thumbnail ?? "",
+					UrlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
+				}).ToList();
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
 			}
-			List<CustomerFeedbackDetailOrderResponseDTO> response = order.OrderDetails.Where(x => x.IsFeedback == true).Select(x => new CustomerFeedbackDetailOrderResponseDTO
+			catch (Exception)
 			{
-				Fullname = order.User.Fullname,
-				Avatar = order.User.Avatar,
-				ProductName = x.ProductVariant.Product.ProductName ?? "",
-				ProductVariantName = x.ProductVariant.Name ?? "",
-				Content = x?.Feedback?.Content ?? "",
-				Rate = x.Feedback?.Rate ?? 0,
-				Quantity = x.Quantity,
-				Date = x.Feedback?.UpdateDate ?? new DateTime(),
-				Thumbnail = x.ProductVariant.Product.Thumbnail ?? "",
-				UrlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
-			}).ToList();
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+			}
+
 		}
 		#endregion
 	}

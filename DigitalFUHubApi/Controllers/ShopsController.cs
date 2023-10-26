@@ -49,7 +49,8 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				_shopRepository.AddShop(request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
+				long userId = Util.Instance.GetUserId(User);
+				_shopRepository.AddShop(request.ShopName.Trim(), userId, request.ShopDescription.Trim());
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			catch (Exception e)
