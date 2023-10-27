@@ -49,7 +49,7 @@ namespace DigitalFUHubApi
 			//Add for more Policy Authorization
 			builder.Services.AddAuthorization(options =>
 			{
-				options.AddPolicy("AdminOnly", policy =>
+				options.AddPolicy("Admin", policy =>
 					policy.RequireRole("Admin"));
 				options.AddPolicy("Seller", policy =>
 					policy.RequireRole("Seller"));
@@ -109,7 +109,7 @@ namespace DigitalFUHubApi
             builder.Services.AddSingleton<IAssetInformationRepository, AssetInformationRepository>();
             builder.Services.AddSingleton<ICouponRepository, CouponRepository>();
 			builder.Services.AddSingleton<IBusinessFeeRepository, BusinessFeeRepositoty>();
-			builder.Services.AddSingleton<ITransactionRepository, TransactionRepository>();
+			builder.Services.AddSingleton<ITransactionInternalRepository, TransactionInternalRepository>();
             builder.Services.AddSingleton<IUserConversationRepository, UserConversationRepository>();
 
             builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();

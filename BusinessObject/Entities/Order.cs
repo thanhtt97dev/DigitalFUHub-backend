@@ -34,7 +34,7 @@ namespace BusinessObject.Entities
         public virtual OrderStatus? OrderStatus { get; set; } = null!;
 		public virtual ICollection<OrderCoupon> OrderCoupons { get; set; } = null!;
 		public virtual ICollection<OrderDetail> OrderDetails { get; set; } = null!;
-		public virtual ICollection<TransactionCoin>? TransactionCoin { get; set; }
-		public virtual ICollection<TransactionInternal>? TransactionInternal { get; set; }
+		public virtual ICollection<TransactionCoin>? TransactionCoins { get; set; }
+		public virtual ICollection<TransactionInternal>? TransactionInternals { get; set; }
 	}
 }

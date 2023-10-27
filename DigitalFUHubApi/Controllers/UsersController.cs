@@ -17,7 +17,9 @@
 	using global::Comons;
 	using static QRCoder.PayloadGenerator;
 	using Google.Apis.Auth;
-	using DTOs.Seller;
+    using DTOs.Seller;
+	using DataAccess.Repositories;
+	using DTOs.Admin;
 
 	[Route("api/[controller]")]
 	[ApiController]
@@ -690,6 +692,68 @@
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+		}
+		#endregion
+
+		#region Get all users for admin
+		[Authorize(Roles = "Admin")]
+		[HttpPost("GetUsers")]
+		public IActionResult GetUsers(UsersRequestDTO requestDTO)
+		{
+
+			if (requestDTO == null || requestDTO.Email == null ||
+				requestDTO.FullName == null || requestDTO.UserId == null)
+			{
+				return BadRequest();
+			}
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			try
+			{
+				long userId = 0;
+				long.TryParse(requestDTO.UserId, out userId);
+
+				var users = _userRepository.GetUsers(userId, requestDTO.Email, requestDTO.FullName, requestDTO.RoleId, requestDTO.Status);
+				var result = _mapper.Map<List<UsersResponseDTO>>(users);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get user info by Id for admin
+		[Authorize(Roles = "Admin")]
+		[HttpPost("GetUser/{id}")]
+		public IActionResult GetUser(int id)
+		{
+			if (id == 0) return BadRequest();
+			ResponseData responseData = new ResponseData();
+
+			try
+			{
+
+
+				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status.Ok = true;
+				responseData.Status.Message = "Success!";
+
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
 		}
 		#endregion
 
