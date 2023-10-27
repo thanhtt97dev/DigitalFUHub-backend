@@ -10,7 +10,8 @@ namespace DTOs.Admin
 	{
 		public long OrderId { get; set; }
 		public DateTime OrderDate { get; set; }
-		public long TotalPayment { get; set; }
+		public long TotalAmount { get; set; }
+		public long TotalCouponDiscount { get; set; }
 		public long CustomerId { get; set; }
 		public string CustomerEmail { get; set; } = string.Empty;
 		public long SellerId { get; set; }

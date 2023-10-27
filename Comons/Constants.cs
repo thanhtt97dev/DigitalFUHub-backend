@@ -69,7 +69,8 @@
 		// Product Status
 		public const int PRODUCT_ACTIVE = 1;
 		public const int PRODUCT_BAN = 2;
-		public const int PRODUCT_HIDE = 3;
+		public const int PRODUCT_REMOVE = 3;
+		public const int PRODUCT_HIDE = 4;
 
 		// Withdraw transaction Status
 		public const int WITHDRAW_TRANSACTION_ALL = 0;

@@ -1,6 +1,9 @@
 ﻿using BusinessObject;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -14,7 +17,9 @@ namespace DigitalFUHubApi.Comons
 			if (path.Contains("/hubs/"))
 			{
 				var accessToken = context.Request.Query["access_token"];
+				var userid = context.Request.Query["userid"];
 				context.Token = accessToken;
+				context.Request.Headers.Add("session-userid", userid);
 			}
 			return Task.CompletedTask;
 		}
@@ -26,6 +31,10 @@ namespace DigitalFUHubApi.Comons
 			string? userIdStr = string.Empty;
 			if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
 			{
+				if(!string.Equals(jwtSecurityToken.Header.Alg, SecurityAlgorithms.HmacSha512, StringComparison.OrdinalIgnoreCase))
+				{
+					context.Fail("Unauthorized");
+				}
 				jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
 				userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
 			}
@@ -53,17 +62,13 @@ namespace DigitalFUHubApi.Comons
 				return base.TokenValidated(context);
 			}
 
-			JwtSecurityToken? securityToken = context.SecurityToken as JwtSecurityToken;
-			if (securityToken == null)
+			StringValues headerValues;
+			context.Request.Headers.TryGetValue("session-userid", out headerValues);
+			if (headerValues.FirstOrDefault() == null || !string.Equals(userId.ToString(), headerValues.FirstOrDefault()))
 			{
 				context.Fail("Unauthorized");
 			}
-			string algorithm = securityToken?.Header?.Alg ?? "";
 
-			if (!string.Equals(algorithm, "HS512", StringComparison.OrdinalIgnoreCase))
-			{
-				context.Fail("Unauthorized");
-			}
 			return base.TokenValidated(context);
 		}
 

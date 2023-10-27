@@ -151,7 +151,8 @@ namespace BusinessObject
 			{
 				new ProductStatus{ProductStatusId = 1, ProductStatusName = "Active"},
 				new ProductStatus{ProductStatusId = 2, ProductStatusName = "Ban"},
-				new ProductStatus{ProductStatusId = 3, ProductStatusName = "Hide"},
+				new ProductStatus{ProductStatusId = 3, ProductStatusName = "Remove"},
+				new ProductStatus{ProductStatusId = 4, ProductStatusName = "Hide"},
 			});
 
 			modelBuilder.Entity<OrderStatus>().HasData(new OrderStatus[]

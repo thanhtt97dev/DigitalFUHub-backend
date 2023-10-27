@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace DTOs.Feedback
 {
-	public class CustomerFeedbackDetailOrderRequestDTO
-	{
-        public long OrderId { get; set; }
-    }
 	public class CustomerFeedbackDetailOrderResponseDTO
 	{
 		public string Fullname { get; set; } = string.Empty!;
