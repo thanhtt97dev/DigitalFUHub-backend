@@ -14,6 +14,7 @@ using System.Security.Cryptography.Xml;
 using Microsoft.Data.SqlClient.Server;
 using Comons;
 using System.Transactions;
+using DTOs.Admin;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -939,6 +940,54 @@ namespace DigitalFUHubApi.Controllers
 					responseData.Status = status;
 					return Ok(responseData);
 				}
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region RejectWithdrawTransaction
+		[Authorize(Roles = "Admin")]
+		[HttpPost("RejectWithdrawTransaction")]
+		public IActionResult RejectWithdrawTransaction(RejectWithdrawTransaction requestDTO)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			try
+			{
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(requestDTO.WithdrawTransactionId);
+
+				if (withdrawTransaction == null)
+				{
+					status.Message = "Withdraw transaction not existed!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID ||
+					withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_REJECT)
+				{
+					status.Message = $"Withdraw transaction has been " +
+						$"{(withdrawTransaction.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID ? "Paid" : "Rejected")}!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				bankRepository.RejectWithdrawTransaction(requestDTO.WithdrawTransactionId, requestDTO.Note);
 
 				status.Message = "Success!";
 				status.Ok = true;
