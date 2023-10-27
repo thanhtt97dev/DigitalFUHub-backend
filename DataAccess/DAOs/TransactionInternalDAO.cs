@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAOs
 {
-	internal class TransactionDAO
+	internal class TransactionInternalDAO
 	{
-		private static TransactionDAO? instance;
+		private static TransactionInternalDAO? instance;
 		private static readonly object instanceLock = new object();
 
-		public static TransactionDAO Instance
+		public static TransactionInternalDAO Instance
 		{
 			get
 			{
@@ -22,7 +22,7 @@ namespace DataAccess.DAOs
 				{
 					if (instance == null)
 					{
-						instance = new TransactionDAO();
+						instance = new TransactionInternalDAO();
 					}
 				}
 				return instance;

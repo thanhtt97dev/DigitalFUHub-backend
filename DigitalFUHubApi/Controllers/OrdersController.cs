@@ -329,6 +329,174 @@ namespace DigitalFUHubApi.Controllers
 			return Ok(response);
 		}
 		#endregion
+
+		#region Get list orders admin
+		[Authorize("Admin")]
+		[HttpPost("Admin/All")]
+		public IActionResult GetOrders(OrdersRequestDTO requestDTO)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
+			if (!acceptedOrderStatus.Contains(requestDTO.Status) && requestDTO.Status != Constants.ORDER_ALL)
+			{
+				status.Message = "Invalid order status!";
+				status.Ok = false;
+				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+
+			try
+			{
+
+				DateTime fromDate;
+				DateTime toDate;
+				string format = "M/d/yyyy";
+				try
+				{
+					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						status.Message = "From date must be less than to date";
+						status.Ok = false;
+						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+						responseData.Status = status;
+						return Ok(responseData);
+					}
+				}
+				catch (FormatException)
+				{
+					status.Message = "Invalid datetime";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+				long orderId;
+				long.TryParse(requestDTO.OrderId, out orderId);
+
+				var orders = _orderRepository.GetOrders(orderId, requestDTO.CustomerEmail, requestDTO.ShopName, fromDate, toDate, requestDTO.Status);
+				var result = _mapper.Map<List<OrdersResponseDTO>>(orders);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get order detail admin
+		[Authorize("Admin")]
+		[HttpPost("Admin/GetOrder/{id}")]
+		public IActionResult GetOrder(int id)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			try
+			{
+				var order = _orderRepository.GetOrder(id);
+				if (order == null)
+				{
+					status.Message = "Order not existed!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var result = _mapper.Map<OrderDetailResponseDTO>(order);
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Update order status admin
+		[Authorize("Admin")]
+		[HttpPost("Admin/UpdateOrderStatus")]
+		public IActionResult UpdateOrderStatus(UpdateOrderStatusRequestDTO requestDTO)
+		{
+			if (requestDTO.OrderId == 0 || requestDTO.Status == 0) return BadRequest();
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+
+			try
+			{
+				int[] statusAccepted = { Constants.ORDER_DISPUTE, Constants.ORDER_REJECT_COMPLAINT, Constants.ORDER_SELLER_VIOLATES };
+				if (!statusAccepted.Contains(requestDTO.Status))
+				{
+					status.Message = "Invalid order status!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				var order = _orderRepository.GetOrderForCheckingExisted(requestDTO.OrderId);
+				if (order == null)
+				{
+					status.Message = "Order not existed!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				if (requestDTO.Status == Constants.ORDER_REJECT_COMPLAINT)
+				{
+					_orderRepository.UpdateOrderStatusRejectComplaint(requestDTO.OrderId, requestDTO.Note);
+				}
+				else if (requestDTO.Status == Constants.ORDER_SELLER_VIOLATES)
+				{
+					_orderRepository.UpdateOrderStatusSellerViolates(requestDTO.OrderId, requestDTO.Note);
+				}
+				else
+				{
+					status.Message = "Invalid order status!";
+					status.Ok = false;
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
+
+				// check seller have VIOLATE 
+
+				status.Message = "Success!";
+				status.Ok = true;
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 	}
 
 }
