@@ -3,10 +3,12 @@ using Comons;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
+using DigitalFUHubApi.Services;
 using DTOs.Shop;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -16,13 +18,14 @@ namespace DigitalFUHubApi.Controllers
 	{
 		private readonly IShopRepository _shopRepository;
 		private readonly IUserRepository _userRepository;
+		private readonly JwtTokenService _jwtTokenService;
 
-		public ShopsController(IShopRepository shopRepository, IUserRepository userRepository)
+		public ShopsController(IShopRepository shopRepository, IUserRepository userRepository, JwtTokenService jwtTokenService)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
+			_jwtTokenService = jwtTokenService;
 		}
-
 
 		[Authorize]
 		[HttpGet("IsExistShopName/{shopName}")]
@@ -49,8 +52,11 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				long userId = Util.Instance.GetUserId(User);
-				_shopRepository.AddShop(request.ShopName.Trim(), userId, request.ShopDescription.Trim());
+				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				_shopRepository.AddShop(request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			catch (Exception e)

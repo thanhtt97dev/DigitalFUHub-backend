@@ -11,6 +11,7 @@ namespace DTOs.Feedback
 {
 	public class CustomerFeedbackOrderRequestDTO
 	{
+		public long UserId { get; set; }
 		public long OrderId { get; set; }
 		public long OrderDetailId { get; set; }
 		public int Rate { get; set; }

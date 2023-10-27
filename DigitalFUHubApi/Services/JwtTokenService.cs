@@ -260,22 +260,16 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Get UserId by access token
-		internal int GetUserIdByAccessToken(string? accessToken)
+		internal long GetUserIdByAccessToken(ClaimsPrincipal user)
 		{
-			if (string.IsNullOrEmpty(accessToken)) throw new NullReferenceException(nameof(accessToken));
-
-			JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-			var secretKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? string.Empty);
-
-			var tokenValidationParameters = new JwtValidationParameters();
-
-			ClaimsPrincipal tokenVerification = jwtSecurityTokenHandler
-				.ValidateToken(accessToken, tokenValidationParameters, out var validatedToken);
-
-			var userIdRaw = tokenVerification.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value; //Sub
-			int userId;
-			int.TryParse(userIdRaw, out userId);
-			return userId;
+			try
+			{
+				return long.Parse(user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+			}
+			catch (Exception)
+			{
+				throw new Exception("INVALID");
+			}
 		}
 		#endregion
 

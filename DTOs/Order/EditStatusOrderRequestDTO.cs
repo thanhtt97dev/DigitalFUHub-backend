@@ -8,6 +8,7 @@ namespace DTOs.Order
 {
 	public class EditStatusOrderRequestDTO
 	{
+		public long UserId { get; set; }
 		public long ShopId { get; set; }
 		public long OrderId { get; set;}
 		public int StatusId { get; set;}

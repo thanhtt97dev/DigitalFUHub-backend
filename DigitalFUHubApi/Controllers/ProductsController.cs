@@ -67,12 +67,16 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#region Get All Product with shopId (userId)
 		[Authorize("Seller")]
-		[HttpGet("Seller/All")]
-		public IActionResult GetAllProductSeller()
+		[HttpGet("Seller/{userId}/All")]
+		public IActionResult GetAllProductSeller(long userId)
 		{
 			try
 			{
-				var products = _productRepository.GetAllProduct(Util.Instance.GetUserId(User));
+				if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				var products = _productRepository.GetAllProduct(userId);
 				return Ok(products);
 			}
 			catch (Exception ex)
@@ -100,12 +104,16 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get Product Of Seller
 		[Authorize("Seller")]
-		[HttpGet("Seller/{productId}")]
-		public IActionResult GetProductSeller(long productId)
+		[HttpGet("Seller/{userId}/{productId}")]
+		public IActionResult GetProductSeller(long userId, long productId)
 		{
 			try
 			{
-				Product? product = _productRepository.GetProductByShop(Util.Instance.GetUserId(User), productId);
+				if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				Product? product = _productRepository.GetProductByShop(userId, productId);
 				if (product == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
@@ -129,18 +137,21 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
-			string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
-			if (request.DataVariants.Any(x => !x.FileName.Contains(".xlsx"))
-				||
-				request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))
-				||
-				!fileExtension.Contains(request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf("."))))
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
-			}
 			try
 			{
-				long userId = Util.Instance.GetUserId(User);
+				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				if (request.DataVariants.Any(x => !x.FileName.Contains(".xlsx"))
+					||
+					request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))
+					||
+					!fileExtension.Contains(request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf("."))))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				}
 				DateTime now;
 				string filename;
 				List<Tag> tags = new List<Tag>();
@@ -169,7 +180,7 @@ namespace DigitalFUHubApi.Controllers
 				foreach (IFormFile file in request.Images)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 					string url = await _storageService.UploadFileToAzureAsync(file, filename);
 					productMedias.Add(new ProductMedia
 					{
@@ -178,7 +189,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				now = DateTime.Now;
-				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf(".")));
+				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf(".")));
 				string urlThumbnail = await _storageService.UploadFileToAzureAsync(request.Thumbnail, filename);
 				Product product = new Product()
 				{
@@ -186,7 +197,7 @@ namespace DigitalFUHubApi.Controllers
 					Description = request.Description,
 					Discount = request.Discount,
 					ProductName = request.ProductName,
-					ShopId = userId,
+					ShopId = request.UserId,
 					Tags = tags,
 					Thumbnail = urlThumbnail,
 					ProductVariants = productVariants,
@@ -214,8 +225,11 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				long userId = Util.Instance.GetUserId(User);
-				Product? prod = _productRepository.GetProductByShop(userId, request.ProductId);
+				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				Product? prod = _productRepository.GetProductByShop(request.UserId, request.ProductId);
 				if (prod == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
@@ -233,7 +247,7 @@ namespace DigitalFUHubApi.Controllers
 				foreach (var file in request.ProductImagesNew)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 					string url = await _storageService.UploadFileToAzureAsync(file, filename);
 					productMediaNew.Add(new ProductMedia
 					{
@@ -271,7 +285,7 @@ namespace DigitalFUHubApi.Controllers
 				if (request.ProductThumbnail != null)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.ProductThumbnail.FileName.Substring(request.ProductThumbnail.FileName.LastIndexOf(".")));
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.ProductThumbnail.FileName.Substring(request.ProductThumbnail.FileName.LastIndexOf(".")));
 					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnail, filename);
 				}
 

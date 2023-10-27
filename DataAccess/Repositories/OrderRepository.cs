@@ -24,7 +24,7 @@ namespace DataAccess.Repositories
 
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 
-		public Order? GetSellerOrderDetail(long orderId) => OrderDAO.Instance.GetSellerOrderDetail(orderId);
+		public Order? GetSellerOrderDetail(long userId, long orderId) => OrderDAO.Instance.GetSellerOrderDetail(userId, orderId);
 		
 		public void UpdateOrderStatusAdmin(long orderId, int status, string? note) => OrderDAO.Instance.UpdateOrderStatusAdmin(orderId, status, note);
 		

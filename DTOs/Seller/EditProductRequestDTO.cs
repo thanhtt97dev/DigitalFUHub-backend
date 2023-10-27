@@ -9,6 +9,7 @@ namespace DTOs.Seller
 {
 	public class EditProductRequestDTO
 	{
+		public long UserId { get; set; }
 		public long ProductId { get; set; }
 		public string ProductName { get; set; } = null!;
 		public string ProductDescription{ get; set; } = null!;

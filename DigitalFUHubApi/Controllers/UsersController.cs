@@ -17,7 +17,7 @@
 	using global::Comons;
 	using static QRCoder.PayloadGenerator;
 	using Google.Apis.Auth;
-    using DTOs.Seller;
+	using DTOs.Seller;
 
 	[Route("api/[controller]")]
 	[ApiController]
@@ -180,7 +180,7 @@
 			try
 			{
 				bool result = _jwtTokenService.ValidateTokenConfirmEmail(token);
-				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_FAILD, 
+				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_FAILD,
 					result ? "SUCCESS" : "INVALID", result, new()));
 			}
 			catch (Exception e)
@@ -497,7 +497,7 @@
 
 				string accessToken = Util.GetAccessToken(HttpContext);
 
-				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
+				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(User);
 				if (user.UserId != userIdInAccessToken) return NotFound();
 
 				return Ok(_mapper.Map<UserSignInResponseDTO>(user));
@@ -544,13 +544,13 @@
 				if (user == null) return NotFound();
 
 
-                return Ok(_mapper.Map<UserOnlineStatusResponseDTO>(user));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+				return Ok(_mapper.Map<UserOnlineStatusResponseDTO>(user));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 		#endregion
 
 		#region Get Customer Balance
@@ -559,41 +559,41 @@
 		public IActionResult GetCustomerBalance(int userId)
 
 		{
-            ResponseData response = new ResponseData();
-            try
-            {
-                if (userId == 0)
-                {
-                    response.Status.Ok = false;
-                    response.Status.Message = "Invalid";
-                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    return Ok(response);
-                }
+			ResponseData response = new ResponseData();
+			try
+			{
+				if (userId == 0)
+				{
+					response.Status.Ok = false;
+					response.Status.Message = "Invalid";
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					return Ok(response);
+				}
 
-                var user = _userRepository.GetUserById(userId);
+				var user = _userRepository.GetUserById(userId);
 
-                if (user == null)
-                {
-                    response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    response.Status.Ok = false;
-                    response.Status.Message = "Data not found!";
-                    return Ok(response);
-                }
+				if (user == null)
+				{
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					response.Status.Ok = false;
+					response.Status.Message = "Data not found!";
+					return Ok(response);
+				}
 
-                response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                response.Status.Message = "Success";
-                response.Status.Ok = true;
-                response.Result = user.AccountBalance;
-            }
-            catch (Exception)
-            {
-                response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                response.Status.Ok = false;
-                response.Status.Message = "Invalid";
-                return Ok(response);
-            }
-            return Ok(response);
-        }
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				response.Status.Message = "Success";
+				response.Status.Ok = true;
+				response.Result = user.AccountBalance;
+			}
+			catch (Exception)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			}
+			return Ok(response);
+		}
 		#endregion
 
 		#region Edit user info
@@ -620,44 +620,44 @@
 		#region Get Coin
 		[Authorize]
 		[HttpGet("GetCoin/{userId}")]
-        public IActionResult UpdateBalance(long userId)
-        {
-            ResponseData response = new ResponseData();
-            try
-            {
-                if (userId == 0)
-                {
-                    response.Status.Ok = false;
-                    response.Status.Message = "Invalid";
-                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    return Ok(response);
-                }
+		public IActionResult UpdateBalance(long userId)
+		{
+			ResponseData response = new ResponseData();
+			try
+			{
+				if (userId == 0)
+				{
+					response.Status.Ok = false;
+					response.Status.Message = "Invalid";
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					return Ok(response);
+				}
 
 				var user = _userRepository.GetUserById(userId);
-				
+
 				if (user == null)
 				{
-                    response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    response.Status.Ok = false;
-                    response.Status.Message = "Data not found!";
-                    return Ok(response);
-                }
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					response.Status.Ok = false;
+					response.Status.Message = "Data not found!";
+					return Ok(response);
+				}
 
-                response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                response.Status.Message = "Success";
-                response.Status.Ok = true;
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				response.Status.Message = "Success";
+				response.Status.Ok = true;
 				response.Result = new UserCoinResponseDTO { Coin = user.Coin };
-            }
-            catch (Exception )
-            {
-                response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                response.Status.Ok = false;
-                response.Status.Message = "Invalid";
-                return Ok(response);
-            }
-            return Ok(response);
-        }
-        #endregion
+			}
+			catch (Exception)
+			{
+				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+				response.Status.Ok = false;
+				response.Status.Message = "Invalid";
+				return Ok(response);
+			}
+			return Ok(response);
+		}
+		#endregion
 
 		#region Check Exist Email
 		[HttpGet("IsExistEmail/{email}")]

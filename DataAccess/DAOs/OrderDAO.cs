@@ -609,7 +609,7 @@ namespace DataAccess.DAOs
 			*/
 		}
 
-		internal Order? GetSellerOrderDetail(long orderId)
+		internal Order? GetSellerOrderDetail(long orderId, long orderId1)
 		{
 			return null;
 			/*

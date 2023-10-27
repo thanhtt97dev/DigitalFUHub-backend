@@ -8,6 +8,7 @@ namespace DTOs.Seller
 {
 	public class SellerOrdersRequestDTO
 	{
+		public long UserId { get; set; }
 		public string OrderId { get; set; } = string.Empty;
 		public string CustomerEmail { get; set; } = string.Empty;
 		public string FromDate { get; set; } = null!;

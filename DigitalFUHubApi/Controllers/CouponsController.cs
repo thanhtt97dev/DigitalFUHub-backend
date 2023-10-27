@@ -17,6 +17,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -126,7 +127,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				Coupon? coupon = _couponRepository.GetCoupon(couponId, Util.Instance.GetUserId(User));
+				Coupon? coupon = _couponRepository.GetCoupon(couponId, _jwtTokenService.GetUserIdByAccessToken(User));
 				if (coupon == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
@@ -159,7 +160,7 @@ namespace DigitalFUHubApi.Controllers
 				CultureInfo provider = CultureInfo.InvariantCulture;
 				DateTime? startDate = string.IsNullOrEmpty(request.StartDate) ? null : DateTime.ParseExact(request.StartDate.Trim(), formatDate, provider);
 				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(), formatDate, provider);
-				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(Util.Instance.GetUserId(User), request.CouponCode.Trim(), startDate, endDate, request.Status);
+				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User), request.CouponCode.Trim(), startDate, endDate, request.Status);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
 					coupons.Select(x => new SellerCouponResponseDTO
@@ -320,17 +321,17 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 
-		//[Authorize("Seller")]
+		[Authorize("Seller")]
 		[HttpGet("IsExistCouponCode/{actionMode}/{couponCode}")]
 		public IActionResult CheckCouponCodeExist(string actionMode, string couponCode)
 		{
-			if (string.IsNullOrWhiteSpace(couponCode))
+			if (string.IsNullOrWhiteSpace(couponCode) || !Regex.IsMatch(couponCode, "^[a-zA-Z0-9]{4,}$"))
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			try
 			{
-				bool result = _couponRepository.IsExistCouponCode(Util.Instance.GetUserId(User), couponCode.Trim(), actionMode);
+				bool result = _couponRepository.IsExistCouponCode(_jwtTokenService.GetUserIdByAccessToken(User), couponCode.Trim(), actionMode);
 				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_FAILD : Constants.RESPONSE_CODE_SUCCESS,
 					result ? "INVALID" : "SUCCESS",
 					!result,

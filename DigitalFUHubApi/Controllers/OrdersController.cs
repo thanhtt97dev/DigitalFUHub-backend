@@ -48,15 +48,10 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				ResponseData responseData = new ResponseData();
-				//var accessToken = Util.GetAccessToken(HttpContext);
-				//var userIdFromAccessToken = _jwtTokenService.GetUserIdByAccessToken(accessToken);
-				//if (request.UserId != userIdFromAccessToken)
-				//{
-				//	responseData.Status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
-				//	responseData.Status.Ok = false;
-				//	responseData.Status.Message = "Not have permission!";
-				//	return Ok(responseData);
-				//}
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
 					_orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
@@ -90,8 +85,8 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get all order of customer
 		[Authorize("Customer,Seller")]
-		[HttpPost("Customer/All")]
-		public IActionResult GetOrders([FromBody] GetAllOrderRequestDTO request)
+		[HttpPost("Customer/List")]
+		public IActionResult GetListOrders([FromBody] GetAllOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -99,8 +94,11 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				long userId = Util.Instance.GetUserId(User);
-				List<Order> orders = _orderRepository.GetAllOrderByUser(userId, request.StatusId, request.Limit, request.Offset);
+				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 				OrderResponseDTO orderResponse = new OrderResponseDTO()
 				{
 					NextOffset = orders.Count < request.Limit ? -1 : request.Offset + orders.Count,
@@ -156,8 +154,11 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				long customerId = Util.Instance.GetUserId(User);
-				Order? order = _orderRepository.GetOrderCustomer(request.OrderId, customerId, request.ShopId);
+				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				Order? order = _orderRepository.GetOrderCustomer(request.OrderId, request.UserId, request.ShopId);
 				if (order == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
@@ -172,7 +173,7 @@ namespace DigitalFUHubApi.Controllers
 				string title = $"{(request.StatusId == Constants.ORDER_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
 				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
 				string link = Constants.FRONT_END_HISTORY_ORDER_URL + request.OrderId;
-				await _hubService.SendNotification(customerId, title, content, link);
+				await _hubService.SendNotification(request.UserId, title, content, link);
 			}
 			catch (Exception e)
 			{
@@ -184,13 +185,16 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get order detail of customer
 		[Authorize("Customer,Seller")]
-		[HttpGet("Customer/{orderId}")]
-		public IActionResult GetOrderDetailCustomer(long orderId)
+		[HttpGet("Customer/{userId}/{orderId}")]
+		public IActionResult GetOrderDetailCustomer(long userId, long orderId)
 		{
 			try
 			{
-				long customerId = Util.Instance.GetUserId(User);
-				Order? order = _orderRepository.GetOrderCustomer(orderId, customerId);
+				if(userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				Order? order = _orderRepository.GetOrderCustomer(orderId, userId);
 				if(order == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
@@ -252,7 +256,10 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-
+				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				DateTime fromDate;
 				DateTime toDate;
 				string format = "M/d/yyyy";
@@ -271,10 +278,9 @@ namespace DigitalFUHubApi.Controllers
 				}
 				long orderId;
 				long.TryParse(request.OrderId, out orderId);
-				long userId = Util.Instance.GetUserId(User);
 				List<Order> orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, "",
 					fromDate, toDate, request.Status)
-					.Where(x => x.Shop.UserId == userId)
+					.Where(x => x.Shop.UserId == request.UserId)
 					.ToList();
 				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
 
@@ -289,16 +295,16 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get order detail seller
 		[Authorize("Seller")]
-		[HttpGet("Seller/{orderId}")]
-		public IActionResult GetOrderDetailSeller(long orderId)
+		[HttpGet("Seller/{userId}/{orderId}")]
+		public IActionResult GetOrderDetailSeller(long userId, long orderId)
 		{
 			ResponseData response = new ResponseData();
-			if (orderId == 0)
+			if (userId != _jwtTokenService.GetUserIdByAccessToken(User)) 
 			{
-				return BadRequest();
+				return Unauthorized();
 			}
 
-			Order? orderRaw = _orderRepository.GetSellerOrderDetail(orderId);
+			Order? orderRaw = _orderRepository.GetSellerOrderDetail(userId,orderId);
 
 			if (orderRaw == null)
 			{

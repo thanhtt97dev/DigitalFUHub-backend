@@ -20,15 +20,19 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IConfiguration _configuration;
 		private readonly IFeedbackRepository _feedbackRepository;
 		private readonly StorageService _storageService;
+		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 
-		public FeedbacksController(IConfiguration configuration, IFeedbackRepository feedbackRepository, StorageService storageService, IMapper mapper)
+		public FeedbacksController(IConfiguration configuration, IFeedbackRepository feedbackRepository, StorageService storageService, JwtTokenService jwtTokenService, IMapper mapper)
 		{
 			_configuration = configuration;
 			_feedbackRepository = feedbackRepository;
 			_storageService = storageService;
+			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 		}
+
+
 		#region Get all feedback
 		[HttpGet("GetAll")]
 		public IActionResult GetAll(long productId)
@@ -55,7 +59,10 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				long userId = Util.Instance.GetUserId(User);
+				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				List<string> urlImages = new List<string>();
 				if (request.ImageFiles != null
@@ -69,13 +76,13 @@ namespace DigitalFUHubApi.Controllers
 					foreach (IFormFile file in request.ImageFiles)
 					{
 						now = DateTime.Now;
-						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", userId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 						string path = await _storageService.UploadFileToAzureAsync(file, filename);
 						urlImages.Add(path);
 					}
 				}
 
-				_feedbackRepository.AddFeedbackOrder(userId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				_feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 			}
 			catch (Exception e)
 			{
@@ -87,12 +94,15 @@ namespace DigitalFUHubApi.Controllers
 
 		#region get feedback detail
 		[Authorize("Customer,Seller")]
-		[HttpGet("Customer/{orderId}")]
-		public IActionResult GetFeedbackDetailOrder(long orderId)
+		[HttpGet("Customer/{userId}/{orderId}")]
+		public IActionResult GetFeedbackDetailOrder(long userId, long orderId)
 		{
 			try
 			{
-				long userId = Util.Instance.GetUserId(User);
+				if(userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				Order? order = _feedbackRepository.GetFeedbackDetail(orderId, userId);
 				if (order == null)
 				{
