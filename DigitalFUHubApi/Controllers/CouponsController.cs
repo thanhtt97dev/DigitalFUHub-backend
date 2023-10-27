@@ -122,12 +122,16 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get coupon of seller by Id
 		[Authorize("Seller")]
-		[HttpGet("{couponId}")]
-		public IActionResult GetCouponById(long couponId)
+		[HttpGet("{userId}/{couponId}")]
+		public IActionResult GetCouponById(long userId, long couponId)
 		{
 			try
 			{
-				Coupon? coupon = _couponRepository.GetCoupon(couponId, _jwtTokenService.GetUserIdByAccessToken(User));
+				if(userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				Coupon? coupon = _couponRepository.GetCoupon(couponId, userId);
 				if (coupon == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
@@ -146,16 +150,20 @@ namespace DigitalFUHubApi.Controllers
 		#region Get list coupons
 
 		[Authorize("Seller")]
-		[HttpPost("List/Seller")]
+		[HttpPost("Seller/List")]
 		public IActionResult GetListCouponsSeller(SellerCouponRequestDTO request)
 		{
 			try
 			{
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				if (!ModelState.IsValid)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
-
+				
 				string formatDate = "M/d/yyyy";
 				CultureInfo provider = CultureInfo.InvariantCulture;
 				DateTime? startDate = string.IsNullOrEmpty(request.StartDate) ? null : DateTime.ParseExact(request.StartDate.Trim(), formatDate, provider);
@@ -189,12 +197,17 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
 					|| string.IsNullOrWhiteSpace(request.CouponName))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
+				
 				DateTime startDT = DateTime.Parse(request.StartDate);
 				DateTime endDT = DateTime.Parse(request.EndDate);
 				Coupon coupon = new Coupon
@@ -228,6 +241,10 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
 					|| string.IsNullOrWhiteSpace(request.CouponName)
@@ -235,6 +252,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
+				
 				DateTime startDT = DateTime.Parse(request.StartDate);
 				DateTime endDT = DateTime.Parse(request.EndDate);
 				Coupon coupon = new Coupon
@@ -268,10 +286,15 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				if (!ModelState.IsValid)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
+				
 
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
@@ -298,11 +321,15 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 				if (!ModelState.IsValid)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
-
+				
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
 				{
