@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Text;
 
 namespace DigitalFUHubApi.Comons
@@ -31,9 +32,10 @@ namespace DigitalFUHubApi.Comons
 			string? userIdStr = string.Empty;
 			if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
 			{
-				if(!string.Equals(jwtSecurityToken.Header.Alg, SecurityAlgorithms.HmacSha512, StringComparison.OrdinalIgnoreCase))
+				if (!string.Equals(jwtSecurityToken.Header.Alg, SecurityAlgorithms.HmacSha512, StringComparison.OrdinalIgnoreCase))
 				{
 					context.Fail("Unauthorized");
+					return base.TokenValidated(context);
 				}
 				jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
 				userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
