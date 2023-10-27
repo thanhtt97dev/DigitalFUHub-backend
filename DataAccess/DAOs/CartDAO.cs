@@ -101,22 +101,6 @@ namespace DataAccess.DAOs
 
 		}
 
-
-        internal Cart? GetCart(long userId, long productVariantId)
-        {
-            return null;
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                /*
-                var cart = context.Cart.FirstOrDefault(
-                        c => c.UserId == userId && c.ProductVariantId == productVariantId
-                    );
-
-                return cart;
-                */
-            }
-        }
-
         internal List<Cart> GetCartsByUserId(long userId)
         {
             using (DatabaseContext context = new DatabaseContext())
@@ -165,45 +149,6 @@ namespace DataAccess.DAOs
                 return result;
 			}
 		}
-
-		 /*
-	     internal (bool, long) CheckQuantityForCart(long userId, long productVariantId, long quantity)
-	     {
-		     return (true, 0);
-		     using (DatabaseContext context = new DatabaseContext())
-		     {
-
-			     var cart = GetCart(userId, productVariantId);
-			     if (cart != null)
-			     {
-				     long quantityPurchased = quantity + cart.Quantity;
-				     long quantityProductVariant = context.AssetInformation.Count(a => a.ProductVariantId == productVariantId);
-				     if (quantityPurchased > quantityProductVariant)
-				     {
-					     return (false, cart.Quantity);
-				     }
-			     }
-			     return (true, cart?.Quantity ?? 0);
-			
-	        }
-        }
-        */
-
-
-        internal async Task DeleteCart(long userId, long productVariantId)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                /*
-                var cart = await context.Cart.FirstOrDefaultAsync(
-                        c => c.UserId == userId && c.ProductVariantId == productVariantId
-                    );
-                if (cart == null) throw new ArgumentNullException("Not found cart");
-                context.Cart.Remove(cart);
-                context.SaveChanges();
-                */
-            }
-        }
 
         internal (bool, int) CheckValidQuantityAddProductToCart(long userId, long shopId, long productVariantId, int quantity)
         {
