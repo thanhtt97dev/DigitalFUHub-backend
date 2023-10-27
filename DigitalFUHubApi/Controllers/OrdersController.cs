@@ -419,7 +419,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var result = _mapper.Map<OrderDetailResponseDTO>(order);
+				var result = _mapper.Map<OrderInfoResponseDTO>(order);
 
 				status.Message = "Success!";
 				status.Ok = true;

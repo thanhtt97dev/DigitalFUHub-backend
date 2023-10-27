@@ -517,96 +517,102 @@ namespace DataAccess.DAOs
 
 		internal Order? GetOrder(long orderId)
 		{
-			return null;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				Order? order = (from o in context.Order
-								join user in context.User
-									on o.UserId equals user.UserId
-								join businessFee in context.BusinessFee
-									on o.BusinessFeeId equals businessFee.BusinessFeeId
-								join productVariant in context.ProductVariant
-									on o.ProductVariantId equals productVariant.ProductVariantId
-								join product in context.Product
-									on productVariant.ProductId equals product.ProductId
-								join shop in context.Shop
-									on product.ShopId equals shop.UserId
-								join category in context.Category
-									on product.CategoryId equals category.CategoryId
-								where o.OrderId == orderId
-								select new Order
-								{
-									OrderId = orderId,
-									UserId = o.UserId,
-									ProductVariantId = o.ProductVariantId,
-									BusinessFeeId = o.BusinessFeeId,
-									Quantity = o.Quantity,
-									Price = o.Price,
-									Discount = o.Discount,
-									OrderDate = o.OrderDate,
-									TotalCouponDiscount = o.TotalCouponDiscount,
-									TotalAmount = o.TotalAmount,
-									TotalCoinDiscount = o.TotalCoinDiscount,
-									TotalPayment = o.TotalPayment,
-									Note = o.Note,
-									IsFeedback = o.IsFeedback,
-									OrderStatusId = o.OrderStatusId,
-									User = new User
+				Order? orderInfo = (from order in context.Order
+									join user in context.User
+										on order.UserId equals user.UserId
+									join shop in context.Shop
+										on order.ShopId equals shop.UserId
+									join businessFee in context.BusinessFee
+										on order.BusinessFeeId equals businessFee.BusinessFeeId
+									where order.OrderId == orderId
+									select new Order
 									{
-										UserId = o.UserId,
-										Email = user.Email,
-									},
-									ProductVariant = new ProductVariant
-									{
-										ProductVariantId = productVariant.ProductVariantId,
-										Name = productVariant.Name,
-										ProductId = productVariant.ProductId,
-										Product = new Product
+										OrderId = orderId,	
+										User = new User
 										{
-											ProductId = product.ProductId,
-											ProductName = product.ProductName,
-											Thumbnail = product.Thumbnail,
-											Category = new Category
-											{
-												CategoryId = category.CategoryId,
-												CategoryName = category.CategoryName
-											},
-											Shop = new Shop
-											{
-												UserId = shop.UserId,
-												ShopName = shop.ShopName,
-											},
-											ProductMedias = (from productMedia in context.ProductMedia
-															 where product.ProductId == productMedia.ProductId
-															 select new ProductMedia { Url = productMedia.Url }
-															).ToList()
-										}
-									},
-									BusinessFee = new BusinessFee
-									{
-										BusinessFeeId = businessFee.BusinessFeeId,
-										Fee = businessFee.Fee,
-									},
-								})
-							   .FirstOrDefault();
+											UserId = user.UserId,
+											Email = user.Email,
+											Avatar = user.Avatar,	
+										},
+										Shop = new Shop
+										{
+											UserId = shop.UserId,
+											ShopName = shop.ShopName
+										},
+										BusinessFee = new BusinessFee
+										{
+											BusinessFeeId = businessFee.BusinessFeeId,
+											Fee = businessFee.Fee
+										},
+										OrderStatusId = order.OrderStatusId,
+										OrderDate = order.OrderDate,
+										Note = order.Note,
+										TotalAmount = order.TotalAmount,
+										TotalCouponDiscount = order.TotalCouponDiscount,	
+										TotalCoinDiscount = order.TotalCoinDiscount,
+										TotalPayment = order.TotalPayment,
+										OrderDetails =(from orderDetail in context.OrderDetail
+													   join productVariant in context.ProductVariant
+															on orderDetail.ProductVariantId equals productVariant.ProductVariantId
+													   join product in context.Product
+															on productVariant.ProductId equals product.ProductId
+													   where orderDetail.OrderId == orderId
+													   select new OrderDetail
+													   {
+														   OrderDetailId = orderDetail.OrderDetailId,
+														   ProductVariant = new ProductVariant
+														   {
+															   ProductVariantId = productVariant.ProductVariantId,
+															   Name = productVariant.Name,
+															   Product = new Product
+															   {
+																   ProductId = product.ProductId,
+																   ProductName = product.ProductName,
+																   Thumbnail = product.Thumbnail
+															   }
+														   },
+														   Quantity = orderDetail.Quantity,
+														   Price = orderDetail.Price,
+														   Discount = orderDetail.Discount,
+														   TotalAmount = orderDetail.TotalAmount,
+														   IsFeedback = orderDetail.IsFeedback,
+														   Feedback = (orderDetail.IsFeedback ? 
+																		(from feedBack in context.Feedback
+																		 join feedbackBenefit in context.FeedbackBenefit
+																			on feedBack.FeedbackBenefitId equals feedbackBenefit.FeedbackBenefitId
+																		where feedBack.OrderDetailId == orderDetail.OrderDetailId 
+																		select new Feedback
+																		{
+																			Rate = feedBack.Rate,
+																			FeedbackBenefit = new FeedbackBenefit
+																			{
+																				Coin = feedbackBenefit.Coin
+																			}
+																		}).FirstOrDefault()
+																		: 
+																		null),
+														   AssetInformations = (from assetInfomation in context.AssetInformation
+																			   where assetInfomation.OrderDetailId == orderDetail.OrderDetailId
+																			   select new AssetInformation
+																			   {
+																				   Asset = assetInfomation.Asset
+																			   }).ToList()
 
-
-				if (order != null && order.IsFeedback)
-				{
-					Feedback feedback = context.Feedback
-						.Select(f => new Feedback()
-						{
-							FeedbackId = f.FeedbackId,
-							Rate = f.Rate,
-						})
-						.First(x => x.OrderId == order.OrderId);
-					order.Feedback = feedback;
-				}
-
-				return order;
+													   }).ToList(),
+										TransactionInternals = (from transactionInternal in context.TransactionInternal
+															  where transactionInternal.OrderId == orderId
+															  select new TransactionInternal
+															  {
+																  TransactionInternalTypeId = transactionInternal.TransactionInternalTypeId,
+																  PaymentAmount = transactionInternal.PaymentAmount,
+																  DateCreate = transactionInternal.DateCreate
+															  }).ToList()
+									}
+									).FirstOrDefault();
+				return orderInfo;
 			}
-			*/
 		}
 
 		internal Order? GetSellerOrderDetail(long orderId)

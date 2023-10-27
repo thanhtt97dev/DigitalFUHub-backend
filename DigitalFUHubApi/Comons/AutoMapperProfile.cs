@@ -59,30 +59,61 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
 				.ReverseMap();
 
-			CreateMap<OrderCoupon, OrderDetailOrderCouponsDTO>()
+			CreateMap<OrderCoupon, OrderDetailInfoResponseDTO>()
 				.ReverseMap();
-			/*
-			CreateMap<Order, OrderDetailResponseDTO>()
-				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
-				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
+			CreateMap<OrderDetail, OrderDetailInfoResponseDTO>()
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))
 				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductVariant.ProductId))
 				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductVariant.Product.ProductName))
 				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.ProductVariant.Product.Thumbnail))
-				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.ProductVariant.Product.Shop.UserId))
-				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.ProductVariant.Product.Shop.ShopName))
-				.ForMember(des => des.ProductCategoryId, act => act.MapFrom(src => src.ProductVariant.Product.Category.CategoryId))
-				.ForMember(des => des.ProductCategoryName, act => act.MapFrom(src => src.ProductVariant.Product.Category.CategoryName))
 				.ForMember(des => des.FeedbackRate, opt => opt.MapFrom((src, dest) =>
 				{
 					if (src.Feedback == null) return 0;
 					return src.Feedback.Rate;
 				}))
-				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
-				//.ForMember(des => des.AssetInformations, act => act.MapFrom(src => src.AssetInformations.Select(x => x.Asset).ToList()))
-				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductVariant.Product.ProductMedias.Select(x => x.Url).ToList()))
+				.ForMember(des => des.FeedbackBenefit, opt => opt.MapFrom((src, dest) =>
+				{
+					if (src.Feedback == null) return 0;
+					return src.Feedback.FeedbackBenefit.Coin;
+				}))
 				.ReverseMap();
-			*/
+
+			CreateMap<AssetInformation, AssetInfomationOrderDetailResponeDTO>()
+				.ForMember(des => des.Data, act => act.MapFrom(src => src.Asset))
+				.ReverseMap();
+
+			CreateMap<TransactionInternal, TransactionInternalOrderDetailResponseDTO>()
+				.ReverseMap();
+
+			CreateMap<OrderDetail, OrderDetailInfoResponseDTO>()
+				.ForMember(des => des.ProductVariantId, act => act.MapFrom(src => src.ProductVariant.ProductVariantId))
+				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))
+				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductVariant.Product.ProductId))
+				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductVariant.Product.ProductName))
+				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.ProductVariant.Product.Thumbnail))
+				.ForMember(des => des.FeedbackRate, opt => opt.MapFrom((src, dest) =>
+				{
+					if (src.Feedback == null) return 0;
+					return src.Feedback.Rate;
+				}))
+				.ForMember(des => des.FeedbackBenefit, opt => opt.MapFrom((src, dest) =>
+				{
+					if (src.Feedback == null) return 0;
+					return src.Feedback.FeedbackBenefit.Coin;
+				}))
+				.ForMember(des => des.AssetInfomations, act => act.MapFrom(src => src.AssetInformations))
+				.ReverseMap();
+
+			CreateMap<Order, OrderInfoResponseDTO>()
+				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
+				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.CustomerAvatar, act => act.MapFrom(src => src.User.Avatar))
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.BusinessFeeId, act => act.MapFrom(src => src.BusinessFee.BusinessFeeId))
+				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
+				.ReverseMap();
+
 			CreateMap<CartDetail, UserCartProductResponseDTO>()
 				.ForMember(des => des.ProductVariantId, act => act.MapFrom(src => src.ProductVariant.ProductVariantId))
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))
