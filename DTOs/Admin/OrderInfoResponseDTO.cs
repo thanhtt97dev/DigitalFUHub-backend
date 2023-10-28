@@ -47,6 +47,7 @@ namespace DTOs.Admin
 
 	public class TransactionInternalOrderDetailResponseDTO
 	{
+		public long TransactionInternalId { get; set; }
 		public int TransactionInternalTypeId { get; set; }
 		public long PaymentAmount { get; set; }
 		public DateTime DateCreate { get; set; }

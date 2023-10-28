@@ -605,6 +605,7 @@ namespace DataAccess.DAOs
 															  where transactionInternal.OrderId == orderId
 															  select new TransactionInternal
 															  {
+																  TransactionInternalId = transactionInternal.TransactionInternalId,
 																  TransactionInternalTypeId = transactionInternal.TransactionInternalTypeId,
 																  PaymentAmount = transactionInternal.PaymentAmount,
 																  DateCreate = transactionInternal.DateCreate
