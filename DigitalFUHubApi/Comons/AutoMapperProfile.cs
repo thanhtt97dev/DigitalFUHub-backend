@@ -82,6 +82,9 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Data, act => act.MapFrom(src => src.Asset))
 				.ReverseMap();
 
+			CreateMap<TransactionCoin, TransactionCoinOrderDetailResponseDTO>()
+				.ReverseMap();
+			
 			CreateMap<TransactionInternal, TransactionInternalOrderDetailResponseDTO>()
 				.ReverseMap();
 
