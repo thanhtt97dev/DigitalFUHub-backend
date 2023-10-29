@@ -24,7 +24,7 @@ namespace DataAccess.Repositories
 			return FeedbackDAO.Instance.GetFeedbacks(productId);
 		}
 
-		public List<Order> GetListFeedbackSeller(long userId, long orderId, string userName, string productName,
+		public List<Order> GetListFeedbackSeller(long userId, string orderId, string userName, string productName,
 			string productVariantName, DateTime? fromDate, int rate)
 		=> FeedbackDAO.Instance.GetListFeedbackSeller(userId, orderId, userName, productName, productVariantName, fromDate, rate);
 	}

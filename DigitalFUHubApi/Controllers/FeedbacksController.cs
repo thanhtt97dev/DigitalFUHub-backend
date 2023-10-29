@@ -150,6 +150,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
+
 				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate, "M/d/yyyy", CultureInfo.InvariantCulture);
 				List<Order> orders = _feedbackRepository.GetListFeedbackSeller(request.UserId, request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(), fromDate, request.Rate);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<List<SellerFeedbackResponseDTO>>(orders)));

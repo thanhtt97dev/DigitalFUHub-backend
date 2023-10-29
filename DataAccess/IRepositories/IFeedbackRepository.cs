@@ -13,7 +13,7 @@ namespace DataAccess.IRepositories
 		Order? GetFeedbackDetail(long orderId, long userId);
 		void AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages);
 		List<FeedbackResponseDTO> GetFeedbacks(long productId);
-		List<Order> GetListFeedbackSeller(long userId, long orderId, string userName, string productName, 
+		List<Order> GetListFeedbackSeller(long userId, string orderId, string userName, string productName, 
 			string productVariantName, DateTime? fromDate, int rate);
 	}
 }

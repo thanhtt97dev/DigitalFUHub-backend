@@ -60,7 +60,7 @@ namespace DataAccess.DAOs
 						var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
 						var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
-						if(sellerProfit > 0)
+						if (sellerProfit > 0)
 						{
 							// update seller's balance
 							var seller = context.User.First(x => x.UserId == sellerId);
@@ -79,7 +79,7 @@ namespace DataAccess.DAOs
 							context.TransactionInternal.Add(transactionSeller);
 						}
 
-						if(adminProfit > 0)
+						if (adminProfit > 0)
 						{
 							// update admin's balance
 							var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
@@ -134,7 +134,7 @@ namespace DataAccess.DAOs
 						var customerId = order.UserId;
 						var customer = context.User.First(x => x.UserId == customerId);
 
-						if (order.TotalPayment > 0) 
+						if (order.TotalPayment > 0)
 						{
 							// update customer balance
 							customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
@@ -615,21 +615,21 @@ namespace DataAccess.DAOs
 
 														}).ToList(),
 										TransactionInternals = (from transactionInternal in context.TransactionInternal
-															  where transactionInternal.OrderId == orderId
-															  select new TransactionInternal
-															  {
-																  TransactionInternalTypeId = transactionInternal.TransactionInternalTypeId,
-																  PaymentAmount = transactionInternal.PaymentAmount,
-																  DateCreate = transactionInternal.DateCreate
-															  }).ToList(),
+																where transactionInternal.OrderId == orderId
+																select new TransactionInternal
+																{
+																	TransactionInternalTypeId = transactionInternal.TransactionInternalTypeId,
+																	PaymentAmount = transactionInternal.PaymentAmount,
+																	DateCreate = transactionInternal.DateCreate
+																}).ToList(),
 										TransactionCoins = (from transactionCoin in context.TransactionCoin
-														   where transactionCoin.OrderId == orderId	
-														   select new TransactionCoin 
-														   {
-															   TransactionCoinTypeId = transactionCoin.TransactionCoinTypeId,
-															   Amount = transactionCoin.Amount,
-															   DateCreate = transactionCoin.DateCreate
-														   }).ToList()
+															where transactionCoin.OrderId == orderId
+															select new TransactionCoin
+															{
+																TransactionCoinTypeId = transactionCoin.TransactionCoinTypeId,
+																Amount = transactionCoin.Amount,
+																DateCreate = transactionCoin.DateCreate
+															}).ToList()
 									}
 									).FirstOrDefault();
 				return orderInfo;
@@ -637,17 +637,20 @@ namespace DataAccess.DAOs
 		}
 		#endregion
 
-		internal Order? GetSellerOrderDetail(long orderId, long orderId1)
+		internal Order? GetOrderDetailSeller(long userId, long orderId)
 		{
-			return null;
-			/*
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Order.Include(i => i.AssetInformations)
-					.ThenInclude(ti => ti.ProductVariant).ThenInclude(x => x.Product).Include(x => x.User)
-					.Where(x => x.OrderId == orderId).FirstOrDefault();
+				return context.Order
+					.Include(x => x.OrderCoupons)
+					.Include(x => x.Shop)
+					.Include(x => x.User)
+					.Include(x => x.OrderDetails)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.OrderId == orderId && x.ShopId == userId);
 			}
-			*/
 		}
 
 		#region Update order status (Seller violate)
@@ -667,7 +670,7 @@ namespace DataAccess.DAOs
 
 					// update customer account balance
 					var customer = context.User.First(x => x.UserId == customerId);
-					
+
 					if (order.TotalPayment > 0)
 					{
 						// update customer's account balance
@@ -686,8 +689,8 @@ namespace DataAccess.DAOs
 						context.SaveChanges();
 					}
 
-					
-					if(order.TotalCoinDiscount > 0)
+
+					if (order.TotalCoinDiscount > 0)
 					{
 						// update customer's coin
 						customer.Coin = customer.Coin + order.TotalCoinDiscount;
@@ -739,8 +742,8 @@ namespace DataAccess.DAOs
 					var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
 					var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
-					
-					if(sellerProfit > 0)
+
+					if (sellerProfit > 0)
 					{
 						// update seller account balance
 						var seller = context.User.First(x => x.UserId == sellerId);
@@ -860,7 +863,7 @@ namespace DataAccess.DAOs
 							List<TransactionInternal> transactionInternals = new List<TransactionInternal>();
 
 							// update blance of seller
-							if (sellerProfit > 0) 
+							if (sellerProfit > 0)
 							{
 								var seller = context.User.First(x => x.UserId == shopId);
 								seller.AccountBalance = seller.AccountBalance + sellerProfit;
@@ -876,7 +879,7 @@ namespace DataAccess.DAOs
 								transactionInternals.Add(transactionInternal);
 							}
 
-							if(adminProfit > 0)
+							if (adminProfit > 0)
 							{
 								User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
 								admin.AccountBalance += adminProfit;
@@ -892,11 +895,11 @@ namespace DataAccess.DAOs
 								transactionInternals.Add(transactionInternal);
 							}
 
-							if(transactionInternals.Count > 0)
+							if (transactionInternals.Count > 0)
 							{
 								context.TransactionInternal.AddRange(transactionInternals);
 							}
-							
+
 						}
 						context.SaveChanges();
 						transaction.Commit();
@@ -957,10 +960,104 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.Product)
 					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
 							&& (fromDate != null && toDate != null ? x.OrderDate >= fromDate && x.OrderDate <= toDate : true)
-							&& (status == 0?true:x.OrderStatusId == status)
+							&& (status == 0 ? true : x.OrderStatusId == status)
 							&& (orderId == 0 ? true : x.OrderId == orderId))
 					.ToList();
 
+			}
+		}
+
+		internal void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				using (var transaction = context.Database.BeginTransaction())
+				{
+					try
+					{
+						Order? order = context.Order.FirstOrDefault(x => x.ShopId == sellerId && x.UserId == customerId
+								&& x.OrderId == orderId);
+						if (order == null) throw new Exception("Not found");
+						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
+						order.OrderStatusId = Constants.ORDER_DISPUTE;
+						Conversation conversation = new Conversation
+						{
+							ConversationName = $"Nhóm chat: Tranh chấp đơn hàng mã #{orderId}",
+							DateCreate = DateTime.Now,
+							IsActivate = true,
+							IsGroup = true,
+							Messages = new List<Message>
+							{
+								new Message
+								{
+									UserId = sellerId,
+									Content = $"Tranh chấp đơn hàng mã #{orderId}.",
+									MessageType = "0",
+									DateCreate = DateTime.Now,
+									IsDelete = false,
+								}
+							},
+							UserConversations = new List<UserConversation> {
+								new UserConversation
+								{
+									UserId = sellerId,
+									IsRead = 1,
+								},
+								new UserConversation
+								{
+									UserId = customerId,
+									IsRead = 0,
+								},
+								new UserConversation
+								{
+									UserId = Constants.ADMIN_USER_ID,
+									IsRead = 0,
+								}
+							}
+						};
+						context.Conversations.Add(conversation);
+						context.SaveChanges();
+						transaction.Commit();
+					}
+					catch (Exception e)
+					{
+						transaction.Rollback();
+						throw new Exception(e.Message);
+					}
+				}
+			}
+		}
+
+		internal void UpdateStatusOrderRefund(long sellerId, long orderId, string note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				using (var transaction = context.Database.BeginTransaction())
+				{
+					try
+					{
+						Order? order = context.Order.FirstOrDefault(x => x.ShopId == sellerId && x.OrderId == orderId);
+						if (order == null) throw new Exception("Not found");
+						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
+
+						order.OrderStatusId = Constants.ORDER_SELLER_REFUNDED;
+						order.Note = note;
+
+						User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+						admin.AccountBalance -= order.TotalPayment;
+
+						User customer = context.User.First(x => x.UserId == order.UserId);
+						customer.AccountBalance += order.TotalPayment;
+
+						context.SaveChanges();
+						transaction.Commit();
+					}
+					catch (Exception e)
+					{
+						transaction.Rollback();
+						throw new Exception(e.Message);
+					}
+				}
 			}
 		}
 	}

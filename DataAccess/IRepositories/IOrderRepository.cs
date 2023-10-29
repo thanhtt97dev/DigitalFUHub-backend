@@ -16,7 +16,7 @@ namespace DataAccess.IRepositories
 		(string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin);
 		Order? GetOrder(long orderId);
 		Order? GetOrderForCheckingExisted(long orderId);
-		Order? GetSellerOrderDetail(long orderId, long orderId1);
+		Order? GetOrderDetailSeller(long userId, long orderId1);
 		void UpdateOrderStatusSellerViolates(long orderId, string? note);
 		void UpdateOrderStatusRejectComplaint(long orderId, string? note);
 		void UpdateOrderStatusAdmin(long orderId, int status, string? note);
@@ -25,5 +25,7 @@ namespace DataAccess.IRepositories
 		Order? GetOrderCustomer(long orderId, long userId, long shopId);
 		Order? GetOrderCustomer(long orderId, long customerId);
 		List<Order> GetListOrderSeller(long userId, long orderId, string username, DateTime? fromDate, DateTime? toDate, int status);
+		void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId);
+		void UpdateStatusOrderRefund(long sellerId, long orderId, string note);
 	}
 }
