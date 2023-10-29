@@ -57,10 +57,11 @@ namespace DataAccess.DAOs
 						var sellerId = order.ShopId;
 
 						//get profit
-						var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
+						var businessFee = order.TotalAmount * fee / 100;
+						var adminProfit = order.TotalCoinDiscount > businessFee ? 0 : businessFee - order.TotalCoinDiscount;
 						var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
-						if(sellerProfit > 0)
+						if (sellerProfit > 0)
 						{
 							// update seller's balance
 							var seller = context.User.First(x => x.UserId == sellerId);
@@ -733,14 +734,14 @@ namespace DataAccess.DAOs
 					order.Note = note;
 					context.Order.Update(order);
 
-					long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
-
 					var sellerId = order.ShopId;
-					var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
+					long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
+					var businessFee = order.TotalAmount * fee / 100;
+					var adminProfit = order.TotalCoinDiscount > businessFee ? 0 : businessFee - order.TotalCoinDiscount;
 					var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
-					
-					if(sellerProfit > 0)
+
+					if (sellerProfit > 0)
 					{
 						// update seller account balance
 						var seller = context.User.First(x => x.UserId == sellerId);
@@ -853,7 +854,8 @@ namespace DataAccess.DAOs
 						if (status == Constants.ORDER_CONFIRMED)
 						{
 							long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
-							var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
+							var businessFee = order.TotalAmount * fee / 100;
+							var adminProfit = order.TotalCoinDiscount > businessFee ? 0 : businessFee - order.TotalCoinDiscount;
 							var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
 							// add transaction receive payment and profit
