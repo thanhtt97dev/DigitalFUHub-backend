@@ -28,6 +28,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
+		#region Update List Order's status in range time (WaitConfirmation => Confirm)
 		internal void UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(int days)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -44,8 +45,6 @@ namespace DataAccess.DAOs
 						.ToList();
 					if (orders.Count() == 0) return;
 
-
-
 					foreach (var order in orders)
 					{
 						// update order status
@@ -61,36 +60,43 @@ namespace DataAccess.DAOs
 						var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
 						var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
-						// update seller's balance
-						var seller = context.User.First(x => x.UserId == sellerId);
-						seller.AccountBalance = seller.AccountBalance + sellerProfit;
-
-						// update admin's balance
-						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-						admin.AccountBalance = admin.AccountBalance + adminProfit;
-
-						// add transaction for refund money to seller
-						TransactionInternal transactionSeller = new TransactionInternal()
+						if(sellerProfit > 0)
 						{
-							UserId = sellerId,
-							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
-							OrderId = order.OrderId,
-							PaymentAmount = sellerProfit,
-							Note = "",
-							DateCreate = DateTime.Now,
-						};
-						context.TransactionInternal.Add(transactionSeller);
-						// add transaction for get benefit
-						TransactionInternal transactionAdmin = new TransactionInternal()
+							// update seller's balance
+							var seller = context.User.First(x => x.UserId == sellerId);
+							seller.AccountBalance = seller.AccountBalance + sellerProfit;
+
+							// add transaction for refund money to seller
+							TransactionInternal transactionSeller = new TransactionInternal()
+							{
+								UserId = sellerId,
+								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+								OrderId = order.OrderId,
+								PaymentAmount = sellerProfit,
+								Note = "",
+								DateCreate = DateTime.Now,
+							};
+							context.TransactionInternal.Add(transactionSeller);
+						}
+
+						if(adminProfit > 0)
 						{
-							UserId = Constants.ADMIN_USER_ID,
-							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
-							OrderId = order.OrderId,
-							PaymentAmount = adminProfit,
-							Note = "",
-							DateCreate = DateTime.Now,
-						};
-						context.TransactionInternal.Add(transactionAdmin);
+							// update admin's balance
+							var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+							admin.AccountBalance = admin.AccountBalance + adminProfit;
+
+							// add transaction for get benefit
+							TransactionInternal transactionAdmin = new TransactionInternal()
+							{
+								UserId = Constants.ADMIN_USER_ID,
+								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+								OrderId = order.OrderId,
+								PaymentAmount = adminProfit,
+								Note = "",
+								DateCreate = DateTime.Now,
+							};
+							context.TransactionInternal.Add(transactionAdmin);
+						}
 					}
 					context.Order.UpdateRange(orders);
 					context.SaveChanges();
@@ -103,7 +109,9 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+		#endregion
 
+		#region Update List Order's status in range time (Complaint => SellerRefunded)
 		internal void UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(int days)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -124,24 +132,26 @@ namespace DataAccess.DAOs
 						order.OrderStatusId = Constants.ORDER_SELLER_REFUNDED;
 
 						var customerId = order.UserId;
-
-						// add transaction internal
-						var transactionInternal = new TransactionInternal()
-						{
-							UserId = customerId,
-							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
-							OrderId = order.OrderId,
-							PaymentAmount = order.TotalPayment,
-							Note = "Seller refund money",
-							DateCreate = DateTime.Now,
-						};
-						context.TransactionInternal.Add(transactionInternal);
-
-
-
-						// update customer balance
 						var customer = context.User.First(x => x.UserId == customerId);
-						customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
+
+						if (order.TotalPayment > 0) 
+						{
+							// update customer balance
+							customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
+
+							// add transaction internal
+							var transactionInternal = new TransactionInternal()
+							{
+								UserId = customerId,
+								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+								OrderId = order.OrderId,
+								PaymentAmount = order.TotalPayment,
+								Note = "Seller refund money",
+								DateCreate = DateTime.Now,
+							};
+							context.TransactionInternal.Add(transactionInternal);
+
+						}
 						if (order.TotalCoinDiscount > 0)
 						{
 							//refund coin of customer
@@ -156,11 +166,6 @@ namespace DataAccess.DAOs
 							};
 							context.TransactionCoin.Add(transactionCoin);
 						}
-
-						//update admin banance
-						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-						admin.AccountBalance = admin.AccountBalance - order.TotalPayment;
-
 					}
 					context.Order.UpdateRange(orders);
 					context.SaveChanges();
@@ -173,7 +178,9 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+		#endregion
 
+		#region Get orders with conditions
 		internal List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status)
 		{
 			List<Order> orders = new List<Order>();
@@ -212,6 +219,7 @@ namespace DataAccess.DAOs
 			}
 			return orders;
 		}
+		#endregion
 
 		#region Add order
 		internal (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
@@ -519,6 +527,7 @@ namespace DataAccess.DAOs
 		}
 		#endregion
 
+		#region Get order detail for admin
 		internal Order? GetOrder(long orderId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -626,6 +635,7 @@ namespace DataAccess.DAOs
 				return orderInfo;
 			}
 		}
+		#endregion
 
 		internal Order? GetSellerOrderDetail(long orderId, long orderId1)
 		{
@@ -640,6 +650,7 @@ namespace DataAccess.DAOs
 			*/
 		}
 
+		#region Update order status (Seller violate)
 		internal void UpdateOrderStatusSellerViolates(long orderId, string? note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -656,10 +667,13 @@ namespace DataAccess.DAOs
 
 					// update customer account balance
 					var customer = context.User.First(x => x.UserId == customerId);
-
-					// add transaction for refund money to customer
+					
 					if (order.TotalPayment > 0)
 					{
+						// update customer's account balance
+						customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
+
+						// add transaction for refund money to customer
 						TransactionInternal transactionInternal = new TransactionInternal()
 						{
 							UserId = customerId,
@@ -670,13 +684,15 @@ namespace DataAccess.DAOs
 						};
 						context.TransactionInternal.Add(transactionInternal);
 						context.SaveChanges();
-
-						customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
 					}
 
-					// add transaction coin for refund coin to customer
+					
 					if(order.TotalCoinDiscount > 0)
 					{
+						// update customer's coin
+						customer.Coin = customer.Coin + order.TotalCoinDiscount;
+
+						// add transaction coin for refund coin to customer
 						TransactionCoin transactionCoin = new TransactionCoin
 						{
 							UserId = customer.UserId,
@@ -684,6 +700,7 @@ namespace DataAccess.DAOs
 							OrderId = orderId,
 							FeedbackId = null,
 							Note = "",
+							Amount = order.TotalCoinDiscount,
 							DateCreate = DateTime.Now
 						};
 						context.TransactionCoin.Add(transactionCoin);
@@ -699,7 +716,9 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+		#endregion
 
+		#region Update order status (RejectComplaint)
 		internal void UpdateOrderStatusRejectComplaint(long orderId, string? note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -720,9 +739,14 @@ namespace DataAccess.DAOs
 					var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
 					var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
-					// add transaction for refund money to seller
+					
 					if(sellerProfit > 0)
 					{
+						// update seller account balance
+						var seller = context.User.First(x => x.UserId == sellerId);
+						seller.AccountBalance = seller.AccountBalance + sellerProfit;
+
+						// add transaction for refund money to seller
 						TransactionInternal transactionInternalSeller = new TransactionInternal()
 						{
 							UserId = sellerId,
@@ -732,15 +756,15 @@ namespace DataAccess.DAOs
 							DateCreate = DateTime.Now,
 						};
 						context.TransactionInternal.Add(transactionInternalSeller);
-
-						// update seller account balance
-						var seller = context.User.First(x => x.UserId == sellerId);
-						seller.AccountBalance = seller.AccountBalance + sellerProfit;
 					}
 
-					// add transaction for get profit admin
 					if (adminProfit > 0)
 					{
+						//update admin profit account balance
+						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+						admin.AccountBalance = admin.AccountBalance + adminProfit;
+
+						// add transaction for get profit admin
 						TransactionInternal transactionInternalAdmin = new TransactionInternal()
 						{
 							UserId = Constants.ADMIN_USER_ID,
@@ -750,11 +774,6 @@ namespace DataAccess.DAOs
 							DateCreate = DateTime.Now,
 						};
 						context.TransactionInternal.Add(transactionInternalAdmin);
-
-
-						//update admin profit account balance
-						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-						admin.AccountBalance = admin.AccountBalance + adminProfit;
 					}
 					context.SaveChanges();
 					transaction.Commit();
@@ -766,6 +785,9 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+		#endregion
+
+
 		internal void UpdateOrderStatusAdmin(long orderId, int status, string? note)
 		{
 			return;
@@ -780,6 +802,7 @@ namespace DataAccess.DAOs
 			*/
 		}
 
+		#region Check order exised
 		internal Order? GetOrderForCheckingExisted(long orderId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -789,7 +812,9 @@ namespace DataAccess.DAOs
 				return order;
 			}
 		}
+		#endregion
 
+		#region Get order detail for user
 		internal List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset)
 		{
 
@@ -811,7 +836,9 @@ namespace DataAccess.DAOs
 			}
 
 		}
+		#endregion
 
+		#region Update order status for customer
 		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -882,6 +909,7 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+		#endregion
 
 		internal Order? GetOrderCustomer(long orderId, long customerId, long shopId)
 		{
