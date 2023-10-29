@@ -21,6 +21,7 @@ namespace DTOs.Admin
 		public long TotalPayment { get; set; }
 		public List<OrderDetailInfoResponseDTO> OrderDetails { get; set; } = new List<OrderDetailInfoResponseDTO>();
 		public List<TransactionInternalOrderDetailResponseDTO> TransactionInternals { get; set; } = new List<TransactionInternalOrderDetailResponseDTO>();
+		public List<TransactionCoinOrderDetailResponseDTO> TransactionCoins { get; set; } = new List<TransactionCoinOrderDetailResponseDTO>();
 	}
 	public class OrderDetailInfoResponseDTO
 	{
@@ -38,6 +39,7 @@ namespace DTOs.Admin
 		public int FeedbackRate { get; set; }
 		public long FeedbackBenefit { get; set; }
 		public List<AssetInfomationOrderDetailResponeDTO> AssetInfomations { get; set; } = new List<AssetInfomationOrderDetailResponeDTO>();
+		
 	}
 
 	public class AssetInfomationOrderDetailResponeDTO
@@ -49,6 +51,13 @@ namespace DTOs.Admin
 	{
 		public int TransactionInternalTypeId { get; set; }
 		public long PaymentAmount { get; set; }
+		public DateTime DateCreate { get; set; }
+	}
+
+	public class TransactionCoinOrderDetailResponseDTO
+	{
+		public int TransactionCoinTypeId { get; set; }
+		public long Amount { get; set; }
 		public DateTime DateCreate { get; set; }
 	}
 }

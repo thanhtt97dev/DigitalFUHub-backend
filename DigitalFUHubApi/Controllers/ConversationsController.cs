@@ -203,6 +203,7 @@ namespace DigitalFUHubApi.Controllers
 					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
 					responseData.Status.Ok = false;
 					responseData.Status.Message = "Data not found!";
+					return Ok(responseData);
 				}
 				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				responseData.Status.Ok = true;
