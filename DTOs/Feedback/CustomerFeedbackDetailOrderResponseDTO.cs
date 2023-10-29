@@ -8,7 +8,7 @@ namespace DTOs.Feedback
 {
 	public class CustomerFeedbackDetailOrderResponseDTO
 	{
-		public string Fullname { get; set; } = string.Empty!;
+		public string Username { get; set; } = string.Empty!;
 		public string Avatar { get; set; } = string.Empty!;
 		public string ProductName { get; set; } = string.Empty!;
 		public string Thumbnail { get; set; } = string.Empty!;

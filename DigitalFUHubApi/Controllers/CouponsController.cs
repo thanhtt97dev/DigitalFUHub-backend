@@ -138,10 +138,10 @@ namespace DigitalFUHubApi.Controllers
 				}
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<SellerCouponResponseDTO>(coupon)));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 
 		}
@@ -183,9 +183,9 @@ namespace DigitalFUHubApi.Controllers
 						IsPublic = x.IsPublic
 					}).ToList()));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "FAIL", false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion
@@ -227,9 +227,9 @@ namespace DigitalFUHubApi.Controllers
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", true, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion
@@ -272,9 +272,9 @@ namespace DigitalFUHubApi.Controllers
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", true, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion
@@ -306,9 +306,9 @@ namespace DigitalFUHubApi.Controllers
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", true, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion
@@ -342,7 +342,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion
@@ -364,10 +364,10 @@ namespace DigitalFUHubApi.Controllers
 					!result,
 					new()));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 	}

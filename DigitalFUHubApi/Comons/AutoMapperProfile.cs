@@ -15,6 +15,7 @@ using DTOs.Coupon;
 using DTOs.Conversation;
 using Comons;
 using DTOs.Seller;
+using DTOs.Feedback;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -27,8 +28,8 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<User, UserSignInResponseDTO>()
 				.ForMember(des => des.RoleName, act => act.MapFrom(src => src.Role.RoleName)).ReverseMap();
 			CreateMap<User, UserUpdateRequestDTO>().ReverseMap();
-            CreateMap<User, UserOnlineStatusResponseDTO>().ReverseMap();
-            CreateMap<Role, RoleDTO>().ReverseMap();
+			CreateMap<User, UserOnlineStatusResponseDTO>().ReverseMap();
+			CreateMap<Role, RoleDTO>().ReverseMap();
 			CreateMap<Notification, NotificationRespone>().ReverseMap();
 			CreateMap<DepositTransaction, CreateTransactionRequestDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, CreateTransactionRequestDTO>().ReverseMap();
@@ -39,7 +40,7 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 			CreateMap<Message, MessageConversationResponseDTO>()
 				.ForMember(des => des.Avatar, act => act.MapFrom(src => src.User.Avatar)).ReverseMap();
-            CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
+			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, HistoryWithdrawResponsetDTO>()
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
 				.ForMember(des => des.CreditAccountName, act => act.MapFrom(src => src.UserBank.CreditAccountName))
@@ -58,7 +59,9 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.SellerId, act => act.MapFrom(src => src.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
 				.ReverseMap();
-
+			CreateMap<Order, SellerOrderResponseDTO>()
+				.ForMember(des => des.Username, act => act.MapFrom(src => src.User.Username))
+				.ReverseMap();
 			CreateMap<OrderCoupon, OrderDetailInfoResponseDTO>()
 				.ReverseMap();
 			CreateMap<OrderDetail, OrderDetailInfoResponseDTO>()
@@ -151,13 +154,28 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<ProductMedia, ProductMediaResponseDTO>().ReverseMap(); ;
 			CreateMap<Tag, TagResponseDTO>().ReverseMap();
 			CreateMap<AssetInformation, AssetInformationResponseDTO>().ReverseMap();
-            CreateMap<Cart, CartDTO>().ReverseMap();
-            CreateMap<Cart, UpdateCartRequestDTO>().ReverseMap();
-            CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
-            CreateMap<Coupon, CouponResponseDTO>().ReverseMap();
+			CreateMap<Cart, CartDTO>().ReverseMap();
+			CreateMap<Cart, UpdateCartRequestDTO>().ReverseMap();
+			CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
+			CreateMap<Coupon, CouponResponseDTO>().ReverseMap();
 			CreateMap<Coupon, SellerCouponResponseDTO>().ReverseMap();
 
-
-        }
+			CreateMap<Order, SellerFeedbackResponseDTO>()
+				.ForMember(des => des.CustomerUsername, act => act.MapFrom(src => src.User.Username))
+				.ForMember(des => des.CustomerAvatar, act => act.MapFrom(src => src.User.Avatar))
+				.ForMember(des => des.Detail, act => act.MapFrom(src => src.OrderDetails))
+				.ReverseMap();
+			CreateMap<OrderDetail, SellerFeedbackDetailResponseDTO>()
+				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductVariant.Product.ProductName))
+				.ForMember(des => des.Thumbnail, act => act.MapFrom(src => src.ProductVariant.Product.Thumbnail))
+				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))
+				.ForMember(des => des.Content, act => act.MapFrom(src => src.Feedback == null ? "" : src.Feedback.Content))
+				.ForMember(des => des.Rate, act => act.MapFrom(src => src.Feedback == null ? 0 : src.Feedback.Rate))
+				.ForMember(des => des.FeedbackDate, act => act.MapFrom(src => src.Feedback == null ? new DateTime() : src.Feedback.UpdateDate))
+				.ForMember(des => des.UrlImageFeedback, act => act.MapFrom(src => src.Feedback == null ? null : src.Feedback.FeedbackMedias))
+				.ReverseMap();
+			CreateMap<FeedbackMedia, string>()
+				.ConvertUsing(r => r.Url);
+		}
 	}
 }

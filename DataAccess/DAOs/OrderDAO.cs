@@ -543,12 +543,12 @@ namespace DataAccess.DAOs
 									where order.OrderId == orderId
 									select new Order
 									{
-										OrderId = orderId,	
+										OrderId = orderId,
 										User = new User
 										{
 											UserId = user.UserId,
 											Email = user.Email,
-											Avatar = user.Avatar,	
+											Avatar = user.Avatar,
 										},
 										Shop = new Shop
 										{
@@ -564,57 +564,57 @@ namespace DataAccess.DAOs
 										OrderDate = order.OrderDate,
 										Note = order.Note,
 										TotalAmount = order.TotalAmount,
-										TotalCouponDiscount = order.TotalCouponDiscount,	
+										TotalCouponDiscount = order.TotalCouponDiscount,
 										TotalCoinDiscount = order.TotalCoinDiscount,
 										TotalPayment = order.TotalPayment,
-										OrderDetails =(from orderDetail in context.OrderDetail
-													   join productVariant in context.ProductVariant
-															on orderDetail.ProductVariantId equals productVariant.ProductVariantId
-													   join product in context.Product
-															on productVariant.ProductId equals product.ProductId
-													   where orderDetail.OrderId == orderId
-													   select new OrderDetail
-													   {
-														   OrderDetailId = orderDetail.OrderDetailId,
-														   ProductVariant = new ProductVariant
-														   {
-															   ProductVariantId = productVariant.ProductVariantId,
-															   Name = productVariant.Name,
-															   Product = new Product
-															   {
-																   ProductId = product.ProductId,
-																   ProductName = product.ProductName,
-																   Thumbnail = product.Thumbnail
-															   }
-														   },
-														   Quantity = orderDetail.Quantity,
-														   Price = orderDetail.Price,
-														   Discount = orderDetail.Discount,
-														   TotalAmount = orderDetail.TotalAmount,
-														   IsFeedback = orderDetail.IsFeedback,
-														   Feedback = (orderDetail.IsFeedback ? 
-																		(from feedBack in context.Feedback
-																		 join feedbackBenefit in context.FeedbackBenefit
-																			on feedBack.FeedbackBenefitId equals feedbackBenefit.FeedbackBenefitId
-																		where feedBack.OrderDetailId == orderDetail.OrderDetailId 
-																		select new Feedback
-																		{
-																			Rate = feedBack.Rate,
-																			FeedbackBenefit = new FeedbackBenefit
-																			{
-																				Coin = feedbackBenefit.Coin
-																			}
-																		}).FirstOrDefault()
-																		: 
-																		null),
-														   AssetInformations = (from assetInfomation in context.AssetInformation
-																			   where assetInfomation.OrderDetailId == orderDetail.OrderDetailId
-																			   select new AssetInformation
-																			   {
-																				   Asset = assetInfomation.Asset
-																			   }).ToList()
+										OrderDetails = (from orderDetail in context.OrderDetail
+														join productVariant in context.ProductVariant
+															 on orderDetail.ProductVariantId equals productVariant.ProductVariantId
+														join product in context.Product
+															 on productVariant.ProductId equals product.ProductId
+														where orderDetail.OrderId == orderId
+														select new OrderDetail
+														{
+															OrderDetailId = orderDetail.OrderDetailId,
+															ProductVariant = new ProductVariant
+															{
+																ProductVariantId = productVariant.ProductVariantId,
+																Name = productVariant.Name,
+																Product = new Product
+																{
+																	ProductId = product.ProductId,
+																	ProductName = product.ProductName,
+																	Thumbnail = product.Thumbnail
+																}
+															},
+															Quantity = orderDetail.Quantity,
+															Price = orderDetail.Price,
+															Discount = orderDetail.Discount,
+															TotalAmount = orderDetail.TotalAmount,
+															IsFeedback = orderDetail.IsFeedback,
+															Feedback = (orderDetail.IsFeedback ?
+																		 (from feedBack in context.Feedback
+																		  join feedbackBenefit in context.FeedbackBenefit
+																			 on feedBack.FeedbackBenefitId equals feedbackBenefit.FeedbackBenefitId
+																		  where feedBack.OrderDetailId == orderDetail.OrderDetailId
+																		  select new Feedback
+																		  {
+																			  Rate = feedBack.Rate,
+																			  FeedbackBenefit = new FeedbackBenefit
+																			  {
+																				  Coin = feedbackBenefit.Coin
+																			  }
+																		  }).FirstOrDefault()
+																		 :
+																		 null),
+															AssetInformations = (from assetInfomation in context.AssetInformation
+																				 where assetInfomation.OrderDetailId == orderDetail.OrderDetailId
+																				 select new AssetInformation
+																				 {
+																					 Asset = assetInfomation.Asset
+																				 }).ToList()
 
-													   }).ToList(),
+														}).ToList(),
 										TransactionInternals = (from transactionInternal in context.TransactionInternal
 															  where transactionInternal.OrderId == orderId
 															  select new TransactionInternal
@@ -944,7 +944,25 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.AssetInformations)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId );
+					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId);
+			}
+		}
+
+		internal List<Order> GetListOrderSeller(long userId, long orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+					.Include(x => x.User)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
+							&& (fromDate != null && toDate != null ? x.OrderDate >= fromDate && x.OrderDate <= toDate : true)
+							&& (status == 0?true:x.OrderStatusId == status)
+							&& (orderId == 0 ? true : x.OrderId == orderId))
+					.ToList();
+
 			}
 		}
 	}

@@ -42,17 +42,15 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (!ModelState.IsValid)
-				{
-					return BadRequest();
-				}
-
 				ResponseData responseData = new ResponseData();
 				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
-
+				if (!ModelState.IsValid)
+				{
+					return BadRequest();
+				}
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
 					_orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
 
@@ -88,15 +86,16 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Customer/List")]
 		public IActionResult GetListOrders([FromBody] GetAllOrderRequestDTO request)
 		{
-			if (!ModelState.IsValid)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
+			
 			try
 			{
-				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
+				}
+				if (!ModelState.IsValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 				}
 				List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 				OrderResponseDTO orderResponse = new OrderResponseDTO()
@@ -134,10 +133,10 @@ namespace DigitalFUHubApi.Controllers
 				};
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, orderResponse));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 
 		}
@@ -148,24 +147,24 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Customer/Edit/Status")]
 		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
 		{
-			if (!ModelState.IsValid)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
-			}
 			try
 			{
-				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
+				}
+				if (!ModelState.IsValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 				}
 				Order? order = _orderRepository.GetOrderCustomer(request.OrderId, request.UserId, request.ShopId);
 				if (order == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 				}
 				else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID STATUS ORDER", false, new()));
 				}
 
 				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
@@ -177,7 +176,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-				return Conflict(e.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 		}
@@ -194,8 +193,9 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Unauthorized();
 				}
+
 				Order? order = _orderRepository.GetOrderCustomer(orderId, userId);
-				if(order == null)
+				if (order == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 
@@ -234,7 +234,7 @@ namespace DigitalFUHubApi.Controllers
 			catch (Exception e)
 			{
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 
 		}
@@ -245,50 +245,47 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Seller/All")]
 		public IActionResult GetOrdersSeller(SellerOrdersRequestDTO request)
 		{
-			if (request == null || request.OrderId == null ||
-				request.CustomerEmail == null ||
-				request.ToDate == null || request.FromDate == null) return BadRequest();
-
-			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
-			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
-			}
 			try
 			{
-				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
-				DateTime fromDate;
-				DateTime toDate;
+				if (request == null || request.OrderId == null ||
+					request.Username == null
+					|| (string.IsNullOrWhiteSpace(request.FromDate) && !string.IsNullOrWhiteSpace(request.FromDate))
+					|| (!string.IsNullOrWhiteSpace(request.FromDate) && string.IsNullOrWhiteSpace(request.FromDate)))
+				{
+					return BadRequest();
+				}
+
+				int[] acceptedOrderStatus = Constants.ORDER_STATUS;
+				if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID STATUS ORDER", false, new()));
+				}
+
+				DateTime? fromDate;
+				DateTime? toDate;
 				string format = "M/d/yyyy";
-				try
+
+				fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate, format, CultureInfo.InvariantCulture);
+				toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : DateTime.ParseExact(request.ToDate, format, CultureInfo.InvariantCulture).AddDays(1);
+				if (fromDate > toDate && fromDate != null && toDate != null)
 				{
-					fromDate = DateTime.ParseExact(request.FromDate, format, CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(request.ToDate, format, CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
-					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
-					}
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
 				}
-				catch (FormatException)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID DATE", false, new()));
-				}
+
 				long orderId;
 				long.TryParse(request.OrderId, out orderId);
-				List<Order> orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, "",
-					fromDate, toDate, request.Status)
-					.Where(x => x.Shop.UserId == request.UserId)
-					.ToList();
-				List<OrdersResponseDTO> result = _mapper.Map<List<OrdersResponseDTO>>(orders);
+				List<Order> orders = _orderRepository.GetListOrderSeller(request.UserId, orderId, request.Username.Trim(), fromDate, toDate, request.Status);
+				List<SellerOrderResponseDTO> result = _mapper.Map<List<SellerOrderResponseDTO>>(orders);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
 			}
 			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion
@@ -299,12 +296,12 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult GetOrderDetailSeller(long userId, long orderId)
 		{
 			ResponseData response = new ResponseData();
-			if (userId != _jwtTokenService.GetUserIdByAccessToken(User)) 
+			if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
 			{
 				return Unauthorized();
 			}
 
-			Order? orderRaw = _orderRepository.GetSellerOrderDetail(userId,orderId);
+			Order? orderRaw = _orderRepository.GetSellerOrderDetail(userId, orderId);
 
 			if (orderRaw == null)
 			{

@@ -262,14 +262,9 @@ namespace DigitalFUHubApi.Services
 		#region Get UserId by access token
 		internal long GetUserIdByAccessToken(ClaimsPrincipal user)
 		{
-			try
-			{
-				return long.Parse(user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
-			}
-			catch (Exception)
-			{
-				throw new Exception("INVALID");
-			}
+			long userId;
+			long.TryParse(user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value, out userId);
+			return userId;
 		}
 		#endregion
 

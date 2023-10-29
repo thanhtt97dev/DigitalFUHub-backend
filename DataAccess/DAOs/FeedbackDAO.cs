@@ -95,12 +95,12 @@ namespace DataAccess.DAOs
 						.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId
 						&& x.OrderDetails.Any(od => od.OrderDetailId == orderDetailId));
 					if (order == null) throw new Exception("NOT FOUND.");
-					if(DateTime.Now.Subtract(order.OrderDate) > TimeSpan.FromDays(7)) throw new Exception("EXCEED TIME TO FEEDBACK.");
+					if (DateTime.Now.Subtract(order.OrderDate) > TimeSpan.FromDays(7)) throw new Exception("EXCEED TIME TO FEEDBACK.");
 
 					User user = context.User.First(x => x.UserId == userId);
 
 					OrderDetail orderDetail = order.OrderDetails.First(x => x.OrderDetailId == orderDetailId);
-
+					if(orderDetail.IsFeedback) throw new Exception("NOT FEEDBACK AGAIN.");
 					Product product = context.Product.First(x => x.ProductId == orderDetail.ProductVariant.ProductId);
 
 					FeedbackBenefit feedbackBenefit = context.FeedbackBenefit
@@ -117,7 +117,7 @@ namespace DataAccess.DAOs
 						UserId = userId,
 						UpdateDate = DateTime.Now,
 					};
-					if(urlImages.Count > 0)
+					if (urlImages.Count > 0)
 					{
 						feedback.FeedbackMedias = urlImages.Select(x => new FeedbackMedia
 						{
@@ -150,6 +150,55 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.Product)
 					.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId);
 				return order;
+
+			}
+		}
+
+		internal List<Order> GetListFeedbackSeller(long userId, long orderId, string userName, string productName,
+			string productVariantName, DateTime? fromDate, int rate)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return (context.Order
+					.Include(x => x.User)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
+					.ThenInclude(x => x.FeedbackMedias)
+					.Where(x => x.ShopId == userId
+							&& x.User.Username.ToLower().Contains(userName.ToLower())
+							&& (orderId == 0 ? true : x.OrderId == orderId))
+					.Select(x => new Order
+					{
+						OrderId = x.OrderId,
+						OrderDate = x.OrderDate,
+						User = new User
+						{
+							Username = x.User.Username,
+							Avatar = x.User.Avatar,
+						},
+						OrderDetails = x.OrderDetails.Where(od => od.IsFeedback == true
+							&& (rate == 0 ? true : od.Feedback.Rate == rate)
+							&& (fromDate == null ? true : fromDate.Value.Date == od.Feedback.UpdateDate.Date)
+							&& (od.ProductVariant.Product.ProductName ?? "").ToLower().Contains(productName.ToLower())
+							&& (od.ProductVariant.Name ?? "").ToLower().Contains(productVariantName.ToLower()))
+							.Select(od => new OrderDetail
+							{
+								OrderId = od.OrderId,
+								Feedback = new Feedback
+								{
+									Content = od.Feedback.Content ?? "",
+									Rate = od.Feedback.Rate,
+									UpdateDate = od.Feedback.UpdateDate,
+									FeedbackMedias = od.Feedback.FeedbackMedias,
+								},
+								ProductVariant = od.ProductVariant,
+							}).ToList(),
+					})
+					.ToList())
+					.Where(x => x.OrderDetails.Count > 0).ToList();
 
 			}
 		}
