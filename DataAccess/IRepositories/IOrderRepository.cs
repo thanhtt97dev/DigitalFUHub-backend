@@ -24,5 +24,6 @@ namespace DataAccess.IRepositories
 		List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset);
 		Order? GetOrderCustomer(long orderId, long userId, long shopId);
 		Order? GetOrderCustomer(long orderId, long customerId);
+		List<Order> GetListOrderSeller(long userId, long orderId, string username, DateTime? fromDate, DateTime? toDate, int status);
 	}
 }

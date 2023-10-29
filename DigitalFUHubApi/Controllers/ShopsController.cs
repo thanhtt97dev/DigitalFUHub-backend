@@ -61,7 +61,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion

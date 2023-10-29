@@ -61,8 +61,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
-				return BadRequest(new Status());
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#region Get All Product with shopId (userId)
@@ -120,9 +119,9 @@ namespace DigitalFUHubApi.Controllers
 				}
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<ProductResponseDTO>(product)));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "FAIL", false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 
 		}
@@ -150,7 +149,7 @@ namespace DigitalFUHubApi.Controllers
 					||
 					!fileExtension.Contains(request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf("."))))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID FILE", false, new()));
 				}
 				DateTime now;
 				string filename;
@@ -213,7 +212,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion
@@ -321,7 +320,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
 		#endregion

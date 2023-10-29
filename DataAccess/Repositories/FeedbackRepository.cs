@@ -23,5 +23,9 @@ namespace DataAccess.Repositories
 			if (productId == 0) throw new ArgumentException("ProductId invalid (at GetFeedbacks)");
 			return FeedbackDAO.Instance.GetFeedbacks(productId);
 		}
+
+		public List<Order> GetListFeedbackSeller(long userId, long orderId, string userName, string productName,
+			string productVariantName, DateTime? fromDate, int rate)
+		=> FeedbackDAO.Instance.GetListFeedbackSeller(userId, orderId, userName, productName, productVariantName, fromDate, rate);
 	}
 }

@@ -25,21 +25,24 @@ namespace DataAccess.Repositories
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 
 		public Order? GetSellerOrderDetail(long userId, long orderId) => OrderDAO.Instance.GetSellerOrderDetail(userId, orderId);
-		
+
 		public void UpdateOrderStatusAdmin(long orderId, int status, string? note) => OrderDAO.Instance.UpdateOrderStatusAdmin(orderId, status, note);
-		
+
 		public void UpdateOrderStatusSellerViolates(long orderId, string? note) => OrderDAO.Instance.UpdateOrderStatusSellerViolates(orderId, note);
-		
+
 		public void UpdateOrderStatusRejectComplaint(long orderId, string? note) => OrderDAO.Instance.UpdateOrderStatusRejectComplaint(orderId, note);
 
 		public Order? GetOrderForCheckingExisted(long orderId) => OrderDAO.Instance.GetOrderForCheckingExisted(orderId);
 
-		public List<Order> GetAllOrderByUser(long userId,List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId,statusId, limit, offset);
+		public List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId, statusId, limit, offset);
 
-		public void UpdateOrderStatusCustomer(long orderId,long shopId, int status) => OrderDAO.Instance.UpdateOrderStatusCustomer(orderId,shopId, status);
-		
-		public Order? GetOrderCustomer(long orderId,long customerId, long shopId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId, shopId);
+		public void UpdateOrderStatusCustomer(long orderId, long shopId, int status) => OrderDAO.Instance.UpdateOrderStatusCustomer(orderId, shopId, status);
+
+		public Order? GetOrderCustomer(long orderId, long customerId, long shopId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId, shopId);
 
 		public Order? GetOrderCustomer(long orderId, long customerId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId);
+
+		public List<Order> GetListOrderSeller(long userId, long orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
+		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
 	}
 }

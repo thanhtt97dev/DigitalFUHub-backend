@@ -6,9 +6,11 @@ using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.Feedback;
+using DTOs.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -53,15 +55,16 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Customer/Add")]
 		public async Task<IActionResult> AddFeedbackOrder([FromForm] CustomerFeedbackOrderRequestDTO request)
 		{
-			if (!ModelState.IsValid)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
-			}
+			
 			try
 			{
-				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
+				}
+				if (!ModelState.IsValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				List<string> urlImages = new List<string>();
@@ -86,7 +89,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 		}
@@ -99,18 +102,19 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if(userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
+
 				Order? order = _feedbackRepository.GetFeedbackDetail(orderId, userId);
 				if (order == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 				}
 				List<CustomerFeedbackDetailOrderResponseDTO> response = order.OrderDetails.Where(x => x.IsFeedback == true).Select(x => new CustomerFeedbackDetailOrderResponseDTO
 				{
-					Fullname = order.User.Fullname,
+					Username = order.User.Username,
 					Avatar = order.User.Avatar,
 					ProductName = x.ProductVariant.Product.ProductName ?? "",
 					ProductVariantName = x.ProductVariant.Name ?? "",
@@ -123,11 +127,37 @@ namespace DigitalFUHubApi.Controllers
 				}).ToList();
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 
+		}
+		#endregion
+
+		#region get list feedback of seller
+		[HttpPost("Seller/List")]
+		public IActionResult GetListFeedbackSeller(SellerFeedbackRequestDTO request)
+		{
+			try
+			{
+				int[] rates = new[] { 0, 1, 2, 3, 4, 5 };
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				if (!ModelState.IsValid || !rates.Contains(request.Rate))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				}
+				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate, "M/d/yyyy", CultureInfo.InvariantCulture);
+				List<Order> orders = _feedbackRepository.GetListFeedbackSeller(request.UserId, request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(), fromDate, request.Rate);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<List<SellerFeedbackResponseDTO>>(orders)));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
 		}
 		#endregion
 	}
