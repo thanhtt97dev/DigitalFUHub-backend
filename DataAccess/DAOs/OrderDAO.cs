@@ -59,7 +59,7 @@ namespace DataAccess.DAOs
 
 						//get profit
 						var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
-						var sellerProfit = order.TotalAmount - order.TotalCoinDiscount - adminProfit;
+						var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
 						// update seller's balance
 						var seller = context.User.First(x => x.UserId == sellerId);
@@ -654,8 +654,6 @@ namespace DataAccess.DAOs
 
 					var customerId = order.UserId;
 
-					
-
 					// update customer account balance
 					var customer = context.User.First(x => x.UserId == customerId);
 
@@ -716,40 +714,48 @@ namespace DataAccess.DAOs
 					order.Note = note;
 					context.Order.Update(order);
 
+					long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
+
 					var sellerId = order.ShopId;
-					var adminProfit = order.TotalAmount * order.BusinessFee.Fee / 100;
-					var sellerProfit = order.TotalAmount - adminProfit;
+					var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
+					var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
 					// add transaction for refund money to seller
-					TransactionInternal transactionInternalSeller = new TransactionInternal()
+					if(sellerProfit > 0)
 					{
-						UserId = sellerId,
-						OrderId = orderId,
-						TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
-						PaymentAmount = sellerProfit,
-						DateCreate = DateTime.Now,
-					};
-					context.TransactionInternal.Add(transactionInternalSeller);
+						TransactionInternal transactionInternalSeller = new TransactionInternal()
+						{
+							UserId = sellerId,
+							OrderId = orderId,
+							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+							PaymentAmount = sellerProfit,
+							DateCreate = DateTime.Now,
+						};
+						context.TransactionInternal.Add(transactionInternalSeller);
+
+						// update seller account balance
+						var seller = context.User.First(x => x.UserId == sellerId);
+						seller.AccountBalance = seller.AccountBalance + sellerProfit;
+					}
 
 					// add transaction for get profit admin
-					TransactionInternal transactionInternalAdmin = new TransactionInternal()
+					if (adminProfit > 0)
 					{
-						UserId = Constants.ADMIN_USER_ID,
-						OrderId = orderId,
-						TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
-						PaymentAmount = adminProfit,
-						DateCreate = DateTime.Now,
-					};
-					context.TransactionInternal.Add(transactionInternalAdmin);
+						TransactionInternal transactionInternalAdmin = new TransactionInternal()
+						{
+							UserId = Constants.ADMIN_USER_ID,
+							OrderId = orderId,
+							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+							PaymentAmount = adminProfit,
+							DateCreate = DateTime.Now,
+						};
+						context.TransactionInternal.Add(transactionInternalAdmin);
 
-					// update seller account balance
-					var seller = context.User.First(x => x.UserId == sellerId);
-					seller.AccountBalance = seller.AccountBalance + sellerProfit;
 
-					//update admin profit account balance
-					var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-					admin.AccountBalance = admin.AccountBalance + adminProfit;
-
+						//update admin profit account balance
+						var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+						admin.AccountBalance = admin.AccountBalance + adminProfit;
+					}
 					context.SaveChanges();
 					transaction.Commit();
 				}
@@ -821,7 +827,7 @@ namespace DataAccess.DAOs
 						{
 							long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
 							var adminProfit = (order.TotalAmount - order.TotalCoinDiscount) * fee / 100;
-							var sellerProfit = order.TotalAmount - order.TotalCoinDiscount - adminProfit;
+							var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
 
 							// add transaction receive payment and profit
 							List<TransactionInternal> transactionInternals = new List<TransactionInternal>();
