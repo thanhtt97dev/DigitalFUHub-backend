@@ -9,7 +9,7 @@ namespace DTOs.Seller
 	public class SellerFeedbackRequestDTO
 	{
 		public long UserId { get; set; }
-		public long OrderId { get; set; }
+		public string OrderId { get; set; } = string.Empty;
 		public string ProductName { get; set; } = string.Empty;
 		public string ProductVariantName { get; set; } = string.Empty;
 		public string? FromDate { get; set; } = null!;

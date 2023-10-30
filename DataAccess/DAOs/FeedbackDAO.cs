@@ -179,7 +179,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetListFeedbackSeller(long userId, long orderId, string userName, string productName,
+		internal List<Order> GetListFeedbackSeller(long userId, string orderId, string userName, string productName,
 			string productVariantName, DateTime? fromDate, int rate)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -194,7 +194,7 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.FeedbackMedias)
 					.Where(x => x.ShopId == userId
 							&& x.User.Username.ToLower().Contains(userName.ToLower())
-							&& (orderId == 0 ? true : x.OrderId == orderId))
+							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString().Trim().ToLower() == orderId))
 					.Select(x => new Order
 					{
 						OrderId = x.OrderId,
@@ -206,7 +206,7 @@ namespace DataAccess.DAOs
 						},
 						OrderDetails = x.OrderDetails.Where(od => od.IsFeedback == true
 							&& (rate == 0 ? true : od.Feedback.Rate == rate)
-							&& (fromDate == null ? true : fromDate.Value.Date == od.Feedback.UpdateDate.Date)
+							&& (fromDate == null ? true : fromDate.Value.Date <= od.Feedback.UpdateDate.Date)
 							&& (od.ProductVariant.Product.ProductName ?? "").ToLower().Contains(productName.ToLower())
 							&& (od.ProductVariant.Name ?? "").ToLower().Contains(productVariantName.ToLower()))
 							.Select(od => new OrderDetail

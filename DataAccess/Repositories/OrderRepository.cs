@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.Repositories
 {
@@ -24,7 +25,7 @@ namespace DataAccess.Repositories
 
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 
-		public Order? GetSellerOrderDetail(long userId, long orderId) => OrderDAO.Instance.GetSellerOrderDetail(userId, orderId);
+		public Order? GetOrderDetailSeller(long userId, long orderId) => OrderDAO.Instance.GetOrderDetailSeller(userId, orderId);
 
 		public void UpdateOrderStatusAdmin(long orderId, int status, string? note) => OrderDAO.Instance.UpdateOrderStatusAdmin(orderId, status, note);
 
@@ -44,5 +45,11 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetListOrderSeller(long userId, long orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
+
+		public void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId)
+		=> OrderDAO.Instance.UpdateStatusOrderDispute(sellerId, customerId, orderId);
+
+		public void UpdateStatusOrderRefund(long sellerId, long orderId, string note)
+		=> OrderDAO.Instance.UpdateStatusOrderRefund(sellerId, orderId, note);
 	}
 }

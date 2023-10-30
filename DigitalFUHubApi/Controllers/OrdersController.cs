@@ -86,7 +86,7 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Customer/List")]
 		public IActionResult GetListOrders([FromBody] GetAllOrderRequestDTO request)
 		{
-			
+
 			try
 			{
 				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
@@ -189,7 +189,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if(userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
@@ -242,7 +242,7 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get list orders seller
 		[Authorize("Seller")]
-		[HttpPost("Seller/All")]
+		[HttpPost("Seller/List")]
 		public IActionResult GetOrdersSeller(SellerOrdersRequestDTO request)
 		{
 			try
@@ -295,41 +295,95 @@ namespace DigitalFUHubApi.Controllers
 		[HttpGet("Seller/{userId}/{orderId}")]
 		public IActionResult GetOrderDetailSeller(long userId, long orderId)
 		{
-			ResponseData response = new ResponseData();
 			if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
 			{
 				return Unauthorized();
 			}
-
-			Order? orderRaw = _orderRepository.GetSellerOrderDetail(userId, orderId);
-
-			if (orderRaw == null)
+			Order? order = _orderRepository.GetOrderDetailSeller(userId, orderId);
+			if (order == null)
 			{
-				response.Status.Ok = false;
-				response.Status.Message = "Not found.";
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-				return Ok(response);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 			}
-			SellerOrderDetailResponseDTO order = new SellerOrderDetailResponseDTO
+
+			SellerOrderDetailResponseDTO response = new SellerOrderDetailResponseDTO
 			{
-				/*
-				EmailCustomer = orderRaw.User.Email,
-				IsFeedbacked = orderRaw.IsFeedback,
-				OrderDate = orderRaw.OrderDate,
-				OrderId = orderId,
-				OrderStatusId = orderRaw.OrderStatusId,
-				Price = orderRaw.Price,
-				Quantity = orderRaw.Quantity,
-				ProductName = orderRaw.ProductVariant.Product?.ProductName ?? "",
-				ProductVariantName = orderRaw.ProductVariant?.Name ?? "",
-				Thumbnail = orderRaw.ProductVariant?.Product?.Thumbnail ?? ""
-				*/
+				OrderId = order.OrderId,
+				Note = order.Note ?? "",
+				OrderDate = order.OrderDate,
+				ShopId = order.ShopId,
+				CustomerId = order.User.UserId,
+				CustomerUsername = order.User.Username,
+				StatusId = order.OrderStatusId,
+				TotalAmount = order.TotalAmount,
+				TotalCoinDiscount = order.TotalCoinDiscount,
+				TotalCouponDiscount = order.TotalCouponDiscount,
+				TotalPayment = order.TotalPayment,
+				OrderDetails = order.OrderDetails.Select(od => new SellerOrderDetailProductResponseDTO
+				{
+					Discount = od.Discount,
+					OrderDetailId = od.OrderDetailId,
+					Price = od.Price,
+					ProductId = od.ProductVariant.ProductId,
+					ProductName = od.ProductVariant?.Product?.ProductName ?? "",
+					ProductVariantId = od.ProductVariantId,
+					ProductVariantName = od.ProductVariant?.Name ?? "",
+					Quantity = od.Quantity,
+					Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
+					TotalAmount = od.TotalAmount,
+				}).ToList(),
 			};
-			response.Status.Ok = true;
-			response.Status.Message = "Success";
-			response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-			response.Result = order;
-			return Ok(response);
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
+		}
+		#endregion
+
+		#region Seller dispute order
+		[Authorize("Seller")]		
+		[HttpPost("Seller/Dispute")]		
+		public IActionResult UpdateDisputeOrder(SellerDisputeOrderRequestDTO request) 
+		{
+			if(!ModelState.IsValid)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+			}
+			try
+			{
+				if(request.SellerId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			}
+			catch (Exception e)
+			{
+
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+		}
+		#endregion
+
+		#region Seller dispute order
+		[Authorize("Seller")]
+		[HttpPost("Seller/Refund")]
+		public IActionResult UpdateRefundOrder(SellerRefundOrderRequestDTO request)
+		{
+			if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.Note))
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+			}
+			try
+			{
+				if (request.SellerId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
+				_orderRepository.UpdateStatusOrderRefund(request.SellerId, request.OrderId, request.Note.Trim());
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
 		}
 		#endregion
 
@@ -501,5 +555,6 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 	}
+
 
 }
