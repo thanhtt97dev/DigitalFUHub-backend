@@ -265,7 +265,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal long GetConversation(long shopId, long userId, bool isGroup)
+		internal long GetConversation(long shopId, long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -277,8 +277,7 @@ namespace DataAccess.DAOs
 					var conversationId = (from userConversation in context.UserConversation
 										  join conversation in context.Conversations
 											  on userConversation.ConversationId equals conversation.ConversationId
-										  where conversation.IsGroup == isGroup &&
-												userConversation.UserId == userId &&
+										  where userConversation.UserId == userId &&
 												userConversation.ConversationId == item.ConversationId
 										  select userConversation.ConversationId).FirstOrDefault();
 					if (conversationId != 0)
@@ -286,51 +285,7 @@ namespace DataAccess.DAOs
 						return conversationId;
 					}
 				}
-
-				if (isGroup)
-				{
-					return 0;
-				}
-
-				var transaction = context.Database.BeginTransaction();
-				try
-				{
-					// add new conversation
-					Conversation newConversation = new Conversation
-					{
-						DateCreate = DateTime.Now,
-						IsGroup = false,
-						IsActivate = true
-					};
-					context.Conversations.Add(newConversation);
-					context.SaveChanges();
-
-					var sellerConversation = new UserConversation
-					{
-						UserId = shopId,
-						ConversationId = newConversation.ConversationId
-					};
-
-					var customerConversation = new UserConversation
-					{
-						UserId = userId,
-						ConversationId = newConversation.ConversationId
-					};
-
-					context.UserConversation.AddRange(sellerConversation, customerConversation);
-					context.SaveChanges();
-
-					transaction.Commit();
-
-					return newConversation.ConversationId;
-				}
-				catch(Exception ex) 
-				{
-					transaction.Rollback();
-					throw new Exception(ex.Message);
-				}
-
-				
+				return 0;
 			}
 		}
 	}

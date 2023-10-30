@@ -560,6 +560,7 @@ namespace DataAccess.DAOs
 											BusinessFeeId = businessFee.BusinessFeeId,
 											Fee = businessFee.Fee
 										},
+										ConversationId = order.ConversationId,
 										OrderStatusId = order.OrderStatusId,
 										OrderDate = order.OrderDate,
 										Note = order.Note,
