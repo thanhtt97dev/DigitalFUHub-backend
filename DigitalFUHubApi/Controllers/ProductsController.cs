@@ -190,8 +190,8 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				now = DateTime.Now;
-				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, 
-					now.Millisecond, now.Second, now.Minute, now.Hour, 
+				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
+					now.Millisecond, now.Second, now.Minute, now.Hour,
 					request.ThumbnailFile.FileName.Substring(request.ThumbnailFile.FileName.LastIndexOf(".")));
 				string urlThumbnail = await _storageService.UploadFileToAzureAsync(request.ThumbnailFile, filename);
 
@@ -233,7 +233,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Unauthorized();
 				}
-				if(request == null)
+				if (request == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
@@ -259,7 +259,7 @@ namespace DigitalFUHubApi.Controllers
 					foreach (var file in request.ProductDetailImagesAddNew)
 					{
 						now = DateTime.Now;
-						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, 
+						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 							now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 						// upload to azure
 						string url = await _storageService.UploadFileToAzureAsync(file, filename);
@@ -273,24 +273,28 @@ namespace DigitalFUHubApi.Controllers
 
 				List<ProductVariant> productVariantsUpdate = new List<ProductVariant>();
 				// check if there are product variant update (not include delete)
-				if(request.ProductVariantIdsUpdate.Count > 0)
+				if (request.ProductVariantIdsUpdate.Count > 0)
 				{
 					for (int i = 0; i < request.ProductVariantIdsUpdate.Count; i++)
 					{
+						#pragma warning disable CS8601 // Possible null reference assignment.
 						productVariantsUpdate.Add(new ProductVariant
 						{
 							Name = request.ProductVariantNamesUpdate[i],
 							Price = request.ProductVariantPricesUpdate[i],
 							ProductId = request.ProductId,
 							ProductVariantId = request.ProductVariantIdsUpdate[i],
-							AssetInformations = Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i]),
+							AssetInformations = request.AssetInformationFilesUpdate != null && request.AssetInformationFilesUpdate.Count > 0
+												&& request.AssetInformationFilesUpdate[i] != null ?
+									Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i]) : null
 						});
+						#pragma warning restore CS8601 // Possible null reference assignment.
 					}
 				}
-				
+
 				List<ProductVariant> productVariantsAddNew = new List<ProductVariant>();
 				// check add new product variant or not
-				if(request.ProductVariantNamesAddNew.Count > 0)
+				if (request.ProductVariantNamesAddNew.Count > 0)
 				{
 					for (int i = 0; i < request.ProductVariantNamesAddNew.Count; i++)
 					{
@@ -304,7 +308,7 @@ namespace DigitalFUHubApi.Controllers
 						});
 					}
 				}
-				
+
 
 				// check product detail image is delete or not
 				if (prod.ProductMedias.Count(x => !request.ProductDetailImagesCurrent.Any(m => m == x.Url)) > 0)
@@ -329,9 +333,9 @@ namespace DigitalFUHubApi.Controllers
 					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnailFileUpdate, filename);
 
 					// delete product thumbnail old
-					#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 					await _storageService.RemoveFileFromAzureAsync(prod.Thumbnail.Substring(prod.Thumbnail.LastIndexOf("/") + 1));
-					#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 				}
 
 				Product product = new Product
