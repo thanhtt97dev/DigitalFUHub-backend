@@ -14,6 +14,7 @@ using System.Reflection.Metadata;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using DTOs.User;
 using System.Security.Cryptography.X509Certificates;
+using Comons;
 
 namespace DataAccess.DAOs
 {
@@ -89,13 +90,14 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
+				var transaction = context.Database.BeginTransaction();
 				try
 				{
 					Order? order = context.Order.Include(x => x.OrderDetails).ThenInclude(x => x.ProductVariant)
 						.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId
 						&& x.OrderDetails.Any(od => od.OrderDetailId == orderDetailId));
 					if (order == null) throw new Exception("NOT FOUND.");
-					if (DateTime.Now.Subtract(order.OrderDate) > TimeSpan.FromDays(7)) throw new Exception("EXCEED TIME TO FEEDBACK.");
+					if (DateTime.Now.Subtract(order.OrderDate) > TimeSpan.FromDays(Constants.NUMBER_DAYS_CAN_MAKE_FEEDBACK)) throw new Exception("EXCEED TIME TO FEEDBACK.");
 
 					User user = context.User.First(x => x.UserId == userId);
 
@@ -124,13 +126,36 @@ namespace DataAccess.DAOs
 							Url = x,
 						}).ToList();
 					}
-					user.Coin += feedbackBenefit.Coin;
-					orderDetail.IsFeedback = true;
 					context.Feedback.Add(feedback);
 					context.SaveChanges();
+
+					if (feedbackBenefit.Coin > 0)
+					{
+						//update user 
+						user.Coin += feedbackBenefit.Coin;
+						//update orderDetail
+						orderDetail.IsFeedback = true;
+
+						//Add new transaction coin
+						TransactionCoin transactionCoin = new TransactionCoin
+						{
+							UserId = user.UserId,
+							TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_RECEIVE,
+							OrderId = orderDetailId,
+							FeedbackId = feedback.FeedbackId,	
+							Amount = feedbackBenefit.Coin,
+							DateCreate = DateTime.Now
+						};
+
+						context.TransactionCoin.Add(transactionCoin);
+						context.SaveChanges();
+					}
+					context.SaveChanges();
+					transaction.Commit();	
 				}
 				catch (Exception e)
 				{
+					transaction.Rollback();
 					throw new Exception(e.Message);
 				}
 			}

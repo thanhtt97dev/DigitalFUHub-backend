@@ -197,7 +197,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				ResponseData responseData = new ResponseData();
-                var conversationId = conversationRepository.GetConversation(request.ShopId, request.UserId, request.IsGroup);
+                var conversationId = conversationRepository.GetConversation(request.ShopId, request.UserId);
                 if(conversationId == 0)
                 {
 					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;

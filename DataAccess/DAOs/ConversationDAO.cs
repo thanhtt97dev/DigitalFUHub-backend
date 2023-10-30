@@ -69,11 +69,45 @@ namespace DataAccess.DAOs
 							RoleId = uc.User.RoleId,
 							Fullname = uc.User.Fullname,
 							Avatar = uc.User.Avatar,
-							LastTimeOnline = uc.User.LastTimeOnline,
-                            IsOnline = uc.User.IsOnline,
                         }).Distinct().ToList()
 					}).ToList();
 
+				// check online
+                    for (int i = 0; i < groupedConversations.Count(); i++)
+                    {
+						if (groupedConversations[i] == null) continue;
+
+						// check group and update
+                        if (groupedConversations[i].IsGroup == false)
+                        {
+							var firstUser = groupedConversations[i].Users?.FirstOrDefault();
+							if (firstUser != null)
+							{
+								var findUser = context.User.FirstOrDefault(x => x.UserId == firstUser.UserId);
+								groupedConversations[i].LastTimeOnline = findUser?.LastTimeOnline ?? DateTime.Now;
+                                groupedConversations[i].IsOnline = findUser?.IsOnline ?? false;
+                            }
+                        } else {
+							var userIds = groupedConversations[i].Users?.Select(x => x.UserId);
+							if (userIds != null)
+							{
+                                // users status online
+                                var users = context.User.Where(x => userIds.Contains(x.UserId) && x.IsOnline == true);
+
+                                if (users.Count() == 0)
+								{
+                                    groupedConversations[i].IsOnline = false;
+                                } else
+								{
+                                    groupedConversations[i].IsOnline = true;
+                                }
+								
+                            }
+						}
+            
+                }
+	
+ 
 				return groupedConversations;
 			}
 
@@ -265,7 +299,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal long GetConversation(long shopId, long userId, bool isGroup)
+		internal long GetConversation(long shopId, long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -277,8 +311,7 @@ namespace DataAccess.DAOs
 					var conversationId = (from userConversation in context.UserConversation
 										  join conversation in context.Conversations
 											  on userConversation.ConversationId equals conversation.ConversationId
-										  where conversation.IsGroup == isGroup &&
-												userConversation.UserId == userId &&
+										  where userConversation.UserId == userId &&
 												userConversation.ConversationId == item.ConversationId
 										  select userConversation.ConversationId).FirstOrDefault();
 					if (conversationId != 0)
@@ -286,51 +319,7 @@ namespace DataAccess.DAOs
 						return conversationId;
 					}
 				}
-
-				if (isGroup)
-				{
-					return 0;
-				}
-
-				var transaction = context.Database.BeginTransaction();
-				try
-				{
-					// add new conversation
-					Conversation newConversation = new Conversation
-					{
-						DateCreate = DateTime.Now,
-						IsGroup = false,
-						IsActivate = true
-					};
-					context.Conversations.Add(newConversation);
-					context.SaveChanges();
-
-					var sellerConversation = new UserConversation
-					{
-						UserId = shopId,
-						ConversationId = newConversation.ConversationId
-					};
-
-					var customerConversation = new UserConversation
-					{
-						UserId = userId,
-						ConversationId = newConversation.ConversationId
-					};
-
-					context.UserConversation.AddRange(sellerConversation, customerConversation);
-					context.SaveChanges();
-
-					transaction.Commit();
-
-					return newConversation.ConversationId;
-				}
-				catch(Exception ex) 
-				{
-					transaction.Rollback();
-					throw new Exception(ex.Message);
-				}
-
-				
+				return 0;
 			}
 		}
 	}

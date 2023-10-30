@@ -18,6 +18,7 @@ namespace BusinessObject.Entities
         public bool IsActivate { get; set; }
 		public bool IsGroup { get; set; }
 
+        public virtual Order? Order { get; set; }  
 		public virtual ICollection<UserConversation>? UserConversations { get; set; }
         public virtual ICollection<Message>? Messages { get; set; }
     }
