@@ -15,6 +15,8 @@ namespace DTOs.Conversation
         public int IsRead { get; set; }
         public string LatestMessage { get; set; } = string.Empty;
         public bool IsGroup { get; set; }
+        public DateTime LastTimeOnline { get; set; }
+        public bool IsOnline { get; set; }
         public ICollection<UserConversationResponseDTO>? Users { get; set; }
 
     }

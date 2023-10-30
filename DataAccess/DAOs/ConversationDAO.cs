@@ -69,11 +69,45 @@ namespace DataAccess.DAOs
 							RoleId = uc.User.RoleId,
 							Fullname = uc.User.Fullname,
 							Avatar = uc.User.Avatar,
-							LastTimeOnline = uc.User.LastTimeOnline,
-                            IsOnline = uc.User.IsOnline,
                         }).Distinct().ToList()
 					}).ToList();
 
+				// check online
+                    for (int i = 0; i < groupedConversations.Count(); i++)
+                    {
+						if (groupedConversations[i] == null) continue;
+
+						// check group and update
+                        if (groupedConversations[i].IsGroup == false)
+                        {
+							var firstUser = groupedConversations[i].Users?.FirstOrDefault();
+							if (firstUser != null)
+							{
+								var findUser = context.User.FirstOrDefault(x => x.UserId == firstUser.UserId);
+								groupedConversations[i].LastTimeOnline = findUser?.LastTimeOnline ?? DateTime.Now;
+                                groupedConversations[i].IsOnline = findUser?.IsOnline ?? false;
+                            }
+                        } else {
+							var userIds = groupedConversations[i].Users?.Select(x => x.UserId);
+							if (userIds != null)
+							{
+                                // users status online
+                                var users = context.User.Where(x => userIds.Contains(x.UserId) && x.IsOnline == true);
+
+                                if (users.Count() == 0)
+								{
+                                    groupedConversations[i].IsOnline = false;
+                                } else
+								{
+                                    groupedConversations[i].IsOnline = true;
+                                }
+								
+                            }
+						}
+            
+                }
+	
+ 
 				return groupedConversations;
 			}
 
