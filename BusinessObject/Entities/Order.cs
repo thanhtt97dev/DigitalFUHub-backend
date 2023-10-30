@@ -16,6 +16,7 @@ namespace BusinessObject.Entities
         public long UserId { get; set; }
 		public long ShopId { get; set; }
         public long BusinessFeeId { get; set; }
+		public long? ConversationId { get; set; }
 		public long OrderStatusId { get; set; }
 		public DateTime OrderDate { get; set; }
 		public string? Note { get; set; }
@@ -30,8 +31,10 @@ namespace BusinessObject.Entities
 		public virtual Shop Shop { get; set; } = null!;
 		[ForeignKey(nameof(BusinessFeeId))]
 		public virtual BusinessFee BusinessFee { get; set; } = null!;
+		[ForeignKey(nameof(ConversationId))]
+		public virtual Conversation? Conversation { get; set; } 
 		[ForeignKey(nameof(OrderStatusId))]
-        public virtual OrderStatus? OrderStatus { get; set; } = null!;
+        public virtual OrderStatus OrderStatus { get; set; } = null!;
 		public virtual ICollection<OrderCoupon> OrderCoupons { get; set; } = null!;
 		public virtual ICollection<OrderDetail> OrderDetails { get; set; } = null!;
 		public virtual ICollection<TransactionCoin>? TransactionCoins { get; set; }
