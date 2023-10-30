@@ -14,11 +14,11 @@ namespace DTOs.Seller
 		public int Discount { get; set;}
 		public string? Description { get; set;}
 		public int Category { get; set;}
-		public IFormFile Thumbnail { get; set; } = null!;
-		public List<IFormFile> Images { get; set; } = null!;
+		public IFormFile ThumbnailFile { get; set; } = null!;
+		public List<IFormFile> ProductDetailImageFiles { get; set; } = null!;
 		public List<string> Tags { get; set; } = null!;
-		public List<string> NameVariants { get; set; } = null!;
-		public List<long> PriceVariants{ get; set; } = null!;
-		public List<IFormFile> DataVariants { get; set; } = null!;
+		public List<string> ProductVariantNames { get; set; } = null!;
+		public List<long> ProductVariantPrices { get; set; } = null!;
+		public List<IFormFile> AssetInformationFiles { get; set; } = null!;
 	}
 }

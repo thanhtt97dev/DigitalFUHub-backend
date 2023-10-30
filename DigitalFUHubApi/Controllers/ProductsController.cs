@@ -132,25 +132,27 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Add")]
 		public async Task<IActionResult> AddProduct([FromForm] AddProductRequestDTO request)
 		{
-			if (!ModelState.IsValid)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
-			}
 			try
 			{
-				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
-				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
-				if (request.DataVariants.Any(x => !x.FileName.Contains(".xlsx"))
+				if (!ModelState.IsValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				}
+				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+				// check file upload satisfy file extension
+				if (request.AssetInformationFiles.Any(x => !x.FileName.Contains(".xlsx"))
 					||
-					request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))
+					request.ProductDetailImageFiles.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf("."))))
 					||
-					!fileExtension.Contains(request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf("."))))
+					!fileExtension.Contains(request.ThumbnailFile.FileName.Substring(request.ThumbnailFile.FileName.LastIndexOf("."))))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID FILE", false, new()));
 				}
+
 				DateTime now;
 				string filename;
 				List<Tag> tags = new List<Tag>();
@@ -162,21 +164,21 @@ namespace DigitalFUHubApi.Controllers
 					});
 				});
 				List<ProductVariant> productVariants = new List<ProductVariant>();
-				for (int i = 0; i < request.DataVariants.Count; i++)
+				for (int i = 0; i < request.AssetInformationFiles.Count; i++)
 				{
-					List<AssetInformation> assetInformation = Util.Instance.ReadDataFileExcelProductVariant(request.DataVariants[i]);
+					List<AssetInformation> assetInformation = Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFiles[i]);
 
 					productVariants.Add(new ProductVariant
 					{
-						Name = request.NameVariants[i],
-						Price = request.PriceVariants[i],
+						Name = request.ProductVariantNames[i],
+						Price = request.ProductVariantPrices[i],
 						AssetInformations = assetInformation,
 						isActivate = true,
 					});
 				}
 				List<ProductMedia> productMedias = new List<ProductMedia>();
-
-				foreach (IFormFile file in request.Images)
+				// upload product detail image file to azure
+				foreach (IFormFile file in request.ProductDetailImageFiles)
 				{
 					now = DateTime.Now;
 					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
@@ -188,8 +190,11 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				now = DateTime.Now;
-				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.Thumbnail.FileName.Substring(request.Thumbnail.FileName.LastIndexOf(".")));
-				string urlThumbnail = await _storageService.UploadFileToAzureAsync(request.Thumbnail, filename);
+				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, 
+					now.Millisecond, now.Second, now.Minute, now.Hour, 
+					request.ThumbnailFile.FileName.Substring(request.ThumbnailFile.FileName.LastIndexOf(".")));
+				string urlThumbnail = await _storageService.UploadFileToAzureAsync(request.ThumbnailFile, filename);
+
 				Product product = new Product()
 				{
 					CategoryId = request.Category,
@@ -224,11 +229,15 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
-				Product? prod = _productRepository.GetProductByShop(request.UserId, request.ProductId);
+				if(request == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				}
+				Product? prod = _productRepository.CheckProductExist(request.UserId, request.ProductId);
 				if (prod == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
@@ -236,56 +245,93 @@ namespace DigitalFUHubApi.Controllers
 
 				string filename = "";
 				DateTime now;
-				List<Tag> tags = new List<Tag>();
+
+				List<Tag> listTagAddNew = new List<Tag>();
 				request.Tags.ForEach((value) =>
 				{
-					tags.Add(new Tag { ProductId = request.ProductId, TagName = value });
+					listTagAddNew.Add(new Tag { ProductId = request.ProductId, TagName = value });
 				});
 
-				List<ProductMedia> productMediaNew = new List<ProductMedia>();
-				foreach (var file in request.ProductImagesNew)
+				List<ProductMedia> listProductDetailImagesAddNew = new List<ProductMedia>();
+				// Check if there are new product detail images add new or not 
+				if (request.ProductDetailImagesAddNew.Count > 0)
 				{
-					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-					string url = await _storageService.UploadFileToAzureAsync(file, filename);
-					productMediaNew.Add(new ProductMedia
+					foreach (var file in request.ProductDetailImagesAddNew)
 					{
-						ProductId = request.ProductId,
-						Url = url,
-					});
-				};
+						now = DateTime.Now;
+						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, 
+							now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
+						// upload to azure
+						string url = await _storageService.UploadFileToAzureAsync(file, filename);
+						listProductDetailImagesAddNew.Add(new ProductMedia
+						{
+							ProductId = request.ProductId,
+							Url = url,
+						});
+					};
+				}
 
 				List<ProductVariant> productVariantsUpdate = new List<ProductVariant>();
-				for (int i = 0; i < request.ProductVariantIdUpdate.Count; i++)
+				// check if there are product variant update (not include delete)
+				if(request.ProductVariantIdsUpdate.Count > 0)
 				{
-					productVariantsUpdate.Add(new ProductVariant
+					for (int i = 0; i < request.ProductVariantIdsUpdate.Count; i++)
 					{
-						Name = request.ProductVariantNameUpdate[i],
-						Price = request.ProductVariantPriceUpdate[i],
-						ProductId = request.ProductId,
-						ProductVariantId = request.ProductVariantIdUpdate[i],
-						AssetInformations = request.ProductVariantFileUpdate.Count == 0 || request.ProductVariantFileUpdate[i] == null ? null : Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileUpdate[i]),
-					});
+						productVariantsUpdate.Add(new ProductVariant
+						{
+							Name = request.ProductVariantNamesUpdate[i],
+							Price = request.ProductVariantPricesUpdate[i],
+							ProductId = request.ProductId,
+							ProductVariantId = request.ProductVariantIdsUpdate[i],
+							AssetInformations = Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i]),
+						});
+					}
 				}
-				List<ProductVariant> productVariantsNew = new List<ProductVariant>();
-				for (int i = 0; i < request.ProductVariantFileNew.Count; i++)
+				
+				List<ProductVariant> productVariantsAddNew = new List<ProductVariant>();
+				// check add new product variant or not
+				if(request.ProductVariantNamesAddNew.Count > 0)
 				{
-					productVariantsNew.Add(new ProductVariant
+					for (int i = 0; i < request.ProductVariantNamesAddNew.Count; i++)
 					{
-						AssetInformations = Util.Instance.ReadDataFileExcelProductVariant(request.ProductVariantFileNew[i]),
-						isActivate = true,
-						Name = request.ProductVariantNameNew[i],
-						Price = request.ProductVariantPriceNew[i],
-						ProductId = request.ProductId,
-					});
+						productVariantsAddNew.Add(new ProductVariant
+						{
+							AssetInformations = Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesAddNew[i]),
+							isActivate = true,
+							Name = request.ProductVariantNamesAddNew[i],
+							Price = request.ProductVariantPricesAddNew[i],
+							ProductId = request.ProductId,
+						});
+					}
 				}
-				string urlThumbnailOld = _productRepository.GetProductThumbnail(request.ProductId);
+				
+
+				// check product detail image is delete or not
+				if (prod.ProductMedias.Count(x => !request.ProductDetailImagesCurrent.Any(m => m == x.Url)) > 0)
+				{
+					List<ProductMedia> productDetailImagesDelete = prod.ProductMedias
+						.Where(x => !request.ProductDetailImagesCurrent.Any(m => m == x.Url)).ToList();
+					foreach (ProductMedia image in productDetailImagesDelete)
+					{
+						await _storageService.RemoveFileFromAzureAsync(image.Url.Substring(image.Url.LastIndexOf("/") + 1));
+					}
+				}
+
 				string urlThumbnailNew = "";
-				if (request.ProductThumbnail != null)
+
+				// check update product thumbnail or not
+				if (request.ProductThumbnailFileUpdate != null)
 				{
 					now = DateTime.Now;
-					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, request.ProductThumbnail.FileName.Substring(request.ProductThumbnail.FileName.LastIndexOf(".")));
-					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnail, filename);
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
+						now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
+						request.ProductThumbnailFileUpdate.FileName.Substring(request.ProductThumbnailFileUpdate.FileName.LastIndexOf(".")));
+					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnailFileUpdate, filename);
+
+					// delete product thumbnail old
+					#pragma warning disable CS8602 // Dereference of a possibly null reference.
+					await _storageService.RemoveFileFromAzureAsync(prod.Thumbnail.Substring(prod.Thumbnail.LastIndexOf("/") + 1));
+					#pragma warning restore CS8602 // Dereference of a possibly null reference.
 				}
 
 				Product product = new Product
@@ -295,27 +341,13 @@ namespace DigitalFUHubApi.Controllers
 					Description = request.ProductDescription,
 					Discount = request.Discount,
 					CategoryId = request.CategoryId,
-					Thumbnail = request.ProductThumbnail == null ? null : urlThumbnailNew,
+					Thumbnail = request.ProductThumbnailFileUpdate == null ? null : urlThumbnailNew,
 					ProductStatusId = request.IsActiveProduct ? Constants.PRODUCT_ACTIVE : Constants.PRODUCT_HIDE
 				};
-				List<ProductMedia> productMedia = _productRepository.GetAllProductMediaById(request.ProductId);
 
-				_productRepository.EditProduct(product, productVariantsNew, productVariantsUpdate, tags, productMediaNew, request.ProductImagesOld);
+				_productRepository.EditProduct(product, productVariantsAddNew, productVariantsUpdate,
+					listTagAddNew, listProductDetailImagesAddNew, request.ProductDetailImagesCurrent);
 
-				// delete thumbnail old
-				if (request.ProductThumbnail != null)
-				{
-					await _storageService.RemoveFileFromAzureAsync(urlThumbnailOld.Substring(urlThumbnailOld.LastIndexOf("/") + 1));
-				}
-				// delete image product
-				if (productMedia.Count(x => !request.ProductImagesOld.Any(m => m == x.Url)) > 0)
-				{
-					List<ProductMedia> productMediaDelete = productMedia.Where(x => !request.ProductImagesOld.Any(m => m == x.Url)).ToList();
-					foreach (ProductMedia media in productMediaDelete)
-					{
-						await _storageService.RemoveFileFromAzureAsync(media.Url.Substring(media.Url.LastIndexOf("/") + 1));
-					}
-				}
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			catch (Exception e)

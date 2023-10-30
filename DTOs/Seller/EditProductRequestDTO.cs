@@ -15,17 +15,17 @@ namespace DTOs.Seller
 		public string ProductDescription{ get; set; } = null!;
 		public int Discount{ get; set; }
 		public int CategoryId{ get; set; }
-		public IFormFile ProductThumbnail { get; set; } = null!;
-		public List<string> ProductImagesOld { get; set; } = new();
-		public List<IFormFile> ProductImagesNew { get; set; } = new();
-		public List<long> ProductVariantIdUpdate { get; set; } = new();
-		public List<string> ProductVariantNameUpdate { get; set; } = new();
-		public List<long> ProductVariantPriceUpdate { get; set; } = new();
-		public List<IFormFile> ProductVariantFileUpdate { get; set; } = new();
-		public List<string> ProductVariantNameNew { get; set; } = new();
-		public List<long> ProductVariantPriceNew { get; set; } = new();
-		public List<IFormFile> ProductVariantFileNew { get; set; } = new();
-		public List<string> Tags { get; set; } = new();
+		public IFormFile ProductThumbnailFileUpdate{ get; set; } = null!; // ProductThumbnailAddNew
+		public List<string> ProductDetailImagesCurrent { get; set; } = new(); // ProductDetailImagesCurrent
+		public List<IFormFile> ProductDetailImagesAddNew { get; set; } = new(); // ProductDetailImagesAddNew
+		public List<long> ProductVariantIdsUpdate { get; set; } = new(); // ProductVariantIdsUpdate
+		public List<string> ProductVariantNamesUpdate { get; set; } = new(); // ProductVariantNamesUpdate
+		public List<long> ProductVariantPricesUpdate { get; set; } = new(); // ProductVariantPricesUpdate
+		public List<IFormFile> AssetInformationFilesUpdate { get; set; } = new(); // AssetInformationFilesUpdate
+		public List<string> ProductVariantNamesAddNew { get; set; } = new(); // ProductVariantNamesAddNew
+		public List<long> ProductVariantPricesAddNew { get; set; } = new(); // ProductVariantPricesAddNew
+		public List<IFormFile> AssetInformationFilesAddNew { get; set; } = new(); //AssetInformationFilesAddNew
+		public List<string> Tags { get; set; } = new(); // Tags
 		public bool IsActiveProduct { get; set; }
 	}
 }

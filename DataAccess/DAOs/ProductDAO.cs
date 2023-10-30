@@ -391,6 +391,20 @@ namespace DataAccess.DAOs
 					.Any(x => x.UserId == userId && x.Products.Any(x => x.ProductId == productId));
 			}
 		}
+
+		internal Product? CheckProductExist(long userId, long productId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Product? product = context.Product
+					.Include(x => x.ProductMedias)
+					.Include(x => x.ProductVariants)
+					.Where(x => x.ProductId == productId && x.ShopId == userId
+							&& (x.ProductStatusId == Constants.PRODUCT_ACTIVE || x.ProductStatusId == Constants.PRODUCT_HIDE))
+						.FirstOrDefault();
+				return product;
+			}
+		}
 	}
 }
 
