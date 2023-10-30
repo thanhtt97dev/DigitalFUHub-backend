@@ -59,7 +59,7 @@ namespace DataAccess.DAOs
 						//get profit
 						var businessFee = order.TotalAmount * fee / 100;
 						var adminProfit = order.TotalCoinDiscount > businessFee ? 0 : businessFee - order.TotalCoinDiscount;
-						var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
+						var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - businessFee;
 
 						if (sellerProfit > 0)
 						{
@@ -738,7 +738,7 @@ namespace DataAccess.DAOs
 					long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
 					var businessFee = order.TotalAmount * fee / 100;
 					var adminProfit = order.TotalCoinDiscount > businessFee ? 0 : businessFee - order.TotalCoinDiscount;
-					var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
+					var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - businessFee;
 
 
 					if (sellerProfit > 0)
@@ -856,7 +856,7 @@ namespace DataAccess.DAOs
 							long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
 							var businessFee = order.TotalAmount * fee / 100;
 							var adminProfit = order.TotalCoinDiscount > businessFee ? 0 : businessFee - order.TotalCoinDiscount;
-							var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - adminProfit;
+							var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - businessFee;
 
 							// add transaction receive payment and profit
 							List<TransactionInternal> transactionInternals = new List<TransactionInternal>();
