@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DTOs", "DTOs\DTOs.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalFUHubApi", "DigitalFUHubApi\DigitalFUHubApi.csproj", "{A7F87A5D-465F-4F7F-9EBF-A87D49F11433}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comons", "Comons\Comons.csproj", "{6848A802-1D1E-4D85-B0D3-1216F12F63C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Comons", "Comons\Comons.csproj", "{6848A802-1D1E-4D85-B0D3-1216F12F63C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

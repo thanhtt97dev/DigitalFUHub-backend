@@ -23,5 +23,6 @@ namespace DataAccess.IRepositories
 		ProductVariant? GetProductVariant(long id);
 		Product? GetProductByShop(long userId, long productId);
 		bool IsExistProductByShop(long userId, long productId);
+		Product? CheckProductExist(long userId, long productId);
 	}
 }
