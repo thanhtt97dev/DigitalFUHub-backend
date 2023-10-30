@@ -23,6 +23,8 @@ namespace BusinessObject.Entities
         public string? Thumbnail { get; set; }
         public DateTime UpdateDate { get; set; }
         public long ProductStatusId { get; set; }
+        public long TotalRatingStar { get; set; }
+        public long NumberFeedback { get; set; }
 
         [ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
