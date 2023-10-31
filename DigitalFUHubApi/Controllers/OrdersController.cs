@@ -362,7 +362,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Seller dispute order
+		#region Seller refund order
 		[Authorize("Seller")]
 		[HttpPost("Seller/Refund")]
 		public IActionResult UpdateRefundOrder(SellerRefundOrderRequestDTO request)

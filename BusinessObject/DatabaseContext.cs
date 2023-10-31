@@ -172,6 +172,12 @@ namespace BusinessObject
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 2, Name = "Paid"},
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 3, Name = "Reject"},
 			});
+			modelBuilder.Entity<CouponType>().HasData(new CouponType[]
+			{
+				new CouponType{CouponTypeId = 1, Name = "For all products (Admin)"},
+				new CouponType{CouponTypeId = 2, Name = "For all shop's product"},
+				new CouponType{CouponTypeId = 3, Name = "For specific products"},
+			});
 
 			modelBuilder.Entity<User>().HasData(new User[]
 			{
