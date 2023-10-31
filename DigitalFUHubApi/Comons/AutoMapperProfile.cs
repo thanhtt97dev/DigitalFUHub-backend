@@ -91,6 +91,9 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<TransactionInternal, TransactionInternalOrderDetailResponseDTO>()
 				.ReverseMap();
 
+			CreateMap<HistoryOrderStatus, HistoryOrderStatusOrderDetailDTO>()
+				.ReverseMap();
+
 			CreateMap<OrderDetail, OrderDetailInfoResponseDTO>()
 				.ForMember(des => des.ProductVariantId, act => act.MapFrom(src => src.ProductVariant.ProductVariantId))
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))

@@ -672,7 +672,15 @@ namespace DataAccess.DAOs
 																TransactionCoinTypeId = transactionCoin.TransactionCoinTypeId,
 																Amount = transactionCoin.Amount,
 																DateCreate = transactionCoin.DateCreate
-															}).ToList()
+															}).ToList(),
+										HistoryOrderStatus = (from historyOrderStatus in context.HistoryOrderStatus
+															 where historyOrderStatus.OrderId == orderId
+															 select new HistoryOrderStatus
+															 {
+																 OrderStatusId = historyOrderStatus.OrderStatusId,
+																 DateCreate = historyOrderStatus.DateCreate,
+																 Note = historyOrderStatus.Note
+															 }).ToList()
 									}
 									).FirstOrDefault();
 				return orderInfo;
