@@ -237,7 +237,11 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
+<<<<<<< HEAD
                             StartDate = new DateTime(2023, 10, 31, 20, 25, 17, 240, DateTimeKind.Local).AddTicks(806)
+=======
+                            StartDate = new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(394)
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                         });
                 });
 
@@ -373,9 +377,12 @@ namespace BusinessObject.Migrations
                     b.Property<string>("CouponName")
                         .HasColumnType("nvarchar(max)");
 
+<<<<<<< HEAD
                     b.Property<long>("CouponTypeId")
                         .HasColumnType("bigint");
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -402,13 +409,17 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("CouponId");
 
+<<<<<<< HEAD
                     b.HasIndex("CouponTypeId");
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.HasIndex("ShopId");
 
                     b.ToTable("Coupon");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("BusinessObject.Entities.CouponProduct", b =>
                 {
                     b.Property<long>("CouponId")
@@ -464,6 +475,8 @@ namespace BusinessObject.Migrations
                         });
                 });
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
             modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
                 {
                     b.Property<long>("DepositTransactionId")
@@ -567,7 +580,11 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 100,
+<<<<<<< HEAD
                             StartDate = new DateTime(2023, 10, 31, 20, 25, 17, 240, DateTimeKind.Local).AddTicks(830)
+=======
+                            StartDate = new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(415)
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                         });
                 });
 
@@ -593,6 +610,7 @@ namespace BusinessObject.Migrations
                     b.ToTable("FeedbackMedia");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("BusinessObject.Entities.HistoryOrderStatus", b =>
                 {
                     b.Property<long>("OrderId")
@@ -615,6 +633,8 @@ namespace BusinessObject.Migrations
                     b.ToTable("HistoryOrderStatus");
                 });
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
                 {
                     b.Property<long>("MessageId")
@@ -872,9 +892,12 @@ namespace BusinessObject.Migrations
                     b.Property<int>("Discount")
                         .HasColumnType("int");
 
+<<<<<<< HEAD
                     b.Property<long>("NumberFeedback")
                         .HasColumnType("bigint");
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
 
@@ -887,9 +910,12 @@ namespace BusinessObject.Migrations
                     b.Property<string>("Thumbnail")
                         .HasColumnType("nvarchar(max)");
 
+<<<<<<< HEAD
                     b.Property<long>("TotalRatingStar")
                         .HasColumnType("bigint");
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
 
@@ -1631,18 +1657,22 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Coupon", b =>
                 {
+<<<<<<< HEAD
                     b.HasOne("BusinessObject.Entities.CouponType", "CouponType")
                         .WithMany("Coupons")
                         .HasForeignKey("CouponTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.HasOne("BusinessObject.Entities.Shop", "Shop")
                         .WithMany("Coupons")
                         .HasForeignKey("ShopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+<<<<<<< HEAD
                     b.Navigation("CouponType");
 
                     b.Navigation("Shop");
@@ -1667,6 +1697,11 @@ namespace BusinessObject.Migrations
                     b.Navigation("Product");
                 });
 
+=======
+                    b.Navigation("Shop");
+                });
+
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
             modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
                 {
                     b.HasOne("BusinessObject.Entities.User", "User")
@@ -1724,6 +1759,7 @@ namespace BusinessObject.Migrations
                     b.Navigation("Feedback");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("BusinessObject.Entities.HistoryOrderStatus", b =>
                 {
                     b.HasOne("BusinessObject.Entities.Order", "Order")
@@ -1743,6 +1779,8 @@ namespace BusinessObject.Migrations
                     b.Navigation("OrderStatus");
                 });
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
                 {
                     b.HasOne("BusinessObject.Entities.Conversation", "Conversation")
@@ -2121,6 +2159,7 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Coupon", b =>
                 {
+<<<<<<< HEAD
                     b.Navigation("CouponProducts");
 
                     b.Navigation("OrderCoupons");
@@ -2131,6 +2170,11 @@ namespace BusinessObject.Migrations
                     b.Navigation("Coupons");
                 });
 
+=======
+                    b.Navigation("OrderCoupons");
+                });
+
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
             modelBuilder.Entity("BusinessObject.Entities.Feedback", b =>
                 {
                     b.Navigation("FeedbackMedias");
@@ -2140,8 +2184,11 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
+<<<<<<< HEAD
                     b.Navigation("HistoryOrderStatus");
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.Navigation("OrderCoupons");
 
                     b.Navigation("OrderDetails");
@@ -2160,15 +2207,21 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.OrderStatus", b =>
                 {
+<<<<<<< HEAD
                     b.Navigation("HistoryOrderStatus");
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Product", b =>
                 {
+<<<<<<< HEAD
                     b.Navigation("CouponProducts");
 
+=======
+>>>>>>> 8488be98e4e1b36720c4b42142c31a387e47e8cc
                     b.Navigation("Feedbacks");
 
                     b.Navigation("ProductMedias");

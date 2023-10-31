@@ -43,7 +43,7 @@ namespace DataAccess.Repositories
 
 		public Order? GetOrderCustomer(long orderId, long customerId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId);
 
-		public List<Order> GetListOrderSeller(long userId, long orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
+		public List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
 
 		public void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId)

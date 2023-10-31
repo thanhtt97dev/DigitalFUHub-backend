@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class initdb : Migration
+    public partial class updatedb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -476,6 +476,7 @@ namespace BusinessObject.Migrations
                     UserId = table.Column<long>(type: "bigint", nullable: false),
                     ShopId = table.Column<long>(type: "bigint", nullable: false),
                     BusinessFeeId = table.Column<long>(type: "bigint", nullable: false),
+                    ConversationId = table.Column<long>(type: "bigint", nullable: true),
                     OrderStatusId = table.Column<long>(type: "bigint", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -493,6 +494,11 @@ namespace BusinessObject.Migrations
                         principalTable: "BusinessFee",
                         principalColumn: "BusinessFeeId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Order_Conversations_ConversationId",
+                        column: x => x.ConversationId,
+                        principalTable: "Conversations",
+                        principalColumn: "ConversationId");
                     table.ForeignKey(
                         name: "FK_Order_OrderStatus_OrderStatusId",
                         column: x => x.OrderStatusId,
@@ -955,7 +961,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "BusinessFee",
                 columns: new[] { "BusinessFeeId", "EndDate", "Fee", "StartDate" },
-                values: new object[] { 1L, null, 5L, new DateTime(2023, 10, 20, 13, 42, 57, 960, DateTimeKind.Local).AddTicks(6831) });
+                values: new object[] { 1L, null, 5L, new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(394) });
 
             migrationBuilder.InsertData(
                 table: "Category",
@@ -972,7 +978,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "FeedbackBenefit",
                 columns: new[] { "FeedbackBenefitId", "Coin", "EndDate", "StartDate" },
-                values: new object[] { 1, 100, null, new DateTime(2023, 10, 20, 13, 42, 57, 960, DateTimeKind.Local).AddTicks(6901) });
+                values: new object[] { 1, 100, null, new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(415) });
 
             migrationBuilder.InsertData(
                 table: "OrderStatus",
@@ -995,7 +1001,8 @@ namespace BusinessObject.Migrations
                 {
                     { 1L, "Active" },
                     { 2L, "Ban" },
-                    { 3L, "Hide" }
+                    { 3L, "Remove" },
+                    { 4L, "Hide" }
                 });
 
             migrationBuilder.InsertData(
@@ -1139,6 +1146,13 @@ namespace BusinessObject.Migrations
                 name: "IX_Order_BusinessFeeId",
                 table: "Order",
                 column: "BusinessFeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_ConversationId",
+                table: "Order",
+                column: "ConversationId",
+                unique: true,
+                filter: "[ConversationId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_OrderStatusId",
@@ -1359,9 +1373,6 @@ namespace BusinessObject.Migrations
                 name: "TransactionInternalType");
 
             migrationBuilder.DropTable(
-                name: "Conversations");
-
-            migrationBuilder.DropTable(
                 name: "WithdrawTransaction");
 
             migrationBuilder.DropTable(
@@ -1387,6 +1398,9 @@ namespace BusinessObject.Migrations
 
             migrationBuilder.DropTable(
                 name: "BusinessFee");
+
+            migrationBuilder.DropTable(
+                name: "Conversations");
 
             migrationBuilder.DropTable(
                 name: "OrderStatus");

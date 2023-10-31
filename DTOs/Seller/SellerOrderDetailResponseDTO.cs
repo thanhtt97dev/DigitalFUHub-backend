@@ -13,12 +13,15 @@ namespace DTOs.Seller
 		public long ShopId { get; set; }
 		public long CustomerId { get; set; }
 		public string CustomerUsername { get; set; } = string.Empty;
+		public string CustomerAvatar { get; set; } = string.Empty;
 		public DateTime OrderDate { get; set; }
 		public string Note { get; set; } = string.Empty;
 		public long TotalAmount { get; set; }
 		public long TotalCouponDiscount { get; set; }
-		public long TotalCoinDiscount { get; set; }
-		public long TotalPayment { get; set; }
+		//public long TotalCoinDiscount { get; set; }
+		//public long TotalPayment { get; set; }
+		public long BussinessFee { get; set; }
+		public long AmountSellerReceive { get; set; }
 		public long StatusId { get; set; }
 		public List<SellerOrderDetailProductResponseDTO> OrderDetails { get; set; } = null!;
 	}

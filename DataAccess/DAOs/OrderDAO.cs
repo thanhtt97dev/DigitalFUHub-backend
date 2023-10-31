@@ -694,12 +694,14 @@ namespace DataAccess.DAOs
 			{
 				return context.Order
 					.Include(x => x.OrderCoupons)
+					.ThenInclude(x => x.Coupon)
 					.Include(x => x.Shop)
 					.Include(x => x.User)
 					.Include(x => x.OrderDetails)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
+					.Include(x => x.BusinessFee)
 					.FirstOrDefault(x => x.OrderId == orderId && x.ShopId == userId);
 			}
 		}
@@ -1031,7 +1033,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetListOrderSeller(long userId, long orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
+		internal List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -1043,7 +1045,8 @@ namespace DataAccess.DAOs
 					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
 							&& (fromDate != null && toDate != null ? x.OrderDate >= fromDate && x.OrderDate <= toDate : true)
 							&& (status == 0 ? true : x.OrderStatusId == status)
-							&& (orderId == 0 ? true : x.OrderId == orderId))
+							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
+					.OrderByDescending(x => x.OrderDate)
 					.ToList();
 
 			}

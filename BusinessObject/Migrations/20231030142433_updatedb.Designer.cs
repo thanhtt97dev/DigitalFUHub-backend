@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231020064258_init db")]
-    partial class initdb
+    [Migration("20231030142433_updatedb")]
+    partial class updatedb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -239,7 +239,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 20, 13, 42, 57, 960, DateTimeKind.Local).AddTicks(6831)
+                            StartDate = new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(394)
                         });
                 });
 
@@ -509,7 +509,7 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 100,
-                            StartDate = new DateTime(2023, 10, 20, 13, 42, 57, 960, DateTimeKind.Local).AddTicks(6901)
+                            StartDate = new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(415)
                         });
                 });
 
@@ -616,6 +616,9 @@ namespace BusinessObject.Migrations
                     b.Property<long>("BusinessFeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("ConversationId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -646,6 +649,10 @@ namespace BusinessObject.Migrations
                     b.HasKey("OrderId");
 
                     b.HasIndex("BusinessFeeId");
+
+                    b.HasIndex("ConversationId")
+                        .IsUnique()
+                        .HasFilter("[ConversationId] IS NOT NULL");
 
                     b.HasIndex("OrderStatusId");
 
@@ -862,6 +869,11 @@ namespace BusinessObject.Migrations
                         new
                         {
                             ProductStatusId = 3L,
+                            ProductStatusName = "Remove"
+                        },
+                        new
+                        {
+                            ProductStatusId = 4L,
                             ProductStatusName = "Hide"
                         });
                 });
@@ -1637,6 +1649,10 @@ namespace BusinessObject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BusinessObject.Entities.Conversation", "Conversation")
+                        .WithOne("Order")
+                        .HasForeignKey("BusinessObject.Entities.Order", "ConversationId");
+
                     b.HasOne("BusinessObject.Entities.OrderStatus", "OrderStatus")
                         .WithMany("Orders")
                         .HasForeignKey("OrderStatusId")
@@ -1656,6 +1672,8 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.Navigation("BusinessFee");
+
+                    b.Navigation("Conversation");
 
                     b.Navigation("OrderStatus");
 
@@ -1791,7 +1809,7 @@ namespace BusinessObject.Migrations
                         .HasForeignKey("BusinessObject.Entities.TransactionCoin", "FeedbackId");
 
                     b.HasOne("BusinessObject.Entities.Order", "Order")
-                        .WithMany("TransactionCoin")
+                        .WithMany("TransactionCoins")
                         .HasForeignKey("OrderId");
 
                     b.HasOne("BusinessObject.Entities.TransactionCoinType", "TransactionCoinType")
@@ -1818,7 +1836,7 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.Entities.TransactionInternal", b =>
                 {
                     b.HasOne("BusinessObject.Entities.Order", "Order")
-                        .WithMany("TransactionInternal")
+                        .WithMany("TransactionInternals")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1964,6 +1982,8 @@ namespace BusinessObject.Migrations
                 {
                     b.Navigation("Messages");
 
+                    b.Navigation("Order");
+
                     b.Navigation("UserConversations");
                 });
 
@@ -1985,9 +2005,9 @@ namespace BusinessObject.Migrations
 
                     b.Navigation("OrderDetails");
 
-                    b.Navigation("TransactionCoin");
+                    b.Navigation("TransactionCoins");
 
-                    b.Navigation("TransactionInternal");
+                    b.Navigation("TransactionInternals");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.OrderDetail", b =>

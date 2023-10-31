@@ -277,9 +277,8 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
 				}
 
-				long orderId;
-				long.TryParse(request.OrderId, out orderId);
-				List<Order> orders = _orderRepository.GetListOrderSeller(request.UserId, orderId, request.Username.Trim(), fromDate, toDate, request.Status);
+				List<Order> orders = _orderRepository.GetListOrderSeller(request.UserId, request.OrderId, request.Username.Trim(), 
+					fromDate, toDate, request.Status);
 				List<SellerOrderResponseDTO> result = _mapper.Map<List<SellerOrderResponseDTO>>(orders);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
@@ -314,11 +313,15 @@ namespace DigitalFUHubApi.Controllers
 				ShopId = order.ShopId,
 				CustomerId = order.User.UserId,
 				CustomerUsername = order.User.Username,
+				CustomerAvatar = order.User.Avatar,
 				StatusId = order.OrderStatusId,
 				TotalAmount = order.TotalAmount,
-				TotalCoinDiscount = order.TotalCoinDiscount,
+				//TotalCoinDiscount = order.TotalCoinDiscount,
+				//TotalPayment = order.TotalPayment,
 				TotalCouponDiscount = order.TotalCouponDiscount,
-				TotalPayment = order.TotalPayment,
+				BussinessFee = (order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100,
+				AmountSellerReceive = (order.TotalAmount - order.TotalCouponDiscount) - 
+									((order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100),
 				OrderDetails = order.OrderDetails.Select(od => new SellerOrderDetailProductResponseDTO
 				{
 					Discount = od.Discount,
