@@ -114,7 +114,7 @@
 
 		//Coupon Type
 		public const int COUPON_TYPE_ALL_PRODUCTS = 1; //admin
-		public const int COUPON_TYPE_FOR_ALL_PRODUCTS_OF_SHOP = 2;
+		public const int COUPON_TYPE_ALL_PRODUCTS_OF_SHOP = 2;
 		public const int COUPON_TYPE_SPECIFIC_PRODUCTS = 3; 
 
 		//Feedback

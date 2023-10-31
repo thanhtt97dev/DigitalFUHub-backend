@@ -45,10 +45,12 @@ namespace BusinessObject
 		public virtual DbSet<FeedbackMedia> FeedbackMedia { get; set; } = null!;
 		public virtual DbSet<ProductMedia> ProductMedia { get; set; } = null!;
 		public virtual DbSet<Coupon> Coupon { get; set; } = null!;
+		public virtual DbSet<CouponProduct> CouponProduct { get; set; } = null!;
 		public virtual DbSet<Order> Order { get; set; } = null!;
 		public virtual DbSet<OrderDetail> OrderDetail { get; set; } = null!;
 		public virtual DbSet<OrderStatus> OrderStatus { get; set; } = null!;
 		public virtual DbSet<OrderCoupon> OrderCoupon { get; set; } = null!;
+		public virtual DbSet<HistoryOrderStatus> HistoryOrderStatus { get; set; } = null!;
 		public virtual DbSet<Category> Category { get; set; } = null!;
 		public virtual DbSet<Cart> Cart { get; set; } = null!;
 		public virtual DbSet<CartDetail> CartDetail { get; set; } = null!;

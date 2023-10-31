@@ -254,20 +254,20 @@ namespace DataAccess.DAOs
 					foreach (var shopProduct in shopProducts)
 					{
 						// check ProductVariant existed
-						var productVariantIdOrder = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
-						var productVariantOrder = context.ProductVariant
+						var productVariantIds = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
+						var productVariants = context.ProductVariant
 							.Include(x => x.Product)
-							.Where(x => productVariantIdOrder.Contains(x.ProductVariantId)).ToList();
+							.Where(x => productVariantIds.Contains(x.ProductVariantId)).ToList();
 
-						bool isProductVariantExisted = productVariantIdOrder.All(id => productVariantOrder.Any(x => x.ProductVariantId == id));
-						if (!isProductVariantExisted)
+						bool isProductVariantsExisted = productVariantIds.All(id => productVariants.Any(x => x.ProductVariantId == id));
+						if (!isProductVariantsExisted)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!", numberQuantityAvailable, orderResult);
 						}
 
 						//check shop existed
-						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId);
+						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId && x.IsActive);
 						if (shop == null)
 						{
 							transaction.Rollback();
@@ -275,10 +275,10 @@ namespace DataAccess.DAOs
 						}
 
 						//check ProductVariant of shop
-						var isAllProductInShop = productVariantOrder
+						var isAllProductVariantInShop = productVariants
 							.All(x => x.Product.ShopId == shopProduct.ShopId);
 
-						if (!isAllProductInShop)
+						if (!isAllProductVariantInShop)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_ORDER_PRODUCT_VARIANT_NOT_IN_SHOP, "A product variant not in shop!", numberQuantityAvailable, orderResult);
@@ -295,7 +295,7 @@ namespace DataAccess.DAOs
 						long customerCoin = customer.Coin;
 
 						//check customers buy their own products 
-						var isCustomerBuyTheirOwnProducts = productVariantOrder
+						var isCustomerBuyTheirOwnProducts = productVariants
 							.Any(x => x.Product.ShopId == userId);
 						if (isCustomerBuyTheirOwnProducts)
 						{
@@ -388,8 +388,8 @@ namespace DataAccess.DAOs
 
 
 						// cacualte order info
-
 						long totalAmount = orderDetails.Sum(x => x.TotalAmount);
+
 						// check coupon
 						long totalCouponDiscount = 0;
 						if (!string.IsNullOrEmpty(shopProduct.Coupon))
@@ -404,6 +404,18 @@ namespace DataAccess.DAOs
 							{
 								transaction.Rollback();
 								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
+							}
+
+							if (coupon.CouponTypeId == Constants.COUPON_TYPE_ALL_PRODUCTS)
+							{
+
+							} else if (coupon.CouponTypeId == Constants.COUPON_TYPE_ALL_PRODUCTS_OF_SHOP)
+							{
+								var couponOfShopExisted = context.Coupon.Any(x => x.ShopId == shopProduct.ShopId && x.CouponId == coupon.CouponId);
+								if (!couponOfShopExisted) 
+								{
+									return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
+								}
 							}
 
 							if (coupon.MinTotalOrderValue > totalAmount)
