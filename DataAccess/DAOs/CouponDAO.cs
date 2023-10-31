@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
+using Comons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,11 +36,19 @@ namespace DataAccess.DAOs
 			{
 				var coupons = context.Coupon.Where(c => c.ShopId == shopId
 															&& c.IsActive == true
-															&& c.IsPublic == true
 															&& c.EndDate > DateTime.Now
-                                                            && c.StartDate < DateTime.Now).ToList();
+                                                            && c.StartDate < DateTime.Now
+                                                            && c.IsPublic == true).ToList();
 
-				return coupons;
+                foreach (var item in coupons)
+                {
+                    if (item.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+					{
+						item.CouponProducts = context.CouponProduct.Where(x => x.CouponId == item.CouponId).ToList();
+					}
+                }
+
+                return coupons;
 			}
 		}
 

@@ -70,14 +70,13 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Message = "Success";
 				response.Status.Ok = true;
 				response.Result = coupons;
+                return Ok(response);
 
-			}
+            }
 			catch (Exception ex)
 			{
-				return BadRequest(ex.Message);
-			}
-
-			return Ok(response);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 		}
 		#endregion
 
