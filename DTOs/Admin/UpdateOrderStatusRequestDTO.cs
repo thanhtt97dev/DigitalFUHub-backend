@@ -10,6 +10,6 @@ namespace DTOs.Admin
 	{
 		public long OrderId { get; set; }	
 		public int Status { get; set; }
-		public string? Note { get; set; }	
+		public string Note { get; set; } = string.Empty;
 	}
 }

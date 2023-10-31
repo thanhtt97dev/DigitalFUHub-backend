@@ -167,7 +167,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID STATUS ORDER", false, new()));
 				}
 
-				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
+				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId, request.Note);
 
 				string title = $"{(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
 				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
@@ -340,7 +340,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Seller dispute order
+		#region Update status dispute (Seller)
 		[Authorize("Seller")]		
 		[HttpPost("Seller/Dispute")]		
 		public IActionResult UpdateDisputeOrder(SellerDisputeOrderRequestDTO request) 
@@ -355,7 +355,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Unauthorized();
 				}
-				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId);
+				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId, request.Note);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			catch (Exception e)
@@ -366,7 +366,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Seller dispute order
+		#region  Update status refund order
 		[Authorize("Seller")]
 		[HttpPost("Seller/Refund")]
 		public IActionResult UpdateRefundOrder(SellerRefundOrderRequestDTO request)

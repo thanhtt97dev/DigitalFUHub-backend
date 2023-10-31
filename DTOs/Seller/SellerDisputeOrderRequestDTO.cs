@@ -11,6 +11,7 @@ namespace DTOs.Seller
 		public long SellerId { get; set; }
 		public long CustomerId { get; set; }
 		public long OrderId { get; set; }
+		public string Note { get; set; } = string.Empty;
 	}
 	public class SellerRefundOrderRequestDTO
 	{
