@@ -12,5 +12,6 @@ namespace DTOs.Order
 		public long ShopId { get; set; }
 		public long OrderId { get; set;}
 		public int StatusId { get; set;}
+		public string Note { get; set; } = string.Empty;
 	}
 }

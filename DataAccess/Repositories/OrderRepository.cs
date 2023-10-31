@@ -29,15 +29,15 @@ namespace DataAccess.Repositories
 
 		public void UpdateOrderStatusAdmin(long orderId, int status, string? note) => OrderDAO.Instance.UpdateOrderStatusAdmin(orderId, status, note);
 
-		public void UpdateOrderStatusSellerViolates(long orderId, string? note) => OrderDAO.Instance.UpdateOrderStatusSellerViolates(orderId, note);
+		public void UpdateOrderStatusSellerViolates(long orderId, string note) => OrderDAO.Instance.UpdateOrderStatusSellerViolates(orderId, note);
 
-		public void UpdateOrderStatusRejectComplaint(long orderId, string? note) => OrderDAO.Instance.UpdateOrderStatusRejectComplaint(orderId, note);
+		public void UpdateOrderStatusRejectComplaint(long orderId, string note) => OrderDAO.Instance.UpdateOrderStatusRejectComplaint(orderId, note);
 
 		public Order? GetOrderForCheckingExisted(long orderId) => OrderDAO.Instance.GetOrderForCheckingExisted(orderId);
 
 		public List<Order> GetAllOrderByUser(long userId, List<long> statusId, int limit, int offset) => OrderDAO.Instance.GetAllOrderByUser(userId, statusId, limit, offset);
 
-		public void UpdateOrderStatusCustomer(long orderId, long shopId, int status) => OrderDAO.Instance.UpdateOrderStatusCustomer(orderId, shopId, status);
+		public void UpdateOrderStatusCustomer(long orderId, long shopId, int status, string note) => OrderDAO.Instance.UpdateOrderStatusCustomer(orderId, shopId, status, note);
 
 		public Order? GetOrderCustomer(long orderId, long customerId, long shopId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId, shopId);
 
@@ -46,8 +46,8 @@ namespace DataAccess.Repositories
 		public List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
 
-		public void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId)
-		=> OrderDAO.Instance.UpdateStatusOrderDispute(sellerId, customerId, orderId);
+		public void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId, string note)
+		=> OrderDAO.Instance.UpdateStatusOrderDispute(sellerId, customerId, orderId, note);
 
 		public void UpdateStatusOrderRefund(long sellerId, long orderId, string note)
 		=> OrderDAO.Instance.UpdateStatusOrderRefund(sellerId, orderId, note);

@@ -707,7 +707,7 @@ namespace DataAccess.DAOs
 		}
 
 		#region Update order status (Seller violate)
-		internal void UpdateOrderStatusSellerViolates(long orderId, string? note)
+		internal void UpdateOrderStatusSellerViolates(long orderId, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -769,6 +769,7 @@ namespace DataAccess.DAOs
 						OrderId = order.OrderId,
 						OrderStatusId = Constants.ORDER_STATUS_SELLER_VIOLATES,
 						DateCreate = DateTime.Now,
+						Note = note
 					};
 					context.HistoryOrderStatus.Add(historyOrderStatus);
 					context.SaveChanges();
@@ -785,7 +786,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Update order status (RejectComplaint)
-		internal void UpdateOrderStatusRejectComplaint(long orderId, string? note)
+		internal void UpdateOrderStatusRejectComplaint(long orderId, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -847,6 +848,7 @@ namespace DataAccess.DAOs
 						OrderId = order.OrderId,
 						OrderStatusId = Constants.ORDER_STATUS_REJECT_COMPLAINT,
 						DateCreate = DateTime.Now,
+						Note = note
 					};
 					context.HistoryOrderStatus.Add(historyOrderStatus);
 					context.SaveChanges();
@@ -914,7 +916,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Update order status for customer
-		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)
+		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -979,6 +981,7 @@ namespace DataAccess.DAOs
 								OrderId = order.OrderId,
 								OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
 								DateCreate = DateTime.Now,
+								Note = note
 							};
 							context.HistoryOrderStatus.Add(historyOrderStatus);
 							context.SaveChanges();
@@ -1052,7 +1055,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId)
+		internal void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -1101,6 +1104,16 @@ namespace DataAccess.DAOs
 							}
 						};
 						context.Conversations.Add(conversation);
+
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
+							DateCreate = DateTime.Now,
+							Note = note
+						};
+
 						context.SaveChanges();
 						transaction.Commit();
 					}
@@ -1128,11 +1141,28 @@ namespace DataAccess.DAOs
 						order.OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED;
 						order.Note = note;
 
-						User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-						admin.AccountBalance -= order.TotalPayment;
-
 						User customer = context.User.First(x => x.UserId == order.UserId);
-						customer.AccountBalance += order.TotalPayment;
+						if (order.TotalPayment > 0)
+						{
+							User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
+							admin.AccountBalance -= order.TotalPayment;
+
+							customer.AccountBalance += order.TotalPayment;
+						}
+
+						if(order.TotalCoinDiscount > 0)
+						{
+							customer.AccountBalance += order.TotalCoinDiscount;
+						}
+
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
+							DateCreate = DateTime.Now,
+							Note = note
+						};
 
 						context.SaveChanges();
 						transaction.Commit();
