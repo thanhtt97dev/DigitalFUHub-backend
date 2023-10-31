@@ -126,6 +126,18 @@ namespace BusinessObject
 				.WithMany(c => c.CouponProducts)
 				.HasForeignKey(x => x.ProductId)
 				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<HistoryOrderStatus>()
+				.HasKey(x => new { x.OrderId, x.OrderStatusId });
+			modelBuilder.Entity<HistoryOrderStatus>()
+				.HasOne(x => x.Order)
+				.WithMany(c => c.HistoryOrderStatus)
+				.HasForeignKey(x => x.OrderId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<HistoryOrderStatus>()
+				.HasOne(x => x.OrderStatus)
+				.WithMany(c => c.HistoryOrderStatus)
+				.HasForeignKey(x => x.OrderStatusId)
+				.OnDelete(DeleteBehavior.NoAction);
 
 
 			modelBuilder.Entity<Role>().HasData(new Role[]
