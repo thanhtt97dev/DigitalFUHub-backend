@@ -115,7 +115,7 @@ namespace BusinessObject
 				.HasForeignKey(x => x.UserBankId)
 				.OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<CouponProduct>()
-			.HasKey(x => new { x.CouponId, x.ProductId });
+				.HasKey(x => new { x.CouponId, x.ProductId });
 			modelBuilder.Entity<CouponProduct>()
 				.HasOne(x => x.Coupon)
 				.WithMany(c => c.CouponProducts)
