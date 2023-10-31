@@ -39,7 +39,7 @@ namespace DataAccess.DAOs
 					DateTime timeAccept = DateTime.Now.AddDays(-days);
 					var orders = context.Order
 						.Where(x =>
-							x.OrderStatusId == Constants.ORDER_WAIT_CONFIRMATION &&
+							x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
 							x.OrderDate < timeAccept
 						)
 						.ToList();
@@ -48,7 +48,7 @@ namespace DataAccess.DAOs
 					foreach (var order in orders)
 					{
 						// update order status
-						order.OrderStatusId = Constants.ORDER_CONFIRMED;
+						order.OrderStatusId = Constants.ORDER_STATUS_CONFIRMED;
 
 						//get platform fee
 						var fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
@@ -98,6 +98,15 @@ namespace DataAccess.DAOs
 							};
 							context.TransactionInternal.Add(transactionAdmin);
 						}
+
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
+							DateCreate = DateTime.Now,
+						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
 					}
 					context.Order.UpdateRange(orders);
 					context.SaveChanges();
@@ -130,7 +139,7 @@ namespace DataAccess.DAOs
 					foreach (var order in orders)
 					{
 						//update order status
-						order.OrderStatusId = Constants.ORDER_SELLER_REFUNDED;
+						order.OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED;
 
 						var customerId = order.UserId;
 						var customer = context.User.First(x => x.UserId == customerId);
@@ -167,6 +176,15 @@ namespace DataAccess.DAOs
 							};
 							context.TransactionCoin.Add(transactionCoin);
 						}
+
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED,
+							DateCreate = DateTime.Now,
+						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
 					}
 					context.Order.UpdateRange(orders);
 					context.SaveChanges();
@@ -309,7 +327,7 @@ namespace DataAccess.DAOs
 							UserId = userId,
 							ShopId = shopProduct.ShopId,
 							BusinessFeeId = businessFeeId,
-							OrderStatusId = Constants.ORDER_WAIT_CONFIRMATION,
+							OrderStatusId = Constants.ORDER_STATUS_WAIT_CONFIRMATION,
 							OrderDate = DateTime.Now
 						};
 						context.Order.Add(order);
@@ -525,6 +543,17 @@ namespace DataAccess.DAOs
 							context.TransactionInternal.Add(newTransaction);
 							context.SaveChanges();
 						}
+
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_STATUS_WAIT_CONFIRMATION,
+							DateCreate = order.OrderDate,
+						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
+						context.SaveChanges();
+
 						orderResult = order;
 					}
 					transaction.Commit();
@@ -676,7 +705,7 @@ namespace DataAccess.DAOs
 				try
 				{
 					var order = context.Order.First(x => x.OrderId == orderId);
-					order.OrderStatusId = Constants.ORDER_SELLER_VIOLATES;
+					order.OrderStatusId = Constants.ORDER_STATUS_SELLER_VIOLATES;
 					order.Note = note;
 					context.SaveChanges();
 
@@ -723,7 +752,17 @@ namespace DataAccess.DAOs
 						context.TransactionCoin.Add(transactionCoin);
 						context.SaveChanges();
 					}
+
+					// add history order status
+					HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+					{
+						OrderId = order.OrderId,
+						OrderStatusId = Constants.ORDER_STATUS_SELLER_VIOLATES,
+						DateCreate = DateTime.Now,
+					};
+					context.HistoryOrderStatus.Add(historyOrderStatus);
 					context.SaveChanges();
+
 					transaction.Commit();
 				}
 				catch (Exception ex)
@@ -746,7 +785,7 @@ namespace DataAccess.DAOs
 					var order = context.Order
 									.Include(x => x.BusinessFee)
 									.First(x => x.OrderId == orderId);
-					order.OrderStatusId = Constants.ORDER_REJECT_COMPLAINT;
+					order.OrderStatusId = Constants.ORDER_STATUS_REJECT_COMPLAINT;
 					order.Note = note;
 					context.Order.Update(order);
 
@@ -792,7 +831,16 @@ namespace DataAccess.DAOs
 						};
 						context.TransactionInternal.Add(transactionInternalAdmin);
 					}
+					// add history order status
+					HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+					{
+						OrderId = order.OrderId,
+						OrderStatusId = Constants.ORDER_STATUS_REJECT_COMPLAINT,
+						DateCreate = DateTime.Now,
+					};
+					context.HistoryOrderStatus.Add(historyOrderStatus);
 					context.SaveChanges();
+
 					transaction.Commit();
 				}
 				catch (Exception ex)
@@ -867,7 +915,7 @@ namespace DataAccess.DAOs
 						// update order status
 						Order order = context.Order.First(x => x.OrderId == orderId);
 						order.OrderStatusId = status;
-						if (status == Constants.ORDER_CONFIRMED)
+						if (status == Constants.ORDER_STATUS_CONFIRMED)
 						{
 							long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
 							var businessFee = order.TotalAmount * fee / 100;
@@ -915,6 +963,17 @@ namespace DataAccess.DAOs
 								context.TransactionInternal.AddRange(transactionInternals);
 							}
 
+							// add history order status
+							HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+							{
+								OrderId = order.OrderId,
+								OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
+								DateCreate = DateTime.Now,
+							};
+							context.HistoryOrderStatus.Add(historyOrderStatus);
+							context.SaveChanges();
+
+
 						}
 						context.SaveChanges();
 						transaction.Commit();
@@ -943,7 +1002,7 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId && x.ShopId == shopId
-					&& x.OrderStatusId != Constants.ORDER_CONFIRMED);
+					&& x.OrderStatusId != Constants.ORDER_STATUS_CONFIRMED);
 			}
 		}
 
@@ -1055,7 +1114,7 @@ namespace DataAccess.DAOs
 						if (order == null) throw new Exception("Not found");
 						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
 
-						order.OrderStatusId = Constants.ORDER_SELLER_REFUNDED;
+						order.OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED;
 						order.Note = note;
 
 						User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
