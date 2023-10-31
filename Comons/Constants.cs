@@ -27,7 +27,12 @@
 		public const string RESPONSE_CODE_BANK_WITHDRAW_REJECT = "BANK_03";
 		public const string RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND = "BANK_04";
 
-		public const string RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY = "ORDER_01";
+        public const string RESPONSE_CODE_PRODUCT_ACTIVE = "PRODUCT_01";
+        public const string RESPONSE_CODE_PRODUCT_BAN = "PRODUCT_02";
+        public const string RESPONSE_CODE_PRODUCT_REMOVE = "PRODUCT_03";
+        public const string RESPONSE_CODE_PRODUCT_HIDE = "PRODUCT_04";
+
+        public const string RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY = "ORDER_01";
 		public const string RESPONSE_CODE_ORDER_COUPON_USED = "ORDER_02";
 		public const string RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE = "ORDER_03";
 		public const string RESPONSE_CODE_ORDER_NOT_ELIGIBLE = "ORDER_04";
