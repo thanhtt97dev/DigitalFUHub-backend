@@ -207,6 +207,7 @@ namespace DigitalFUHubApi.Controllers
 					OrderDate = order.OrderDate,
 					ShopId = order.ShopId,
 					ShopName = order.Shop.ShopName,
+					ConversationId = order.ConversationId ?? 0,
 					StatusId = order.OrderStatusId,
 					TotalAmount = order.TotalAmount,
 					TotalCoinDiscount = order.TotalCoinDiscount,
@@ -362,7 +363,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Seller refund order
+		#region Seller dispute order
 		[Authorize("Seller")]
 		[HttpPost("Seller/Refund")]
 		public IActionResult UpdateRefundOrder(SellerRefundOrderRequestDTO request)
