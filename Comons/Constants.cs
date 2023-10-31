@@ -27,7 +27,12 @@
 		public const string RESPONSE_CODE_BANK_WITHDRAW_REJECT = "BANK_03";
 		public const string RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND = "BANK_04";
 
-		public const string RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY = "ORDER_01";
+        public const string RESPONSE_CODE_PRODUCT_ACTIVE = "PRODUCT_01";
+        public const string RESPONSE_CODE_PRODUCT_BAN = "PRODUCT_02";
+        public const string RESPONSE_CODE_PRODUCT_REMOVE = "PRODUCT_03";
+        public const string RESPONSE_CODE_PRODUCT_HIDE = "PRODUCT_04";
+
+        public const string RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY = "ORDER_01";
 		public const string RESPONSE_CODE_ORDER_COUPON_USED = "ORDER_02";
 		public const string RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE = "ORDER_03";
 		public const string RESPONSE_CODE_ORDER_NOT_ELIGIBLE = "ORDER_04";
@@ -83,14 +88,14 @@
 		public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
 		public const int NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER = NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER + 3;
 		public const int ORDER_ALL = 0;
-		public const int ORDER_WAIT_CONFIRMATION = 1;
-		public const int ORDER_CONFIRMED = 2;
+		public const int ORDER_STATUS_WAIT_CONFIRMATION = 1;
+		public const int ORDER_STATUS_CONFIRMED = 2;
 		public const int ORDER_COMPLAINT = 3;
-		public const int ORDER_SELLER_REFUNDED = 4;
+		public const int ORDER_STATUS_SELLER_REFUNDED = 4;
 		public const int ORDER_DISPUTE = 5;
-		public const int ORDER_REJECT_COMPLAINT = 6;
-		public const int ORDER_SELLER_VIOLATES = 7;
-		public static int[] ORDER_STATUS = new int[] { ORDER_WAIT_CONFIRMATION, ORDER_CONFIRMED, ORDER_COMPLAINT, ORDER_SELLER_REFUNDED, ORDER_DISPUTE, ORDER_REJECT_COMPLAINT, ORDER_SELLER_VIOLATES };
+		public const int ORDER_STATUS_REJECT_COMPLAINT = 6;
+		public const int ORDER_STATUS_SELLER_VIOLATES = 7;
+		public static int[] ORDER_STATUS = new int[] { ORDER_STATUS_WAIT_CONFIRMATION, ORDER_STATUS_CONFIRMED, ORDER_COMPLAINT, ORDER_STATUS_SELLER_REFUNDED, ORDER_DISPUTE, ORDER_STATUS_REJECT_COMPLAINT, ORDER_STATUS_SELLER_VIOLATES };
 
 		//Transaction internal Type
 		public const int TRANSACTION_TYPE_INTERNAL_PAYMENT = 1;
@@ -112,9 +117,15 @@
 		public const int USER_CONVERSATION_TYPE_UN_READ = 2;
 		public const int USER_CONVERSATION_TYPE_IS_READ = 3;
 
+		//Coupon Type
+		public const int COUPON_TYPE_ALL_PRODUCTS = 1; //admin
+		public const int COUPON_TYPE_ALL_PRODUCTS_OF_SHOP = 2;
+		public const int COUPON_TYPE_SPECIFIC_PRODUCTS = 3; 
+
 		//Feedback
 		public const int NUMBER_DAYS_CAN_MAKE_FEEDBACK = 7;
 
+		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 	}
 }

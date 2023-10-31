@@ -45,10 +45,12 @@ namespace BusinessObject
 		public virtual DbSet<FeedbackMedia> FeedbackMedia { get; set; } = null!;
 		public virtual DbSet<ProductMedia> ProductMedia { get; set; } = null!;
 		public virtual DbSet<Coupon> Coupon { get; set; } = null!;
+		public virtual DbSet<CouponProduct> CouponProduct { get; set; } = null!;
 		public virtual DbSet<Order> Order { get; set; } = null!;
 		public virtual DbSet<OrderDetail> OrderDetail { get; set; } = null!;
 		public virtual DbSet<OrderStatus> OrderStatus { get; set; } = null!;
 		public virtual DbSet<OrderCoupon> OrderCoupon { get; set; } = null!;
+		public virtual DbSet<HistoryOrderStatus> HistoryOrderStatus { get; set; } = null!;
 		public virtual DbSet<Category> Category { get; set; } = null!;
 		public virtual DbSet<Cart> Cart { get; set; } = null!;
 		public virtual DbSet<CartDetail> CartDetail { get; set; } = null!;
@@ -114,6 +116,31 @@ namespace BusinessObject
 				.WithMany(x => x.WithdrawTransactions)
 				.HasForeignKey(x => x.UserBankId)
 				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<CouponProduct>()
+				.HasKey(x => new { x.CouponId, x.ProductId });
+			modelBuilder.Entity<CouponProduct>()
+				.HasOne(x => x.Coupon)
+				.WithMany(c => c.CouponProducts)
+				.HasForeignKey(x => x.CouponId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<CouponProduct>()
+				.HasOne(x => x.Product)
+				.WithMany(c => c.CouponProducts)
+				.HasForeignKey(x => x.ProductId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<HistoryOrderStatus>()
+				.HasKey(x => new { x.OrderId, x.OrderStatusId });
+			modelBuilder.Entity<HistoryOrderStatus>()
+				.HasOne(x => x.Order)
+				.WithMany(c => c.HistoryOrderStatus)
+				.HasForeignKey(x => x.OrderId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<HistoryOrderStatus>()
+				.HasOne(x => x.OrderStatus)
+				.WithMany(c => c.HistoryOrderStatus)
+				.HasForeignKey(x => x.OrderStatusId)
+				.OnDelete(DeleteBehavior.NoAction);
+
 
 			modelBuilder.Entity<Role>().HasData(new Role[]
 			{
@@ -171,6 +198,12 @@ namespace BusinessObject
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 1, Name = "In processing"},
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 2, Name = "Paid"},
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 3, Name = "Reject"},
+			});
+			modelBuilder.Entity<CouponType>().HasData(new CouponType[]
+			{
+				new CouponType{CouponTypeId = 1, Name = "For all products (Admin)"},
+				new CouponType{CouponTypeId = 2, Name = "For all shop's product"},
+				new CouponType{CouponTypeId = 3, Name = "For specific products"},
 			});
 
 			modelBuilder.Entity<User>().HasData(new User[]

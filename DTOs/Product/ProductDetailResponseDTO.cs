@@ -17,12 +17,11 @@ namespace DTOs.Product
         public string? Thumbnail { get; set; }
         public string? Description { get; set; }
         public int Discount { get; set; }
-        public string ShopName { get; set; } = null!;
 		public long CategoryId { get; set; }
         public long Quantity { get; set; } = 0;
+        public List<string>? ProductMedias { get; set; }
         public ProductDetailShopResponseDTO Shop { get; set; } = null!;
         public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }
-        public List<string>? ProductMedias { get; set; }
         public List<TagResponseDTO>? Tags { get; set; }
     }
 

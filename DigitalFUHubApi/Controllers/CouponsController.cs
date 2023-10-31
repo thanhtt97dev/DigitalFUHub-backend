@@ -221,7 +221,8 @@ namespace DigitalFUHubApi.Controllers
 					PriceDiscount = request.PriceDiscount,
 					MinTotalOrderValue = request.MinTotalOrderValue,
 					Quantity = request.Quantity,
-					ShopId = request.UserId
+					ShopId = request.UserId,
+					CouponTypeId = Constants.COUPON_TYPE_ALL_PRODUCTS
 				};
 				_couponRepository.AddCoupon(coupon);
 

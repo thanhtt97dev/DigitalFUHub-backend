@@ -14,6 +14,7 @@ namespace BusinessObject.Entities
 		public long OrderStatusId { get; set; }
 		public string? Name { get; set; }
 
-		public virtual ICollection<Order>? Orders { get; set; } 
+		public virtual ICollection<Order>? Orders { get; set; }
+		public virtual ICollection<HistoryOrderStatus>? HistoryOrderStatus { get; set; }
 	}
 }

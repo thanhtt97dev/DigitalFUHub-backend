@@ -140,6 +140,9 @@ namespace DataAccess.DAOs
                                                                                        Thumbnail = product.Thumbnail,
                                                                                        ProductStatusId = product.ProductStatusId,
 																				   }).First(),
+                                                                         AssetInformations = context.AssetInformation
+                                                                                               .Select(x => new AssetInformation { })
+                                                                                               .ToList()
                                                                      }).First(),
 													Quantity = cartDetail.Quantity, 
                                                 }

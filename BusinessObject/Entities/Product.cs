@@ -23,7 +23,8 @@ namespace BusinessObject.Entities
         public string? Thumbnail { get; set; }
         public DateTime UpdateDate { get; set; }
         public long ProductStatusId { get; set; }
-
+        public long TotalRatingStar { get; set; }
+        public long NumberFeedback { get; set; }
         [ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
         [ForeignKey(nameof(CategoryId))]
@@ -34,5 +35,6 @@ namespace BusinessObject.Entities
         public virtual ICollection<ProductMedia> ProductMedias { get; set; } = null!;
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<Tag>? Tags{ get; set; }
-    }
+		public virtual List<CouponProduct>? CouponProducts { get; set; }
+	}
 }

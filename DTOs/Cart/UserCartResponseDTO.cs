@@ -27,5 +27,6 @@ namespace DTOs.Cart
 		public string? ProductThumbnail { get; set; }
 		public bool ProductActivate { get; set; }
 		public int Quantity { get; set; }
+		public int QuantityProductRemaining { get; set; }
 	}
 }

@@ -162,15 +162,15 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 				}
-				else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_CONFIRMED)
+				else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_STATUS_CONFIRMED)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID STATUS ORDER", false, new()));
 				}
 
 				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
 
-				string title = $"{(request.StatusId == Constants.ORDER_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
-				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
+				string title = $"{(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
+				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
 				string link = Constants.FRONT_END_HISTORY_ORDER_URL + request.OrderId;
 				await _hubService.SendNotification(request.UserId, title, content, link);
 			}
@@ -207,6 +207,7 @@ namespace DigitalFUHubApi.Controllers
 					OrderDate = order.OrderDate,
 					ShopId = order.ShopId,
 					ShopName = order.Shop.ShopName,
+					ConversationId = order.ConversationId ?? 0,
 					StatusId = order.OrderStatusId,
 					TotalAmount = order.TotalAmount,
 					TotalCoinDiscount = order.TotalCoinDiscount,
@@ -506,7 +507,7 @@ namespace DigitalFUHubApi.Controllers
 
 			try
 			{
-				int[] statusAccepted = { Constants.ORDER_DISPUTE, Constants.ORDER_REJECT_COMPLAINT, Constants.ORDER_SELLER_VIOLATES };
+				int[] statusAccepted = { Constants.ORDER_DISPUTE, Constants.ORDER_STATUS_REJECT_COMPLAINT, Constants.ORDER_STATUS_SELLER_VIOLATES };
 				if (!statusAccepted.Contains(requestDTO.Status))
 				{
 					status.Message = "Invalid order status!";
@@ -526,11 +527,11 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				if (requestDTO.Status == Constants.ORDER_REJECT_COMPLAINT)
+				if (requestDTO.Status == Constants.ORDER_STATUS_REJECT_COMPLAINT)
 				{
 					_orderRepository.UpdateOrderStatusRejectComplaint(requestDTO.OrderId, requestDTO.Note);
 				}
-				else if (requestDTO.Status == Constants.ORDER_SELLER_VIOLATES)
+				else if (requestDTO.Status == Constants.ORDER_STATUS_SELLER_VIOLATES)
 				{
 					_orderRepository.UpdateOrderStatusSellerViolates(requestDTO.OrderId, requestDTO.Note);
 				}

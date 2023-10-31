@@ -42,30 +42,79 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 		}
 
-		[HttpGet("GetById/{productId}")]
+        #region Get Product Detail
+        [HttpGet("GetById/{productId}")]
 		public IActionResult GetById(long productId)
 		{
-			try
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
+            try
 			{
-				if (productId == 0)
-				{
-					return BadRequest(new Status());
-				}
+				if (productId == 0) {
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					status.Message = "Invalid";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+                }
+				
+                (var product, long productStatusId) = _productRepository.GetProductById(productId);
 
-				var product = _productRepository.GetProductById(productId);
-				if (product == null)
+				if (product == null) {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "Product not found!";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+				// check product status
+				if (productStatusId == Constants.PRODUCT_BAN)
 				{
-					return NotFound(new Status());
-				}
-				return Ok(product);
-			}
+                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_BAN;
+                    status.Message = "This product has been banned";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    responseData.Result = product;
+                    return Ok(responseData);
+                }
+
+                if (productStatusId == Constants.PRODUCT_REMOVE)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_REMOVE;
+                    status.Message = "This product has been remove";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                if (productStatusId == Constants.PRODUCT_HIDE)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_HIDE;
+                    status.Message = "This product has been hide";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    responseData.Result = product;
+                    return Ok(responseData);
+                }
+
+                status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_ACTIVE;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
+                responseData.Result = product;
+                return Ok(responseData);
+
+            }
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#region Get All Product with shopId (userId)
-		[Authorize("Seller")]
+        #endregion
+
+        #region Get All Product with shopId (userId)
+        [Authorize("Seller")]
 		[HttpGet("Seller/{userId}/All")]
 		public IActionResult GetAllProductSeller(long userId)
 		{
@@ -208,6 +257,8 @@ namespace DigitalFUHubApi.Controllers
 					ProductMedias = productMedias,
 					ProductStatusId = Constants.PRODUCT_ACTIVE,
 					UpdateDate = DateTime.Now,
+					TotalRatingStar = 0,
+					NumberFeedback = 0,
 				};
 
 				_productRepository.AddProduct(product);
