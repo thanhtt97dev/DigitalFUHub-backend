@@ -114,6 +114,19 @@ namespace BusinessObject
 				.WithMany(x => x.WithdrawTransactions)
 				.HasForeignKey(x => x.UserBankId)
 				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<CouponProduct>()
+			.HasKey(x => new { x.CouponId, x.ProductId });
+			modelBuilder.Entity<CouponProduct>()
+				.HasOne(x => x.Coupon)
+				.WithMany(c => c.CouponProducts)
+				.HasForeignKey(x => x.CouponId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<CouponProduct>()
+				.HasOne(x => x.Product)
+				.WithMany(c => c.CouponProducts)
+				.HasForeignKey(x => x.ProductId)
+				.OnDelete(DeleteBehavior.NoAction);
+
 
 			modelBuilder.Entity<Role>().HasData(new Role[]
 			{
