@@ -12,6 +12,7 @@ namespace DTOs.Admin
 		public string? ShopName { get; set; }
 		public long BusinessFeeId { get; set; }
 		public long BusinessFeeValue { get; set; }
+		public long ConversationId { get; set; }
 		public long OrderStatusId { get; set; }
 		public DateTime OrderDate { get; set; }
 		public string? Note { get; set; }
