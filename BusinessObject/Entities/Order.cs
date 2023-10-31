@@ -39,5 +39,6 @@ namespace BusinessObject.Entities
 		public virtual ICollection<OrderDetail> OrderDetails { get; set; } = null!;
 		public virtual ICollection<TransactionCoin>? TransactionCoins { get; set; }
 		public virtual ICollection<TransactionInternal>? TransactionInternals { get; set; }
+		public virtual ICollection<HistoryOrderStatus>? HistoryOrderStatus { get; set; }
 	}
 }

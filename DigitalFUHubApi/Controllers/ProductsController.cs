@@ -257,6 +257,8 @@ namespace DigitalFUHubApi.Controllers
 					ProductMedias = productMedias,
 					ProductStatusId = Constants.PRODUCT_ACTIVE,
 					UpdateDate = DateTime.Now,
+					TotalRatingStar = 0,
+					NumberFeedback = 0,
 				};
 
 				_productRepository.AddProduct(product);

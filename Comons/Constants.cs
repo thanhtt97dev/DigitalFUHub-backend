@@ -117,9 +117,15 @@
 		public const int USER_CONVERSATION_TYPE_UN_READ = 2;
 		public const int USER_CONVERSATION_TYPE_IS_READ = 3;
 
+		//Coupon Type
+		public const int COUPON_TYPE_ALL_PRODUCTS = 1; //admin
+		public const int COUPON_TYPE_FOR_ALL_PRODUCTS_OF_SHOP = 2;
+		public const int COUPON_TYPE_SPECIFIC_PRODUCTS = 3; 
+
 		//Feedback
 		public const int NUMBER_DAYS_CAN_MAKE_FEEDBACK = 7;
 
+		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 	}
 }

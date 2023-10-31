@@ -14,7 +14,8 @@ namespace BusinessObject.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long CouponId { get; set; }
         public long ShopId { get; set; }
-        public string CouponCode { get; set; } = string.Empty;
+        public long CouponTypeId { get; set; }  
+		public string CouponCode { get; set; } = string.Empty;
 		public string? CouponName { get; set; }
         public long PriceDiscount { get; set; }
         public long Quantity { get; set; }
@@ -26,6 +27,9 @@ namespace BusinessObject.Entities
 
 		[ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
-        public virtual List<OrderCoupon>? OrderCoupons { get; set; }
+		[ForeignKey(nameof(CouponTypeId))]
+		public virtual CouponType CouponType { get; set; } = null!;
+		public virtual List<OrderCoupon>? OrderCoupons { get; set; }
+		public virtual List<CouponProduct>? CouponProducts { get; set; }
 	}
 }
