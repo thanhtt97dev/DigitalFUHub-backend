@@ -1009,20 +1009,17 @@ namespace DataAccess.DAOs
 							{
 								context.TransactionInternal.AddRange(transactionInternals);
 							}
-
-							// add history order status
-							HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
-							{
-								OrderId = order.OrderId,
-								OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
-								DateCreate = DateTime.Now,
-								Note = note
-							};
-							context.HistoryOrderStatus.Add(historyOrderStatus);
-							context.SaveChanges();
-
-
 						}
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
+							DateCreate = DateTime.Now,
+							Note = note
+						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
+
 						context.SaveChanges();
 						transaction.Commit();
 					}
@@ -1144,10 +1141,11 @@ namespace DataAccess.DAOs
 						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
 						{
 							OrderId = order.OrderId,
-							OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
+							OrderStatusId = Constants.ORDER_DISPUTE,
 							DateCreate = DateTime.Now,
 							Note = note
 						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
 
 						context.SaveChanges();
 						transaction.Commit();
