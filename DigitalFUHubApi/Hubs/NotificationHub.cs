@@ -47,9 +47,10 @@ namespace DigitalFUHubApi.Hubs
 		private async Task SendAllNotificationToUserCaller()
 		{
 			var userId = hubService.GetUserIdFromHubCaller(Context);
-			if (userId == 0) return;
+            var visibleNotifications = hubService.GetVisibleNotificationsFromHubCaller(Context);
+            if (userId == 0) return;
 
-			var notifications = notificationRepositiory.GetNotifications(userId);
+			var notifications = notificationRepositiory.GetNotifications(userId, visibleNotifications);
 			await Clients.Caller.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION,
 						JsonConvert.SerializeObject(mapper.Map<List<NotificationRespone>>(notifications)));
 		}

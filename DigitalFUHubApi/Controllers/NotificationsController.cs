@@ -12,6 +12,9 @@ using DTOs.Notification;
 using Comons;
 using DataAccess.Repositories;
 using DTOs.User;
+using System.Collections.Generic;
+using DTOs.Order;
+using DigitalFUHubApi.Services;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -91,6 +94,53 @@ namespace DigitalFUHubApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+		# endregion
+
+        #region Edit read all notifications
+        [Authorize]
+        [HttpPut("editReadAllNotifications/{id}")]
+        public IActionResult EditReadAllNotifications(int id)
+        {
+            try
+            {
+                _notificationRepositiory.EditReadAllNotifications(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+        #region Fetch More Notifications
+        [Authorize]
+        [HttpPost("fetchMoreNotifications")]
+        public IActionResult FetchMoreNotifications([FromBody] GetAllOrderRequestDTO request)
+        {
+            try
+			{
+				var notifications = _notificationRepositiory.GetNotifications(request.UserId, request.Offset);
+                List<NotificationRespone> responseData = new List<NotificationRespone>();
+				foreach (var notification in notifications)
+				{
+                    NotificationRespone notif = new NotificationRespone();
+					notif.NotificationId = notification.NotificationId;
+					notif.Title = notification.Title;
+					notif.Content = notification.Content;
+					notif.Link = notification.Link;
+					notif.DateCreated = notification.DateCreated;
+					notif.IsReaded = notification.IsReaded;
+					responseData.Add(notif);
+
+                }
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(responseData))));
+            }
+			catch (Exception e)
+			{
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
         #endregion
