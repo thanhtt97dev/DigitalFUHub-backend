@@ -29,13 +29,13 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Notification> GetNotifications(int userId)
+		internal List<Notification> GetNotifications(long userId, int offset)
 		{
 			List<Notification> notifications = new List<Notification>();	
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				notifications = context.Notification.Where(x => x.UserId == userId)
-					.OrderByDescending(x => x.DateCreated).ToList();
+					.OrderByDescending(x => x.DateCreated).Skip(offset).Take(5).ToList();
 			}
 			return notifications;	
 		}
@@ -65,6 +65,19 @@ namespace DataAccess.DAOs
             {
                 var notification = context.Notification.First(x => x.NotificationId == notificationId);
 				notification.IsReaded = true;
+                context.SaveChanges();
+            }
+        }
+
+        internal void EditReadAllNotifications(int userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var notifications = context.Notification.Where(x => x.UserId == userId).ToList();
+                foreach (var notification in notifications)
+				{
+					notification.IsReaded = true;
+				}
                 context.SaveChanges();
             }
         }

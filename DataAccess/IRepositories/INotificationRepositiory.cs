@@ -9,12 +9,14 @@ namespace DataAccess.IRepositories
 {
     public interface INotificationRepositiory
 	{
-		List<Notification> GetNotifications(int userId);
+		List<Notification> GetNotifications(long userId, int offset);
 
         Notification GetNotificationById(int notificationId);
 
         void AddNotification(Notification notification);
 
         void EditNotificationIsReaded(int notificationId);
+
+        void EditReadAllNotifications(int userId); 
     }
 }
