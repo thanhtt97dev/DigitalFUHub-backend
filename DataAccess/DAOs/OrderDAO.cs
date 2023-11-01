@@ -241,7 +241,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Add order
-		internal (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> ordersInfo, bool isUseCoin)
+		internal (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> shopProducts, bool isUseCoin)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -252,7 +252,7 @@ namespace DataAccess.DAOs
 					Order orderResult = new Order();
 
 					#region Check customer by with quantity < 0
-					if (ordersInfo.Any(x => x.Products.Any(p => p.Quantity <= 0)))
+					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0)))
 					{
 						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", numberQuantityAvailable, orderResult);
 					}
@@ -274,10 +274,10 @@ namespace DataAccess.DAOs
 					#endregion
 
 					#region Make order
-					foreach (var orderDetailInfo in ordersInfo)
+					foreach (var shopProduct in shopProducts)
 					{
 						#region Check ProductVariant existed
-						var productVariantIds = orderDetailInfo.Products.Select(x => x.ProductVariantId).ToList();
+						var productVariantIds = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
 						var productVariants = context.ProductVariant
 							.Include(x => x.Product)
 							.Where(x => productVariantIds.Contains(x.ProductVariantId) &&
@@ -295,7 +295,7 @@ namespace DataAccess.DAOs
 						#endregion
 
 						#region Check shop existed
-						var shop = context.Shop.FirstOrDefault(x => x.UserId == orderDetailInfo.ShopId && x.IsActive);
+						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId && x.IsActive);
 						if (shop == null)
 						{
 							transaction.Rollback();
@@ -305,7 +305,7 @@ namespace DataAccess.DAOs
 
 						#region Check all product variant order in shop
 						var isAllProductVariantInShop = productVariants
-							.All(x => x.Product.ShopId == orderDetailInfo.ShopId);
+							.All(x => x.Product.ShopId == shopProduct.ShopId);
 
 						if (!isAllProductVariantInShop)
 						{
@@ -338,7 +338,7 @@ namespace DataAccess.DAOs
 						Order order = new Order()
 						{
 							UserId = userId,
-							ShopId = orderDetailInfo.ShopId,
+							ShopId = shopProduct.ShopId,
 							BusinessFeeId = businessFeeId,
 							OrderStatusId = Constants.ORDER_STATUS_WAIT_CONFIRMATION,
 							OrderDate = DateTime.Now
@@ -349,7 +349,7 @@ namespace DataAccess.DAOs
 
 						#region Create list order detail
 						List<OrderDetail> orderDetails = new List<OrderDetail>();
-						foreach (var item in orderDetailInfo.Products)
+						foreach (var item in shopProduct.Products)
 						{
 							// check quantity
 							var assetInformationRemaining = context.AssetInformation
@@ -427,11 +427,11 @@ namespace DataAccess.DAOs
 						long totalPayment = 0;
 
 						#region Check coupon
-						if (!string.IsNullOrEmpty(orderDetailInfo.Coupon))
+						if (!string.IsNullOrEmpty(shopProduct.Coupon))
 						{
 							var coupon = (from c in context.Coupon
 										  where
-										  orderDetailInfo.Coupon == c.CouponCode &&
+										  shopProduct.Coupon == c.CouponCode &&
 										  c.StartDate < DateTime.Now && c.EndDate > DateTime.Now &&
 										  c.IsActive && c.Quantity > 0
 										  select c).FirstOrDefault();
@@ -447,7 +447,7 @@ namespace DataAccess.DAOs
 							}
 							else if (coupon.CouponTypeId == Constants.COUPON_TYPE_ALL_PRODUCTS_OF_SHOP)
 							{
-								var couponOfShopExisted = context.Coupon.Any(x => x.ShopId == orderDetailInfo.ShopId && x.CouponId == coupon.CouponId);
+								var couponOfShopExisted = context.Coupon.Any(x => x.ShopId == shopProduct.ShopId && x.CouponId == coupon.CouponId);
 								if (!couponOfShopExisted)
 								{
 									return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
