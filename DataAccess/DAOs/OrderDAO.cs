@@ -1198,10 +1198,11 @@ namespace DataAccess.DAOs
 						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
 						{
 							OrderId = order.OrderId,
-							OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
+							OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED,
 							DateCreate = DateTime.Now,
 							Note = note
 						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
 
 						context.SaveChanges();
 						transaction.Commit();
