@@ -35,6 +35,7 @@ namespace BusinessObject
 		public virtual DbSet<Message> Messages { get; set; } = null!;
 		public virtual DbSet<Bank> Bank { get; set; } = null!;
 		public virtual DbSet<UserBank> UserBank { get; set; } = null!;
+		public virtual DbSet<WishList> WishList { get; set; } = null!;
 		public virtual DbSet<Product> Product { get; set; } = null!;
 		public virtual DbSet<ProductVariant> ProductVariant { get; set; } = null!;
 		public virtual DbSet<ProductStatus> ProductStatus { get; set; } = null!;
@@ -139,6 +140,18 @@ namespace BusinessObject
 				.HasOne(x => x.OrderStatus)
 				.WithMany(c => c.HistoryOrderStatus)
 				.HasForeignKey(x => x.OrderStatusId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<WishList>()
+				.HasKey(x => new { x.UsertId, x.ProductId });
+			modelBuilder.Entity<WishList>()
+				.HasOne(x => x.User)
+				.WithMany(c => c.WishList)
+				.HasForeignKey(x => x.UsertId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<WishList>()
+				.HasOne(x => x.Product)
+				.WithMany(c => c.WishList)
+				.HasForeignKey(x => x.ProductId)
 				.OnDelete(DeleteBehavior.NoAction);
 
 
