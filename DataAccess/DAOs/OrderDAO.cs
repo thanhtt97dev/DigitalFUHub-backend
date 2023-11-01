@@ -1099,7 +1099,6 @@ namespace DataAccess.DAOs
 								&& x.OrderId == orderId);
 						if (order == null) throw new Exception("Not found");
 						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
-						order.OrderStatusId = Constants.ORDER_DISPUTE;
 						Conversation conversation = new Conversation
 						{
 							ConversationName = $"Nhóm chat: Tranh chấp đơn hàng mã #{orderId}",
@@ -1110,7 +1109,7 @@ namespace DataAccess.DAOs
 							{
 								new Message
 								{
-									UserId = sellerId,
+									UserId = Constants.ADMIN_USER_ID,
 									Content = $"Tranh chấp đơn hàng mã #{orderId}.",
 									MessageType = "0",
 									DateCreate = DateTime.Now,
@@ -1136,6 +1135,11 @@ namespace DataAccess.DAOs
 							}
 						};
 						context.Conversations.Add(conversation);
+						context.SaveChanges();
+
+						order.OrderStatusId = Constants.ORDER_DISPUTE;
+						order.ConversationId = conversation.ConversationId;
+						context.Order.Update(order);
 
 						// add history order status
 						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus

@@ -109,6 +109,7 @@ namespace DigitalFUHubApi.Controllers
 						OrderDate = x.OrderDate,
 						ShopId = x.ShopId,
 						ShopName = x.Shop.ShopName,
+						ConversationId = x.ConversationId,
 						StatusId = x.OrderStatusId,
 						TotalAmount = x.TotalAmount,
 						TotalCoinDiscount = x.TotalCoinDiscount,

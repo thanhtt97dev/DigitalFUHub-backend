@@ -17,7 +17,7 @@ namespace DTOs.Order
 		public long OrderId { get; set; }
 		public long ShopId { get; set; }
 		public string ShopName { get; set; } = string.Empty;
-		public long ConversationId { get; set; }
+		public long? ConversationId { get; set; }
 		public DateTime OrderDate { get; set; }
 		public string Note { get; set; } = string.Empty;
 		public long TotalAmount { get; set; }
