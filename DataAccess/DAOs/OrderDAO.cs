@@ -962,6 +962,13 @@ namespace DataAccess.DAOs
 						// update order status
 						Order order = context.Order.First(x => x.OrderId == orderId);
 						order.OrderStatusId = status;
+
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							DateCreate = DateTime.Now,
+							Note = note
+						};
 						if (status == Constants.ORDER_STATUS_CONFIRMED)
 						{
 							long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
@@ -1009,17 +1016,12 @@ namespace DataAccess.DAOs
 							{
 								context.TransactionInternal.AddRange(transactionInternals);
 							}
-						}
-						// add history order status
-						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+							historyOrderStatus.OrderStatusId = Constants.ORDER_STATUS_CONFIRMED;
+						}else if(status == Constants.ORDER_COMPLAINT)
 						{
-							OrderId = order.OrderId,
-							OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
-							DateCreate = DateTime.Now,
-							Note = note
-						};
+							historyOrderStatus.OrderStatusId = Constants.ORDER_COMPLAINT;
+						}
 						context.HistoryOrderStatus.Add(historyOrderStatus);
-
 						context.SaveChanges();
 						transaction.Commit();
 					}

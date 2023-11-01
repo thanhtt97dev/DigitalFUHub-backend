@@ -96,17 +96,11 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region get feedback detail
-		[Authorize("Customer,Seller")]
 		[HttpGet("Customer/{userId}/{orderId}")]
 		public IActionResult GetFeedbackDetailOrder(long userId, long orderId)
 		{
 			try
 			{
-				if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
-
 				Order? order = _feedbackRepository.GetFeedbackDetail(orderId, userId);
 				if (order == null)
 				{
