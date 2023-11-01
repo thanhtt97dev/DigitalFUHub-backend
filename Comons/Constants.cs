@@ -72,10 +72,10 @@
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
 
 		// Product Status
-		public const int PRODUCT_ACTIVE = 1;
-		public const int PRODUCT_BAN = 2;
-		public const int PRODUCT_REMOVE = 3;
-		public const int PRODUCT_HIDE = 4;
+		public const int PRODUCT_STATUS_ACTIVE = 1;
+		public const int PRODUCT_STATUS_BAN = 2;
+		public const int PRODUCT_STATUS_REMOVE = 3;
+		public const int PRODUCT_STATUS_HIDE = 4;
 
 		// Withdraw transaction Status
 		public const int WITHDRAW_TRANSACTION_ALL = 0;
