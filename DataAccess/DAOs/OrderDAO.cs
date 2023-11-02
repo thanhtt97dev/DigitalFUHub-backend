@@ -1183,15 +1183,41 @@ namespace DataAccess.DAOs
 						User customer = context.User.First(x => x.UserId == order.UserId);
 						if (order.TotalPayment > 0)
 						{
-							User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-							admin.AccountBalance -= order.TotalPayment;
+							// update customer's account balance
+							customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
 
-							customer.AccountBalance += order.TotalPayment;
+							// add transaction for refund money to customer
+							TransactionInternal transactionInternal = new TransactionInternal()
+							{
+								UserId = customer.UserId,
+								OrderId = orderId,
+								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+								PaymentAmount = order.TotalPayment,
+								DateCreate = DateTime.Now,
+							};
+							context.TransactionInternal.Add(transactionInternal);
+							context.SaveChanges();
 						}
 
-						if(order.TotalCoinDiscount > 0)
+
+						if (order.TotalCoinDiscount > 0)
 						{
-							customer.AccountBalance += order.TotalCoinDiscount;
+							// update customer's coin
+							customer.Coin = customer.Coin + order.TotalCoinDiscount;
+
+							// add transaction coin for refund coin to customer
+							TransactionCoin transactionCoin = new TransactionCoin
+							{
+								UserId = customer.UserId,
+								TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_REFUND,
+								OrderId = orderId,
+								FeedbackId = null,
+								Note = "",
+								Amount = order.TotalCoinDiscount,
+								DateCreate = DateTime.Now
+							};
+							context.TransactionCoin.Add(transactionCoin);
+							context.SaveChanges();
 						}
 
 						// add history order status
