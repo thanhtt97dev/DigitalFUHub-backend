@@ -560,7 +560,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				if (request.Status != Constants.ORDER_STATUS_REJECT_COMPLAINT || request.Status != Constants.ORDER_STATUS_SELLER_VIOLATES)
+				if (request.Status != Constants.ORDER_STATUS_REJECT_COMPLAINT && request.Status != Constants.ORDER_STATUS_SELLER_VIOLATES)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid status", false, new()));
 				}

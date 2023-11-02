@@ -1176,7 +1176,6 @@ namespace DataAccess.DAOs
 					{
 						Order? order = context.Order.FirstOrDefault(x => x.ShopId == sellerId && x.OrderId == orderId);
 						if (order == null) throw new Exception("Not found");
-						if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT) throw new Exception("Invalid order");
 
 						order.OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED;
 						order.Note = note;
