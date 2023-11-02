@@ -5,6 +5,7 @@ using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.DAOs
 {
@@ -132,7 +133,7 @@ namespace DataAccess.DAOs
 					DateTime timeAccept = DateTime.Now.AddDays(-days);
 					var orders = context.Order
 						.Where(x =>
-							x.OrderStatusId == Constants.ORDER_COMPLAINT &&
+							x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT &&
 							x.OrderDate < timeAccept)
 						.ToList();
 
@@ -605,7 +606,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Get order detail for admin
-		internal Order? GetOrder(long orderId)
+		internal Order? GetOrderInfoAdmin(long orderId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -1017,9 +1018,9 @@ namespace DataAccess.DAOs
 								context.TransactionInternal.AddRange(transactionInternals);
 							}
 							historyOrderStatus.OrderStatusId = Constants.ORDER_STATUS_CONFIRMED;
-						}else if(status == Constants.ORDER_COMPLAINT)
+						}else if(status == Constants.ORDER_STATUS_COMPLAINT)
 						{
-							historyOrderStatus.OrderStatusId = Constants.ORDER_COMPLAINT;
+							historyOrderStatus.OrderStatusId = Constants.ORDER_STATUS_COMPLAINT;
 						}
 						context.HistoryOrderStatus.Add(historyOrderStatus);
 						context.SaveChanges();
@@ -1100,7 +1101,7 @@ namespace DataAccess.DAOs
 						Order? order = context.Order.FirstOrDefault(x => x.ShopId == sellerId && x.UserId == customerId
 								&& x.OrderId == orderId);
 						if (order == null) throw new Exception("Not found");
-						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
+						if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT) throw new Exception("Invalid order");
 						Conversation conversation = new Conversation
 						{
 							ConversationName = $"Nhóm chat: Tranh chấp đơn hàng mã #{orderId}",
@@ -1175,7 +1176,7 @@ namespace DataAccess.DAOs
 					{
 						Order? order = context.Order.FirstOrDefault(x => x.ShopId == sellerId && x.OrderId == orderId);
 						if (order == null) throw new Exception("Not found");
-						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
+						if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT) throw new Exception("Invalid order");
 
 						order.OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED;
 						order.Note = note;
@@ -1239,6 +1240,14 @@ namespace DataAccess.DAOs
 						throw new Exception(e.Message);
 					}
 				}
+			}
+		}
+
+		internal Order? GetOrder(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order.FirstOrDefault(x => x.OrderId == orderId);
 			}
 		}
 	}

@@ -23,7 +23,7 @@ namespace DataAccess.Repositories
 
 		public (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin) => OrderDAO.Instance.AddOrder(userId, orders, isUseCoin);
 
-		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
+		public Order? GetOrderInfoAdmin(long orderId) => OrderDAO.Instance.GetOrderInfoAdmin(orderId);
 
 		public Order? GetOrderDetailSeller(long userId, long orderId) => OrderDAO.Instance.GetOrderDetailSeller(userId, orderId);
 
@@ -51,5 +51,8 @@ namespace DataAccess.Repositories
 
 		public void UpdateStatusOrderRefund(long sellerId, long orderId, string note)
 		=> OrderDAO.Instance.UpdateStatusOrderRefund(sellerId, orderId, note);
+
+		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
+
 	}
 }
