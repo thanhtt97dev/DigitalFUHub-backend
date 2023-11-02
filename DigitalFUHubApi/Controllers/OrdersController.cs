@@ -419,7 +419,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 
-				if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT || order.OrderStatusId != Constants.ORDER_DISPUTE)
+				if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT && order.OrderStatusId != Constants.ORDER_DISPUTE)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
 				}
