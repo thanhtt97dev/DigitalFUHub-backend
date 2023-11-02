@@ -141,7 +141,6 @@ namespace DataAccess.DAOs
 						{
 							UserId = user.UserId,
 							TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_RECEIVE,
-							OrderId = orderDetailId,
 							FeedbackId = feedback.FeedbackId,	
 							Amount = feedbackBenefit.Coin,
 							DateCreate = DateTime.Now

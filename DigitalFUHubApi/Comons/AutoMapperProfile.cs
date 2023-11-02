@@ -132,7 +132,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductVariant.Product.ProductName))
 				.ForMember(des => des.ProductDiscount, act => act.MapFrom(src => src.ProductVariant.Product.Discount))
 				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.ProductVariant.Product.Thumbnail))
-				.ForMember(des => des.ProductActivate, act => act.MapFrom(src => src.ProductVariant.Product.ProductStatusId == Constants.PRODUCT_ACTIVE))
+				.ForMember(des => des.ProductActivate, act => act.MapFrom(src => src.ProductVariant.Product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE))
 				.ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariant.AssetInformations.Count()))
 				.ReverseMap();
 			CreateMap<Cart, UserCartResponseDTO>()
@@ -161,7 +161,9 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Cart, CartDTO>().ReverseMap();
 			CreateMap<Cart, UpdateCartRequestDTO>().ReverseMap();
 			CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
-			CreateMap<Coupon, CouponResponseDTO>().ReverseMap();
+			CreateMap<Coupon, CouponResponseDTO>()
+				.ForMember(des => des.productIds, act => act.MapFrom(src => src.CouponProducts != null ? src.CouponProducts.Select(x => x.ProductId).ToList() : new List<long>()))
+                .ReverseMap();
 			CreateMap<Coupon, SellerCouponResponseDTO>().ReverseMap();
 
 			CreateMap<Order, SellerFeedbackResponseDTO>()

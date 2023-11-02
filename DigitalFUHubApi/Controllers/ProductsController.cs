@@ -69,7 +69,7 @@ namespace DigitalFUHubApi.Controllers
                 }
 
 				// check product status
-				if (productStatusId == Constants.PRODUCT_BAN)
+				if (productStatusId == Constants.PRODUCT_STATUS_BAN)
 				{
                     status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_BAN;
                     status.Message = "This product has been banned";
@@ -79,7 +79,7 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
-                if (productStatusId == Constants.PRODUCT_REMOVE)
+                if (productStatusId == Constants.PRODUCT_STATUS_REMOVE)
                 {
                     status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_REMOVE;
                     status.Message = "This product has been remove";
@@ -88,7 +88,7 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
-                if (productStatusId == Constants.PRODUCT_HIDE)
+                if (productStatusId == Constants.PRODUCT_STATUS_HIDE)
                 {
                     status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_HIDE;
                     status.Message = "This product has been hide";
@@ -271,7 +271,7 @@ namespace DigitalFUHubApi.Controllers
 					Thumbnail = urlThumbnail,
 					ProductVariants = productVariants,
 					ProductMedias = productMedias,
-					ProductStatusId = Constants.PRODUCT_ACTIVE,
+					ProductStatusId = Constants.PRODUCT_STATUS_ACTIVE,
 					UpdateDate = DateTime.Now,
 					TotalRatingStar = 0,
 					NumberFeedback = 0,
@@ -413,7 +413,7 @@ namespace DigitalFUHubApi.Controllers
 					Discount = request.Discount,
 					CategoryId = request.CategoryId,
 					Thumbnail = request.ProductThumbnailFileUpdate == null ? null : urlThumbnailNew,
-					ProductStatusId = request.IsActiveProduct ? Constants.PRODUCT_ACTIVE : Constants.PRODUCT_HIDE
+					ProductStatusId = request.IsActiveProduct ? Constants.PRODUCT_STATUS_ACTIVE : Constants.PRODUCT_STATUS_HIDE
 				};
 
 				_productRepository.EditProduct(product, productVariantsAddNew, productVariantsUpdate,

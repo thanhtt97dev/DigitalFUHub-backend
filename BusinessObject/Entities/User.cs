@@ -43,7 +43,8 @@ namespace BusinessObject.Entities
         public virtual ICollection<TransactionInternal>? TransactionInternals { get; set; }
         public virtual ICollection<WithdrawTransaction>? WithdrawTransactions { get; set; }
         public virtual ICollection<Cart>? Carts { get; set; }
-        public virtual ICollection<TransactionCoin>? TransactionCoins { get; set; } 
+        public virtual ICollection<TransactionCoin>? TransactionCoins { get; set; }
+		public virtual List<WishList>? WishList { get; set; }
 
 	}
 }

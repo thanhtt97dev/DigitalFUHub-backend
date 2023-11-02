@@ -39,7 +39,7 @@ namespace DataAccess.DAOs
 			List<SellerProductResponseDTO> result = new List<SellerProductResponseDTO>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var products = context.Product.Where(x => x.ShopId == shopId && (x.ProductStatusId == Constants.PRODUCT_ACTIVE || x.ProductStatusId == Constants.PRODUCT_HIDE)).ToList();
+				var products = context.Product.Where(x => x.ShopId == shopId && (x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)).ToList();
 				foreach (var product in products)
 				{
 					var productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList();
@@ -367,7 +367,7 @@ namespace DataAccess.DAOs
 			{
 				Product? product = context.Product
 					.Where(x => x.ProductId == productId && x.ShopId == userId
-							&& (x.ProductStatusId == Constants.PRODUCT_ACTIVE || x.ProductStatusId == Constants.PRODUCT_HIDE))
+							&& (x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_HIDE))
 						.Select(x => new Product
 						{
 							ProductId = productId,
@@ -402,7 +402,7 @@ namespace DataAccess.DAOs
 					.Include(x => x.ProductMedias)
 					.Include(x => x.ProductVariants)
 					.Where(x => x.ProductId == productId && x.ShopId == userId
-							&& (x.ProductStatusId == Constants.PRODUCT_ACTIVE || x.ProductStatusId == Constants.PRODUCT_HIDE))
+							&& (x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_HIDE))
 						.FirstOrDefault();
 				return product;
 			}

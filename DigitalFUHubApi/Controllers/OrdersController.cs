@@ -35,7 +35,7 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 		}
 
-		#region Add order customer
+		#region Add order
 		//[Authorize("Customer,Seller")]
 		[HttpPost("Customer/AddOrder")]
 		public async Task<IActionResult> AddOrder(AddOrderRequestDTO request)
@@ -81,7 +81,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get all order of customer
+		#region Get all order (customer)
 		[Authorize("Customer,Seller")]
 		[HttpPost("Customer/List")]
 		public IActionResult GetListOrders([FromBody] GetAllOrderRequestDTO request)
@@ -109,6 +109,7 @@ namespace DigitalFUHubApi.Controllers
 						OrderDate = x.OrderDate,
 						ShopId = x.ShopId,
 						ShopName = x.Shop.ShopName,
+						ConversationId = x.ConversationId,
 						StatusId = x.OrderStatusId,
 						TotalAmount = x.TotalAmount,
 						TotalCoinDiscount = x.TotalCoinDiscount,
@@ -142,7 +143,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Update status order customer
+		#region Update status order (customer)
 		[Authorize("Customer,Seller")]
 		[HttpPost("Customer/Edit/Status")]
 		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
@@ -157,17 +158,36 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
 				}
+
+				if (request.StatusId != Constants.ORDER_STATUS_COMPLAINT && request.StatusId != Constants.ORDER_STATUS_CONFIRMED)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID STATUS ORDER", false, new()));
+				}
+
 				Order? order = _orderRepository.GetOrderCustomer(request.OrderId, request.UserId, request.ShopId);
 				if (order == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 				}
-				else if (request.StatusId != Constants.ORDER_COMPLAINT && request.StatusId != Constants.ORDER_STATUS_CONFIRMED)
+
+				//check vaild order status
+				if(request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID STATUS ORDER", false, new()));
+					if(order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
+						order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT) 
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
+					}
+				}
+				if (request.StatusId == Constants.ORDER_STATUS_COMPLAINT)
+				{
+					if (order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
+					}
 				}
 
-				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId);
+				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId, request.Note);
 
 				string title = $"{(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
 				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
@@ -182,7 +202,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get order detail of customer
+		#region Get order detail (customer)
 		[Authorize("Customer,Seller")]
 		[HttpGet("Customer/{userId}/{orderId}")]
 		public IActionResult GetOrderDetailCustomer(long userId, long orderId)
@@ -241,7 +261,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get list orders seller
+		#region Get list orders (seller)
 		[Authorize("Seller")]
 		[HttpPost("Seller/List")]
 		public IActionResult GetOrdersSeller(SellerOrdersRequestDTO request)
@@ -290,7 +310,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get order detail seller
+		#region Get order detail (seller)
 		[Authorize("Seller")]
 		[HttpGet("Seller/{userId}/{orderId}")]
 		public IActionResult GetOrderDetailSeller(long userId, long orderId)
@@ -340,7 +360,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Seller dispute order
+		#region Update status dispute (seller)
 		[Authorize("Seller")]		
 		[HttpPost("Seller/Dispute")]		
 		public IActionResult UpdateDisputeOrder(SellerDisputeOrderRequestDTO request) 
@@ -355,7 +375,18 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Unauthorized();
 				}
-				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId);
+				var order = _orderRepository.GetOrder(request.OrderId);
+				if(order == null) 
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+
+				if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
+				}
+
+				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId, request.Note);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			catch (Exception e)
@@ -366,7 +397,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Seller dispute order
+		#region  Update status refund (seller)
 		[Authorize("Seller")]
 		[HttpPost("Seller/Refund")]
 		public IActionResult UpdateRefundOrder(SellerRefundOrderRequestDTO request)
@@ -381,6 +412,18 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Unauthorized();
 				}
+
+				var order = _orderRepository.GetOrder(request.OrderId);
+				if (order == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+
+				if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT && order.OrderStatusId != Constants.ORDER_DISPUTE)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
+				}
+
 				_orderRepository.UpdateStatusOrderRefund(request.SellerId, request.OrderId, request.Note.Trim());
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
@@ -391,7 +434,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get list orders admin
+		#region Get list orders (admin)
 		[Authorize("Admin")]
 		[HttpPost("Admin/All")]
 		public IActionResult GetOrders(OrdersRequestDTO requestDTO)
@@ -458,7 +501,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get order detail admin
+		#region Get order detail (admin)
 		[Authorize("Admin")]
 		[HttpPost("Admin/GetOrder/{id}")]
 		public IActionResult GetOrder(int id)
@@ -470,7 +513,7 @@ namespace DigitalFUHubApi.Controllers
 
 			try
 			{
-				var order = _orderRepository.GetOrder(id);
+				var order = _orderRepository.GetOrderInfoAdmin(id);
 				if (order == null)
 				{
 					status.Message = "Order not existed!";
@@ -496,19 +539,19 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Update order status admin
+		#region Update order status (admin)
 		[Authorize("Admin")]
 		[HttpPost("Admin/UpdateOrderStatus")]
-		public IActionResult UpdateOrderStatus(UpdateOrderStatusRequestDTO requestDTO)
+		public IActionResult UpdateOrderStatus(UpdateOrderStatusRequestDTO request)
 		{
-			if (requestDTO.OrderId == 0 || requestDTO.Status == 0) return BadRequest();
+			if (request.OrderId == 0 || request.Status == 0) return BadRequest();
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 
 			try
 			{
 				int[] statusAccepted = { Constants.ORDER_DISPUTE, Constants.ORDER_STATUS_REJECT_COMPLAINT, Constants.ORDER_STATUS_SELLER_VIOLATES };
-				if (!statusAccepted.Contains(requestDTO.Status))
+				if (!statusAccepted.Contains(request.Status))
 				{
 					status.Message = "Invalid order status!";
 					status.Ok = false;
@@ -517,23 +560,29 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(responseData);
 				}
 
-				var order = _orderRepository.GetOrderForCheckingExisted(requestDTO.OrderId);
-				if (order == null)
+				if (request.Status != Constants.ORDER_STATUS_REJECT_COMPLAINT && request.Status != Constants.ORDER_STATUS_SELLER_VIOLATES)
 				{
-					status.Message = "Order not existed!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid status", false, new()));
 				}
 
-				if (requestDTO.Status == Constants.ORDER_STATUS_REJECT_COMPLAINT)
+				var order = _orderRepository.GetOrder(request.OrderId);
+				if (order == null)
 				{
-					_orderRepository.UpdateOrderStatusRejectComplaint(requestDTO.OrderId, requestDTO.Note);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
-				else if (requestDTO.Status == Constants.ORDER_STATUS_SELLER_VIOLATES)
+
+				if (order.OrderStatusId != Constants.ORDER_DISPUTE)
 				{
-					_orderRepository.UpdateOrderStatusSellerViolates(requestDTO.OrderId, requestDTO.Note);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
+				}
+
+				if (request.Status == Constants.ORDER_STATUS_REJECT_COMPLAINT)
+				{
+					_orderRepository.UpdateOrderStatusRejectComplaint(request.OrderId, request.Note);
+				}
+				else if (request.Status == Constants.ORDER_STATUS_SELLER_VIOLATES)
+				{
+					_orderRepository.UpdateOrderStatusSellerViolates(request.OrderId, request.Note);
 				}
 				else
 				{

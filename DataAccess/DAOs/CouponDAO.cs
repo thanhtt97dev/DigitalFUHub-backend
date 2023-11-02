@@ -36,11 +36,19 @@ namespace DataAccess.DAOs
 			{
 				var coupons = context.Coupon.Where(c => c.ShopId == shopId
 															&& c.IsActive == true
-															&& c.IsPublic == true
 															&& c.EndDate > DateTime.Now
-                                                            && c.StartDate < DateTime.Now).ToList();
+                                                            && c.StartDate < DateTime.Now
+                                                            && c.IsPublic == true).ToList();
 
-				return coupons;
+                foreach (var item in coupons)
+                {
+                    if (item.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+					{
+						item.CouponProducts = context.CouponProduct.Where(x => x.CouponId == item.CouponId).ToList();
+					}
+                }
+
+                return coupons;
 			}
 		}
 
@@ -97,7 +105,7 @@ namespace DataAccess.DAOs
 						//			&& coupon.CouponProducts.Any(cp => cp.ProductId != x.ProductId));
 #pragma warning disable CS8604 // Possible null reference argument.
 						bool isExist = coupon.CouponProducts.Any(cp => context.Product.Any(x => x.ShopId == coupon.ShopId 
-											&& x.ProductStatusId == Constants.PRODUCT_ACTIVE && cp.ProductId != x.ProductId));
+											&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE && cp.ProductId != x.ProductId));
 #pragma warning restore CS8604 // Possible null reference argument.
 						if (isExist)
 						{

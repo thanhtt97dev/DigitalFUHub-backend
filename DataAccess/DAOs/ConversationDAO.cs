@@ -319,7 +319,44 @@ namespace DataAccess.DAOs
 						return conversationId;
 					}
 				}
-				return 0;
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					// add new conversation
+					Conversation newConversation = new Conversation
+					{
+						DateCreate = DateTime.Now,
+						IsGroup = false,
+						IsActivate = true
+					};
+					context.Conversations.Add(newConversation);
+					context.SaveChanges();
+
+					var sellerConversation = new UserConversation
+					{
+						UserId = shopId,
+						ConversationId = newConversation.ConversationId
+					};
+
+					var customerConversation = new UserConversation
+					{
+						UserId = userId,
+						ConversationId = newConversation.ConversationId
+					};
+
+					context.UserConversation.AddRange(sellerConversation, customerConversation);
+					context.SaveChanges();
+
+					transaction.Commit();
+
+					return newConversation.ConversationId;
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+
 			}
 		}
 	}

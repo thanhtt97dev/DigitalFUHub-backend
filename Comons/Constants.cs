@@ -50,6 +50,10 @@
 
 		public const string RESPONSE_CODE_CONFIRM_PASSWORD_IS_CONFIRMED = "CF_01";
 
+		public const string RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE = "ORDER_STATUS_01";
+
+		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
+
 
 		//SignalR
 		public const string SIGNAL_R_CHAT_HUB = "chatHub";
@@ -72,10 +76,10 @@
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
 
 		// Product Status
-		public const int PRODUCT_ACTIVE = 1;
-		public const int PRODUCT_BAN = 2;
-		public const int PRODUCT_REMOVE = 3;
-		public const int PRODUCT_HIDE = 4;
+		public const int PRODUCT_STATUS_ACTIVE = 1;
+		public const int PRODUCT_STATUS_BAN = 2;
+		public const int PRODUCT_STATUS_REMOVE = 3;
+		public const int PRODUCT_STATUS_HIDE = 4;
 
 		// Withdraw transaction Status
 		public const int WITHDRAW_TRANSACTION_ALL = 0;
@@ -90,12 +94,12 @@
 		public const int ORDER_ALL = 0;
 		public const int ORDER_STATUS_WAIT_CONFIRMATION = 1;
 		public const int ORDER_STATUS_CONFIRMED = 2;
-		public const int ORDER_COMPLAINT = 3;
+		public const int ORDER_STATUS_COMPLAINT = 3;
 		public const int ORDER_STATUS_SELLER_REFUNDED = 4;
 		public const int ORDER_DISPUTE = 5;
 		public const int ORDER_STATUS_REJECT_COMPLAINT = 6;
 		public const int ORDER_STATUS_SELLER_VIOLATES = 7;
-		public static int[] ORDER_STATUS = new int[] { ORDER_STATUS_WAIT_CONFIRMATION, ORDER_STATUS_CONFIRMED, ORDER_COMPLAINT, ORDER_STATUS_SELLER_REFUNDED, ORDER_DISPUTE, ORDER_STATUS_REJECT_COMPLAINT, ORDER_STATUS_SELLER_VIOLATES };
+		public static int[] ORDER_STATUS = new int[] { ORDER_STATUS_WAIT_CONFIRMATION, ORDER_STATUS_CONFIRMED, ORDER_STATUS_COMPLAINT, ORDER_STATUS_SELLER_REFUNDED, ORDER_DISPUTE, ORDER_STATUS_REJECT_COMPLAINT, ORDER_STATUS_SELLER_VIOLATES };
 
 		//Transaction internal Type
 		public const int TRANSACTION_TYPE_INTERNAL_PAYMENT = 1;

@@ -5,6 +5,7 @@ using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.DAOs
 {
@@ -132,7 +133,7 @@ namespace DataAccess.DAOs
 					DateTime timeAccept = DateTime.Now.AddDays(-days);
 					var orders = context.Order
 						.Where(x =>
-							x.OrderStatusId == Constants.ORDER_COMPLAINT &&
+							x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT &&
 							x.OrderDate < timeAccept)
 						.ToList();
 
@@ -250,32 +251,41 @@ namespace DataAccess.DAOs
 				{
 					int numberQuantityAvailable = 0;
 					Order orderResult = new Order();
-					// check valid quantity
+
+					#region Check customer by with quantity < 0
 					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0)))
 					{
 						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", numberQuantityAvailable, orderResult);
 					}
+					#endregion
 
-					//check customer existed
+					#region Check customer existed
 					var isCustomerExisted = context.User.Any(x => x.UserId == userId);
 					if (!isCustomerExisted)
 					{
 						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!", numberQuantityAvailable, orderResult);
 					}
+					#endregion
 
-					// get bussinsis fee
+					#region Get bussinsis fee
 					var businessFeeDate = context.BusinessFee.Max(x => x.StartDate);
 					var businessFee = context.BusinessFee.First(x => x.StartDate == businessFeeDate);
 					long businessFeeId = businessFee.BusinessFeeId;
 					long businessFeeValue = businessFee.Fee;
+					#endregion
 
+					#region Make order
 					foreach (var shopProduct in shopProducts)
 					{
-						// check ProductVariant existed
+						#region Check ProductVariant existed
 						var productVariantIds = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
 						var productVariants = context.ProductVariant
 							.Include(x => x.Product)
-							.Where(x => productVariantIds.Contains(x.ProductVariantId)).ToList();
+							.Where(x => productVariantIds.Contains(x.ProductVariantId) &&
+								   x.isActivate &&
+								   x.Product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+								   )
+							.ToList();
 
 						bool isProductVariantsExisted = productVariantIds.All(id => productVariants.Any(x => x.ProductVariantId == id));
 						if (!isProductVariantsExisted)
@@ -283,16 +293,18 @@ namespace DataAccess.DAOs
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product variant not existed!", numberQuantityAvailable, orderResult);
 						}
+						#endregion
 
-						//check shop existed
+						#region Check shop existed
 						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId && x.IsActive);
 						if (shop == null)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!", numberQuantityAvailable, orderResult);
 						}
+						#endregion
 
-						//check ProductVariant of shop
+						#region Check all product variant order in shop
 						var isAllProductVariantInShop = productVariants
 							.All(x => x.Product.ShopId == shopProduct.ShopId);
 
@@ -301,8 +313,9 @@ namespace DataAccess.DAOs
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_ORDER_PRODUCT_VARIANT_NOT_IN_SHOP, "A product variant not in shop!", numberQuantityAvailable, orderResult);
 						}
+						#endregion
 
-						//get customer info
+						#region Check customer existed
 						var customer = context.User
 							.FirstOrDefault(x => x.UserId == userId);
 						if (customer == null)
@@ -310,9 +323,9 @@ namespace DataAccess.DAOs
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!", numberQuantityAvailable, orderResult);
 						}
-						long customerCoin = customer.Coin;
+						#endregion
 
-						//check customers buy their own products 
+						#region Check customer buy their own products 
 						var isCustomerBuyTheirOwnProducts = productVariants
 							.Any(x => x.Product.ShopId == userId);
 						if (isCustomerBuyTheirOwnProducts)
@@ -320,8 +333,9 @@ namespace DataAccess.DAOs
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT, "Customers buy their own products !", numberQuantityAvailable, orderResult);
 						}
+						#endregion
 
-						//create order
+						#region Create order
 						Order order = new Order()
 						{
 							UserId = userId,
@@ -332,8 +346,9 @@ namespace DataAccess.DAOs
 						};
 						context.Order.Add(order);
 						context.SaveChanges();
+						#endregion
 
-						//create order detail
+						#region Create list order detail
 						List<OrderDetail> orderDetails = new List<OrderDetail>();
 						foreach (var item in shopProduct.Products)
 						{
@@ -370,8 +385,8 @@ namespace DataAccess.DAOs
 								})
 								.First(x => x.ProductVariantId == item.ProductVariantId);
 
-							if (!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_BAN ||
-								productVariant.Product.ProductStatusId == Constants.PRODUCT_REMOVE ||
+							if (!productVariant.isActivate || productVariant.Product.ProductStatusId == Constants.PRODUCT_STATUS_BAN ||
+								productVariant.Product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE ||
 								!productVariant.Product.Shop.IsActive)
 							{
 								transaction.Rollback();
@@ -403,13 +418,16 @@ namespace DataAccess.DAOs
 							context.AssetInformation.UpdateRange(assetInformationRemaining);
 							context.SaveChanges();
 						}
+						#endregion
 
+						#region Cacualte order's info
 
-						// cacualte order info
 						long totalAmount = orderDetails.Sum(x => x.TotalAmount);
-
-						// check coupon
 						long totalCouponDiscount = 0;
+						long totalCoinDiscount = 0;
+						long totalPayment = 0;
+
+						#region Check coupon
 						if (!string.IsNullOrEmpty(shopProduct.Coupon))
 						{
 							var coupon = (from c in context.Coupon
@@ -427,10 +445,23 @@ namespace DataAccess.DAOs
 							if (coupon.CouponTypeId == Constants.COUPON_TYPE_ALL_PRODUCTS)
 							{
 
-							} else if (coupon.CouponTypeId == Constants.COUPON_TYPE_ALL_PRODUCTS_OF_SHOP)
+							}
+							else if (coupon.CouponTypeId == Constants.COUPON_TYPE_ALL_PRODUCTS_OF_SHOP)
 							{
 								var couponOfShopExisted = context.Coupon.Any(x => x.ShopId == shopProduct.ShopId && x.CouponId == coupon.CouponId);
-								if (!couponOfShopExisted) 
+								if (!couponOfShopExisted)
+								{
+									return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
+								}
+							}
+							else if (coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+							{
+								var listProductIdsOrder = productVariants.Select(x => x.ProductId).ToList();
+								var couponForSpecificProductOfShopExisted = context.CouponProduct
+																				.Any(x => x.CouponId == coupon.CouponId &&
+																					listProductIdsOrder.Contains(x.ProductId)
+																				);
+								if (!couponForSpecificProductOfShopExisted)
 								{
 									return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
 								}
@@ -458,30 +489,32 @@ namespace DataAccess.DAOs
 							context.Coupon.Update(coupon);
 							context.SaveChanges();
 						}
+						#endregion
 
-						long totalPayment = totalAmount - totalCouponDiscount;
-
+						// caculate total payment
+						totalPayment = totalAmount - totalCouponDiscount;
 						if (totalPayment < 0)
 						{
 							totalPayment = 0;
 						}
 
 						// caculate total coin discount
-						long totalCoinDiscount = 0;
-						if (isUseCoin && customerCoin > 0 && totalPayment > 0)
+						if (isUseCoin && customer.Coin > 0 && totalPayment > 0)
 						{
-							if (totalPayment <= customerCoin)
+							if (totalPayment <= customer.Coin)
 							{
-								totalCoinDiscount = totalPayment;
+								totalCoinDiscount = customer.Coin;
 								totalPayment = 0;
 							}
 							else
 							{
-								totalCoinDiscount = customerCoin;
-								totalPayment = totalPayment - customerCoin;
+								totalCoinDiscount = customer.Coin;
+								totalPayment = totalPayment - customer.Coin;
 							}
 						}
+						#endregion
 
+						#region Update data in database
 						//update customer and admin account balance
 						if (totalPayment >= 0)
 						{
@@ -553,9 +586,12 @@ namespace DataAccess.DAOs
 						};
 						context.HistoryOrderStatus.Add(historyOrderStatus);
 						context.SaveChanges();
+						#endregion
 
 						orderResult = order;
 					}
+					#endregion
+
 					transaction.Commit();
 					return (Constants.RESPONSE_CODE_SUCCESS, "Success!", numberQuantityAvailable, orderResult);
 				}
@@ -570,7 +606,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Get order detail for admin
-		internal Order? GetOrder(long orderId)
+		internal Order? GetOrderInfoAdmin(long orderId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -707,7 +743,7 @@ namespace DataAccess.DAOs
 		}
 
 		#region Update order status (Seller violate)
-		internal void UpdateOrderStatusSellerViolates(long orderId, string? note)
+		internal void UpdateOrderStatusSellerViolates(long orderId, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -769,6 +805,7 @@ namespace DataAccess.DAOs
 						OrderId = order.OrderId,
 						OrderStatusId = Constants.ORDER_STATUS_SELLER_VIOLATES,
 						DateCreate = DateTime.Now,
+						Note = note
 					};
 					context.HistoryOrderStatus.Add(historyOrderStatus);
 					context.SaveChanges();
@@ -785,7 +822,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Update order status (RejectComplaint)
-		internal void UpdateOrderStatusRejectComplaint(long orderId, string? note)
+		internal void UpdateOrderStatusRejectComplaint(long orderId, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -847,6 +884,7 @@ namespace DataAccess.DAOs
 						OrderId = order.OrderId,
 						OrderStatusId = Constants.ORDER_STATUS_REJECT_COMPLAINT,
 						DateCreate = DateTime.Now,
+						Note = note
 					};
 					context.HistoryOrderStatus.Add(historyOrderStatus);
 					context.SaveChanges();
@@ -914,7 +952,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Update order status for customer
-		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status)
+		internal void UpdateOrderStatusCustomer(long orderId, long shopId, int status, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -925,6 +963,13 @@ namespace DataAccess.DAOs
 						// update order status
 						Order order = context.Order.First(x => x.OrderId == orderId);
 						order.OrderStatusId = status;
+
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							DateCreate = DateTime.Now,
+							Note = note
+						};
 						if (status == Constants.ORDER_STATUS_CONFIRMED)
 						{
 							long fee = context.BusinessFee.First(x => x.BusinessFeeId == order.BusinessFeeId).Fee;
@@ -972,19 +1017,12 @@ namespace DataAccess.DAOs
 							{
 								context.TransactionInternal.AddRange(transactionInternals);
 							}
-
-							// add history order status
-							HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
-							{
-								OrderId = order.OrderId,
-								OrderStatusId = Constants.ORDER_STATUS_CONFIRMED,
-								DateCreate = DateTime.Now,
-							};
-							context.HistoryOrderStatus.Add(historyOrderStatus);
-							context.SaveChanges();
-
-
+							historyOrderStatus.OrderStatusId = Constants.ORDER_STATUS_CONFIRMED;
+						}else if(status == Constants.ORDER_STATUS_COMPLAINT)
+						{
+							historyOrderStatus.OrderStatusId = Constants.ORDER_STATUS_COMPLAINT;
 						}
+						context.HistoryOrderStatus.Add(historyOrderStatus);
 						context.SaveChanges();
 						transaction.Commit();
 					}
@@ -1052,7 +1090,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId)
+		internal void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId, string note)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -1063,8 +1101,7 @@ namespace DataAccess.DAOs
 						Order? order = context.Order.FirstOrDefault(x => x.ShopId == sellerId && x.UserId == customerId
 								&& x.OrderId == orderId);
 						if (order == null) throw new Exception("Not found");
-						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
-						order.OrderStatusId = Constants.ORDER_DISPUTE;
+						if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT) throw new Exception("Invalid order");
 						Conversation conversation = new Conversation
 						{
 							ConversationName = $"Nhóm chat: Tranh chấp đơn hàng mã #{orderId}",
@@ -1075,7 +1112,7 @@ namespace DataAccess.DAOs
 							{
 								new Message
 								{
-									UserId = sellerId,
+									UserId = Constants.ADMIN_USER_ID,
 									Content = $"Tranh chấp đơn hàng mã #{orderId}.",
 									MessageType = "0",
 									DateCreate = DateTime.Now,
@@ -1102,6 +1139,22 @@ namespace DataAccess.DAOs
 						};
 						context.Conversations.Add(conversation);
 						context.SaveChanges();
+
+						order.OrderStatusId = Constants.ORDER_DISPUTE;
+						order.ConversationId = conversation.ConversationId;
+						context.Order.Update(order);
+
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_DISPUTE,
+							DateCreate = DateTime.Now,
+							Note = note
+						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
+
+						context.SaveChanges();
 						transaction.Commit();
 					}
 					catch (Exception e)
@@ -1123,16 +1176,59 @@ namespace DataAccess.DAOs
 					{
 						Order? order = context.Order.FirstOrDefault(x => x.ShopId == sellerId && x.OrderId == orderId);
 						if (order == null) throw new Exception("Not found");
-						if (order.OrderStatusId != Constants.ORDER_COMPLAINT) throw new Exception("Invalid order");
 
 						order.OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED;
 						order.Note = note;
 
-						User admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-						admin.AccountBalance -= order.TotalPayment;
-
 						User customer = context.User.First(x => x.UserId == order.UserId);
-						customer.AccountBalance += order.TotalPayment;
+						if (order.TotalPayment > 0)
+						{
+							// update customer's account balance
+							customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
+
+							// add transaction for refund money to customer
+							TransactionInternal transactionInternal = new TransactionInternal()
+							{
+								UserId = customer.UserId,
+								OrderId = orderId,
+								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+								PaymentAmount = order.TotalPayment,
+								DateCreate = DateTime.Now,
+							};
+							context.TransactionInternal.Add(transactionInternal);
+							context.SaveChanges();
+						}
+
+
+						if (order.TotalCoinDiscount > 0)
+						{
+							// update customer's coin
+							customer.Coin = customer.Coin + order.TotalCoinDiscount;
+
+							// add transaction coin for refund coin to customer
+							TransactionCoin transactionCoin = new TransactionCoin
+							{
+								UserId = customer.UserId,
+								TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_REFUND,
+								OrderId = orderId,
+								FeedbackId = null,
+								Note = "",
+								Amount = order.TotalCoinDiscount,
+								DateCreate = DateTime.Now
+							};
+							context.TransactionCoin.Add(transactionCoin);
+							context.SaveChanges();
+						}
+
+						// add history order status
+						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
+						{
+							OrderId = order.OrderId,
+							OrderStatusId = Constants.ORDER_STATUS_SELLER_REFUNDED,
+							DateCreate = DateTime.Now,
+							Note = note
+						};
+						context.HistoryOrderStatus.Add(historyOrderStatus);
 
 						context.SaveChanges();
 						transaction.Commit();
@@ -1143,6 +1239,22 @@ namespace DataAccess.DAOs
 						throw new Exception(e.Message);
 					}
 				}
+			}
+		}
+
+		internal Order? GetOrder(long orderId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order.FirstOrDefault(x => x.OrderId == orderId);
+			}
+		}
+
+		internal OrderDetail? GetOrderDetail(long orderDetailId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.OrderDetail.Include(x => x.Order).FirstOrDefault(x => x.OrderDetailId == orderDetailId);
 			}
 		}
 	}

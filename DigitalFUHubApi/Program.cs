@@ -66,9 +66,10 @@ namespace DigitalFUHubApi
 				{
 					policy.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
 					policy.WithOrigins("http://localhost:4000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+					policy.WithOrigins("http://52.187.34.218:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+					policy.WithOrigins("http://52.187.34.218:4000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
 				});
 			});
-
 
 			// Disable auto model state validate
 			builder.Services.Configure<ApiBehaviorOptions>(opts =>
@@ -122,7 +123,8 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<StorageService>();
 
 			//Add SignalR
-			builder.Services.AddSignalR(c => {
+			builder.Services.AddSignalR(c =>
+			{
 				c.EnableDetailedErrors = true;
 				c.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
 				c.KeepAliveInterval = TimeSpan.FromSeconds(15);

@@ -36,5 +36,6 @@ namespace BusinessObject.Entities
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<Tag>? Tags{ get; set; }
 		public virtual List<CouponProduct>? CouponProducts { get; set; }
+		public virtual List<WishList>? WishList { get; set; }
 	}
 }

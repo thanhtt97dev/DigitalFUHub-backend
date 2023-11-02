@@ -48,7 +48,21 @@ namespace DigitalFUHubApi.Services
 			return userId;
 		}
 
-		public async Task SendNotification(long userId, string title, string content, string link)
+        public int GetVisibleNotificationsFromHubCaller(HubCallerContext hubCallerContext)
+        {
+            var httpContext = hubCallerContext.GetHttpContext();
+            if (httpContext == null) return 0;
+
+            var visibleNotificationsRaw = httpContext.Request.Query["visibleNotifications"];
+            if (string.IsNullOrEmpty(visibleNotificationsRaw)) return 0;
+
+            int visibleNotifications;
+            int.TryParse(visibleNotificationsRaw, out visibleNotifications);
+
+            return visibleNotifications;
+        }
+
+        public async Task SendNotification(long userId, string title, string content, string link)
 		{
 			HashSet<string>? connections = connectionManager
 				.GetConnections(userId, Constants.SIGNAL_R_NOTIFICATION_HUB);
