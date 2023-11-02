@@ -57,8 +57,8 @@ namespace DigitalFUHubApi.Controllers
 					responseData.Status = status;
 					return Ok(responseData);
                 }
-				
-                (var product, long productStatusId) = _productRepository.GetProductById(productId);
+
+                var product = _productRepository.GetProductById(productId);
 
 				if (product == null) {
                     status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
@@ -69,7 +69,7 @@ namespace DigitalFUHubApi.Controllers
                 }
 
 				// check product status
-				if (productStatusId == Constants.PRODUCT_STATUS_BAN)
+				if (product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
 				{
                     status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_BAN;
                     status.Message = "This product has been banned";
@@ -79,7 +79,7 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
-                if (productStatusId == Constants.PRODUCT_STATUS_REMOVE)
+                if (product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE)
                 {
                     status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_REMOVE;
                     status.Message = "This product has been remove";
@@ -88,13 +88,12 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
-                if (productStatusId == Constants.PRODUCT_STATUS_HIDE)
+                if (product.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)
                 {
                     status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_HIDE;
                     status.Message = "This product has been hide";
                     status.Ok = false;
                     responseData.Status = status;
-                    responseData.Result = product;
                     return Ok(responseData);
                 }
 

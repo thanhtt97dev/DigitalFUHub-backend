@@ -120,12 +120,12 @@ namespace DataAccess.DAOs
 		}
 
 
-		internal (ProductDetailResponseDTO?, long) GetProductById(long productId)
+		internal ProductDetailResponseDTO? GetProductById(long productId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var product = context.Product.Include(_ => _.Shop).FirstOrDefault(x => x.ProductId == productId);
-				if (product == null) return (null, 0);
+				if (product == null) return null;
 
 				long productQuantity = 0;
 				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
@@ -194,6 +194,7 @@ namespace DataAccess.DAOs
 					Description = product.Description,
 					Discount = product.Discount,
 					CategoryId = product.CategoryId,
+					ProductStatusId = product.ProductStatusId,
 					Quantity = productQuantity,
                     ProductVariants = variants,
 					ProductMedias = medias,
@@ -201,7 +202,7 @@ namespace DataAccess.DAOs
 					Shop = shop
 				};
 
-				return (productDetailResponse, product.ProductStatusId);
+				return productDetailResponse;
 			}
 		}
 

@@ -21,7 +21,7 @@ namespace DataAccess.Repositories
 
         public List<ProductDetailVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
 
-        public (ProductDetailResponseDTO?, long) GetProductById(long productId) => ProductDAO.Instance.GetProductById(productId);
+        public ProductDetailResponseDTO? GetProductById(long productId) => ProductDAO.Instance.GetProductById(productId);
 
 		public void EditProduct(Product product, List<ProductVariant> productVariantsNew, List<ProductVariant> productVariantsUpdate, List<Tag> tags, List<ProductMedia> productMediaNew, List<string> productImagesOld)
 		=> ProductDAO.Instance.EditProduct( product,  productVariantsNew, productVariantsUpdate, tags, productMediaNew, productImagesOld);

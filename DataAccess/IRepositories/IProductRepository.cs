@@ -15,7 +15,7 @@ namespace DataAccess.IRepositories
 		void AddProduct(Product product);
 		List<SellerProductResponseDTO> GetAllProduct(long userId);
 		List<ProductDetailVariantResponeDTO> GetProductVariants(int productId);
-        (ProductDetailResponseDTO?, long) GetProductById(long productId);
+        ProductDetailResponseDTO? GetProductById(long productId);
 		void EditProduct(Product product, List<ProductVariant> productVariantsNew, List<ProductVariant> productVariantsUpdate, List<Tag> tags, List<ProductMedia> productMediaNew, List<string> productImagesOld);
 		string GetProductThumbnail(long productId);
 		List<ProductMedia> GetAllProductMediaById(long productId);
