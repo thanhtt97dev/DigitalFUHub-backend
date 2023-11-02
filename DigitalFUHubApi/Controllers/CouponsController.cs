@@ -95,15 +95,15 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(response);
 				}
 
-                if (shopId == 0)
-                {
-                    response.Status.Ok = false;
-                    response.Status.Message = "Invalid";
-                    response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    return Ok(response);
-                }
+				if (shopId == 0)
+				{
+					response.Status.Ok = false;
+					response.Status.Message = "Invalid";
+					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					return Ok(response);
+				}
 
-                CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponPrivate(couponCode, shopId));
+				CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponPrivate(couponCode, shopId));
 				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
 				response.Status.Message = "Success";
 				response.Status.Ok = true;
@@ -126,7 +126,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if(userId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
@@ -162,7 +162,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
-				
+
 				string formatDate = "M/d/yyyy";
 				CultureInfo provider = CultureInfo.InvariantCulture;
 				DateTime? startDate = string.IsNullOrEmpty(request.StartDate) ? null : DateTime.ParseExact(request.StartDate.Trim(), formatDate, provider);
@@ -204,9 +204,9 @@ namespace DigitalFUHubApi.Controllers
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
 					|| string.IsNullOrWhiteSpace(request.CouponName))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
 				}
-				
+
 				DateTime startDT = DateTime.Parse(request.StartDate);
 				DateTime endDT = DateTime.Parse(request.EndDate);
 				Coupon coupon = new Coupon
@@ -221,8 +221,25 @@ namespace DigitalFUHubApi.Controllers
 					MinTotalOrderValue = request.MinTotalOrderValue,
 					Quantity = request.Quantity,
 					ShopId = request.UserId,
-					CouponTypeId = Constants.COUPON_TYPE_ALL_PRODUCTS
+					CouponTypeId = request.TypeId
 				};
+				if (request.TypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+				{
+					if (request.ProductsApplied == null || request.ProductsApplied.Count == 0)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					}
+					else
+					{
+						coupon.CouponProducts = request.ProductsApplied.Select(x => new CouponProduct
+						{
+							ProductId = x,
+							UpdateDate = DateTime.Now,
+							IsActivate = true
+						}).ToList();
+					}
+
+				}
 				_couponRepository.AddCoupon(coupon);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
@@ -252,7 +269,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
-				
+
 				DateTime startDT = DateTime.Parse(request.StartDate);
 				DateTime endDT = DateTime.Parse(request.EndDate);
 				Coupon coupon = new Coupon
@@ -294,7 +311,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
-				
+
 
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
@@ -329,7 +346,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
-				
+
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
 				{

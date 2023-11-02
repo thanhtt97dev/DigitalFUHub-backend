@@ -38,5 +38,8 @@ namespace DataAccess.Repositories
 
 		public Product? CheckProductExist(long userId, long productId)
 		=> ProductDAO.Instance.CheckProductExist(userId, productId);
+
+		public List<Product> GetListProductOfSeller(long userId, string productId, string productName)
+		=> ProductDAO.Instance.GetListProductOfSeller(userId, productId, productName);
 	}
 }
