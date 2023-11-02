@@ -64,7 +64,10 @@ namespace DigitalFUHubApi
 			{
 				options.AddDefaultPolicy(policy =>
 				{
-					policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+					policy.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+					policy.WithOrigins("http://localhost:4000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+					policy.WithOrigins("http://52.187.34.218:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+					policy.WithOrigins("http://52.187.34.218:4000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
 				});
 			});
 
