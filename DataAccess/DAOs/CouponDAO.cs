@@ -101,11 +101,9 @@ namespace DataAccess.DAOs
 					}
 					if(coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
 					{
-						//bool isExist = context.Product.Any(x => x.ShopId == coupon.ShopId && x.ProductStatusId == Constants.PRODUCT_ACTIVE
-						//			&& coupon.CouponProducts.Any(cp => cp.ProductId != x.ProductId));
 #pragma warning disable CS8604 // Possible null reference argument.
-						bool isExist = coupon.CouponProducts.Any(cp => context.Product.Any(x => x.ShopId == coupon.ShopId 
-											&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE && cp.ProductId != x.ProductId));
+						bool isExist = coupon.CouponProducts.Any(cp => !context.Product.Any(x => x.ShopId == coupon.ShopId 
+											&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE && cp.ProductId == x.ProductId));
 #pragma warning restore CS8604 // Possible null reference argument.
 						if (isExist)
 						{
