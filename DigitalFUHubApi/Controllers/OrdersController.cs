@@ -174,7 +174,8 @@ namespace DigitalFUHubApi.Controllers
 				if(request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
 				{
 					if(order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
-						order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT) 
+						order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT &&
+						order.OrderStatusId != Constants.ORDER_STATUS_DISPUTE)
 					{
 						return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
 					}
@@ -419,7 +420,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 
-				if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT && order.OrderStatusId != Constants.ORDER_DISPUTE)
+				if (order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT && order.OrderStatusId != Constants.ORDER_STATUS_DISPUTE)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
 				}
@@ -550,7 +551,7 @@ namespace DigitalFUHubApi.Controllers
 
 			try
 			{
-				int[] statusAccepted = { Constants.ORDER_DISPUTE, Constants.ORDER_STATUS_REJECT_COMPLAINT, Constants.ORDER_STATUS_SELLER_VIOLATES };
+				int[] statusAccepted = { Constants.ORDER_STATUS_DISPUTE, Constants.ORDER_STATUS_REJECT_COMPLAINT, Constants.ORDER_STATUS_SELLER_VIOLATES };
 				if (!statusAccepted.Contains(request.Status))
 				{
 					status.Message = "Invalid order status!";
@@ -571,7 +572,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 
-				if (order.OrderStatusId != Constants.ORDER_DISPUTE)
+				if (order.OrderStatusId != Constants.ORDER_STATUS_DISPUTE)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
 				}

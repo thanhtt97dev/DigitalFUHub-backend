@@ -1140,7 +1140,7 @@ namespace DataAccess.DAOs
 						context.Conversations.Add(conversation);
 						context.SaveChanges();
 
-						order.OrderStatusId = Constants.ORDER_DISPUTE;
+						order.OrderStatusId = Constants.ORDER_STATUS_DISPUTE;
 						order.ConversationId = conversation.ConversationId;
 						context.Order.Update(order);
 
@@ -1148,7 +1148,7 @@ namespace DataAccess.DAOs
 						HistoryOrderStatus historyOrderStatus = new HistoryOrderStatus
 						{
 							OrderId = order.OrderId,
-							OrderStatusId = Constants.ORDER_DISPUTE,
+							OrderStatusId = Constants.ORDER_STATUS_DISPUTE,
 							DateCreate = DateTime.Now,
 							Note = note
 						};

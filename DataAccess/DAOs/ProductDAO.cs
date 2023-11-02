@@ -131,7 +131,7 @@ namespace DataAccess.DAOs
 				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
 				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
 				List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
-				
+
 				List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
 				foreach (var variant in productVariants)
 				{
@@ -196,7 +196,7 @@ namespace DataAccess.DAOs
 					CategoryId = product.CategoryId,
 					ProductStatusId = product.ProductStatusId,
 					Quantity = productQuantity,
-                    ProductVariants = variants,
+					ProductVariants = variants,
 					ProductMedias = medias,
 					Tags = tags,
 					Shop = shop
@@ -406,6 +406,19 @@ namespace DataAccess.DAOs
 							&& (x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_HIDE))
 						.FirstOrDefault();
 				return product;
+			}
+		}
+
+		internal List<Product> GetListProductOfSeller(long userId, string productId, string productName)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				if (userId == 0) throw new Exception("INVALID DATA");
+				var lsProduct = context.Product.Where(x => x.ShopId == userId
+							&& (string.IsNullOrWhiteSpace(productId) ? true : productId.Trim() == x.ProductId.ToString())
+							&& (string.IsNullOrWhiteSpace(productName) ? true : x.ProductName.ToLower().Contains(productName.ToLower().Trim())))
+					.ToList();
+				return lsProduct;
 			}
 		}
 	}
