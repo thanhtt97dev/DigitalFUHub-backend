@@ -1250,6 +1250,14 @@ namespace DataAccess.DAOs
 				return context.Order.FirstOrDefault(x => x.OrderId == orderId);
 			}
 		}
+
+		internal OrderDetail? GetOrderDetail(long orderDetailId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.OrderDetail.Include(x => x.Order).FirstOrDefault(x => x.OrderDetailId == orderDetailId);
+			}
+		}
 	}
 }
 

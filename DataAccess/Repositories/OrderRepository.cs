@@ -54,5 +54,7 @@ namespace DataAccess.Repositories
 
 		public Order? GetOrder(long orderId) => OrderDAO.Instance.GetOrder(orderId);
 
+		public OrderDetail? GetOrderDetail(long orderDetailId) => OrderDAO.Instance.GetOrderDetail(orderDetailId);
+
 	}
 }

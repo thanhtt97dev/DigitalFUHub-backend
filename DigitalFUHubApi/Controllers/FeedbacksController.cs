@@ -18,16 +18,15 @@ namespace DigitalFUHubApi.Controllers
 	[ApiController]
 	public class FeedbacksController : ControllerBase
 	{
-
-		private readonly IConfiguration _configuration;
+		private readonly IOrderRepository _orderRepository;
 		private readonly IFeedbackRepository _feedbackRepository;
 		private readonly StorageService _storageService;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 
-		public FeedbacksController(IConfiguration configuration, IFeedbackRepository feedbackRepository, StorageService storageService, JwtTokenService jwtTokenService, IMapper mapper)
+		public FeedbacksController(IOrderRepository orderRepository, IFeedbackRepository feedbackRepository, StorageService storageService, JwtTokenService jwtTokenService, IMapper mapper)
 		{
-			_configuration = configuration;
+			_orderRepository = orderRepository;
 			_feedbackRepository = feedbackRepository;
 			_storageService = storageService;
 			_jwtTokenService = jwtTokenService;
@@ -66,6 +65,18 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 				}
+
+				var orderDetail = _orderRepository.GetOrderDetail(request.OrderDetailId);
+				if (orderDetail == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+
+				if (orderDetail.Order.OrderStatusId != Constants.ORDER_STATUS_CONFIRMED)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM, "Order's status confirm not yet!", false, new()));
+				}
+
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				List<string> urlImages = new List<string>();
 				if (request.ImageFiles != null
@@ -84,6 +95,7 @@ namespace DigitalFUHubApi.Controllers
 						urlImages.Add(path);
 					}
 				}
+
 
 				_feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 			}

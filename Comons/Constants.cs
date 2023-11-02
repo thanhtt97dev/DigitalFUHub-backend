@@ -52,6 +52,8 @@
 
 		public const string RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE = "ORDER_STATUS_01";
 
+		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
+
 
 		//SignalR
 		public const string SIGNAL_R_CHAT_HUB = "chatHub";

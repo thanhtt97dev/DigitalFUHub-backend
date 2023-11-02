@@ -27,6 +27,7 @@ namespace DataAccess.IRepositories
 		List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status);
 		void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId, string note);
 		void UpdateStatusOrderRefund(long sellerId, long orderId, string note);
-		Order? GetOrder(long orderId);	
+		Order? GetOrder(long orderId);
+		OrderDetail? GetOrderDetail(long orderDetailId);
 	}
 }
