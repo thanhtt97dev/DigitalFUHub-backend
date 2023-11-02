@@ -118,7 +118,7 @@
 		public const int USER_CONVERSATION_TYPE_IS_READ = 3;
 
 		//Coupon Type
-		public const int COUPON_TYPE_ALL_PRODUCTS = 1; //admin
+		public const int COUPON_TYPE_ALL_PRODUCTS = 1; 
 		public const int COUPON_TYPE_ALL_PRODUCTS_OF_SHOP = 2;
 		public const int COUPON_TYPE_SPECIFIC_PRODUCTS = 3; 
 

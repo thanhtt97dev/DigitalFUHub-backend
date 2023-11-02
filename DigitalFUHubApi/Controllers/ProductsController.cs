@@ -149,6 +149,22 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
+		[Authorize("Seller")]		
+		[HttpGet("Seller/List")]		
+		public IActionResult GetListProductBySeller(string productId, string productName) 
+		{
+			try
+			{
+				long userId = _jwtTokenService.GetUserIdByAccessToken(User);
+				List<Product> products = _productRepository.GetListProductOfSeller(userId, productId, productName);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, products));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+
+		}
 
 		#region Get Product Of Seller
 		[Authorize("Seller")]

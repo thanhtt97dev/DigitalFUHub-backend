@@ -18,6 +18,8 @@ namespace DTOs.Seller
 		public string StartDate { get; set; } = string.Empty;
 		public string EndDate { get; set; } = string.Empty;
 		public bool IsPublic { get; set; }
+		public long TypeId { get; set; }
+		public List<long> ProductsApplied { get; set; } = new(); 
 	}
 	public class SellerEditCouponRequestDTO
 	{

@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
+using Comons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +87,23 @@ namespace DataAccess.DAOs
 					Shop? shop = context.Shop.FirstOrDefault(x => x.UserId == coupon.ShopId);
 					Coupon? coup = context.Coupon.FirstOrDefault(x => x.CouponCode.ToLower() == coupon.CouponCode.ToLower().Trim());
 
-					if (shop == null || coup != null || coupon.StartDate >= coupon.EndDate) throw new Exception("INVALID");
+					if (shop == null || coup != null || coupon.StartDate >= coupon.EndDate)
+					{
+						throw new Exception("INVALID");
+					}
+					if(coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+					{
+						//bool isExist = context.Product.Any(x => x.ShopId == coupon.ShopId && x.ProductStatusId == Constants.PRODUCT_ACTIVE
+						//			&& coupon.CouponProducts.Any(cp => cp.ProductId != x.ProductId));
+#pragma warning disable CS8604 // Possible null reference argument.
+						bool isExist = coupon.CouponProducts.Any(cp => context.Product.Any(x => x.ShopId == coupon.ShopId 
+											&& x.ProductStatusId == Constants.PRODUCT_ACTIVE && cp.ProductId != x.ProductId));
+#pragma warning restore CS8604 // Possible null reference argument.
+						if (isExist)
+						{
+							throw new Exception("INVALID");
+						}
+					}
 					context.Coupon.Add(coupon);
 					context.SaveChanges();
 				}

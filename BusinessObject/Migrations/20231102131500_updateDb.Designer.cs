@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231030142433_updatedb")]
-    partial class updatedb
+    [Migration("20231102131500_updateDb")]
+    partial class updateDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -239,7 +239,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(394)
+                            StartDate = new DateTime(2023, 11, 2, 20, 15, 0, 105, DateTimeKind.Local).AddTicks(6607)
                         });
                 });
 
@@ -375,6 +375,9 @@ namespace BusinessObject.Migrations
                     b.Property<string>("CouponName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("CouponTypeId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -401,9 +404,66 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("CouponId");
 
+                    b.HasIndex("CouponTypeId");
+
                     b.HasIndex("ShopId");
 
                     b.ToTable("Coupon");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.CouponProduct", b =>
+                {
+                    b.Property<long>("CouponId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActivate")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CouponId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CouponProduct");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.CouponType", b =>
+                {
+                    b.Property<long>("CouponTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CouponTypeId"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CouponTypeId");
+
+                    b.ToTable("CouponType");
+
+                    b.HasData(
+                        new
+                        {
+                            CouponTypeId = 1L,
+                            Name = "For all products (Admin)"
+                        },
+                        new
+                        {
+                            CouponTypeId = 2L,
+                            Name = "For all shop's product"
+                        },
+                        new
+                        {
+                            CouponTypeId = 3L,
+                            Name = "For specific products"
+                        });
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
@@ -509,7 +569,7 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 100,
-                            StartDate = new DateTime(2023, 10, 30, 21, 24, 33, 290, DateTimeKind.Local).AddTicks(415)
+                            StartDate = new DateTime(2023, 11, 2, 20, 15, 0, 105, DateTimeKind.Local).AddTicks(6636)
                         });
                 });
 
@@ -533,6 +593,28 @@ namespace BusinessObject.Migrations
                     b.HasIndex("FeedbackId");
 
                     b.ToTable("FeedbackMedia");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.HistoryOrderStatus", b =>
+                {
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("OrderStatusId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("DateCreate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderId", "OrderStatusId");
+
+                    b.HasIndex("OrderStatusId");
+
+                    b.ToTable("HistoryOrderStatus");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
@@ -792,6 +874,9 @@ namespace BusinessObject.Migrations
                     b.Property<int>("Discount")
                         .HasColumnType("int");
 
+                    b.Property<long>("NumberFeedback")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
 
@@ -803,6 +888,9 @@ namespace BusinessObject.Migrations
 
                     b.Property<string>("Thumbnail")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TotalRatingStar")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
@@ -1545,13 +1633,40 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Coupon", b =>
                 {
+                    b.HasOne("BusinessObject.Entities.CouponType", "CouponType")
+                        .WithMany("Coupons")
+                        .HasForeignKey("CouponTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BusinessObject.Entities.Shop", "Shop")
                         .WithMany("Coupons")
                         .HasForeignKey("ShopId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CouponType");
+
                     b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.CouponProduct", b =>
+                {
+                    b.HasOne("BusinessObject.Entities.Coupon", "Coupon")
+                        .WithMany("CouponProducts")
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.Product", "Product")
+                        .WithMany("CouponProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Coupon");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.DepositTransaction", b =>
@@ -1609,6 +1724,25 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.Navigation("Feedback");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.HistoryOrderStatus", b =>
+                {
+                    b.HasOne("BusinessObject.Entities.Order", "Order")
+                        .WithMany("HistoryOrderStatus")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.Entities.OrderStatus", "OrderStatus")
+                        .WithMany("HistoryOrderStatus")
+                        .HasForeignKey("OrderStatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("OrderStatus");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Message", b =>
@@ -1989,7 +2123,14 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Coupon", b =>
                 {
+                    b.Navigation("CouponProducts");
+
                     b.Navigation("OrderCoupons");
+                });
+
+            modelBuilder.Entity("BusinessObject.Entities.CouponType", b =>
+                {
+                    b.Navigation("Coupons");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Feedback", b =>
@@ -2001,6 +2142,8 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.Order", b =>
                 {
+                    b.Navigation("HistoryOrderStatus");
+
                     b.Navigation("OrderCoupons");
 
                     b.Navigation("OrderDetails");
@@ -2019,11 +2162,15 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.Entities.OrderStatus", b =>
                 {
+                    b.Navigation("HistoryOrderStatus");
+
                     b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("BusinessObject.Entities.Product", b =>
                 {
+                    b.Navigation("CouponProducts");
+
                     b.Navigation("Feedbacks");
 
                     b.Navigation("ProductMedias");
