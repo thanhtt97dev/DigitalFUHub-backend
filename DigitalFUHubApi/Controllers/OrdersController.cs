@@ -173,7 +173,7 @@ namespace DigitalFUHubApi.Controllers
 				//check vaild order status
 				if(request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
 				{
-					if(order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION ||
+					if(order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
 						order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT) 
 					{
 						return Ok(new ResponseData(Constants.RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE, "Order's status has been changed before!", false, new()));
