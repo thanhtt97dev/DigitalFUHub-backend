@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using AutoMapper;
+using Azure.Core;
 using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
@@ -18,14 +19,14 @@ namespace DigitalFUHubApi.Controllers
 
         private readonly JwtTokenService jwtTokenService;
         private readonly IUserRepository userRepository;
-        private readonly IProductRepository productRepository;
         private readonly IWishListRepository wishListRepository;
+        private readonly IMapper mapper;
 
-        public WishListsController(IUserRepository userRepository, JwtTokenService jwtTokenService, IProductRepository productRepository, IWishListRepository wishListRepository) {
+        public WishListsController(IUserRepository userRepository, JwtTokenService jwtTokenService, IWishListRepository wishListRepository, IMapper mapper) {
             this.jwtTokenService = jwtTokenService;
             this.userRepository = userRepository;
-            this.productRepository = productRepository;
             this.wishListRepository = wishListRepository;
+            this.mapper = mapper;
         }
 
         [HttpPost("Add")]
@@ -157,6 +158,43 @@ namespace DigitalFUHubApi.Controllers
                 return Ok(responseData);
 
             } catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("GetByUserId/{userId}")]
+        [Authorize]
+        public IActionResult GetWishListByUserId(long userId)
+        {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
+            try
+            {
+                //if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+                //{
+                //    return Unauthorized();
+                //}
+
+                var user = userRepository.GetUserById(userId);
+                if (user == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "User not found";
+                    status.Ok = false;
+                }
+
+                var products = mapper.Map<List<WishListProductResponseDTO>>(wishListRepository.GetProductFromWishListByUserId(userId));
+
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
+                responseData.Result = products;
+                return Ok(responseData);
+
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }

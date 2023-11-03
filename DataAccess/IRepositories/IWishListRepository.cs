@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessObject.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,6 @@ namespace DataAccess.IRepositories
         void AddWishList(long productId, long userId);
         void RemoveWishList(long productId, long userId);
         (string, string, bool) CheckRequestWishListIsValid(long productId, long userId);
+        List<Product> GetProductFromWishListByUserId(long userId);
     }
 }

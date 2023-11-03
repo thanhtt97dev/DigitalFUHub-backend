@@ -6,6 +6,7 @@ using DataAccess.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,13 +32,24 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal WishList? GetWishListByUserId (long userId)
+        internal List<Product> GetProductFromWishListByUserId (long userId)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                var wishList = context.WishList.Where(x => x.UserId == userId);
+                var productIds = context.WishList.Where(x => x.UserId == userId).Select(x => x.ProductId);
+                if (productIds.Count() == 0) return new List<Product>();
+                var products = context.Product.Where(x => productIds.Contains(x.ProductId)).ToList();
 
-                return null;
+                List<ProductVariant> productVariants = new List<ProductVariant>();
+                foreach(var product in products)
+                {
+                    var productVariant = context.ProductVariant.Where(x => x.ProductId == product.ProductId && x.isActivate == true).ToList();
+                    if (productVariant.Count() > 0) {
+                        productVariants.AddRange(productVariant);
+                    }
+                }
+
+                return products;
             }
         }
 

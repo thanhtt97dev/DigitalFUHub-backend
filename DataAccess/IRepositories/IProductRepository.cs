@@ -25,5 +25,6 @@ namespace DataAccess.IRepositories
 		bool IsExistProductByShop(long userId, long productId);
 		Product? CheckProductExist(long userId, long productId);
 		List<Product> GetListProductOfSeller(long userId, string productId, string productName);
-	}
+
+    }
 }
