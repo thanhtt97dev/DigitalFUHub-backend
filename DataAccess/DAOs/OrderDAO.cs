@@ -1123,17 +1123,17 @@ namespace DataAccess.DAOs
 								new UserConversation
 								{
 									UserId = sellerId,
-									IsRead = 1,
+									IsRead = Constants.USER_CONVERSATION_TYPE_IS_READ,
 								},
 								new UserConversation
 								{
 									UserId = customerId,
-									IsRead = 0,
+									IsRead = Constants.USER_CONVERSATION_TYPE_UN_READ,
 								},
 								new UserConversation
 								{
 									UserId = Constants.ADMIN_USER_ID,
-									IsRead = 0,
+									IsRead = Constants.USER_CONVERSATION_TYPE_UN_READ,
 								}
 							}
 						};

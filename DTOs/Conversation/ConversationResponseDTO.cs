@@ -12,7 +12,7 @@ namespace DTOs.Conversation
         public string? ConversationName { get; set; }
         public DateTime DateCreate { get; set; }
         public bool IsActivate { get; set; }
-        public int IsRead { get; set; }
+        public bool IsRead { get; set; }
         public string LatestMessage { get; set; } = string.Empty;
         public bool IsGroup { get; set; }
         public DateTime LastTimeOnline { get; set; }

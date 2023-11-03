@@ -9,12 +9,12 @@ namespace DTOs.UserConversation
     public class UpdateUserConversationRequestDTO
     {
         public long ConversationId { get; set; }
-        public int IsRead { get; set; }
+        public bool IsRead { get; set; }
         public long UserId { get; set; }
 
         public bool IsValid()
         {
-            return UserId > 0 && ConversationId > 0 && IsRead > 0;
+            return UserId > 0 && ConversationId > 0;
         }
     }
 }

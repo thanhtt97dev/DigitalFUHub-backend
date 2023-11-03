@@ -117,9 +117,8 @@
 		public const string MESSAGE_TYPE_CONVERSATION_TEXT = "0";
 		public const string MESSAGE_TYPE_CONVERSATION_IMAGE = "1";
 
-		public const int USER_CONVERSATION_TYPE_INITIAL = 1;
-		public const int USER_CONVERSATION_TYPE_UN_READ = 2;
-		public const int USER_CONVERSATION_TYPE_IS_READ = 3;
+		public const bool USER_CONVERSATION_TYPE_UN_READ = false;
+		public const bool USER_CONVERSATION_TYPE_IS_READ = true;
 
 		//Coupon Type
 		public const int COUPON_TYPE_ALL_PRODUCTS = 1; 

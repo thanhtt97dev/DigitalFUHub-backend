@@ -59,7 +59,7 @@ namespace DataAccess.DAOs
 						ConversationName = group.Key.ConversationName,
 						DateCreate = group.Key.DateCreate,
 						IsActivate = group.Key.IsActivate,
-						IsRead = userConversations.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.IsRead ?? 1,
+						IsRead = userConversations.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.IsRead ?? Constants.USER_CONVERSATION_TYPE_UN_READ,
 						LatestMessage = context.Messages.OrderByDescending(x => x.DateCreate)
 						.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.Content ?? "",
 						IsGroup = group.Key.IsGroup,
@@ -167,8 +167,8 @@ namespace DataAccess.DAOs
 						{
 							UserId = userId,
 							ConversationId = conversationId,
-							IsRead = Constants.USER_CONVERSATION_TYPE_INITIAL
-						};
+							IsRead = Constants.USER_CONVERSATION_TYPE_UN_READ
+                        };
 						context.UserConversation.Add(newUserConversation);
 					}
 					context.SaveChanges();
@@ -254,6 +254,14 @@ namespace DataAccess.DAOs
 				return result;
 			}
 		}
+
+		//internal long GetNumberConversationUnReadOfUser (long userId)
+		//{
+  //          using (DatabaseContext context = new DatabaseContext())
+  //          {
+                
+  //          }
+  //      }
 
 		internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
 		{
