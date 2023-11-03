@@ -9,10 +9,10 @@ namespace BusinessObject.Entities
 {
 	public class WishList
 	{
-		public long UsertId { get; set; }	
+		public long UserId { get; set; }	
 		public long ProductId { get; set;}
 
-		[ForeignKey(nameof(UsertId))]
+		[ForeignKey(nameof(UserId))]
 		public virtual User User { get; set; } = null!;
 		[ForeignKey(nameof(ProductId))]
 		public virtual Product Product { get; set; } = null!;

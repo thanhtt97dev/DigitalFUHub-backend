@@ -142,11 +142,11 @@ namespace BusinessObject
 				.HasForeignKey(x => x.OrderStatusId)
 				.OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<WishList>()
-				.HasKey(x => new { x.UsertId, x.ProductId });
+				.HasKey(x => new { x.UserId, x.ProductId });
 			modelBuilder.Entity<WishList>()
 				.HasOne(x => x.User)
 				.WithMany(c => c.WishList)
-				.HasForeignKey(x => x.UsertId)
+				.HasForeignKey(x => x.UserId)
 				.OnDelete(DeleteBehavior.NoAction);
 			modelBuilder.Entity<WishList>()
 				.HasOne(x => x.Product)
