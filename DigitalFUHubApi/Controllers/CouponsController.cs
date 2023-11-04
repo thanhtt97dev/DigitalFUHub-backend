@@ -70,13 +70,13 @@ namespace DigitalFUHubApi.Controllers
 				response.Status.Message = "Success";
 				response.Status.Ok = true;
 				response.Result = coupons;
-                return Ok(response);
+				return Ok(response);
 
-            }
+			}
 			catch (Exception ex)
 			{
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
 		}
 		#endregion
 
@@ -279,11 +279,19 @@ namespace DigitalFUHubApi.Controllers
 					StartDate = startDT,
 					EndDate = endDT,
 					CouponName = request.CouponName.Trim(),
-					CouponCode = request.CouponCode.Trim(),
+					CouponCode = request.CouponCode.ToUpper().Trim(),
 					PriceDiscount = request.PriceDiscount,
 					MinTotalOrderValue = request.MinTotalOrderValue,
 					Quantity = request.Quantity,
-					ShopId = request.UserId
+					ShopId = request.UserId,
+					CouponTypeId = request.TypeId,
+					CouponProducts = request.ProductsApplied.Select(x => new CouponProduct
+					{
+						CouponId = request.CouponId,
+						ProductId = x,
+						IsActivate = true,
+						UpdateDate = DateTime.Now,
+					}).ToList()
 				};
 				_couponRepository.UpdateCoupon(coupon);
 

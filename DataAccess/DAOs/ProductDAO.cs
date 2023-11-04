@@ -409,16 +409,18 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Product> GetListProductOfSeller(long userId, string productId, string productName)
+		internal (List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				if (userId == 0) throw new Exception("INVALID DATA");
-				var lsProduct = context.Product.Where(x => x.ShopId == userId
+				var query = context.Product.Where(x => x.ShopId == userId
 							&& (string.IsNullOrWhiteSpace(productId) ? true : productId.Trim() == x.ProductId.ToString())
-							&& (string.IsNullOrWhiteSpace(productName) ? true : x.ProductName.ToLower().Contains(productName.ToLower().Trim())))
+							&& (string.IsNullOrWhiteSpace(productName) ? true : x.ProductName.ToLower().Contains(productName.ToLower().Trim())));
+				var lsProduct = query
+					.Skip((page - 1) * 10).Take(10)
 					.ToList();
-				return lsProduct;
+				return (lsProduct, query.Count());
 			}
 		}
 	}

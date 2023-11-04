@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using BusinessObject.Entities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,7 @@ namespace DTOs.Seller
 		public long PriceDiscount { get; set; }
 		public long MinTotalOrderValue { get; set; }
 		public bool IsPublic { get; set; }
+		public long CouponTypeId { get; set; }
+		public List<BusinessObject.Entities.Product> ProductsApplied { get; set; } = new();
 	}
 }
