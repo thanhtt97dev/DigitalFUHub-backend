@@ -179,8 +179,6 @@ namespace DigitalFUHubApi.Controllers
                 // message response to chat hub
                 List<MessageConversationResponseDTO> messageConversations = mapper.Map<List<MessageConversationResponseDTO>>(messages);
 
-
-
                 // signR chat hub
                 if (connections.Count > 0)
                 {
@@ -191,6 +189,7 @@ namespace DigitalFUHubApi.Controllers
                             await hubContext.Clients.Clients(connectionId)
                            .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, msg);
                         }
+                      
                     }
                 }
                 return Ok();
