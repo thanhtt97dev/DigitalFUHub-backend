@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using DigitalFUHubApi.Hubs;
-using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Managers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using DataAccess.IRepositories;
 using Microsoft.AspNetCore.Authorization;
-using Comons;
 using DataAccess.Repositories;
 using BusinessObject.Entities;
 using DTOs.Conversation;
@@ -17,6 +15,10 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Collections.Generic;
 using DTOs.UserConversation;
 using System.Threading;
+using DigitalFUHubApi.Comons;
+using Comons;
+using DTOs.User;
+using Newtonsoft.Json;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -31,8 +33,9 @@ namespace DigitalFUHubApi.Controllers
         private readonly StorageService storageService;
         private readonly IUserRepository userRepository;
         private readonly IUserConversationRepository userConversationRepository;
+        private readonly JwtTokenService jwtTokenService;
 
-        public ConversationsController(IHubContext<ChatHub> hubContext, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, StorageService storageService, IUserRepository userRepository, IUserConversationRepository userConversationRepository)
+        public ConversationsController(IHubContext<ChatHub> hubContext, JwtTokenService jwtTokenService, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, StorageService storageService, IUserRepository userRepository, IUserConversationRepository userConversationRepository)
         {
             this.hubContext = hubContext;
             this.connectionManager = connectionManager;
@@ -41,6 +44,7 @@ namespace DigitalFUHubApi.Controllers
             this.storageService = storageService;
             this.userRepository = userRepository;
             this.userConversationRepository = userConversationRepository;
+            this.jwtTokenService = jwtTokenService;
         }
 
         [HttpPost("SendMessage")]
@@ -50,7 +54,11 @@ namespace DigitalFUHubApi.Controllers
             {
                 return BadRequest();
             }
+
             ResponseData responseData = new ResponseData();
+            string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+            List<string> urlImages = new List<string>();
+            List<string> connections = new List<string>();
 
             //check users recipient and user sender existed
             List<long> userIdInConverstion = new List<long>();
@@ -64,20 +72,21 @@ namespace DigitalFUHubApi.Controllers
                 responseData.Status.Message = "Data not found!";
             }
 
-            string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
-            List<string> urlImages = new List<string>();
-            List<string> connections = new List<string>();
-
             //get connectionId of user recipient
             foreach (long recipientId in request.RecipientIds)
             {
+                // get connection id of chat hub
                 HashSet<string>? connectionIds = connectionManager
                         .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
-                if (connectionIds == null) continue;
-                connections.AddRange(connectionIds.ToList());
+
+                if (connectionIds != null)
+                {
+                    connections.AddRange(connectionIds.ToList());
+                }
+
             }
 
-            //get connection Id of user sender
+            //get connection id of user sender
             long senderId = request.UserId;
             HashSet<string>? connectionIdsSender = connectionManager
                .GetConnections(senderId, Constants.SIGNAL_R_CHAT_HUB);
@@ -86,18 +95,19 @@ namespace DigitalFUHubApi.Controllers
                 connections.AddRange(connectionIdsSender.ToList());
             }
 
+
             try
             {
+                // upload file
                 if (request.Images != null)
                 {
                     if (request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf(".")))))
                     {
-                        Console.WriteLine("File không hợp lệ");
                         return Ok(new Status
                         {
                             Ok = false,
                             ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
-                            Message = ""
+                            Message = "Invalid file!"
                         });
                     }
 
@@ -113,7 +123,7 @@ namespace DigitalFUHubApi.Controllers
                     }
                 }
 
-                // Create message
+                // Create messages
                 Message newMessage;
                 List<Message> messages = new List<Message>();
 
@@ -147,7 +157,10 @@ namespace DigitalFUHubApi.Controllers
                     };
                     messages.Add(newMessage);
                 }
+
+
                
+                // add message
                 await conversationRepository.SendMessageConversation(messages);
 
                 // update un read for user recipient
@@ -163,9 +176,12 @@ namespace DigitalFUHubApi.Controllers
                 }
 
 
-                //send to signR connections
+                // message response to chat hub
                 List<MessageConversationResponseDTO> messageConversations = mapper.Map<List<MessageConversationResponseDTO>>(messages);
 
+
+
+                // signR chat hub
                 if (connections.Count > 0)
                 {
                     foreach (var connectionId in connections)
@@ -177,7 +193,6 @@ namespace DigitalFUHubApi.Controllers
                         }
                     }
                 }
-
                 return Ok();
             }
             catch (Exception ex)
@@ -303,5 +318,56 @@ namespace DigitalFUHubApi.Controllers
                 return BadRequest(new Status());
             }
         }
+
+        [HttpGet("getNumberConversationUnRead")]
+        [Authorize]
+        public IActionResult GetNumberConversationUnRead(long userId)
+        {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
+            try
+            {
+
+                if (userId == 0)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "Invalid";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+                var user = userRepository.GetUserById(userId);
+
+                if (user == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "user not found!";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                long numberConversation = conversationRepository.GetNumberConversationUnReadOfUser(userId);
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
+                responseData.Result = numberConversation;
+                return Ok(responseData);
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest(new Status());
+            }
+        }
+
+
     }
 }

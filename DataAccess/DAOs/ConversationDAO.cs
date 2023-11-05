@@ -255,13 +255,15 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		//internal long GetNumberConversationUnReadOfUser (long userId)
-		//{
-  //          using (DatabaseContext context = new DatabaseContext())
-  //          {
-                
-  //          }
-  //      }
+		internal long GetNumberConversationUnReadOfUser(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				long numberConversationUnRead = context.UserConversation.Count(x => x.UserId == userId && x.IsRead == Constants.USER_CONVERSATION_TYPE_UN_READ);
+
+                return numberConversationUnRead;
+			}
+		}
 
 		internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
 		{

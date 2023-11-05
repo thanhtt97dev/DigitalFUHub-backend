@@ -27,5 +27,6 @@ namespace DataAccess.Repositories
 
 		public long GetConversation(long shopId, long userId) => ConversationDAO.Instance.GetConversation(shopId, userId);
 
-	}
+        public long GetNumberConversationUnReadOfUser(long userId) => ConversationDAO.Instance.GetNumberConversationUnReadOfUser(userId);
+    }
 }

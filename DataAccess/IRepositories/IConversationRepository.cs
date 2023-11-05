@@ -20,5 +20,7 @@ namespace DataAccess.IRepositories
         (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation);
 		public List<UserConversationDTO> GetRecipientUserIdHasConversation(long userId);
         public long GetConversation(long shopId, long userId);
-	}
+        long GetNumberConversationUnReadOfUser(long userId);
+
+    }
 }
