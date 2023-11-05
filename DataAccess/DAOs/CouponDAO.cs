@@ -1,6 +1,7 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
 using Comons;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,18 +38,18 @@ namespace DataAccess.DAOs
 				var coupons = context.Coupon.Where(c => c.ShopId == shopId
 															&& c.IsActive == true
 															&& c.EndDate > DateTime.Now
-                                                            && c.StartDate < DateTime.Now
-                                                            && c.IsPublic == true).ToList();
+															&& c.StartDate < DateTime.Now
+															&& c.IsPublic == true).ToList();
 
-                foreach (var item in coupons)
-                {
-                    if (item.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+				foreach (var item in coupons)
+				{
+					if (item.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
 					{
 						item.CouponProducts = context.CouponProduct.Where(x => x.CouponId == item.CouponId).ToList();
 					}
-                }
+				}
 
-                return coupons;
+				return coupons;
 			}
 		}
 
@@ -60,9 +61,9 @@ namespace DataAccess.DAOs
 								.Coupon
 								.FirstOrDefault(c => c.CouponCode.ToLower().Equals(couponCode.ToLower())
 											&& c.ShopId == shopId
-                                            && c.IsActive == true
-                                            && c.IsPublic == false
-                                            && c.EndDate > DateTime.Now
+											&& c.IsActive == true
+											&& c.IsPublic == false
+											&& c.EndDate > DateTime.Now
 											&& c.StartDate < DateTime.Now);
 
 				return coupon;
@@ -99,10 +100,10 @@ namespace DataAccess.DAOs
 					{
 						throw new Exception("INVALID");
 					}
-					if(coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+					if (coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
 					{
 #pragma warning disable CS8604 // Possible null reference argument.
-						bool isExist = coupon.CouponProducts.Any(cp => !context.Product.Any(x => x.ShopId == coupon.ShopId 
+						bool isExist = coupon.CouponProducts.Any(cp => !context.Product.Any(x => x.ShopId == coupon.ShopId
 											&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE && cp.ProductId == x.ProductId));
 #pragma warning restore CS8604 // Possible null reference argument.
 						if (isExist)
@@ -124,7 +125,8 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Coupon.FirstOrDefault(x => x.CouponId == couponId && x.ShopId == shopId && x.IsActive == true);
+				return context.Coupon.Include(x => x.CouponProducts).ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.CouponId == couponId && x.ShopId == shopId && x.IsActive == true);
 			}
 		}
 
@@ -148,7 +150,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Coupon.Any(x => x.CouponCode.ToLower() == couponCode.ToLower() 
+				return context.Coupon.Any(x => x.CouponCode.ToLower() == couponCode.ToLower()
 				&& (action.ToLower() == "u" ? x.ShopId != shopId : true));
 			}
 		}
@@ -159,7 +161,9 @@ namespace DataAccess.DAOs
 			{
 				try
 				{
-					Coupon? coup = context.Coupon.FirstOrDefault(x => x.CouponId == coupon.CouponId && x.ShopId == coupon.ShopId && x.IsActive == true);
+					Coupon? coup = context.Coupon
+						.FirstOrDefault(x => x.CouponId == coupon.CouponId && x.ShopId == coupon.ShopId
+						&& x.IsActive == true);
 					if (coup == null || coupon.StartDate >= coupon.EndDate) throw new Exception("INVALID");
 					coup.StartDate = coupon.StartDate;
 					coup.EndDate = coupon.EndDate;
@@ -170,6 +174,14 @@ namespace DataAccess.DAOs
 					coup.MinTotalOrderValue = coupon.MinTotalOrderValue;
 					coup.Quantity = coupon.Quantity;
 
+					if(coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+					{
+						context.CouponProduct.RemoveRange(context.CouponProduct.Where(x => x.CouponId == coup.CouponId));
+						#pragma warning disable CS8604 // Possible null reference argument.
+						context.CouponProduct.AddRange(coupon.CouponProducts);
+						#pragma warning restore CS8604 // Possible null reference argument.
+					}
+					
 					context.Coupon.Update(coup);
 					context.SaveChanges();
 				}

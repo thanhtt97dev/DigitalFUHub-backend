@@ -13,18 +13,18 @@ namespace DataAccess.Repositories
 {
 	public class ProductRepository : IProductRepository
 	{
-		public void AddProduct(Product product) =>  ProductDAO.Instance.AddProduct(product);
+		public void AddProduct(Product product) => ProductDAO.Instance.AddProduct(product);
 
 		public List<SellerProductResponseDTO> GetAllProduct(long userId) => ProductDAO.Instance.GetAllProduct(userId);
 
-        public List<AllProductResponseDTO> GetAllProduct() => ProductDAO.Instance.GetAllProduct();
+		public List<AllProductResponseDTO> GetAllProduct() => ProductDAO.Instance.GetAllProduct();
 
-        public List<ProductDetailVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
+		public List<ProductDetailVariantResponeDTO> GetProductVariants(int productId) => ProductDAO.Instance.GetProductVariants(productId);
 
-        public ProductDetailResponseDTO? GetProductById(long productId) => ProductDAO.Instance.GetProductById(productId);
+		public ProductDetailResponseDTO? GetProductById(long productId) => ProductDAO.Instance.GetProductById(productId);
 
 		public void EditProduct(Product product, List<ProductVariant> productVariantsNew, List<ProductVariant> productVariantsUpdate, List<Tag> tags, List<ProductMedia> productMediaNew, List<string> productImagesOld)
-		=> ProductDAO.Instance.EditProduct( product,  productVariantsNew, productVariantsUpdate, tags, productMediaNew, productImagesOld);
+		=> ProductDAO.Instance.EditProduct(product, productVariantsNew, productVariantsUpdate, tags, productMediaNew, productImagesOld);
 
 		public string GetProductThumbnail(long productId) => ProductDAO.Instance.GetProductThumbnail(productId);
 
@@ -39,7 +39,7 @@ namespace DataAccess.Repositories
 		public Product? CheckProductExist(long userId, long productId)
 		=> ProductDAO.Instance.CheckProductExist(userId, productId);
 
-		public List<Product> GetListProductOfSeller(long userId, string productId, string productName)
-		=> ProductDAO.Instance.GetListProductOfSeller(userId, productId, productName);
+		public (List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page)
+		=> ProductDAO.Instance.GetListProductOfSeller(userId, productId, productName, page);
 	}
 }

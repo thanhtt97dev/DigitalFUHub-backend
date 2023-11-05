@@ -10,6 +10,7 @@ using DTOs.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -42,78 +43,80 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 		}
 
-        #region Get Product Detail
-        [HttpGet("GetById/{productId}")]
+		#region Get Product Detail
+		[HttpGet("GetById/{productId}")]
 		public IActionResult GetById(long productId)
 		{
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
-            try
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
 			{
-				if (productId == 0) {
+				if (productId == 0)
+				{
 					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
 					status.Message = "Invalid";
 					status.Ok = false;
 					responseData.Status = status;
 					return Ok(responseData);
-                }
+				}
 
-                var product = _productRepository.GetProductById(productId);
+				var product = _productRepository.GetProductById(productId);
 
-				if (product == null) {
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Message = "Product not found!";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				if (product == null)
+				{
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					status.Message = "Product not found!";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
 				// check product status
 				if (product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
 				{
-                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_BAN;
-                    status.Message = "This product has been banned";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    responseData.Result = product;
-                    return Ok(responseData);
-                }
+					status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_BAN;
+					status.Message = "This product has been banned";
+					status.Ok = false;
+					responseData.Status = status;
+					responseData.Result = product;
+					return Ok(responseData);
+				}
 
-                if (product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_REMOVE;
-                    status.Message = "This product has been remove";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				if (product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE)
+				{
+					status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_REMOVE;
+					status.Message = "This product has been remove";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
-                if (product.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_HIDE;
-                    status.Message = "This product has been hide";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				if (product.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)
+				{
+					status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_HIDE;
+					status.Message = "This product has been hide";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
-                status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_ACTIVE;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                responseData.Result = product;
-                return Ok(responseData);
+				status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_ACTIVE;
+				status.Message = "Success";
+				status.Ok = true;
+				responseData.Status = status;
+				responseData.Result = product;
+				return Ok(responseData);
 
-            }
+			}
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Get All Product with shopId (userId)
-        [Authorize("Seller")]
+		#region Get All Product with shopId (userId)
+		[Authorize("Seller")]
 		[HttpGet("Seller/{userId}/All")]
 		public IActionResult GetAllProductSeller(long userId)
 		{
@@ -148,15 +151,20 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
-		[Authorize("Seller")]		
-		[HttpGet("Seller/List")]		
-		public IActionResult GetListProductBySeller(string productId, string productName) 
+		[Authorize("Seller")]
+		[HttpGet("Seller/List")]
+		public IActionResult GetListProductBySeller(string productId, string productName, int page)
 		{
 			try
 			{
 				long userId = _jwtTokenService.GetUserIdByAccessToken(User);
-				List<Product> products = _productRepository.GetListProductOfSeller(userId, productId, productName);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, products));
+				(List<Product> products, long totalItems) = _productRepository.GetListProductOfSeller(userId, productId, productName, page);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerGetProductResponseDTO
+				{
+					Products = products,
+					TotalItems = totalItems
+				}));
 			}
 			catch (Exception e)
 			{
@@ -343,7 +351,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					for (int i = 0; i < request.ProductVariantIdsUpdate.Count; i++)
 					{
-						#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8601 // Possible null reference assignment.
 						productVariantsUpdate.Add(new ProductVariant
 						{
 							Name = request.ProductVariantNamesUpdate[i],
@@ -354,7 +362,7 @@ namespace DigitalFUHubApi.Controllers
 												&& request.AssetInformationFilesUpdate[i] != null ?
 									Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i]) : null
 						});
-						#pragma warning restore CS8601 // Possible null reference assignment.
+#pragma warning restore CS8601 // Possible null reference assignment.
 					}
 				}
 

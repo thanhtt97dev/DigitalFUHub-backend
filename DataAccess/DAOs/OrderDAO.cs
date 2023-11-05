@@ -439,7 +439,7 @@ namespace DataAccess.DAOs
 							if (coupon == null)
 							{
 								transaction.Rollback();
-								return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
+								return (Constants.RESPONSE_CODE_ORDER_COUPON_NOT_EXISTED, "Coupon not existed!", numberQuantityAvailable, orderResult);
 							}
 
 							if (coupon.CouponTypeId == Constants.COUPON_TYPE_ALL_PRODUCTS)
@@ -451,7 +451,7 @@ namespace DataAccess.DAOs
 								var couponOfShopExisted = context.Coupon.Any(x => x.ShopId == shopProduct.ShopId && x.CouponId == coupon.CouponId);
 								if (!couponOfShopExisted)
 								{
-									return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
+									return (Constants.RESPONSE_CODE_ORDER_COUPON_NOT_EXISTED, "Coupon not existed!", numberQuantityAvailable, orderResult);
 								}
 							}
 							else if (coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
@@ -463,7 +463,7 @@ namespace DataAccess.DAOs
 																				);
 								if (!couponForSpecificProductOfShopExisted)
 								{
-									return (Constants.RESPONSE_CODE_ORDER_COUPON_USED, "A coupon has been used!", numberQuantityAvailable, orderResult);
+									return (Constants.RESPONSE_CODE_ORDER_COUPON_INVALID_PRODUCT_APPLY, "Invalid product apply!", numberQuantityAvailable, orderResult);
 								}
 							}
 

@@ -17,6 +17,7 @@ using Comons;
 using DTOs.Seller;
 using DTOs.Feedback;
 using DTOs.WishList;
+using Google.Apis.Util;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -165,7 +166,22 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Coupon, CouponResponseDTO>()
 				.ForMember(des => des.productIds, act => act.MapFrom(src => src.CouponProducts != null ? src.CouponProducts.Select(x => x.ProductId).ToList() : new List<long>()))
                 .ReverseMap();
-			CreateMap<Coupon, SellerCouponResponseDTO>().ReverseMap();
+			CreateMap<Coupon, SellerCouponResponseDTO>()
+				.ForMember(des => des.ProductsApplied, act => act.MapFrom(src => src.CouponProducts.Select(x => new Product
+				{
+					ProductId = x.ProductId,
+					ProductName = x.Product.ProductName,
+					ProductStatusId = x.Product.ProductId,
+					Thumbnail = x.Product.Thumbnail,
+					NumberFeedback = x.Product.NumberFeedback,
+					TotalRatingStar = x.Product.TotalRatingStar,
+					Discount = x.Product.Discount,
+					Description = x.Product.Description,
+					UpdateDate = x.Product.UpdateDate,
+					ShopId = x.Product.ShopId,
+					CategoryId = x.Product.CategoryId,
+				}).ToList()))
+				.ReverseMap();
             CreateMap<Product, WishListProductResponseDTO>().ReverseMap();
             CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
 
