@@ -323,6 +323,7 @@ namespace DataAccess.DAOs
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not found!", numberQuantityAvailable, orderResult);
 						}
+						var customerCoin = customer.Coin;
 						#endregion
 
 						#region Check customer buy their own products 
@@ -499,17 +500,19 @@ namespace DataAccess.DAOs
 						}
 
 						// caculate total coin discount
-						if (isUseCoin && customer.Coin > 0 && totalPayment > 0)
+						if (isUseCoin && customerCoin > 0 && totalPayment > 0)
 						{
-							if (totalPayment <= customer.Coin)
+							if (totalPayment <= customerCoin)
 							{
-								totalCoinDiscount = customer.Coin;
+								totalCoinDiscount = customerCoin;
 								totalPayment = 0;
+								customerCoin -= totalCoinDiscount;
 							}
 							else
 							{
-								totalCoinDiscount = customer.Coin;
-								totalPayment = totalPayment - customer.Coin;
+								totalCoinDiscount = customerCoin;
+								totalPayment = totalPayment - customerCoin;
+								customerCoin = 0;
 							}
 						}
 						#endregion

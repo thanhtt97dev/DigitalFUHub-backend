@@ -20,4 +20,11 @@ namespace DTOs.Conversation
         public ICollection<UserConversationResponseDTO>? Users { get; set; }
 
     }
+
+    public class ConversationLatestMessageResponseDTO
+    {
+        public string Content { get; set; }
+        public DateTime DateCreate { get; set; }   
+
+	}
 }
