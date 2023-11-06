@@ -367,6 +367,33 @@ namespace DigitalFUHubApi.Controllers
             }
         }
 
+		[HttpGet("GetConversationsUnRead/{userId}")]
+		public IActionResult GetConversationsUnRead(long userId)
+        {
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+            try
+            {
+                if (userId == 0)
+                {
+                    return BadRequest();
+                }
+
+                var result = conversationRepository.GetConversationsUnRead(userId);
+
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				status.Message = "Success";
+				status.Ok = true;
+				responseData.Status = status;
+				responseData.Result = result;
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
 
     }
 }

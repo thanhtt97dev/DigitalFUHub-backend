@@ -373,5 +373,16 @@ namespace DataAccess.DAOs
 
 			}
 		}
+
+		internal List<long> GetConversationsUnRead(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var conversationsUnRead = context.UserConversation
+					.Where(x => x.UserId == userId && x.IsRead == false)
+					.ToList();	
+				return conversationsUnRead.Select(x => x.ConversationId).ToList();	
+			}
+		}
 	}
 }
