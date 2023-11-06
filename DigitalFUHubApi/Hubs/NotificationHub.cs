@@ -8,6 +8,7 @@ using DigitalFUHubApi.Services;
 using DigitalFUHubApi.Comons;
 using DTOs.Notification;
 using Comons;
+using System;
 
 namespace DigitalFUHubApi.Hubs
 {
@@ -28,12 +29,12 @@ namespace DigitalFUHubApi.Hubs
 			this.connectionManager = connectionManager;
 		}
 
-		public override async Task OnConnectedAsync()
+		public override Task OnConnectedAsync()
 		{
 			var userId = hubService.GetUserIdFromHubCaller(Context);
 			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
 			connectionManager.AddConnection(userId, Constants.SIGNAL_R_NOTIFICATION_HUB, connectionId);
-			await SendAllNotificationToUserCaller();
+			return base.OnConnectedAsync();
 		}
 
 		public override Task OnDisconnectedAsync(Exception? exception)
@@ -42,17 +43,6 @@ namespace DigitalFUHubApi.Hubs
 			var connectionId = hubService.GetConnectionIdFromHubCaller(Context);
 			connectionManager.RemoveConnection(userId, Constants.SIGNAL_R_NOTIFICATION_HUB, connectionId);
 			return base.OnDisconnectedAsync(exception);
-		}
-
-		private async Task SendAllNotificationToUserCaller()
-		{
-			var userId = hubService.GetUserIdFromHubCaller(Context);
-            var visibleNotifications = hubService.GetVisibleNotificationsFromHubCaller(Context);
-            if (userId == 0) return;
-
-			var notifications = notificationRepositiory.GetNotifications(userId, visibleNotifications);
-			await Clients.Caller.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION,
-						JsonConvert.SerializeObject(mapper.Map<List<NotificationRespone>>(notifications)));
 		}
 
     }

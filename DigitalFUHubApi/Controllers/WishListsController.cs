@@ -37,10 +37,10 @@ namespace DigitalFUHubApi.Controllers
             Status status = new Status();
             try
             {
-                //if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
-                //{
-                //    return Unauthorized();
-                //}
+                if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
 
                 (string responseCode, string message, bool isOk) = wishListRepository.CheckRequestWishListIsValid(request.ProductId, request.UserId);
                 if (!isOk)
@@ -86,10 +86,10 @@ namespace DigitalFUHubApi.Controllers
             Status status = new Status();
             try
             {
-                //if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
-                //{
-                //    return Unauthorized();
-                //}
+                if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
 
                 (string responseCode, string message, bool isOk) = wishListRepository.CheckRequestWishListIsValid(request.ProductId, request.UserId);
                 if (!isOk)
@@ -134,10 +134,10 @@ namespace DigitalFUHubApi.Controllers
             Status status = new Status();
             try
             {
-                //if (userId != jwtTokenService.GetUserIdByAccessToken(User))
-                //{
-                //    return Unauthorized();
-                //}
+                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
 
                 (string responseCode, string message, bool isOk) = wishListRepository.CheckRequestWishListIsValid(productId, userId);
                 if (!isOk)
@@ -171,10 +171,10 @@ namespace DigitalFUHubApi.Controllers
             Status status = new Status();
             try
             {
-                //if (userId != jwtTokenService.GetUserIdByAccessToken(User))
-                //{
-                //    return Unauthorized();
-                //}
+                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
 
                 var user = userRepository.GetUserById(userId);
                 if (user == null)

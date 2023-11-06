@@ -60,8 +60,12 @@ namespace DataAccess.DAOs
 						DateCreate = group.Key.DateCreate,
 						IsActivate = group.Key.IsActivate,
 						IsRead = userConversations.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.IsRead ?? Constants.USER_CONVERSATION_TYPE_UN_READ,
-						LatestMessage = context.Messages.OrderByDescending(x => x.DateCreate)
-						.FirstOrDefault(x => x.ConversationId == group.Key.ConversationId)?.Content ?? "",
+						LatestMessage = context.Messages.Where(x => x.ConversationId == group.Key.ConversationId)
+							.Select(x => new ConversationLatestMessageResponseDTO
+							{
+								Content = x.Content,
+								DateCreate = x.DateCreate
+							}).OrderByDescending(x => x.DateCreate).FirstOrDefault(),
 						IsGroup = group.Key.IsGroup,
 						Users = group.Select(uc => new UserConversationResponseDTO
 						{
@@ -72,7 +76,7 @@ namespace DataAccess.DAOs
                         }).Distinct().ToList()
 					}).ToList();
 
-				// check online
+                // check online
                     for (int i = 0; i < groupedConversations.Count(); i++)
                     {
 						if (groupedConversations[i] == null) continue;
@@ -255,13 +259,15 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		//internal long GetNumberConversationUnReadOfUser (long userId)
-		//{
-  //          using (DatabaseContext context = new DatabaseContext())
-  //          {
-                
-  //          }
-  //      }
+		internal long GetNumberConversationUnReadOfUser(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				long numberConversationUnRead = context.UserConversation.Count(x => x.UserId == userId && x.IsRead == Constants.USER_CONVERSATION_TYPE_UN_READ);
+
+                return numberConversationUnRead;
+			}
+		}
 
 		internal List<UserConversation> GetUserConversation(long senderId, long recipientId)
 		{
@@ -365,6 +371,17 @@ namespace DataAccess.DAOs
 					throw new Exception(ex.Message);
 				}
 
+			}
+		}
+
+		internal List<long> GetConversationsUnRead(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var conversationsUnRead = context.UserConversation
+					.Where(x => x.UserId == userId && x.IsRead == false)
+					.ToList();	
+				return conversationsUnRead.Select(x => x.ConversationId).ToList();	
 			}
 		}
 	}
