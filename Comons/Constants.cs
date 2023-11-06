@@ -125,6 +125,13 @@
 		public const int COUPON_TYPE_ALL_PRODUCTS_OF_SHOP = 2;
 		public const int COUPON_TYPE_SPECIFIC_PRODUCTS = 3; 
 
+		// Coupon Status
+		public const int COUPON_STATUS_ALL = 0; 
+		public const int COUPON_STATUS_COMING_SOON = 1; 
+		public const int COUPON_STATUS_ONGOING = 2; 
+		public const int COUPON_STATUS_FINISHED = 3; 
+
+
 		//Feedback
 		public const int NUMBER_DAYS_CAN_MAKE_FEEDBACK = 7;
 

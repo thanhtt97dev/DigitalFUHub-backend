@@ -18,6 +18,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using static Azure.Core.HttpHeader;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -165,22 +166,14 @@ namespace DigitalFUHubApi.Controllers
 
 				string formatDate = "M/d/yyyy";
 				CultureInfo provider = CultureInfo.InvariantCulture;
-				DateTime? startDate = string.IsNullOrEmpty(request.StartDate) ? null : DateTime.ParseExact(request.StartDate.Trim(), formatDate, provider);
-				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(), formatDate, provider);
-				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User), request.CouponCode.Trim(), startDate, endDate, request.Status);
-
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
-					coupons.Select(x => new SellerCouponResponseDTO
-					{
-						CouponId = x.CouponId,
-						CouponCode = x.CouponCode,
-						StartDate = x.StartDate,
-						EndDate = x.EndDate,
-						Quantity = x.Quantity,
-						PriceDiscount = x.PriceDiscount,
-						MinTotalOrderValue = x.MinTotalOrderValue,
-						IsPublic = x.IsPublic
-					}).ToList()));
+				DateTime? startDate = string.IsNullOrEmpty(request.StartDate) ? null : DateTime.ParseExact(request.StartDate.Trim(),
+					formatDate, provider);
+				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(), 
+					formatDate, provider);
+				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User), 
+					request.CouponCode.Trim(), startDate, endDate, request.IsPublic, request.Status);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, 
+					_mapper.Map<List<SellerCouponResponseDTO>>(coupons)));
 			}
 			catch (Exception e)
 			{

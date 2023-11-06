@@ -70,18 +70,36 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate, bool? isPublic)
+		internal List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate,
+			bool? isPublic, long status)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 				List<Coupon> coupons = context.Coupon
+					.Include(x => x.CouponProducts)
+					.ThenInclude(x => x.Product)
 					.Where(c => c.ShopId == userId
 							&& c.IsActive == true
+							&& (status == Constants.COUPON_STATUS_ALL ?
+								true
+								:
+								(
+									status == Constants.COUPON_STATUS_COMING_SOON ? c.StartDate > DateTime.Now
+									: 
+									status == Constants.COUPON_STATUS_ONGOING? c.StartDate <= DateTime.Now && DateTime.Now <= c.EndDate
+									:
+									status == Constants.COUPON_STATUS_FINISHED? c.EndDate < DateTime.Now : true
+								)
+							)
 							&& c.CouponCode.ToLower().Contains(couponCode.ToLower())
 							&& (startDate == null ? true : c.StartDate.Date >= startDate.Value.Date)
 							&& (endDate == null ? true : c.EndDate.Date <= endDate.Value.Date)
 							&& (isPublic == null ? true : c.IsPublic == isPublic)
-							).ToList();
+							)
+					.OrderByDescending(x => x.CouponId)
+					.ToList();
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 
 				return coupons;
 			}
@@ -164,7 +182,7 @@ namespace DataAccess.DAOs
 					Coupon? coup = context.Coupon
 						.FirstOrDefault(x => x.CouponId == coupon.CouponId && x.ShopId == coupon.ShopId
 						&& x.IsActive == true);
-					if (coup == null || coupon.StartDate >= coupon.EndDate) throw new Exception("INVALID");
+					if (coup == null || coup.StartDate <= DateTime.Now||coupon.StartDate >= coupon.EndDate) throw new Exception("INVALID");
 					coup.StartDate = coupon.StartDate;
 					coup.EndDate = coupon.EndDate;
 					coup.CouponCode = coupon.CouponCode;
@@ -174,14 +192,14 @@ namespace DataAccess.DAOs
 					coup.MinTotalOrderValue = coupon.MinTotalOrderValue;
 					coup.Quantity = coupon.Quantity;
 
-					if(coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
+					if (coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
 					{
 						context.CouponProduct.RemoveRange(context.CouponProduct.Where(x => x.CouponId == coup.CouponId));
-						#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS8604 // Possible null reference argument.
 						context.CouponProduct.AddRange(coupon.CouponProducts);
-						#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8604 // Possible null reference argument.
 					}
-					
+
 					context.Coupon.Update(coup);
 					context.SaveChanges();
 				}
