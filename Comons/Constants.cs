@@ -62,7 +62,6 @@
 
 		public const string SIGNAL_R_NOTIFICATION_HUB = "notificationHub";
 		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION = "ReceiveNotification";
-		public const string SIGNAL_R_NOTIFICATION_HUB_RECEIVE_ALL_NOTIFICATION = "ReceiveAllNotification";
 
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userOnlineStatusHub";
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS = "ReceiveUserOnlineStatus";
