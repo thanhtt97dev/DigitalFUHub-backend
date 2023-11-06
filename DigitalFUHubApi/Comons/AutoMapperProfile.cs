@@ -18,6 +18,7 @@ using DTOs.Seller;
 using DTOs.Feedback;
 using DTOs.WishList;
 using Google.Apis.Util;
+using DTOs.TransactionCoin;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -185,7 +186,9 @@ namespace DigitalFUHubApi.Comons
             CreateMap<Product, WishListProductResponseDTO>().ReverseMap();
             CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
 
-            CreateMap<Order, SellerFeedbackResponseDTO>()
+			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>().ReverseMap();
+
+			CreateMap<Order, SellerFeedbackResponseDTO>()
 				.ForMember(des => des.CustomerUsername, act => act.MapFrom(src => src.User.Username))
 				.ForMember(des => des.CustomerAvatar, act => act.MapFrom(src => src.User.Avatar))
 				.ForMember(des => des.Detail, act => act.MapFrom(src => src.OrderDetails))

@@ -2,7 +2,7 @@
 using Comons;
 using DataAccess.IRepositories;
 using DigitalFUHubApi.Comons;
-using DTOs.Bank;
+using DTOs.TransactionCoin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,21 +11,21 @@ namespace DigitalFUHubApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class TransactionInternalsController : ControllerBase
+	public class TransactionCoinsController : ControllerBase
 	{
-		private readonly ITransactionInternalRepository transactionRepository;
+		private readonly ITransactionCoinRepository transactionCoinRepository;
 		private readonly IMapper mapper;
 
-		public TransactionInternalsController(ITransactionInternalRepository transactionRepository, IMapper mapper)
+		public TransactionCoinsController(ITransactionCoinRepository transactionCoinRepository, IMapper mapper)
 		{
-			this.transactionRepository = transactionRepository;
+			this.transactionCoinRepository = transactionCoinRepository;
 			this.mapper = mapper;
 		}
 
-		#region Get History transaction of internal 
+		#region Get History transaction coin 
 		[Authorize(Roles = "Admin")]
-		[HttpPost("All")]
-		public IActionResult GetHistoryTransactionInternal(HistoryTransactionInternalRequestDTO requestDTO)
+		[HttpPost("GetHistoryTransactionCoin")]
+		public IActionResult GetHistoryTransactionInternal(HistoryTransactionCoinRequestDTO requestDTO)
 		{
 			if (!ModelState.IsValid) return BadRequest();
 
@@ -33,8 +33,8 @@ namespace DigitalFUHubApi.Controllers
 			Status status = new Status();
 
 			const int TRANSACTION_TYPE_ALL = 0;
-			int[] transactionTypes = Constants.TRANSACTION_INTERNAL_STATUS_TYPE;
-			if (!transactionTypes.Contains(requestDTO.TransactionInternalTypeId) && requestDTO.TransactionInternalTypeId != TRANSACTION_TYPE_ALL)
+			int[] transactionTypes = Constants.TRANSACTION_COIN_STATUS_TYPE;
+			if (!transactionTypes.Contains(requestDTO.TransactionCoinTypeId) && requestDTO.TransactionCoinTypeId != TRANSACTION_TYPE_ALL)
 			{
 				status.Message = "Invalid transaction type id!";
 				status.Ok = false;
@@ -74,9 +74,10 @@ namespace DigitalFUHubApi.Controllers
 				long orderId;
 				long.TryParse(requestDTO.OrderId, out orderId);
 
-				var transactions = transactionRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionInternalTypeId);
+				var transactions = transactionCoinRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionCoinTypeId);
 
-				var result = mapper.Map<List<HistoryTransactionInternalResponseDTO>>(transactions);
+				var result = mapper.Map<List<HistoryTransactionCoinResponseDTO>>(transactions);
+
 
 				status.Message = "Success!";
 				status.Ok = true;
@@ -91,6 +92,5 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
-
 	}
 }

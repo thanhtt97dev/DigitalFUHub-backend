@@ -72,7 +72,7 @@ namespace DataAccess.DAOs
 							TransactionInternal transactionSeller = new TransactionInternal()
 							{
 								UserId = sellerId,
-								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+								TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT,
 								OrderId = order.OrderId,
 								PaymentAmount = sellerProfit,
 								Note = "",
@@ -91,7 +91,7 @@ namespace DataAccess.DAOs
 							TransactionInternal transactionAdmin = new TransactionInternal()
 							{
 								UserId = Constants.ADMIN_USER_ID,
-								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+								TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PROFIT,
 								OrderId = order.OrderId,
 								PaymentAmount = adminProfit,
 								Note = "",
@@ -154,7 +154,7 @@ namespace DataAccess.DAOs
 							var transactionInternal = new TransactionInternal()
 							{
 								UserId = customerId,
-								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+								TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_REFUND,
 								OrderId = order.OrderId,
 								PaymentAmount = order.TotalPayment,
 								Note = "Seller refund money",
@@ -570,7 +570,7 @@ namespace DataAccess.DAOs
 							TransactionInternal newTransaction = new TransactionInternal
 							{
 								UserId = order.UserId,
-								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_PAYMENT,
+								TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_PAYMENT,
 								OrderId = order.OrderId,
 								PaymentAmount = order.TotalPayment,
 								Note = "Payment",
@@ -773,7 +773,7 @@ namespace DataAccess.DAOs
 						{
 							UserId = customerId,
 							OrderId = orderId,
-							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+							TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_REFUND,
 							PaymentAmount = order.TotalPayment,
 							DateCreate = DateTime.Now,
 						};
@@ -857,7 +857,7 @@ namespace DataAccess.DAOs
 						{
 							UserId = sellerId,
 							OrderId = orderId,
-							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+							TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT,
 							PaymentAmount = sellerProfit,
 							DateCreate = DateTime.Now,
 						};
@@ -875,7 +875,7 @@ namespace DataAccess.DAOs
 						{
 							UserId = Constants.ADMIN_USER_ID,
 							OrderId = orderId,
-							TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+							TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PROFIT,
 							PaymentAmount = adminProfit,
 							DateCreate = DateTime.Now,
 						};
@@ -994,7 +994,7 @@ namespace DataAccess.DAOs
 									Note = "Receive Payment",
 									OrderId = order.OrderId,
 									PaymentAmount = sellerProfit,
-									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PAYMENT,
+									TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT,
 									UserId = shopId,
 								};
 								transactionInternals.Add(transactionInternal);
@@ -1010,7 +1010,7 @@ namespace DataAccess.DAOs
 									Note = "Profit",
 									OrderId = order.OrderId,
 									PaymentAmount = adminProfit,
-									TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_PROFIT,
+									TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PROFIT,
 									UserId = Constants.ADMIN_USER_ID,
 								};
 								transactionInternals.Add(transactionInternal);
@@ -1194,7 +1194,7 @@ namespace DataAccess.DAOs
 							{
 								UserId = customer.UserId,
 								OrderId = orderId,
-								TransactionInternalTypeId = Constants.TRANSACTION_TYPE_INTERNAL_RECEIVE_REFUND,
+								TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_REFUND,
 								PaymentAmount = order.TotalPayment,
 								DateCreate = DateTime.Now,
 							};
