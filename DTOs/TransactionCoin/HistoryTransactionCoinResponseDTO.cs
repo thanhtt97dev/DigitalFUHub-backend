@@ -11,8 +11,8 @@ namespace DTOs.TransactionCoin
 		public string OrderId { get; set; } = null!;
 		public long UserId { get; set; }
 		public string Email { get; set; } = null!;
-		public long Coin { get; set; }
-		public int TransactionInternalTypeId { get; set; }
+		public long Amount { get; set; }
+		public int TransactionCoinTypeId { get; set; }
 		public DateTime? DateCreate { get; set; }
 	}
 }

@@ -186,7 +186,9 @@ namespace DigitalFUHubApi.Comons
             CreateMap<Product, WishListProductResponseDTO>().ReverseMap();
             CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
 
-			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>().ReverseMap();
+			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>()
+				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
+				.ReverseMap();
 
 			CreateMap<Order, SellerFeedbackResponseDTO>()
 				.ForMember(des => des.CustomerUsername, act => act.MapFrom(src => src.User.Username))
