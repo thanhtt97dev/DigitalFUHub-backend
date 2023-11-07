@@ -12,6 +12,7 @@ namespace DTOs.Seller
 		public string CouponCode { get; set; } = string.Empty;
 		public string? StartDate { get; set; } = null!;
 		public string? EndDate { get; set; } = null!;
-		public bool? Status { get; set; }
+		public long Status { get; set; }
+		public bool? IsPublic { get; set; }
 	}
 }
