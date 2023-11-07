@@ -63,6 +63,7 @@ namespace DataAccess.DAOs
 						LatestMessage = context.Messages.Where(x => x.ConversationId == group.Key.ConversationId)
 							.Select(x => new ConversationLatestMessageResponseDTO
 							{
+								UserId = x.UserId,
 								Content = x.Content,
 								DateCreate = x.DateCreate
 							}).OrderByDescending(x => x.DateCreate).FirstOrDefault(),
