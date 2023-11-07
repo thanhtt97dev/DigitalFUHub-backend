@@ -48,104 +48,123 @@ namespace DigitalFUHubApi.Controllers
         }
 
         [HttpPost("SendMessage")]
+        [Authorize]
         public async Task<IActionResult> SendMessage([FromForm] SendMessageConversationRequestDTO request)
         {
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
+            // Response
             ResponseData responseData = new ResponseData();
-            string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
-            List<string> urlImages = new List<string>();
-            List<string> connections = new List<string>();
+            Status status = new Status();
 
-            //check users recipient and user sender existed
+            if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
+            {
+                return Unauthorized();
+            }
+
+            // Check conversation existed
+            var conversation = conversationRepository.GetConversationById(request.ConversationId);
+            if (conversation == null)
+            {
+                status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                status.Ok = false;
+                status.Message = "Data not found!";
+                responseData.Status = status;
+                return Ok(responseData);
+            }
+
+            // Check users recipient and user sender existed
             List<long> userIdInConverstion = new List<long>();
             userIdInConverstion.Add(request.UserId);
             userIdInConverstion.AddRange(request.RecipientIds);
 
             if (!userRepository.CheckUsersExisted(userIdInConverstion))
             {
-                responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                responseData.Status.Ok = false;
-                responseData.Status.Message = "Data not found!";
+                status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                status.Ok = false;
+                status.Message = "Data not found!";
+                responseData.Status = status;
+                return Ok(responseData);
             }
 
-            //get connectionId of user recipient
+            // Check sends many types of messages at once
+            if (request.Content != null && request.Image != null)
+            {
+                status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                status.Ok = false;
+                status.Message = "Cannot send multiple types of messages at the same time!";
+                responseData.Status = status;
+                return Ok(responseData);
+            }
+
+            // Declares variable
+            string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+            List<string> connections = new List<string>();
+            string urlImage = "";
+
+            // Get connectionId of user recipient
             foreach (long recipientId in request.RecipientIds)
             {
-                // get connection id of chat hub
+                // Get connection id of chat hub
                 HashSet<string>? connectionIds = connectionManager
                         .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
 
-                if (connectionIds != null)
-                {
-                    connections.AddRange(connectionIds.ToList());
-                }
-
+                if (connectionIds != null) connections.AddRange(connectionIds.ToList());
             }
 
-            //get connection id of user sender
-            long senderId = request.UserId;
+            // Get connection id of user sender
             HashSet<string>? connectionIdsSender = connectionManager
-               .GetConnections(senderId, Constants.SIGNAL_R_CHAT_HUB);
-            if (connectionIdsSender != null)
-            {
-                connections.AddRange(connectionIdsSender.ToList());
-            }
-
+               .GetConnections(request.UserId, Constants.SIGNAL_R_CHAT_HUB);
+            if (connectionIdsSender != null) connections.AddRange(connectionIdsSender.ToList());
 
             try
             {
-                // upload file
-                if (request.Images != null)
+                // Upload file
+                if (request.Image != null)
                 {
-                    if (request.Images.Any(x => !fileExtension.Contains(x.FileName.Substring(x.FileName.LastIndexOf(".")))))
+                    // Check file extension
+                    IFormFile fileRequest = request.Image;
+                    if (!fileExtension.Contains(fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf("."))))
                     {
-                        return Ok(new Status
-                        {
-                            Ok = false,
-                            ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT,
-                            Message = "Invalid file!"
-                        });
+                        status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                        status.Ok = false;
+                        status.Message = "Invalid file!";
+                        responseData.Status = status;
+                        return Ok(responseData);
                     }
 
+                    // Declares variable
                     DateTime now;
-                    string filename;
+                    string filename = "";
 
-                    foreach (IFormFile file in request.Images)
-                    {
-                        now = DateTime.Now;
-                        filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-                        string url = await storageService.UploadFileToAzureAsync(file, filename);
-                        urlImages.Add(url);
-                    }
+                    // Upload file to azure
+                    now = DateTime.Now;
+                    filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf(".")));
+                    urlImage = await storageService.UploadFileToAzureAsync(fileRequest, filename);
                 }
 
-                // Create messages
+                // Declares variable
                 Message newMessage;
-                List<Message> messages = new List<Message>();
 
-                if (urlImages.Count > 0)
+                // Create message
+                if (!string.IsNullOrEmpty(urlImage))
                 {
-                    foreach (string url in urlImages)
+                    // Create message type image
+                    newMessage = new Message
                     {
-                        newMessage = new Message
-                        {
-                            UserId = request.UserId,
-                            ConversationId = request.ConversationId,
-                            Content = url,
-                            MessageType = Constants.MESSAGE_TYPE_CONVERSATION_IMAGE,
-                            DateCreate = DateTime.Now,
-                            IsDelete = false
-                        };
-                        messages.Add(newMessage);
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(request.Content))
-                {
+                        UserId = request.UserId,
+                        ConversationId = request.ConversationId,
+                        Content = urlImage,
+                        MessageType = Constants.MESSAGE_TYPE_CONVERSATION_IMAGE,
+                        DateCreate = DateTime.Now,
+                        IsDelete = false
+                    };
+                } else if (!string.IsNullOrEmpty(request.Content)) {
+                    // Create message type text
                     newMessage = new Message
                     {
                         UserId = request.UserId,
@@ -155,20 +174,25 @@ namespace DigitalFUHubApi.Controllers
                         DateCreate = DateTime.Now,
                         IsDelete = false
                     };
-                    messages.Add(newMessage);
+                } else {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Ok = false;
+                    status.Message = "Message is not allowed to be null!";
+                    responseData.Status = status;
+                    return Ok(responseData);
                 }
 
-
                
-                // add message
-                await conversationRepository.SendMessageConversation(messages);
+                // Add message to db
+                await conversationRepository.SendMessageConversation(newMessage);
 
-                // update un read for user recipient
+
                 UpdateUserConversationRequestDTO requestUpdate = new UpdateUserConversationRequestDTO {
                     ConversationId = request.ConversationId,
                     IsRead = Constants.USER_CONVERSATION_TYPE_UN_READ,
                 };
 
+                // Update un read for user recipient
                 foreach (long userId in request.RecipientIds)
                 {
                     requestUpdate.UserId = userId;
@@ -176,23 +200,26 @@ namespace DigitalFUHubApi.Controllers
                 }
 
 
-                // message response to chat hub
-                List<MessageConversationResponseDTO> messageConversations = mapper.Map<List<MessageConversationResponseDTO>>(messages);
+                // Message response to chat hub
+                MessageConversationResponseDTO messageConversation = mapper.Map<MessageConversationResponseDTO>(newMessage);
 
-                // signR chat hub
+                // Send to signR chat hub
                 if (connections.Count > 0)
                 {
                     foreach (var connectionId in connections)
                     {
-                        foreach (var msg in messageConversations)
-                        {
-                            await hubContext.Clients.Clients(connectionId)
-                           .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, msg);
-                        }
-                      
+                        await hubContext.Clients.Clients(connectionId)
+                           .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, messageConversation);
+
                     }
                 }
-                return Ok();
+
+                // Ok
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Ok = true;
+                status.Message = "Success";
+                responseData.Status = status;
+                return Ok(responseData);
             }
             catch (Exception ex)
             {
@@ -202,9 +229,9 @@ namespace DigitalFUHubApi.Controllers
         }
 
 		[HttpPost("GetConversation")]
-		public IActionResult GetConversation(GetConversationIdRequestDTO request)
+        public IActionResult GetConversation(GetConversationIdRequestDTO request)
 		{
-			if (!ModelState.IsValid)
+            if (!ModelState.IsValid)
 			{
 				return BadRequest();
 			}
@@ -232,42 +259,78 @@ namespace DigitalFUHubApi.Controllers
 
 		}
 
-		[HttpGet("getUsers")]
-        public IActionResult GetUsersConversation(long userId)
+		[HttpGet("getConversations")]
+        [Authorize]
+        public IActionResult GetConversations(long userId)
         {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
             try
             {
-                if (userId == 0)
-                {
-                    return BadRequest(new Status());
+                if (userId == 0) {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Ok = false;
+                    status.Message = "Invalid file!";
+                    responseData.Status = status;
+                    return Ok(responseData);
                 }
-                List<ConversationResponseDTO> userConversations = conversationRepository.GetUsersConversations(userId);
 
-                return Ok(userConversations);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                return BadRequest(new Status());
+                var user = userRepository.GetUserById(userId);
+                if (user == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Ok = false;
+                    status.Message = "Data not found!";
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+                List<ConversationResponseDTO> userConversations = conversationRepository.GetUsersConversations(userId);
+                responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                responseData.Status.Ok = true;
+                responseData.Status.Message = "Success!";
+                responseData.Result = userConversations;
+                return Ok(responseData);
+
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
         [HttpPost("add")]
+        [Authorize]
         public IActionResult AddConversation([FromBody] AddConversationRequestDTO addConversation)
         {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
             try
             {
 
-                (bool, string) result = conversationRepository.ValidateAddConversation(addConversation);
-                if (!result.Item1)
+                if (addConversation.UserId != jwtTokenService.GetUserIdByAccessToken(User))
                 {
-                    Console.WriteLine(result.Item2);
-                    return BadRequest(new Status());
+                    return Unauthorized();
+                }
+                
+                (string responseCode, string message, bool isOk) = conversationRepository.ValidateAddConversation(addConversation);
+                
+                if (!isOk)
+                {
+                    status.ResponseCode = responseCode;
+                    status.Message = message;
+                    status.Ok = isOk;
+                    responseData.Status = status;
+                    return Ok(responseData);
                 }
 
+                // Add conversation
                 long conversationId = conversationRepository.AddConversation(addConversation);
 
-                //get connectionId of user recipient
+                // Get connectionId of user recipient
                 foreach (long recipientId in addConversation.RecipientIds)
                 {
                     List<ConversationResponseDTO> conversationResponse = conversationRepository
@@ -288,33 +351,60 @@ namespace DigitalFUHubApi.Controllers
                     }
                 }
 
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
+                responseData.Result = conversationId;
                 return Ok(conversationId);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                return BadRequest(new Status());
+            catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
 
         [HttpGet("getMessages")]
+        [Authorize]
         public IActionResult GetMessages(long conversationId)
         {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
             try
             {
                 if (conversationId == 0)
                 {
-                    return BadRequest(new Status());
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Ok = false;
+                    status.Message = "Invalid!";
+                    responseData.Status = status;
+                    return Ok(responseData);
                 }
+
+                // Check conversation existed
+                var conversation = conversationRepository.GetConversationById(conversationId);
+
+                if (conversation == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Ok = false;
+                    status.Message = "Data not found!";
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
                 List<MessageConversationResponseDTO> messages = mapper
-                    .Map<List<MessageConversationResponseDTO>>(conversationRepository.GetMessages(conversationId));
-                return Ok(messages);
+                                .Map<List<MessageConversationResponseDTO>>(conversationRepository.GetMessages(conversationId));
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
+                responseData.Result = messages;
+                return Ok(responseData);
             }
             catch (ArgumentException ex)
             {
-                Console.WriteLine(ex.Message);
-                return BadRequest(new Status());
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 

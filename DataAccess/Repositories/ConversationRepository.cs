@@ -17,11 +17,11 @@ namespace DataAccess.Repositories
 
         public List<ConversationResponseDTO> GetUsersConversations(long userId) => ConversationDAO.Instance.GetSenderConversations(userId);
 
-        public async Task SendMessageConversation(List<Message> messages) => await ConversationDAO.Instance.SendMessageConversation(messages);
+        public async Task SendMessageConversation(Message message) => await ConversationDAO.Instance.SendMessageConversation(message);
 
         public long AddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.AddConversation(addConversation);
 
-        public (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.ValidateAddConversation(addConversation);
+        public (string, string, bool) ValidateAddConversation(AddConversationRequestDTO addConversation) => ConversationDAO.Instance.ValidateAddConversation(addConversation);
 
 		public List<UserConversationDTO> GetRecipientUserIdHasConversation(long userId) => ConversationDAO.Instance.GetRecipientUserIdHasConversation(userId);
 
@@ -31,5 +31,6 @@ namespace DataAccess.Repositories
 
 		public List<long> GetConversationsUnRead(long userId) => ConversationDAO.Instance.GetConversationsUnRead(userId);
 
-	}
+        public Conversation? GetConversationById(long conversationId) => ConversationDAO.Instance.GetConversationById(conversationId);
+    }
 }

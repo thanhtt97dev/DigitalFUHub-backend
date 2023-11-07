@@ -12,12 +12,11 @@ namespace DataAccess.IRepositories
     public interface IConversationRepository
     {
         List<ConversationResponseDTO> GetUsersConversations(long userId);
-
-        Task SendMessageConversation(List<Message> messages);
-
+        Task SendMessageConversation(Message message);
+        Conversation? GetConversationById(long conversationId);
         List<Message> GetMessages (long conversationId);
         long AddConversation(AddConversationRequestDTO addConversation);
-        (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation);
+        (string, string, bool) ValidateAddConversation(AddConversationRequestDTO addConversation);
 		public List<UserConversationDTO> GetRecipientUserIdHasConversation(long userId);
         public long GetConversation(long shopId, long userId);
         long GetNumberConversationUnReadOfUser(long userId);

@@ -190,58 +190,74 @@ namespace DataAccess.DAOs
 
 		}
 
-		internal (bool, string) ValidateAddConversation(AddConversationRequestDTO addConversation)
+		internal (string, string, bool) ValidateAddConversation(AddConversationRequestDTO addConversation)
 		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
+            string responseCode = "";
+            string message = "";
+            bool isOk = true;
 
-				List<long> listUserId = new List<long>();
+            using (DatabaseContext context = new DatabaseContext())
+			{
+                // List user sender id and recipient
+                List<long> listUserId = new List<long>();
 				listUserId.AddRange(addConversation.RecipientIds);
 				listUserId.Add(addConversation.UserId);
 
+				// Check conversation name and number users
 				if (listUserId.Count == 0 || listUserId.Count < 2
 					|| (listUserId.Count == 2 && !string.IsNullOrEmpty(addConversation.ConversationName))
-					|| (listUserId.Count > 2 && string.IsNullOrEmpty(addConversation.ConversationName)))
-				{
-					return (false, "Missing name conversation or invalid number of Users");
+					|| (listUserId.Count > 2 && string.IsNullOrEmpty(addConversation.ConversationName))) {
+                    responseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    message = "Missing name conversation or invalid number of Users";
+                    isOk = false;
+                    return (responseCode, message, isOk);
 				}
-				var duplicates = listUserId
+
+                // Check user appear more than once
+                var duplicates = listUserId
 					  .GroupBy(x => x)
 					  .Where(group => group.Count() > 1)
 					  .Select(group => group.Key)
 					  .ToList();
 				if (duplicates.Count > 0)
 				{
-					return (false, "Elements appear more than once");
+                    responseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    message = "Elements appear more than once";
+                    isOk = false;
+                    return (responseCode, message, isOk);
 				}
+
+				// Check user existed
 				var users = context.User.Where(x => listUserId.Contains(x.UserId)).ToList();
 				if (users.Count != listUserId.Count)
 				{
-					return (false, "Appears that the user does not exist in the system");
+                    responseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    message = "Appears that the user does not exist in the system";
+                    isOk = false;
+                    return (responseCode, message, isOk);
 				}
 
-				return (true, "Success");
-			}
+                responseCode = Constants.RESPONSE_CODE_SUCCESS;
+                message = "Success";
+                return (responseCode, message, isOk);
+            }
 		}
 
 
 
 
-		internal async Task SendMessageConversation(List<Message> messages)
+		internal async Task SendMessageConversation(Message message)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					context.Messages.AddRange(messages);
+					context.Messages.Add(message);
 
 					await context.SaveChangesAsync();
-					transaction.Commit();
 				}
 				catch (Exception ex)
 				{
-					transaction.Rollback();
 					throw new Exception(ex.Message);
 				}
 			}
@@ -386,5 +402,15 @@ namespace DataAccess.DAOs
 				return conversationsUnRead.Select(x => x.ConversationId).ToList();	
 			}
 		}
+
+		internal Conversation? GetConversationById (long conversationId)
+		{
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var conversation = context.Conversations.FirstOrDefault(x => x.ConversationId == conversationId);
+
+				return conversation;
+            }
+        }
 	}
 }
