@@ -65,7 +65,8 @@ namespace DataAccess.DAOs
 							{
 								UserId = x.UserId,
 								Content = x.Content,
-								DateCreate = x.DateCreate
+								DateCreate = x.DateCreate,
+								MessageType = x.MessageType,
 							}).OrderByDescending(x => x.DateCreate).FirstOrDefault(),
 						IsGroup = group.Key.IsGroup,
 						Users = group.Select(uc => new UserConversationResponseDTO
