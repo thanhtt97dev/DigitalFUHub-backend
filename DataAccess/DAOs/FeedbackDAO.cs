@@ -139,6 +139,7 @@ namespace DataAccess.DAOs
 						//Add new transaction coin
 						TransactionCoin transactionCoin = new TransactionCoin
 						{
+							OrderId = orderDetail.OrderId,
 							UserId = user.UserId,
 							TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_RECEIVE,
 							FeedbackId = feedback.FeedbackId,	
