@@ -22,10 +22,11 @@ namespace BusinessObject.Entities
         public int Discount { get; set; }
         public string? Thumbnail { get; set; }
         public DateTime UpdateDate { get; set; }
-        public long ProductStatusId { get; set; }
         public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
-        [ForeignKey(nameof(ShopId))]
+		public long SoldCount { get; set; }
+		public long ProductStatusId { get; set; }
+		[ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
         [ForeignKey(nameof(CategoryId))]
         public virtual Category Category { get; set; } = null!;

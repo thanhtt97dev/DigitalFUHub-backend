@@ -434,5 +434,23 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
+
+		#region Get products for admin
+		[HttpPost("GetAllProductAdmin")]
+		public IActionResult GetAllProductAdmin()
+		{
+			try
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerGetProductResponseDTO
+				{
+					
+				}));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+		}
+		#endregion
 	}
 }
