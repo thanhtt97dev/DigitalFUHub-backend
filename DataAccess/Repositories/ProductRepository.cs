@@ -44,7 +44,7 @@ namespace DataAccess.Repositories
 
 		public int GetNumberProduct() => ProductDAO.Instance.GetNumberProduct();
 
-		public List<Product> GetProductsForAdmin(string shopName, string productName, int productCategory, long priceMin, long priceMax, int soldMin, int soldMax) => ProductDAO.Instance.GetProductsForAdmin(shopName, productName, productCategory, priceMin, priceMax, soldMin, soldMax);
+		public List<Product> GetProductsForAdmin(string shopName, string productName, int productCategory, int soldMin, int soldMax) => ProductDAO.Instance.GetProductsForAdmin(shopName, productName, productCategory, priceMin, priceMax, soldMin, soldMax);
 
 	}
 }
