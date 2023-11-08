@@ -24,6 +24,8 @@ namespace BusinessObject.Entities
         public DateTime UpdateDate { get; set; }
         public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
+		public int ViewCount { get; set; }
+		public int LikedCount { get; set; }
 		public long SoldCount { get; set; }
 		public long ProductStatusId { get; set; }
 		[ForeignKey(nameof(ShopId))]

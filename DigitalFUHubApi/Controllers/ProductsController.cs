@@ -445,13 +445,14 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				if(request.SoldMin < 0 || request.SoldMax < request.SoldMin ||
-				   request.Page <= 0)
+				if(request.SoldMin < 0 || (request.SoldMax != 0 && request.SoldMin != 0 ? false : (request.SoldMin > request.SoldMax || request.SoldMin < 0 || request.SoldMax < 0)) ||
+				   request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
 				}
 
-				var numberProducts = _productRepository.GetNumberProduct();
+				var numberProducts = _productRepository.GetNumberProductByConditions(request.ShopName, request.ProductId, request.ProductName, request.ProductCategory,
+					 request.SoldMin, request.SoldMax, request.ProductStatusId);
 				var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
 
 				if(request.Page > numberPages) 
@@ -460,8 +461,8 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				List<Product> products = _productRepository
-					.GetProductsForAdmin(request.ShopName, request.ProductName, request.ProductCategory, 
-					 request.SoldMin, request.SoldMax, request.Page);
+					.GetProductsForAdmin(request.ShopName, request.ProductId, request.ProductName, request.ProductCategory, 
+					 request.SoldMin, request.SoldMax,request.ProductStatusId, request.Page);
 
 				var result = new GetProductsResponseDTO
 				{
