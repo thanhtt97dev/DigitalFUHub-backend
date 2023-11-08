@@ -138,6 +138,9 @@
 
 		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
+
+		//
+		public const int PAGE_SIZE = 10;
 	}
 }
 

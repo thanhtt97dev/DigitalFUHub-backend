@@ -423,6 +423,54 @@ namespace DataAccess.DAOs
 				return (lsProduct, query.Count());
 			}
 		}
+
+		internal int GetNumberProduct()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Product.Count();
+			}
+		}
+
+		internal List<Product> GetProductsForAdmin(string shopName, string productName, int productCategory, int soldMin, int soldMax, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var products = (from product in context.Product
+								join shop in context.Shop
+									 on product.ShopId equals shop.UserId
+								where (1 == 1) &&
+								shop.ShopName.Contains(shopName.Trim()) &&
+								product.ProductName.Contains(productName.Trim()) &&
+								product.CategoryId == productCategory &&
+								(soldMin == 0) ? true : product.SoldCount >= soldMin &&
+								(soldMax == 0) ? true : product.SoldCount <= soldMax 
+								select new Product
+								{
+									ProductId = product.ProductId,
+									ProductName = product.ProductName,
+									Thumbnail = product.Thumbnail,
+									Shop = new Shop
+									{
+										UserId = shop.UserId,
+										ShopName = shop.ShopName,	
+									},
+									ProductVariants = (from productVariant in context.ProductVariant
+													  where productVariant.ProductId == product.ProductId && productVariant.isActivate == true
+													  select new ProductVariant
+													  {
+														  ProductVariantId = productVariant.ProductId,
+														  Name = productVariant.Name,	
+														  Price = productVariant.Price,
+													  }).ToList(),
+								}
+							   )
+							   .Skip((page - 1) * Constants.PAGE_SIZE)
+							   .Take(Constants.PAGE_SIZE)
+							   .ToList();
+				return products;
+			}
+		}
 	}
 }
 

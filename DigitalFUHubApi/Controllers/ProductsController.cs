@@ -437,18 +437,39 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get products for admin
 		[HttpPost("GetAllProductAdmin")]
-		public IActionResult GetAllProductAdmin()
+		public IActionResult GetAllProductAdmin(GetProductsRequestDTO request)
 		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
 			try
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerGetProductResponseDTO
+				if(request.SoldMin < 0 || request.SoldMax < request.SoldMin ||
+				   request.Page < 0)
 				{
-					
-				}));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
+				}
+
+				var numberProducts = _productRepository.GetNumberProduct();
+				var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
+
+				List<Product> products = _productRepository
+					.GetProductsForAdmin(request.ShopName, request.ProductName, request.ProductCategory, 
+					 request.SoldMin, request.SoldMax, request.Page);
+
+				var result = new GetProductsResponseDTO
+				{
+					TotalProduct = numberProducts,
+					TotalPage = numberPages,
+					Products = _mapper.Map<List<GetProductsProductDetailResponseDTO>>(products)
+				};
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
