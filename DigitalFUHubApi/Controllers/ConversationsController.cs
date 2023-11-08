@@ -82,7 +82,8 @@ namespace DigitalFUHubApi.Controllers
             userIdInConverstion.Add(request.UserId);
             userIdInConverstion.AddRange(request.RecipientIds);
 
-            if (!userRepository.CheckUsersExisted(userIdInConverstion))
+            bool resultCheckUsersExisted = userRepository.CheckUsersExisted(userIdInConverstion);
+            if (!resultCheckUsersExisted)
             {
                 status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
                 status.Ok = false;
@@ -229,6 +230,7 @@ namespace DigitalFUHubApi.Controllers
         }
 
 		[HttpPost("GetConversation")]
+        [Authorize]
         public IActionResult GetConversation(GetConversationIdRequestDTO request)
 		{
             if (!ModelState.IsValid)
@@ -315,7 +317,7 @@ namespace DigitalFUHubApi.Controllers
                 {
                     return Unauthorized();
                 }
-                
+
                 (string responseCode, string message, bool isOk) = conversationRepository.ValidateAddConversation(addConversation);
                 
                 if (!isOk)

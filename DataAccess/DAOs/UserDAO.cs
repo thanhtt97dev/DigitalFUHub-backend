@@ -193,7 +193,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.User.Any(x => !userIds.Contains(x.UserId));
+				return context.User.Any(x => userIds.Contains(x.UserId));
 			}
 		}
 
