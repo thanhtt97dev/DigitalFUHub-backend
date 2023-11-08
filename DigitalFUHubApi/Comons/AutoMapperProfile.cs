@@ -207,7 +207,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<FeedbackMedia, string>()
 				.ConvertUsing(r => r.Url);
 
-			//product/GetAllProductAdmin
+			// products/admin/getProducts
 			CreateMap<ProductVariant, GetProductsProductVariantDetailResponseDTO>()
 				.ForMember(des => des.ProductVariantId, act => act.MapFrom(src => src.ProductVariantId))
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.Name))

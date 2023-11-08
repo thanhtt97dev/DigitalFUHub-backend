@@ -436,8 +436,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get products for admin
-		[HttpPost("GetAllProductAdmin")]
-		public IActionResult GetAllProductAdmin(GetProductsRequestDTO request)
+		[HttpPost("admin/getProducts")]
+		public IActionResult GetProductsAdmin(GetProductsRequestDTO request)
 		{
 			if (!ModelState.IsValid)
 			{
