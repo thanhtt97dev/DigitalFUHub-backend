@@ -9,6 +9,7 @@ namespace DTOs.Product
 	public class GetProductsRequestDTO
 	{
 		public string ShopName { get; set; } = string.Empty;
+		public long ProductId { get; set; }
 		public string ProductName { get; set; }	= string.Empty;
 		public int ProductCategory { get; set; }
 		public int ProductStatusId { get; set; }
