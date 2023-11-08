@@ -105,6 +105,12 @@ namespace DataAccess.DAOs
 					if(orderDetail.IsFeedback) throw new Exception("NOT FEEDBACK AGAIN.");
 					Product product = context.Product.First(x => x.ProductId == orderDetail.ProductVariant.ProductId);
 
+					//update product
+					product.TotalRatingStar += rate;
+					product.NumberFeedback += 1;
+					context.Product.Update(product);
+					context.SaveChanges();
+
 					FeedbackBenefit feedbackBenefit = context.FeedbackBenefit
 						.OrderByDescending(x => x.FeedbackBenefitId)
 						.First(x => x.EndDate == null);

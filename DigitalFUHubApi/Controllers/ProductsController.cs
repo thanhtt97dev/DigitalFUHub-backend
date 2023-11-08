@@ -446,13 +446,18 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				if(request.SoldMin < 0 || request.SoldMax < request.SoldMin ||
-				   request.Page < 0)
+				   request.Page <= 0)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
 				}
 
 				var numberProducts = _productRepository.GetNumberProduct();
 				var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
+
+				if(request.Page > numberPages) 
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
 				List<Product> products = _productRepository
 					.GetProductsForAdmin(request.ShopName, request.ProductName, request.ProductCategory, 

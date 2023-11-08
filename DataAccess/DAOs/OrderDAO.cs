@@ -1001,6 +1001,16 @@ namespace DataAccess.DAOs
 							var adminProfit = order.TotalCoinDiscount > businessFee ? 0 : businessFee - order.TotalCoinDiscount;
 							var sellerProfit = order.TotalAmount - order.TotalCouponDiscount - businessFee;
 
+							// update sold count number of product
+							var orderDetails = context.OrderDetail.Where(x => x.OrderId == order.OrderId).ToList();
+							foreach (var orderDetail in orderDetails)
+							{
+								var productVariant = context.ProductVariant.First(x => x.ProductVariantId == orderDetail.ProductVariantId);
+								var product = context.Product.First(x => x.ProductId == productVariant.ProductId);
+								product.SoldCount += orderDetail.Quantity;
+								context.Product.Update(product);
+							}
+
 							// add transaction receive payment and profit
 							List<TransactionInternal> transactionInternals = new List<TransactionInternal>();
 
