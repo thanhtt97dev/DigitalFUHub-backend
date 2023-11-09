@@ -495,35 +495,71 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var productInfo = (from product in context.Product
-								  join category in context.Category
-									   on product.CategoryId equals category.CategoryId
-								  join shop in context.Shop
-									   on product.ShopId equals shop.UserId
-								  where product.ProductId == id
-								  select new Product 
-								  { 
-									  ProductId = id,
-									  Category = new Category
-									  {
-										  CategoryId = category.CategoryId,	
-										  CategoryName = category.CategoryName
-									  },
-									  Shop = new Shop
-									  {
-										  UserId = shop.UserId,
-										  ShopName = shop.ShopName
-									  },
-									  ProductName = product.ProductName,	
-									  Discount = product.Discount,
-									  Thumbnail = product.Thumbnail,	
-									  UpdateDate = product.UpdateDate,
-									  TotalRatingStar = product.TotalRatingStar,	
-									  NumberFeedback = product.NumberFeedback,
-									  SoldCount = product.SoldCount,
-									  Note = product.Note,
-									  ProductStatusId = product.ProductStatusId,
+								   join category in context.Category
+										on product.CategoryId equals category.CategoryId
+								   join shop in context.Shop
+										on product.ShopId equals shop.UserId
+								   where product.ProductId == id
+								   select new Product
+								   {
+									   ProductId = id,
+									   Category = new Category
+									   {
+										   CategoryId = category.CategoryId,
+										   CategoryName = category.CategoryName
+									   },
+									   Shop = new Shop
+									   {
+										   UserId = shop.UserId,
+										   ShopName = shop.ShopName
+									   },
+									   ProductName = product.ProductName,
+									   Discount = product.Discount,
+									   Thumbnail = product.Thumbnail,
+									   UpdateDate = product.UpdateDate,
+									   TotalRatingStar = product.TotalRatingStar,
+									   NumberFeedback = product.NumberFeedback,
+									   SoldCount = product.SoldCount,
+									   Note = product.Note,
+									   ProductStatusId = product.ProductStatusId,
+									   ProductVariants = (from productVariant in context.ProductVariant
+														 where productVariant.ProductId == id
+														 select new ProductVariant
+														 {
+															 Name = productVariant.Name,
+															 Price = productVariant.Price,
+														 }).ToList(),
+									   ProductMedias = (from productMedia in context.ProductMedia
+													   where productMedia.ProductId == id
+													   select new ProductMedia
+													   {
+														   Url = productMedia.Url
+													   }).ToList(),
+									   ReportProducts = (from reportProduct in context.ReportProduct
+														 join reasonReportProduct in context.ReasonReportProduct
+														     on reportProduct.ReasonReportProductId equals reasonReportProduct.ReasonReportProductId
+														 join user in context.User
+															 on reportProduct.UserId equals user.UserId
+														 where reportProduct.ProductId == id
+														 select new ReportProduct
+														 {
+															 User = new User
+															 {
+																 UserId = user.UserId,
+																 Email = user.Email,
+																 Avatar = user.Avatar,
+															 },
+															 ReasonReportProduct = new ReasonReportProduct
+															 {
+																 ReasonReportProductId = reasonReportProduct.ReasonReportProductId,
+																 ViName = reasonReportProduct.ViName,
+																 ViExplanation = reasonReportProduct.ViExplanation
+															 },
+															 Description = reportProduct.Description,
+															 DateCreate = reportProduct.DateCreate
+														 }).ToList()
 
-								  })
+								   })
 								  .FirstOrDefault();
 				return productInfo;
 			}

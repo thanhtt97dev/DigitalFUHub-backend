@@ -440,7 +440,7 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get products for admin
 		[Authorize("Admin")]
-		[HttpPost("/admin/product/all")]
+		[HttpPost("admin/getProducts")]
 		public IActionResult GetProductsAdmin(GetProductsRequestDTO request)
 		{
 			if (!ModelState.IsValid)
@@ -449,7 +449,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				if(request.SoldMin < 0 || (request.SoldMax != 0 && request.SoldMin != 0 ? false : (request.SoldMin > request.SoldMax || request.SoldMin < 0 || request.SoldMax < 0)) ||
+				if (request.SoldMin < 0 || (request.SoldMax != 0 && request.SoldMin != 0 ? false : (request.SoldMin > request.SoldMax || request.SoldMin < 0 || request.SoldMax < 0)) ||
 				   request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
@@ -459,14 +459,14 @@ namespace DigitalFUHubApi.Controllers
 					 request.SoldMin, request.SoldMax, request.ProductStatusId);
 				var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
 
-				if(request.Page > numberPages) 
+				if (request.Page > numberPages)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
 				}
 
 				List<Product> products = _productRepository
-					.GetProductsForAdmin(request.ShopName, request.ProductId, request.ProductName, request.ProductCategory, 
-					 request.SoldMin, request.SoldMax,request.ProductStatusId, request.Page);
+					.GetProductsForAdmin(request.ShopName, request.ProductId, request.ProductName, request.ProductCategory,
+					 request.SoldMin, request.SoldMax, request.ProductStatusId, request.Page);
 
 				var result = new GetProductsResponseDTO
 				{
@@ -485,8 +485,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get product detail for admin
-		[Authorize("Admin")]
-		[HttpGet("/admin/product/{id}")]
+		//[Authorize("Admin")]
+		[HttpGet("admin/{id}")]
 		public IActionResult GetProductDetailAdmin(long id)
 		{
 			if (!ModelState.IsValid)
@@ -496,12 +496,12 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				var product = _productRepository.GetProduct(id);
-				if(product == null)
+				if (product == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
-
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				var result = _mapper.Map<ProductDetailAdminResponseDTO>(product);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
 			}
 			catch (Exception ex)
 			{
@@ -509,4 +509,5 @@ namespace DigitalFUHubApi.Controllers
 			}
 			#endregion
 		}
+	}
 }
