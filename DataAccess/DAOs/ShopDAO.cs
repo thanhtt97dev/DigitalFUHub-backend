@@ -27,7 +27,7 @@ namespace DataAccess.DAOs
 
 
 
-		internal void AddShop(string shopName, long userId, string shopDescription)
+		internal void AddShop(string avatarUrl, string shopName, long userId, string shopDescription)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -39,6 +39,7 @@ namespace DataAccess.DAOs
 					{
 						DateCreate = DateTime.Now,
 						ShopName = shopName,
+						Avatar = avatarUrl,
 						IsActive = true,
 						Description = shopDescription,
 						UserId = userId,
@@ -100,6 +101,28 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Shop.FirstOrDefault(x => x.UserId == shopId);
+			}
+		}
+
+		internal void EditShop(Shop shopEdit)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				try
+				{
+					Shop? shop = context.Shop.FirstOrDefault(x => x.UserId == shopEdit.UserId);
+					if (shop == null) throw new Exception("Not Found");
+					shop.Description = shopEdit.Description;
+					if(!string.IsNullOrEmpty(shopEdit.Avatar))
+					{
+						shop.Avatar = shopEdit.Avatar;
+					}
+					context.SaveChanges();
+				}
+				catch (Exception e)
+				{
+					throw new Exception(e.Message);
+				}
 			}
 		}
 	}

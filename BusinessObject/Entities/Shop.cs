@@ -13,6 +13,7 @@ namespace BusinessObject.Entities
 		[Key]
 		public long UserId { get; set; }
 		public string ShopName { get; set; } = null!;
+		public string Avatar { get; set; } = string.Empty;
 		public DateTime DateCreate { get; set; }
 		public string? Description { get; set; }
 		public bool IsActive { get; set; }

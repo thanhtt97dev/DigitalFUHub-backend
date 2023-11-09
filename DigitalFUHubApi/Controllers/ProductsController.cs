@@ -152,6 +152,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region get list product of seller
 		[Authorize("Seller")]
 		[HttpGet("Seller/List")]
 		public IActionResult GetListProductBySeller(string productId, string productName, int page)
@@ -173,6 +174,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 
 		}
+		#endregion
 
 		#region Get Product Of Seller
 		[Authorize("Seller")]

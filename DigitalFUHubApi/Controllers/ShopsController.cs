@@ -4,6 +4,7 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.Seller;
 using DTOs.Shop;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -19,12 +20,14 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IShopRepository _shopRepository;
 		private readonly IUserRepository _userRepository;
 		private readonly JwtTokenService _jwtTokenService;
+		private readonly StorageService _storageService;
 
-		public ShopsController(IShopRepository shopRepository, IUserRepository userRepository, JwtTokenService jwtTokenService)
+		public ShopsController(IShopRepository shopRepository, IUserRepository userRepository, JwtTokenService jwtTokenService, StorageService storageService)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
 			_jwtTokenService = jwtTokenService;
+			_storageService = storageService;
 		}
 
 		[Authorize]
@@ -38,26 +41,87 @@ namespace DigitalFUHubApi.Controllers
 			bool result = _shopRepository.IsExistShopName(shopName.Trim());
 			return Ok(new ResponseData(!result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_NOT_ACCEPT, !result ? "SUCCESS" : "INVALID", !result, new()));
 		}
+		#region get info shop of seller
+		[Authorize("Seller")]
+		[HttpGet("Seller/Get")]
+		public IActionResult GetShopOfSeller()
+		{
+			Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+			if (shop == null)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not Found", false, new()));
+			}
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, shop));
+
+		}
+		#endregion
 
 		#region register seller
 		[Authorize("Customer")]
 		[HttpPost("Register")]
-		public IActionResult Register(RegisterShopRequestDTO request)
+		public async Task<IActionResult> Register([FromForm] RegisterShopRequestDTO request)
 		{
+			string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 			if (!ModelState.IsValid
 				|| string.IsNullOrWhiteSpace(request.ShopName)
-				|| string.IsNullOrWhiteSpace(request.ShopDescription))
+				|| string.IsNullOrWhiteSpace(request.ShopDescription)
+				|| !fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf("."))))
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			try
 			{
-				if(request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
-				_shopRepository.AddShop(request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
+				DateTime now = DateTime.Now;
+				string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
+					now.Millisecond, now.Second, now.Minute, now.Hour,
+					request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
+				string avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
+				_shopRepository.AddShop(avatarUrl, request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+		}
+		#endregion
+
+		#region register seller
+		[Authorize("Seller")]
+		[HttpPost("Seller/Edit")]
+		public async Task<IActionResult> EditShop([FromForm]SellerEditShopRequestDTO request)
+		{
+			string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+			if (string.IsNullOrWhiteSpace(request.ShopDescription)
+				|| (request.AvatarFile != null &&
+				!fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")))))
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+			}
+			try
+			{
+				string avatarUrl = "";
+				if (request.AvatarFile != null)
+				{
+					DateTime now = DateTime.Now;
+					string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
+						now.Millisecond, now.Second, now.Minute, now.Hour,
+						request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
+					 avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
+				}
+				Shop shop = new Shop
+				{
+					Avatar = avatarUrl,
+					UserId = _jwtTokenService.GetUserIdByAccessToken(User),
+					DateCreate = DateTime.Now,
+					Description = request.ShopDescription
+				};
+				_shopRepository.EditShop(shop);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
