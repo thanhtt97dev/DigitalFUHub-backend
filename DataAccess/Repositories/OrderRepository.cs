@@ -43,8 +43,9 @@ namespace DataAccess.Repositories
 
 		public Order? GetOrderCustomer(long orderId, long customerId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId);
 
-		public List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
-		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
+		public (long, List<Order>) GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, 
+			DateTime? toDate, int status, int page)
+		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status, page);
 
 		public void UpdateStatusOrderDispute(long sellerId, long customerId, long orderId, string note)
 		=> OrderDAO.Instance.UpdateStatusOrderDispute(sellerId, customerId, orderId, note);
@@ -56,5 +57,7 @@ namespace DataAccess.Repositories
 
 		public OrderDetail? GetOrderDetail(long orderDetailId) => OrderDAO.Instance.GetOrderDetail(orderDetailId);
 
+		public (long totalItem, List<Order> orders) GetListOrderByCoupon(long userId, long couponId, int page)
+		=> OrderDAO.Instance.GetListOrderByCoupon(userId, couponId, page);
 	}
 }

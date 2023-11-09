@@ -152,7 +152,7 @@
 					Email = request.Email,
 					Password = request.Password,
 					Fullname = request.Fullname,
-					RoleId = 1,
+					RoleId = Constants.CUSTOMER_ROLE,
 					SignInGoogle = false,
 					Status = true,
 					Username = request.Username,

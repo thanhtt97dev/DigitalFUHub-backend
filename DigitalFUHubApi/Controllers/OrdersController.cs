@@ -35,8 +35,8 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 		}
 
-		#region Add order
-		//[Authorize("Customer,Seller")]
+		#region Add order (customer)
+		[Authorize("Customer,Seller")]
 		[HttpPost("Customer/AddOrder")]
 		public async Task<IActionResult> AddOrder(AddOrderRequestDTO request)
 		{
@@ -291,23 +291,43 @@ namespace DigitalFUHubApi.Controllers
 				DateTime? toDate;
 				string format = "M/d/yyyy";
 
-				fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate, format, CultureInfo.InvariantCulture);
-				toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : DateTime.ParseExact(request.ToDate, format, CultureInfo.InvariantCulture).AddDays(1);
+				fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate, 
+					format, CultureInfo.InvariantCulture);
+				toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : DateTime.ParseExact(request.ToDate, 
+					format, CultureInfo.InvariantCulture);
 				if (fromDate > toDate && fromDate != null && toDate != null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
 				}
 
-				List<Order> orders = _orderRepository.GetListOrderSeller(request.UserId, request.OrderId, request.Username.Trim(), 
-					fromDate, toDate, request.Status);
-				List<SellerOrderResponseDTO> result = _mapper.Map<List<SellerOrderResponseDTO>>(orders);
+				(long totalItems, List<Order> orders) = _orderRepository.GetListOrderSeller(request.UserId, request.OrderId, 
+					request.Username.Trim(), fromDate, toDate, request.Status, request.Page);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerListOrderResponseDTO
+				{
+					TotalItems = totalItems,
+					Orders = _mapper.Map<List<SellerOrderResponseDTO>>(orders)
+				}));
 			}
 			catch (Exception e)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
+		}
+		#endregion
+
+		#region get list order using coupon (seller)
+		[Authorize("Seller")]		
+		[HttpGet("Seller/Coupon")]		
+		public IActionResult GetListOrderByCoupon(long couponId, int page)
+		{
+			(long totalItems, List<Order> orders) = _orderRepository.GetListOrderByCoupon(_jwtTokenService.GetUserIdByAccessToken(User),
+				couponId, page);
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SellerListOrderCouponResponseDTO
+			{
+				TotalItems = totalItems,
+				Orders = _mapper.Map<List<SellerOrderResponseDTO>>(orders)
+			}));
 		}
 		#endregion
 
@@ -609,6 +629,4 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 	}
-
-
 }

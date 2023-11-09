@@ -168,12 +168,16 @@ namespace DigitalFUHubApi.Controllers
 				CultureInfo provider = CultureInfo.InvariantCulture;
 				DateTime? startDate = string.IsNullOrEmpty(request.StartDate) ? null : DateTime.ParseExact(request.StartDate.Trim(),
 					formatDate, provider);
-				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(), 
+				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(),
 					formatDate, provider);
-				List<Coupon> coupons = _couponRepository.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User), 
-					request.CouponCode.Trim(), startDate, endDate, request.IsPublic, request.Status);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, 
-					_mapper.Map<List<SellerCouponResponseDTO>>(coupons)));
+				(long totalItems, List<Coupon> coupons) = _couponRepository.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User),
+					request.CouponCode.Trim(), startDate, endDate, request.IsPublic, request.Status, request.Page);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ListCouponResponseDTO
+					{
+						TotalItems = totalItems,
+						Coupons = _mapper.Map<List<SellerCouponResponseDTO>>(coupons)
+					}
+				));
 			}
 			catch (Exception e)
 			{
@@ -331,6 +335,22 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region update coupon finish
+		[Authorize("Seller")]		
+		[HttpPost("Edit/Finish/{couponId}")]
+		public IActionResult UpdateCouponFinish(long couponId)
+		{
+			try
+			{
+				_couponRepository.UpdateCouponFinish(couponId, _jwtTokenService.GetUserIdByAccessToken(User));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+			}
+			catch (Exception e)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, e.Message, false, new()));
+			}
+		}
+		#endregion
 
 		#region Remove coupon
 		[Authorize("Seller")]
@@ -365,7 +385,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-
+		#region check coupon exist
 		[Authorize("Seller")]
 		[HttpGet("IsExistCouponCode/{actionMode}/{couponCode}")]
 		public IActionResult CheckCouponCodeExist(string actionMode, string couponCode)
@@ -388,5 +408,6 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 		}
+		#endregion
 	}
 }

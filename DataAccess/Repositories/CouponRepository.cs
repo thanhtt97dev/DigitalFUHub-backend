@@ -21,12 +21,15 @@ namespace DataAccess.Repositories
 
 		public Coupon? GetCoupon(long couponId, long shopId) => CouponDAO.Instance.GetCoupon(couponId, shopId);
 
-		public List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, 
-			DateTime? endDate, bool? isPublic, long status)
-		=> CouponDAO.Instance.GetListCouponsByShop(userId, couponCode, startDate, endDate, isPublic, status);
+		public (long, List<Coupon>) GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, 
+			DateTime? endDate, bool? isPublic, long status, int page)
+		=> CouponDAO.Instance.GetListCouponsByShop(userId, couponCode, startDate, endDate, isPublic, status, page);
 
 		public void UpdateStatusCoupon(Coupon coupon) => CouponDAO.Instance.UpdateStatusCoupon(coupon);
 
 		public void UpdateCoupon(Coupon coupon) => CouponDAO.Instance.UpdateCoupon(coupon);
+
+		public void UpdateCouponFinish(long couponId, long userId) => CouponDAO.Instance.UpdateCouponFinish( couponId, userId);
+
 	}
 }

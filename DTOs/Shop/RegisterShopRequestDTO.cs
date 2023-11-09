@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,5 +16,7 @@ namespace DTOs.Shop
         public string ShopName { get; set; } = string.Empty!;
         [Required]
         public string ShopDescription { get; set; } = string.Empty!;
-    }
+		[Required]
+		public IFormFile AvatarFile { get; set; } = null!;
+	}
 }

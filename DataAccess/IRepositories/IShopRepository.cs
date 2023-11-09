@@ -11,8 +11,9 @@ namespace DataAccess.IRepositories
 	public interface IShopRepository
 	{
 		bool IsExistShopName(string shopName);
-		void AddShop(string shopName, long userId, string shopDescription);
+		void AddShop(string avatarUrl,string shopName, long userId, string shopDescription);
 		bool IsExistShop(long userId);
 		Shop? GetShopById(long shopId);
+		void EditShop(Shop shop);
 	}
 }
