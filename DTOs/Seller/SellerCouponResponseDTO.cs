@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace DTOs.Seller
 {
+	public class ListCouponResponseDTO
+	{
+		public long TotalItems { get; set; }
+		public List<SellerCouponResponseDTO> Coupons { get; set; } = new();
+	}
 	public class SellerCouponResponseDTO
 	{
 		public long CouponId { get; set; }

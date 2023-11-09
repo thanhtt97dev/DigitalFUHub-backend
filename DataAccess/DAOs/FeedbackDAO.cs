@@ -178,12 +178,12 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetListFeedbackSeller(long userId, string orderId, string userName, string productName,
-			string productVariantName, DateTime? fromDate, int rate)
+		internal (long, List<Order>) GetListFeedbackSeller(long userId, string orderId, string userName, string productName,
+			string productVariantName, DateTime? fromDate, int rate, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return (context.Order
+				var query = (context.Order
 					.Include(x => x.User)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
@@ -222,7 +222,9 @@ namespace DataAccess.DAOs
 							}).ToList(),
 					})
 					.ToList())
-					.Where(x => x.OrderDetails.Count > 0).ToList();
+					.Where(x => x.OrderDetails.Count > 0);
+
+					return (query.Count(), query.Skip((page - 1)*5).Take(5).ToList());
 
 			}
 		}

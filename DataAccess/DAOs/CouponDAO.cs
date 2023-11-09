@@ -70,13 +70,13 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Coupon> GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate,
-			bool? isPublic, long status)
+		internal (long, List<Coupon>) GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate,
+			bool? isPublic, long status , int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-				List<Coupon> coupons = context.Coupon
+				var query = context.Coupon
 					.Include(x => x.CouponProducts)
 					.ThenInclude(x => x.Product)
 					.Where(c => c.ShopId == userId
@@ -86,10 +86,10 @@ namespace DataAccess.DAOs
 								:
 								(
 									status == Constants.COUPON_STATUS_COMING_SOON ? c.StartDate > DateTime.Now
-									: 
-									status == Constants.COUPON_STATUS_ONGOING? c.StartDate <= DateTime.Now && DateTime.Now <= c.EndDate
 									:
-									status == Constants.COUPON_STATUS_FINISHED? c.EndDate < DateTime.Now : true
+									status == Constants.COUPON_STATUS_ONGOING ? c.StartDate <= DateTime.Now && DateTime.Now <= c.EndDate
+									:
+									status == Constants.COUPON_STATUS_FINISHED ? c.EndDate < DateTime.Now : true
 								)
 							)
 							&& c.CouponCode.ToLower().Contains(couponCode.ToLower())
@@ -97,11 +97,11 @@ namespace DataAccess.DAOs
 							&& (endDate == null ? true : c.EndDate.Date <= endDate.Value.Date)
 							&& (isPublic == null ? true : c.IsPublic == isPublic)
 							)
-					.OrderByDescending(x => x.CouponId)
-					.ToList();
+					.OrderByDescending(x => x.CouponId);
+				List<Coupon> coupons = query.Skip((page - 1) * 10).Take(10).ToList();
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 
-				return coupons;
+				return (query.Count(), coupons);
 			}
 		}
 
@@ -202,6 +202,36 @@ namespace DataAccess.DAOs
 
 					context.Coupon.Update(coup);
 					context.SaveChanges();
+				}
+				catch (Exception e)
+				{
+					throw new Exception(e.Message);
+				}
+			}
+		}
+
+		internal void UpdateCouponFinish(long couponId, long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				try
+				{
+					Coupon? coupon = GetCoupon(couponId, userId);
+					if (coupon == null)
+					{
+						throw new Exception("Not Found");
+					}
+					DateTime now = DateTime.Now;
+					if (coupon.StartDate <= now && now <= coupon.EndDate)
+					{
+						coupon.EndDate = now;
+						context.Coupon.Update(coupon);
+						context.SaveChanges();
+					}
+					else
+					{
+						throw new Exception("Invalid");
+					}
 				}
 				catch (Exception e)
 				{

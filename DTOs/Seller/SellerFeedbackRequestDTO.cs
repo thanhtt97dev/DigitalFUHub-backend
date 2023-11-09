@@ -15,7 +15,13 @@ namespace DTOs.Seller
 		public string? FromDate { get; set; } = null!;
 		public string UserName { get; set; } = string.Empty;
 		public int Rate { get; set; }
+		public int Page { get; set; }
 	}
+	public class ListFeedbackResponseDTO
+	{
+		public long TotalItems { get; set; }
+		public List<SellerFeedbackResponseDTO> Feedbacks { get; set; } = new();
+	} 
 	public class SellerFeedbackResponseDTO
 	{
 		public long OrderId { get; set; }

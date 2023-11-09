@@ -14,5 +14,6 @@ namespace DTOs.Seller
 		public string? EndDate { get; set; } = null!;
 		public long Status { get; set; }
 		public bool? IsPublic { get; set; }
+		public int Page { get; set; }
 	}
 }

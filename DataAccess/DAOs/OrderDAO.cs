@@ -1074,11 +1074,12 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
+		internal (long, List<Order>) GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, 
+			DateTime? toDate, int status, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Order
+				var query = context.Order
 					.Include(x => x.User)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
@@ -1087,8 +1088,9 @@ namespace DataAccess.DAOs
 							&& (fromDate != null && toDate != null ? x.OrderDate >= fromDate && x.OrderDate <= toDate : true)
 							&& (status == 0 ? true : x.OrderStatusId == status)
 							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
-					.OrderByDescending(x => x.OrderDate)
-					.ToList();
+					.OrderByDescending(x => x.OrderDate);
+					return (query.Count(), query.Skip((page - 1) * 10).Take(10).ToList());
+
 
 			}
 		}
@@ -1258,6 +1260,17 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.OrderDetail.Include(x => x.Order).FirstOrDefault(x => x.OrderDetailId == orderDetailId);
+			}
+		}
+
+		internal (long totalItem, List<Order> orders) GetListOrderByCoupon(long userId, long couponId, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var query = context.Order.Include(x => x.User).
+					Where(x => x.ShopId == userId && x.OrderCoupons.Any(x => x.CouponId == couponId));
+
+				return (query.Count(), query.Skip((page - 1) * 10).Take(10).ToList());
 			}
 		}
 	}

@@ -14,5 +14,6 @@ namespace DTOs.Seller
 		public string FromDate { get; set; } = null!;
 		public string ToDate { get; set; } = null!;
 		public int Status { get; set; }
+		public int Page { get; set; }
 	}
 }
