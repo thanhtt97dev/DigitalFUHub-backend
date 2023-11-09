@@ -463,7 +463,7 @@ namespace DataAccess.DAOs
 									ProductName = product.ProductName,
 									Thumbnail = product.Thumbnail,
 									ViewCount = product.ViewCount,
-									LikedCount = product.LikedCount,
+									LikedCount = context.WishList.Where(x => x.ProductId == product.ProductId).Count(),
 									SoldCount = product.SoldCount,
 									ProductStatusId = product.ProductStatusId,	
 									Shop = new Shop
