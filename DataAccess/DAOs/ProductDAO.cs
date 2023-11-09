@@ -177,7 +177,7 @@ namespace DataAccess.DAOs
 				ProductDetailShopResponseDTO shop = new ProductDetailShopResponseDTO
 				{
 					ShopId = product.Shop.UserId,
-					Avatar = "",
+					Avatar = product.Shop.Avatar,
 					ShopName = product.Shop.ShopName,
 					DateCreate = product.Shop.DateCreate,
 					FeedbackNumber = feedbachNumber,
@@ -195,7 +195,9 @@ namespace DataAccess.DAOs
 					Discount = product.Discount,
 					CategoryId = product.CategoryId,
 					ProductStatusId = product.ProductStatusId,
-					Quantity = productQuantity,
+                    TotalRatingStar = product.TotalRatingStar,
+                    NumberFeedback = product.NumberFeedback,
+                    Quantity = productQuantity,
 					ProductVariants = variants,
 					ProductMedias = medias,
 					Tags = tags,
