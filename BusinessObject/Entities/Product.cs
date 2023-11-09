@@ -26,7 +26,8 @@ namespace BusinessObject.Entities
         public long NumberFeedback { get; set; }
 		public int ViewCount { get; set; }
 		public int LikedCount { get; set; }
-		public long SoldCount { get; set; }
+		public int SoldCount { get; set; }
+        public string Note { get; set; } = string.Empty;
 		public long ProductStatusId { get; set; }
 		[ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
