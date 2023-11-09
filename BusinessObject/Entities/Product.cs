@@ -39,7 +39,8 @@ namespace BusinessObject.Entities
         public virtual ICollection<ProductMedia> ProductMedias { get; set; } = null!;
         public virtual ICollection<Feedback>? Feedbacks { get; set; }
         public virtual ICollection<Tag>? Tags{ get; set; }
-		public virtual List<CouponProduct>? CouponProducts { get; set; }
-		public virtual List<WishList>? WishList { get; set; }
+		public virtual ICollection<CouponProduct>? CouponProducts { get; set; }
+		public virtual ICollection<WishList>? WishList { get; set; }
+		public virtual ICollection<ReportProduct>? ReportProducts { get; set; }
 	}
 }

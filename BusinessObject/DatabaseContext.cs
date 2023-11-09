@@ -59,6 +59,9 @@ namespace BusinessObject
 		public virtual DbSet<BusinessFee> BusinessFee { get; set; } = null!;
 		public virtual DbSet<TransactionCoin> TransactionCoin { get; set; } = null!;
 		public virtual DbSet<TransactionCoinType> TransactionCoinType { get; set; } = null!;
+		public virtual DbSet<ReportProduct> ReportProduct { get; set; } = null!;
+		public virtual DbSet<ReasonReportProduct> ReasonReportProduct { get; set; } = null!;
+		public virtual DbSet<ReportProductStatus> ReportProductStatus { get; set; } = null!;
 
 		#endregion
 
@@ -153,7 +156,15 @@ namespace BusinessObject
 				.WithMany(c => c.WishList)
 				.HasForeignKey(x => x.ProductId)
 				.OnDelete(DeleteBehavior.NoAction);
-
+			modelBuilder.Entity<ReportProduct>()
+				.HasOne(x => x.User)
+				.WithMany(c => c.ReportProducts)
+				.HasForeignKey(x => x.UserId)
+				.OnDelete(DeleteBehavior.NoAction);
+			modelBuilder.Entity<User>()
+				.HasMany(x => x.ReportProducts)
+				.WithOne(x => x.User)
+				.OnDelete(DeleteBehavior.NoAction);
 
 			modelBuilder.Entity<Role>().HasData(new Role[]
 			{
@@ -248,9 +259,22 @@ namespace BusinessObject
 				new BusinessFee() {BusinessFeeId = 1, Fee = 5, StartDate = DateTime.Now},
 			});
 
-			modelBuilder.Entity<FeedbackBenefit>().HasData(new FeedbackBenefit[]
+			modelBuilder.Entity<ReportProductStatus>().HasData(new ReportProductStatus[]
 			{
-				new FeedbackBenefit{FeedbackBenefitId = 1, Coin = 100, StartDate = DateTime.Now},
+				new ReportProductStatus{ReportProductId = 1, Name = "verifying"},
+				new ReportProductStatus{ReportProductId = 2, Name = "reject"},
+				new ReportProductStatus{ReportProductId = 3, Name = "accept"},
+			});
+
+			modelBuilder.Entity<ReasonReportProduct>().HasData(new ReasonReportProduct[]
+			{
+				new ReasonReportProduct{ReasonReportProductId = 1, ViName = "Sản phẩm bị cấm buôn bán (động vật hoang dã, 18+,...)", ViExplanation = "Sản phẩm bị cấm theo quy định của Pháp luật hoặc nằm trong danh mục bị hạn chế trên FuDigitalHub"},
+				new ReasonReportProduct{ReasonReportProductId = 2, ViName = "Hình ảnh sản phẩm không rõ ràng", ViExplanation = "Hình ảnh sản phẩm chưa rõ ràng (quá nhỏ, không nhìn thấy toàn bộ sản phẩm hoặc bị che mờ các thông tin cần thiết)"},
+				new ReasonReportProduct{ReasonReportProductId = 3, ViName = "Sản phẩm có hình ảnh, nội dung phản cảm hoặc có thể gây phản cảm", ViExplanation = "Sản phẩm có hình ảnh, nội dung phản cảm hoặc có thể gây phản cảm"},
+				new ReasonReportProduct{ReasonReportProductId = 4, ViName = "Sản phẩm có dấu hiệu lừa đảo", ViExplanation = "Thông tin sản phẩm có chứa yêu cầu bất hợp pháp: đặt cọc, chuyển khoản, gửi lại tiền thừa trong gói hàng, hoặc giao dịch ngoài DigitabFuHub, v.v..."},
+				new ReasonReportProduct{ReasonReportProductId = 5, ViName = "Tên sản phẩm (Name) không phù hợp với hình ảnh sản phẩm", ViExplanation = "Tên sản phẩm hoàn toàn khác với hình ảnh. Người bán cần sửa lại tên phù hợp với hình ảnh sản phẩm."},
+				new ReasonReportProduct{ReasonReportProductId = 6, ViName = "Sản phẩm có dấu hiệu tăng đơn ảo", ViExplanation = "Người bán có dấu hiệu tạo đơn ảo để tăng số lượng đơn hàng và đánh giá"},
+				new ReasonReportProduct{ReasonReportProductId = 7, ViName = "Khác", ViExplanation = "Sản phẩm vi phạm quy định khác của DigitabFuHub"},
 			});
 		}
 

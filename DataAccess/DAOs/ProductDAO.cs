@@ -487,6 +487,45 @@ namespace DataAccess.DAOs
 				return products;
 			}
 		}
+
+		internal Product? GetProduct(long id)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var productInfo = (from product in context.Product
+								  join category in context.Category
+									   on product.CategoryId equals category.CategoryId
+								  join shop in context.Shop
+									   on product.ShopId equals shop.UserId
+								  where product.ProductId == id
+								  select new Product 
+								  { 
+									  ProductId = id,
+									  Category = new Category
+									  {
+										  CategoryId = category.CategoryId,	
+										  CategoryName = category.CategoryName
+									  },
+									  Shop = new Shop
+									  {
+										  UserId = shop.UserId,
+										  ShopName = shop.ShopName
+									  },
+									  ProductName = product.ProductName,	
+									  Discount = product.Discount,
+									  Thumbnail = product.Thumbnail,	
+									  UpdateDate = product.UpdateDate,
+									  TotalRatingStar = product.TotalRatingStar,	
+									  NumberFeedback = product.NumberFeedback,
+									  SoldCount = product.SoldCount,
+									  Note = product.Note,
+									  ProductStatusId = product.ProductStatusId,
+
+								  })
+								  .FirstOrDefault();
+				return productInfo;
+			}
+		}
 	}
 }
 

@@ -495,6 +495,12 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
+				var product = _productRepository.GetProduct(id);
+				if(product == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 			}
 			catch (Exception ex)
