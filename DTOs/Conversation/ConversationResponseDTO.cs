@@ -23,8 +23,10 @@ namespace DTOs.Conversation
 
     public class ConversationLatestMessageResponseDTO
     {
-        public string Content { get; set; }
-        public DateTime DateCreate { get; set; }   
+        public long UserId { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public DateTime DateCreate { get; set; }
+        public string MessageType { get; set; } = string.Empty;
 
-	}
+    }
 }

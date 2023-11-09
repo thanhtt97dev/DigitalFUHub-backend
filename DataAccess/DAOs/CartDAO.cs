@@ -141,7 +141,7 @@ namespace DataAccess.DAOs
                                                                                        ProductStatusId = product.ProductStatusId,
 																				   }).First(),
                                                                          AssetInformations = context.AssetInformation
-                                                                                               .Where(x => x.IsActive)
+                                                                                               .Where(x => x.IsActive && x.ProductVariantId == productVariant.ProductVariantId)
                                                                                                .Select(x => new AssetInformation { })
                                                                                                .ToList()
                                                                      }).First(),

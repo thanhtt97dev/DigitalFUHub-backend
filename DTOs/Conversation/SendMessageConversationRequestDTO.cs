@@ -11,8 +11,8 @@ namespace DTOs.Conversation
     {
         public long ConversationId { get; set; }
         public long UserId { get; set; }
-        public string? Content { get; set; } = string.Empty;
-        public IEnumerable<IFormFile>? Images { get; set; }
+        public string? Content { get; set; }
+        public IFormFile? Image { get; set; }
         public IEnumerable<long> RecipientIds { get; set; } = null!;
     }
 }

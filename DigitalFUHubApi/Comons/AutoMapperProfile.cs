@@ -206,6 +206,20 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 			CreateMap<FeedbackMedia, string>()
 				.ConvertUsing(r => r.Url);
+
+			// products/admin/getProducts
+			CreateMap<ProductVariant, GetProductsProductVariantDetailResponseDTO>()
+				.ForMember(des => des.ProductVariantId, act => act.MapFrom(src => src.ProductVariantId))
+				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.Name))
+				.ForMember(des => des.ProductVariantPrice, act => act.MapFrom(src => src.Price))
+				.ReverseMap();
+			CreateMap<Product, GetProductsProductDetailResponseDTO>()
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductId))
+				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductName))
+				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.Thumbnail))
+				.ReverseMap();
 		}
 	}
 }

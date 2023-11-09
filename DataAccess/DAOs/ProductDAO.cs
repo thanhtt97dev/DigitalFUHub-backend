@@ -423,6 +423,70 @@ namespace DataAccess.DAOs
 				return (lsProduct, query.Count());
 			}
 		}
+
+		internal int GetNumberProductByConditions(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return (from product in context.Product
+						join shop in context.Shop
+							 on product.ShopId equals shop.UserId
+						where shop.ShopName.Contains(shopName.Trim()) &&
+						product.ProductName.Contains(productName.Trim()) &&
+						((productId == 0) ? true : product.ProductId == productId) &&
+						((productCategory == 0) ? true : product.CategoryId == productCategory) &&
+						((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
+						((soldMin == 0) ? true : product.SoldCount >= soldMin) &&
+						((soldMax == 0) ? true : product.SoldCount <= soldMax)
+						select new {}
+						).Count();
+			}
+		}
+
+		internal List<Product> GetProductsForAdmin(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var products = (from product in context.Product
+								join shop in context.Shop
+									 on product.ShopId equals shop.UserId
+								where shop.ShopName.Contains(shopName.Trim()) &&
+								product.ProductName.Contains(productName.Trim()) &&
+								((productId == 0) ? true : product.ProductId == productId) &&
+								((productCategory == 0) ? true : product.CategoryId == productCategory)&&
+								((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
+								((soldMin == 0) ? true : product.SoldCount >= soldMin) &&
+								((soldMax == 0) ? true : product.SoldCount <= soldMax) 
+								select new Product
+								{
+									ProductId = product.ProductId,
+									ProductName = product.ProductName,
+									Thumbnail = product.Thumbnail,
+									ViewCount = product.ViewCount,
+									LikedCount = product.LikedCount,
+									SoldCount = product.SoldCount,
+									ProductStatusId = product.ProductStatusId,	
+									Shop = new Shop
+									{
+										UserId = shop.UserId,
+										ShopName = shop.ShopName,
+									},
+									ProductVariants = (from productVariant in context.ProductVariant
+													   where productVariant.ProductId == product.ProductId && productVariant.isActivate == true
+													   select new ProductVariant
+													   {
+														   ProductVariantId = productVariant.ProductId,
+														   Name = productVariant.Name,
+														   Price = productVariant.Price,
+													   }).ToList(),
+								}
+							   )
+							   .Skip((page - 1) * Constants.PAGE_SIZE)
+							   .Take(Constants.PAGE_SIZE)
+							   .ToList();
+				return products;
+			}
+		}
 	}
 }
 

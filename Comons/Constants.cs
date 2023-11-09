@@ -76,10 +76,12 @@
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
 
 		// Product Status
+		public const int PRODUCT_STATUS_ALL = 0;
 		public const int PRODUCT_STATUS_ACTIVE = 1;
 		public const int PRODUCT_STATUS_BAN = 2;
 		public const int PRODUCT_STATUS_REMOVE = 3;
 		public const int PRODUCT_STATUS_HIDE = 4;
+		public static int[] PRODUCT_STATUS = new int[] { PRODUCT_STATUS_ALL, PRODUCT_STATUS_ACTIVE, PRODUCT_STATUS_BAN, PRODUCT_STATUS_REMOVE, PRODUCT_STATUS_HIDE };
 
 		// Withdraw transaction Status
 		public const int WITHDRAW_TRANSACTION_ALL = 0;
@@ -138,6 +140,9 @@
 
 		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
+
+		//
+		public const int PAGE_SIZE = 10;
 	}
 }
 

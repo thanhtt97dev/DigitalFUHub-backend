@@ -16,16 +16,19 @@ namespace BusinessObject.Entities
         public long ProductId { get; set; }
         public long ShopId { get; set; }
         public long CategoryId { get; set; }
-        public string? ProductName { get; set; }
+        public string ProductName { get; set; } = string.Empty;
         [DataType(DataType.Text)]
         public string? Description { get; set; }
         public int Discount { get; set; }
         public string? Thumbnail { get; set; }
         public DateTime UpdateDate { get; set; }
-        public long ProductStatusId { get; set; }
         public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
-        [ForeignKey(nameof(ShopId))]
+		public int ViewCount { get; set; }
+		public int LikedCount { get; set; }
+		public long SoldCount { get; set; }
+		public long ProductStatusId { get; set; }
+		[ForeignKey(nameof(ShopId))]
         public virtual Shop Shop { get; set; } = null!;
         [ForeignKey(nameof(CategoryId))]
         public virtual Category Category { get; set; } = null!;
