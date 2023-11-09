@@ -439,7 +439,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get products for admin
-		[HttpPost("admin/getProducts")]
+		[Authorize("Admin")]
+		[HttpPost("/admin/product/all")]
 		public IActionResult GetProductsAdmin(GetProductsRequestDTO request)
 		{
 			if (!ModelState.IsValid)
@@ -482,5 +483,24 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
-	}
+
+		#region Get product detail for admin
+		[Authorize("Admin")]
+		[HttpGet("/admin/product/{id}")]
+		public IActionResult GetProductDetailAdmin(long id)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			try
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+			#endregion
+		}
 }
