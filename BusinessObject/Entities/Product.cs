@@ -21,11 +21,12 @@ namespace BusinessObject.Entities
         public string? Description { get; set; }
         public int Discount { get; set; }
         public string? Thumbnail { get; set; }
-        public DateTime UpdateDate { get; set; }
+		public DateTime DateCreate { get; set; }
+		public DateTime DateUpdate { get; set; }
         public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
 		public int ViewCount { get; set; }
-		public int LikedCount { get; set; }
+		public int LikeCount { get; set; }
 		public int SoldCount { get; set; }
         public string Note { get; set; } = string.Empty;
 		public long ProductStatusId { get; set; }

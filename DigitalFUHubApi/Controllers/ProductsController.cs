@@ -282,7 +282,8 @@ namespace DigitalFUHubApi.Controllers
 					ProductVariants = productVariants,
 					ProductMedias = productMedias,
 					ProductStatusId = Constants.PRODUCT_STATUS_ACTIVE,
-					UpdateDate = DateTime.Now,
+					DateCreate = DateTime.Now,
+					DateUpdate = DateTime.Now,
 					TotalRatingStar = 0,
 					NumberFeedback = 0,
 				};

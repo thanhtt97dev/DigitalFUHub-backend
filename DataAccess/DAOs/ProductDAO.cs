@@ -239,7 +239,7 @@ namespace DataAccess.DAOs
 					{
 						Product? productE = context.Product.Where(p => p.ProductId == product.ProductId).FirstOrDefault();
 						if (productE == null) throw new Exception("Product not found");
-						productE.UpdateDate = DateTime.Now;
+						productE.DateUpdate = DateTime.Now;
 						productE.CategoryId = product.CategoryId;
 						productE.ProductName = product.ProductName;
 						productE.Description = product.Description;
@@ -465,7 +465,7 @@ namespace DataAccess.DAOs
 									ProductName = product.ProductName,
 									Thumbnail = product.Thumbnail,
 									ViewCount = product.ViewCount,
-									LikedCount = context.WishList.Where(x => x.ProductId == product.ProductId).Count(),
+									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
 									ProductStatusId = product.ProductStatusId,	
 									Shop = new Shop
@@ -516,7 +516,8 @@ namespace DataAccess.DAOs
 									   ProductName = product.ProductName,
 									   Discount = product.Discount,
 									   Thumbnail = product.Thumbnail,
-									   UpdateDate = product.UpdateDate,
+									   DateCreate = product.DateCreate,
+									   DateUpdate = product.DateUpdate,
 									   TotalRatingStar = product.TotalRatingStar,
 									   NumberFeedback = product.NumberFeedback,
 									   SoldCount = product.SoldCount,

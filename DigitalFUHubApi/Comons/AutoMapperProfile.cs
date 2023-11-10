@@ -178,7 +178,7 @@ namespace DigitalFUHubApi.Comons
 					TotalRatingStar = x.Product.TotalRatingStar,
 					Discount = x.Product.Discount,
 					Description = x.Product.Description,
-					UpdateDate = x.Product.UpdateDate,
+					DateUpdate = x.Product.DateUpdate,
 					ShopId = x.Product.ShopId,
 					CategoryId = x.Product.CategoryId,
 				}).ToList()))
