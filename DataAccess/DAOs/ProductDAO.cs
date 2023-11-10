@@ -576,6 +576,19 @@ namespace DataAccess.DAOs
 				return productInfo;
 			}
 		}
+
+		internal void UpdateProductStatusAdmin(long productId, int status, string note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
+				if (product == null) throw new Exception("Data not found");
+				product.ProductStatusId = status;
+				product.Note = note;
+				context.Product.Update(product);
+				context.SaveChanges();
+			}
+		}
 	}
 }
 

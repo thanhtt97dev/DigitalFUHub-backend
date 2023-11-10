@@ -28,5 +28,6 @@ namespace DataAccess.IRepositories
 		int GetNumberProductByConditions(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId);
 		List<Product> GetProductsForAdmin(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
 		Product? GetProduct(long id);
+		void UpdateProductStatusAdmin(long productId, int status, string note);
 	}
 }

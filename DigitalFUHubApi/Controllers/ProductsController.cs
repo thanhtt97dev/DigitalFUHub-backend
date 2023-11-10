@@ -6,6 +6,7 @@ using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.Product;
+using DTOs.ReportProduct;
 using DTOs.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -508,7 +509,29 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
+		}
+		#endregion
+
+		#region Update product status for admin
+		[Authorize("Admin")]
+		[HttpPost("admin/update")]
+		public IActionResult GetProductDetailAdmin(UpdateProductStatusAdminRequestDTO request)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			try
+			{
+				_productRepository.UpdateProductStatusAdmin(request.ProductId, request.Status, request.Note);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
 			#endregion
+
 		}
 	}
 }
