@@ -426,7 +426,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal int GetNumberProductByConditions(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId)
+		internal int GetNumberProductByConditions(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -435,6 +435,7 @@ namespace DataAccess.DAOs
 							 on product.ShopId equals shop.UserId
 						where shop.ShopName.Contains(shopName.Trim()) &&
 						product.ProductName.Contains(productName.Trim()) &&
+						((shopId == 0) ? true : product.ShopId == shopId) &&
 						((productId == 0) ? true : product.ProductId == productId) &&
 						((productCategory == 0) ? true : product.CategoryId == productCategory) &&
 						((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
@@ -445,7 +446,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Product> GetProductsForAdmin(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
+		internal List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -454,6 +455,7 @@ namespace DataAccess.DAOs
 									 on product.ShopId equals shop.UserId
 								where shop.ShopName.Contains(shopName.Trim()) &&
 								product.ProductName.Contains(productName.Trim()) &&
+								((shopId == 0) ? true : product.ShopId == shopId) &&
 								((productId == 0) ? true : product.ProductId == productId) &&
 								((productCategory == 0) ? true : product.CategoryId == productCategory)&&
 								((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
@@ -480,7 +482,9 @@ namespace DataAccess.DAOs
 														   ProductVariantId = productVariant.ProductId,
 														   Name = productVariant.Name,
 														   Price = productVariant.Price,
-													   }).ToList(),
+													   })
+													   .OrderBy(x => x.Price)
+													   .ToList(),
 								}
 							   )
 							   .Skip((page - 1) * Constants.PAGE_SIZE)
@@ -593,6 +597,54 @@ namespace DataAccess.DAOs
 				product.Note = note;
 				context.Product.Update(product);
 				context.SaveChanges();
+			}
+		}
+
+		internal List<Product> GetProductsOfSeller(long userId, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var products = (from product in context.Product
+								join shop in context.Shop
+									 on product.ShopId equals shop.UserId
+								where 
+								product.ProductName.Contains(productName.Trim()) &&
+								product.ShopId == userId &&
+								((productId == 0) ? true : product.ProductId == productId) &&
+								((productCategory == 0) ? true : product.CategoryId == productCategory) &&
+								((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
+								((soldMin == 0) ? true : product.SoldCount >= soldMin) &&
+								((soldMax == 0) ? true : product.SoldCount <= soldMax)
+								select new Product
+								{
+									ProductId = product.ProductId,
+									ProductName = product.ProductName,
+									Thumbnail = product.Thumbnail,
+									ViewCount = product.ViewCount,
+									LikeCount = product.LikeCount,
+									SoldCount = product.SoldCount,
+									ProductStatusId = product.ProductStatusId,
+									Shop = new Shop
+									{
+										UserId = shop.UserId,
+										ShopName = shop.ShopName,
+									},
+									ProductVariants = (from productVariant in context.ProductVariant
+													   where productVariant.ProductId == product.ProductId && productVariant.isActivate == true
+													   select new ProductVariant
+													   {
+														   ProductVariantId = productVariant.ProductId,
+														   Name = productVariant.Name,
+														   Price = productVariant.Price,
+													   })
+													   .OrderBy(x => x.Price)
+													   .ToList(),
+								}
+							   )
+							   .Skip((page - 1) * Constants.PAGE_SIZE)
+							   .Take(Constants.PAGE_SIZE)
+							   .ToList();
+				return products;
 			}
 		}
 	}
