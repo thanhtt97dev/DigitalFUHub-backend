@@ -114,6 +114,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<ITransactionCoinRepository, TransactionCoinRepository>();
 			builder.Services.AddSingleton<IUserConversationRepository, UserConversationRepository>();
             builder.Services.AddSingleton<IWishListRepository, WishListRepository>();
+			builder.Services.AddSingleton<IReportProductRepository, ReportProductRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 

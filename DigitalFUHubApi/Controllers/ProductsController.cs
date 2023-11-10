@@ -486,7 +486,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get product detail for admin
-		//[Authorize("Admin")]
+		[Authorize("Admin")]
 		[HttpGet("admin/{id}")]
 		public IActionResult GetProductDetailAdmin(long id)
 		{
