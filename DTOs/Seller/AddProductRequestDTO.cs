@@ -10,7 +10,7 @@ namespace DTOs.Seller
 	public class AddProductRequestDTO
 	{
 		public long UserId { get; set; }
-		public string? ProductName { get; set;}
+		public string ProductName { get; set;} = null!;
 		public int Discount { get; set;}
 		public string? Description { get; set;}
 		public int Category { get; set;}

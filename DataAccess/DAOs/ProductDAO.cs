@@ -511,9 +511,11 @@ namespace DataAccess.DAOs
 									   Shop = new Shop
 									   {
 										   UserId = shop.UserId,
-										   ShopName = shop.ShopName
+										   ShopName = shop.ShopName,
+										   Avatar = shop.Avatar
 									   },
 									   ProductName = product.ProductName,
+									   Description = product.Description,
 									   Discount = product.Discount,
 									   Thumbnail = product.Thumbnail,
 									   DateCreate = product.DateCreate,
@@ -524,12 +526,18 @@ namespace DataAccess.DAOs
 									   Note = product.Note,
 									   ProductStatusId = product.ProductStatusId,
 									   ProductVariants = (from productVariant in context.ProductVariant
-														 where productVariant.ProductId == id
+														 where productVariant.ProductId == id && productVariant.isActivate
 														 select new ProductVariant
 														 {
 															 Name = productVariant.Name,
 															 Price = productVariant.Price,
 														 }).ToList(),
+									   Tags = (from tag in context.Tag
+											  where tag.ProductId == id
+											  select new Tag
+											  {
+												  TagName = tag.TagName
+											  }).ToList(),
 									   ProductMedias = (from productMedia in context.ProductMedia
 													   where productMedia.ProductId == id
 													   select new ProductMedia

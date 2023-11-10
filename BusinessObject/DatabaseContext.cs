@@ -259,6 +259,11 @@ namespace BusinessObject
 				new BusinessFee() {BusinessFeeId = 1, Fee = 5, StartDate = DateTime.Now},
 			});
 
+			modelBuilder.Entity<FeedbackBenefit>().HasData(new FeedbackBenefit[]
+			{
+				new FeedbackBenefit() {FeedbackBenefitId = 1, Coin = 200, StartDate = DateTime.Now},
+			});
+
 			modelBuilder.Entity<ReportProductStatus>().HasData(new ReportProductStatus[]
 			{
 				new ReportProductStatus{ReportProductId = 1, Name = "verifying"},

@@ -14,11 +14,12 @@ namespace DTOs.Product
 		public long CategoryId { get; set; }
 		public string? CategoryName { get; set; }
 		public string ShopName { get; set; } = null!;
-		public string Avatar { get; set; } = string.Empty;
+		public string ShopAvatar { get; set; } = string.Empty;
 		public string? Description { get; set; }
 		public int Discount { get; set; }
 		public string? Thumbnail { get; set; }
-		public DateTime UpdateDate { get; set; }
+		public DateTime DateCreate { get; set; }
+		public DateTime DateUpdate { get; set; }
 		public long TotalRatingStar { get; set; }
 		public long NumberFeedback { get; set; }
 		public int ViewCount { get; set; }
@@ -27,6 +28,7 @@ namespace DTOs.Product
 		public string Note { get; set; } = string.Empty;
 		public long ProductStatusId { get; set; }
 		public List<ProductDetailProductVariantAdminResponseDTO> ProductVariants { get; set; } = new List<ProductDetailProductVariantAdminResponseDTO>();
+		public List<ProductDetailTagAdminResponseDTO> Tags { get; set; } = new List<ProductDetailTagAdminResponseDTO>();
 		public List<ProductDetailProductMediaAdminResponseDTO> ProductMedias { get; set; } = new List<ProductDetailProductMediaAdminResponseDTO>();
 		public List<ProductDetailReportProductAdminResponseDTO> ReportProducts { get; set; } = new List<ProductDetailReportProductAdminResponseDTO>();
 	}
@@ -36,6 +38,12 @@ namespace DTOs.Product
 		public string? Name { get; set; }
 		public long Price { get; set; }
 	}
+
+	public class ProductDetailTagAdminResponseDTO
+	{
+		public string TagName { get; set; } = string.Empty;
+	}
+
 	public class ProductDetailProductMediaAdminResponseDTO
 	{
 		public string Url { get; set; } = string.Empty;
