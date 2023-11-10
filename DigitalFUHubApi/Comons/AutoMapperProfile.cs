@@ -225,22 +225,21 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Name, act => act.MapFrom(src => src.Name))
 				.ForMember(des => des.Price, act => act.MapFrom(src => src.Price))
 				.ReverseMap();
-			CreateMap<ProductMedia, ProductDetailProductMediaAdminResponseDTO>()
-				.ForMember(des => des.Url, act => act.MapFrom(src => src.Url))
-				.ReverseMap();
 			CreateMap<ReportProduct, ProductDetailReportProductAdminResponseDTO>()
 				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.ReasonReportProductId, act => act.MapFrom(src => src.ReasonReportProduct.ReasonReportProductId))
 				.ForMember(des => des.ViName, act => act.MapFrom(src => src.ReasonReportProduct.ViName))
 				.ForMember(des => des.ViExplanation, act => act.MapFrom(src => src.ReasonReportProduct.ViExplanation))
-				.ReverseMap();
-			CreateMap<Tag, ProductDetailTagAdminResponseDTO>()
 				.ReverseMap();
 			CreateMap<Product, ProductDetailAdminResponseDTO>()
 				.ForMember(des => des.CategoryId, act => act.MapFrom(src => src.Category.CategoryId))
 				.ForMember(des => des.CategoryName, act => act.MapFrom(src => src.Category.CategoryName))
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
 				.ForMember(des => des.ShopAvatar, act => act.MapFrom(src => src.Shop.Avatar))
+				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductMedias.Select(x => x.Url).ToList()))
+				.ForMember(des => des.Tags, act => act.MapFrom(src => (src.Tags == null) ? null : src.Tags.Select(x => x.TagName).ToList()))
 				.ReverseMap();
 
 		}

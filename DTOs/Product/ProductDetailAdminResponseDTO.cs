@@ -13,6 +13,7 @@ namespace DTOs.Product
 		public string ProductName { get; set; } = string.Empty;
 		public long CategoryId { get; set; }
 		public string? CategoryName { get; set; }
+		public long ShopId { get; set; }
 		public string ShopName { get; set; } = null!;
 		public string ShopAvatar { get; set; } = string.Empty;
 		public string? Description { get; set; }
@@ -28,9 +29,9 @@ namespace DTOs.Product
 		public string Note { get; set; } = string.Empty;
 		public long ProductStatusId { get; set; }
 		public List<ProductDetailProductVariantAdminResponseDTO> ProductVariants { get; set; } = new List<ProductDetailProductVariantAdminResponseDTO>();
-		public List<ProductDetailTagAdminResponseDTO> Tags { get; set; } = new List<ProductDetailTagAdminResponseDTO>();
-		public List<ProductDetailProductMediaAdminResponseDTO> ProductMedias { get; set; } = new List<ProductDetailProductMediaAdminResponseDTO>();
-		public List<ProductDetailReportProductAdminResponseDTO> ReportProducts { get; set; } = new List<ProductDetailReportProductAdminResponseDTO>();
+		public List<string>? Tags { get; set; } = new List<string>();
+		public List<string>? ProductMedias { get; set; } = new List<string>();
+		public List<ProductDetailReportProductAdminResponseDTO>? ReportProducts { get; set; } = new List<ProductDetailReportProductAdminResponseDTO>();
 	}
 
 	public class ProductDetailProductVariantAdminResponseDTO
@@ -39,10 +40,6 @@ namespace DTOs.Product
 		public long Price { get; set; }
 	}
 
-	public class ProductDetailTagAdminResponseDTO
-	{
-		public string TagName { get; set; } = string.Empty;
-	}
 
 	public class ProductDetailProductMediaAdminResponseDTO
 	{
@@ -51,6 +48,7 @@ namespace DTOs.Product
 
 	public class ProductDetailReportProductAdminResponseDTO
 	{
+		public long ReportProductId { get; set; }
 		public long UserId { get; set; }
 		public string Email { get; set; } = string.Empty;
 		public string Avatar { get; set; } = string.Empty;
@@ -59,6 +57,8 @@ namespace DTOs.Product
 		public string ViExplanation { get; set; } = string.Empty;
 		public string Description { get; set; } = string.Empty;
 		public DateTime DateCreate { get; set; }
+		public string Note { get; set; } = string.Empty;
+		public int ReportProductStatusId { get; set; }
 	}
 
 

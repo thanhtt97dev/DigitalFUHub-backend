@@ -18,6 +18,7 @@ namespace BusinessObject.Entities
 		public int ReasonReportProductId { get; set; }
 		public string Description { get; set; } = string.Empty;
 		public DateTime DateCreate { get; set; }
+		public string Note { get; set; } = string.Empty;
 		public int ReportProductStatusId { get; set; }
 		[ForeignKey(nameof(UserId))]
 		public virtual User User { get; set; } = null!;

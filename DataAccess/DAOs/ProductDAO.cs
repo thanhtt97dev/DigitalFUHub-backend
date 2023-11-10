@@ -552,6 +552,7 @@ namespace DataAccess.DAOs
 														 where reportProduct.ProductId == id
 														 select new ReportProduct
 														 {
+															 ReportProductId = reportProduct.ReportProductId,
 															 User = new User
 															 {
 																 UserId = user.UserId,
@@ -565,7 +566,9 @@ namespace DataAccess.DAOs
 																 ViExplanation = reasonReportProduct.ViExplanation
 															 },
 															 Description = reportProduct.Description,
-															 DateCreate = reportProduct.DateCreate
+															 DateCreate = reportProduct.DateCreate,
+															 Note = reportProduct.Note,
+															 ReportProductStatusId= reportProduct.ReportProductStatusId,	
 														 }).ToList()
 
 								   })
