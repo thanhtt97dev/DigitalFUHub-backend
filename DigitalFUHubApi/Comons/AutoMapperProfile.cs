@@ -122,6 +122,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.CustomerAvatar, act => act.MapFrom(src => src.User.Avatar))
 				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.ShopAvatar, act => act.MapFrom(src => src.Shop.Avatar))
 				.ForMember(des => des.BusinessFeeId, act => act.MapFrom(src => src.BusinessFee.BusinessFeeId))
 				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
 				.ReverseMap();
