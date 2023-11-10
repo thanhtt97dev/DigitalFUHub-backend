@@ -411,7 +411,18 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal (List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page)
+        internal bool CheckProductExist(List<long> productIds)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				bool isExist = context.Product.Any(x => productIds.Contains(x.ProductId));
+
+				return isExist;
+
+            }
+        }
+
+        internal (List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -489,6 +500,16 @@ namespace DataAccess.DAOs
 				return products;
 			}
 		}
+
+		internal Product? GetProductEntityById (long productId)
+		{
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
+
+				return product;
+            }
+        }
 	}
 }
 
