@@ -512,7 +512,13 @@ namespace DataAccess.DAOs
 									   {
 										   UserId = shop.UserId,
 										   ShopName = shop.ShopName,
-										   Avatar = shop.Avatar
+										   Avatar = shop.Avatar,
+										   User = (from seller in context.User
+												  where seller.UserId == shop.UserId
+												  select new User
+												  {
+													  Email = seller.Email
+												  }).First()
 									   },
 									   ProductName = product.ProductName,
 									   Description = product.Description,
@@ -531,7 +537,7 @@ namespace DataAccess.DAOs
 														 {
 															 Name = productVariant.Name,
 															 Price = productVariant.Price,
-														 }).ToList(),
+														 }).OrderBy(x => x.Price).ToList(),
 									   Tags = (from tag in context.Tag
 											  where tag.ProductId == id
 											  select new Tag

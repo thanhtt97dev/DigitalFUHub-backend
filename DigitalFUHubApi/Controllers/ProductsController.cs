@@ -28,9 +28,11 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IOrderRepository _orderRepository;
 		private readonly ICouponRepository _couponRepository;
 		private readonly JwtTokenService _jwtTokenService;
+		private readonly HubService _hubService;
+		private readonly MailService _mailService;
 		private readonly IMapper _mapper;
 
-		public ProductsController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IShopRepository shopRepository, IUserRepository userRepository, IRoleRepository roleRepository, IOrderRepository orderRepository, ICouponRepository couponRepository, JwtTokenService jwtTokenService, IMapper mapper)
+		public ProductsController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IShopRepository shopRepository, IUserRepository userRepository, IRoleRepository roleRepository, IOrderRepository orderRepository, ICouponRepository couponRepository, JwtTokenService jwtTokenService, IMapper mapper, MailService mailService, HubService hubService)
 		{
 			_configuration = configuration;
 			_productRepository = productRepository;
@@ -42,6 +44,8 @@ namespace DigitalFUHubApi.Controllers
 			_couponRepository = couponRepository;
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
+			_mailService = mailService;
+			_hubService = hubService;
 		}
 
 		#region Get Product Detail
@@ -515,7 +519,7 @@ namespace DigitalFUHubApi.Controllers
 		#region Update product status for admin
 		[Authorize("Admin")]
 		[HttpPost("admin/update")]
-		public IActionResult GetProductDetailAdmin(UpdateProductStatusAdminRequestDTO request)
+		public async Task<IActionResult> GetProductDetailAdmin(UpdateProductStatusAdminRequestDTO request)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -523,8 +527,26 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
+				var product = _productRepository.GetProduct(request.ProductId);
+				if(product == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
 				_productRepository.UpdateProductStatusAdmin(request.ProductId, request.Status, request.Note);
+				if(request.Status == Constants.PRODUCT_STATUS_BAN)
+				{
+					// send notification
+					await _hubService.SendNotification(product.Shop.UserId, "Sản phẩm đã bị cấm", $"Sản phẩm mã số #{product.ProductId} đã bị cấm", Constants.FRONT_END_SELLER_PRODUCT_URL + "list");
+					// send mail
+					await _mailService.SendEmailAsync(product.Shop.User.Email, $"DigitalFuHub: Sản phẩm mã số #{product.ProductId} đã bị cấm", "Bạn vui lòng truy cập vào webside của chúng tôi để kiểm tra thêm thông tin");
+				}
+				else
+				{
+					// send notification
+					await _hubService.SendNotification(product.Shop.UserId, "Sản phẩm của bạn đã được kích hoạt", $"Sản phẩm mã số #{product.ProductId} đã hoạt động trở lại", Constants.FRONT_END_SELLER_PRODUCT_URL + product.ProductId.ToString());
+				}
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+
 			}
 			catch (Exception ex)
 			{
