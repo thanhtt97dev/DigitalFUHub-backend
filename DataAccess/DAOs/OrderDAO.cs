@@ -643,7 +643,8 @@ namespace DataAccess.DAOs
 										Shop = new Shop
 										{
 											UserId = shop.UserId,
-											ShopName = shop.ShopName
+											ShopName = shop.ShopName,
+											Avatar = shop.Avatar
 										},
 										BusinessFee = new BusinessFee
 										{

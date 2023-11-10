@@ -10,6 +10,7 @@ namespace DTOs.Admin
 		public string? CustomerAvatar { get; set; }
 		public long ShopId { get; set; }
 		public string? ShopName { get; set; }
+		public string ShopAvatar { get; set; } = string.Empty;
 		public long BusinessFeeId { get; set; }
 		public long BusinessFeeValue { get; set; }
 		public long ConversationId { get; set; }

@@ -122,6 +122,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.CustomerAvatar, act => act.MapFrom(src => src.User.Avatar))
 				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.ShopAvatar, act => act.MapFrom(src => src.Shop.Avatar))
 				.ForMember(des => des.BusinessFeeId, act => act.MapFrom(src => src.BusinessFee.BusinessFeeId))
 				.ForMember(des => des.BusinessFeeValue, act => act.MapFrom(src => src.BusinessFee.Fee))
 				.ReverseMap();
@@ -178,7 +179,7 @@ namespace DigitalFUHubApi.Comons
 					TotalRatingStar = x.Product.TotalRatingStar,
 					Discount = x.Product.Discount,
 					Description = x.Product.Description,
-					UpdateDate = x.Product.UpdateDate,
+					DateUpdate = x.Product.DateUpdate,
 					ShopId = x.Product.ShopId,
 					CategoryId = x.Product.CategoryId,
 				}).ToList()))
@@ -207,7 +208,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<FeedbackMedia, string>()
 				.ConvertUsing(r => r.Url);
 
-			// products/admin/getProducts
+			// /admin/product/all
 			CreateMap<ProductVariant, GetProductsProductVariantDetailResponseDTO>()
 				.ForMember(des => des.ProductVariantId, act => act.MapFrom(src => src.ProductVariantId))
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.Name))
@@ -220,6 +221,28 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductName))
 				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.Thumbnail))
 				.ReverseMap();
+			// /admin/product/{id}
+			CreateMap<ProductVariant, ProductDetailProductVariantAdminResponseDTO>()
+				.ForMember(des => des.Name, act => act.MapFrom(src => src.Name))
+				.ForMember(des => des.Price, act => act.MapFrom(src => src.Price))
+				.ReverseMap();
+			CreateMap<ReportProduct, ProductDetailReportProductAdminResponseDTO>()
+				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
+				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.ReasonReportProductId, act => act.MapFrom(src => src.ReasonReportProduct.ReasonReportProductId))
+				.ForMember(des => des.ViName, act => act.MapFrom(src => src.ReasonReportProduct.ViName))
+				.ForMember(des => des.ViExplanation, act => act.MapFrom(src => src.ReasonReportProduct.ViExplanation))
+				.ReverseMap();
+			CreateMap<Product, ProductDetailAdminResponseDTO>()
+				.ForMember(des => des.CategoryId, act => act.MapFrom(src => src.Category.CategoryId))
+				.ForMember(des => des.CategoryName, act => act.MapFrom(src => src.Category.CategoryName))
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.ShopAvatar, act => act.MapFrom(src => src.Shop.Avatar))
+				.ForMember(des => des.ProductMedias, act => act.MapFrom(src => src.ProductMedias.Select(x => x.Url).ToList()))
+				.ForMember(des => des.Tags, act => act.MapFrom(src => (src.Tags == null) ? null : src.Tags.Select(x => x.TagName).ToList()))
+				.ReverseMap();
+
 		}
 	}
 }

@@ -239,7 +239,7 @@ namespace DataAccess.DAOs
 					{
 						Product? productE = context.Product.Where(p => p.ProductId == product.ProductId).FirstOrDefault();
 						if (productE == null) throw new Exception("Product not found");
-						productE.UpdateDate = DateTime.Now;
+						productE.DateUpdate = DateTime.Now;
 						productE.CategoryId = product.CategoryId;
 						productE.ProductName = product.ProductName;
 						productE.Description = product.Description;
@@ -437,7 +437,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal int GetNumberProductByConditions(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId)
+		internal int GetNumberProductByConditions(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -446,6 +446,7 @@ namespace DataAccess.DAOs
 							 on product.ShopId equals shop.UserId
 						where shop.ShopName.Contains(shopName.Trim()) &&
 						product.ProductName.Contains(productName.Trim()) &&
+						((shopId == 0) ? true : product.ShopId == shopId) &&
 						((productId == 0) ? true : product.ProductId == productId) &&
 						((productCategory == 0) ? true : product.CategoryId == productCategory) &&
 						((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
@@ -456,7 +457,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Product> GetProductsForAdmin(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
+		internal List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -465,6 +466,7 @@ namespace DataAccess.DAOs
 									 on product.ShopId equals shop.UserId
 								where shop.ShopName.Contains(shopName.Trim()) &&
 								product.ProductName.Contains(productName.Trim()) &&
+								((shopId == 0) ? true : product.ShopId == shopId) &&
 								((productId == 0) ? true : product.ProductId == productId) &&
 								((productCategory == 0) ? true : product.CategoryId == productCategory)&&
 								((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
@@ -476,7 +478,7 @@ namespace DataAccess.DAOs
 									ProductName = product.ProductName,
 									Thumbnail = product.Thumbnail,
 									ViewCount = product.ViewCount,
-									LikedCount = context.WishList.Where(x => x.ProductId == product.ProductId).Count(),
+									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
 									ProductStatusId = product.ProductStatusId,	
 									Shop = new Shop
@@ -491,7 +493,163 @@ namespace DataAccess.DAOs
 														   ProductVariantId = productVariant.ProductId,
 														   Name = productVariant.Name,
 														   Price = productVariant.Price,
+													   })
+													   .OrderBy(x => x.Price)
+													   .ToList(),
+								}
+							   )
+							   .Skip((page - 1) * Constants.PAGE_SIZE)
+							   .Take(Constants.PAGE_SIZE)
+							   .ToList();
+				return products;
+			}
+		}
+
+		internal Product? GetProduct(long id)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var productInfo = (from product in context.Product
+								   join category in context.Category
+										on product.CategoryId equals category.CategoryId
+								   join shop in context.Shop
+										on product.ShopId equals shop.UserId
+								   where product.ProductId == id
+								   select new Product
+								   {
+									   ProductId = id,
+									   Category = new Category
+									   {
+										   CategoryId = category.CategoryId,
+										   CategoryName = category.CategoryName
+									   },
+									   Shop = new Shop
+									   {
+										   UserId = shop.UserId,
+										   ShopName = shop.ShopName,
+										   Avatar = shop.Avatar,
+										   User = (from seller in context.User
+												  where seller.UserId == shop.UserId
+												  select new User
+												  {
+													  Email = seller.Email
+												  }).First()
+									   },
+									   ProductName = product.ProductName,
+									   Description = product.Description,
+									   Discount = product.Discount,
+									   Thumbnail = product.Thumbnail,
+									   DateCreate = product.DateCreate,
+									   DateUpdate = product.DateUpdate,
+									   TotalRatingStar = product.TotalRatingStar,
+									   NumberFeedback = product.NumberFeedback,
+									   SoldCount = product.SoldCount,
+									   Note = product.Note,
+									   ProductStatusId = product.ProductStatusId,
+									   ProductVariants = (from productVariant in context.ProductVariant
+														 where productVariant.ProductId == id && productVariant.isActivate
+														 select new ProductVariant
+														 {
+															 Name = productVariant.Name,
+															 Price = productVariant.Price,
+														 }).OrderBy(x => x.Price).ToList(),
+									   Tags = (from tag in context.Tag
+											  where tag.ProductId == id
+											  select new Tag
+											  {
+												  TagName = tag.TagName
+											  }).ToList(),
+									   ProductMedias = (from productMedia in context.ProductMedia
+													   where productMedia.ProductId == id
+													   select new ProductMedia
+													   {
+														   Url = productMedia.Url
 													   }).ToList(),
+									   ReportProducts = (from reportProduct in context.ReportProduct
+														 join reasonReportProduct in context.ReasonReportProduct
+														     on reportProduct.ReasonReportProductId equals reasonReportProduct.ReasonReportProductId
+														 join user in context.User
+															 on reportProduct.UserId equals user.UserId
+														 where reportProduct.ProductId == id
+														 select new ReportProduct
+														 {
+															 ReportProductId = reportProduct.ReportProductId,
+															 User = new User
+															 {
+																 UserId = user.UserId,
+																 Email = user.Email,
+																 Avatar = user.Avatar,
+															 },
+															 ReasonReportProduct = new ReasonReportProduct
+															 {
+																 ReasonReportProductId = reasonReportProduct.ReasonReportProductId,
+																 ViName = reasonReportProduct.ViName,
+																 ViExplanation = reasonReportProduct.ViExplanation
+															 },
+															 Description = reportProduct.Description,
+															 DateCreate = reportProduct.DateCreate,
+															 Note = reportProduct.Note,
+															 ReportProductStatusId= reportProduct.ReportProductStatusId,	
+														 }).ToList()
+
+								   })
+								  .FirstOrDefault();
+				return productInfo;
+			}
+		}
+
+		internal void UpdateProductStatusAdmin(long productId, int status, string note)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
+				if (product == null) throw new Exception("Data not found");
+				product.ProductStatusId = status;
+				product.Note = note;
+				context.Product.Update(product);
+				context.SaveChanges();
+			}
+		}
+
+		internal List<Product> GetProductsOfSeller(long userId, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var products = (from product in context.Product
+								join shop in context.Shop
+									 on product.ShopId equals shop.UserId
+								where 
+								product.ProductName.Contains(productName.Trim()) &&
+								product.ShopId == userId &&
+								((productId == 0) ? true : product.ProductId == productId) &&
+								((productCategory == 0) ? true : product.CategoryId == productCategory) &&
+								((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
+								((soldMin == 0) ? true : product.SoldCount >= soldMin) &&
+								((soldMax == 0) ? true : product.SoldCount <= soldMax)
+								select new Product
+								{
+									ProductId = product.ProductId,
+									ProductName = product.ProductName,
+									Thumbnail = product.Thumbnail,
+									ViewCount = product.ViewCount,
+									LikeCount = product.LikeCount,
+									SoldCount = product.SoldCount,
+									ProductStatusId = product.ProductStatusId,
+									Shop = new Shop
+									{
+										UserId = shop.UserId,
+										ShopName = shop.ShopName,
+									},
+									ProductVariants = (from productVariant in context.ProductVariant
+													   where productVariant.ProductId == product.ProductId && productVariant.isActivate == true
+													   select new ProductVariant
+													   {
+														   ProductVariantId = productVariant.ProductId,
+														   Name = productVariant.Name,
+														   Price = productVariant.Price,
+													   })
+													   .OrderBy(x => x.Price)
+													   .ToList(),
 								}
 							   )
 							   .Skip((page - 1) * Constants.PAGE_SIZE)

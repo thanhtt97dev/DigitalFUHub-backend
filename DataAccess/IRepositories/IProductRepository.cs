@@ -26,8 +26,11 @@ namespace DataAccess.IRepositories
 		Product? CheckProductExist(long userId, long productId);
 		Product? GetProductEntityById(long productId);
 		bool CheckProductExist(List<long> productIds);
-        (List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page);
-		int GetNumberProductByConditions(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId);
-		List<Product> GetProductsForAdmin(string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
-	}
+		(List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page);
+		int GetNumberProductByConditions(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId);
+		List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
+		Product? GetProduct(long id);
+		void UpdateProductStatusAdmin(long productId, int status, string note);
+		List<Product> GetProductsOfSeller(long userId, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
+    }
 }
