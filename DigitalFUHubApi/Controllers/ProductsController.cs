@@ -196,8 +196,9 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				if (request.SoldMin < 0 || (request.SoldMax != 0 && request.SoldMin != 0 ? false : (request.SoldMin > request.SoldMax || request.SoldMin < 0 || request.SoldMax < 0)) ||
-				   request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId))
+				if (request.SoldMin < 0 || request.SoldMax < 0 || request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId) ||
+					(request.SoldMin != 0 && request.SoldMax != 0 && (request.SoldMin > request.SoldMax))
+					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
 				}
@@ -505,8 +506,9 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				if (request.SoldMin < 0 || (request.SoldMax != 0 && request.SoldMin != 0 ? false : (request.SoldMin > request.SoldMax || request.SoldMin < 0 || request.SoldMax < 0)) ||
-				   request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId))
+				if (request.SoldMin < 0 || request.SoldMax < 0 || request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId) ||
+					(request.SoldMin != 0 && request.SoldMax != 0 && (request.SoldMin > request.SoldMax))
+					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
 				}
