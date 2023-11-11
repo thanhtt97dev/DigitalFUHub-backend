@@ -3,7 +3,6 @@ using BusinessObject.Entities;
 using Comons;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace DataAccess.DAOs
 {
 	internal class ShopDAO
@@ -123,6 +122,74 @@ namespace DataAccess.DAOs
 				{
 					throw new Exception(e.Message);
 				}
+			}
+		}
+
+		internal int GetNumberShopWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var result = (from shop in context.Shop
+							  join user in context.User
+								 on shop.UserId equals user.UserId
+							  where
+							  ((shopId == 0) ? true : shop.UserId == shopId) &&
+							  user.Email.Contains(shopEmail.Trim()) &&
+							  shop.ShopName.Contains(shopName.Trim()) &&
+							  ((shopId == 0) ? true : shop.IsActive == (shopStatusId == 1))
+							  select new { }
+							 ).Count();
+				return result;
+			}
+		}
+
+		internal List<Shop> GetShopsWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var shops = (from shop in context.Shop
+							  join user in context.User
+								 on shop.UserId equals user.UserId
+							  where
+							  ((shopId == 0) ? true : shop.UserId == shopId) &&
+							  user.Email.Contains(shopEmail.Trim()) &&
+							  shop.ShopName.Contains(shopName.Trim()) &&
+							  ((shopStatusId == 0) ? true : shop.IsActive == (shopStatusId == 1))
+							  select new Shop
+							  {
+								  UserId = shop.UserId,
+								  ShopName = shop.ShopName,
+								  Avatar = shop.Avatar,
+								  DateCreate = shop.DateCreate,
+								  IsActive = shop.IsActive,
+								  User = new User
+								  {
+									  Email = user.Email,
+									  TransactionInternals = (from transactionInternal in context.TransactionInternal
+															 where transactionInternal.UserId == shop.UserId && transactionInternal.TransactionInternalTypeId == Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT
+															 select new TransactionInternal
+															 {
+																 PaymentAmount = transactionInternal.PaymentAmount
+															 }
+															 ).ToList(),
+								  },
+								  Orders = (from order in context.Order
+										   where order.ShopId == shop.UserId
+										   select new Order 
+										   {
+											   OrderStatusId = order.OrderStatusId,	
+										   }
+										   ).ToList(),
+								  Products = (from product in context.Product
+											where product.ShopId == shop.UserId
+											select new Product {}
+										   ).ToList()
+							  }
+							 )
+							 .Skip((page - 1) * Constants.PAGE_SIZE)
+							 .Take(Constants.PAGE_SIZE)
+							 .ToList();
+				return shops;
 			}
 		}
 	}
