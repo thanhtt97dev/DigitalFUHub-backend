@@ -289,6 +289,13 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
 				}
+				if (!(request.ProductVariantNames.Count() == request.ProductVariantPrices.Count()
+					&& request.ProductVariantPrices.Count() == request.ProductVariantDiscounts.Count()
+					&& request.ProductVariantDiscounts.Count() == request.AssetInformationFiles.Count()
+					&& request.AssetInformationFiles.Count() == request.ProductVariantNames.Count()))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PRODUCTVARIANT", false, new()));
+				}
 				if (request.ProductVariantDiscounts.Any(x => x > 50))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DISCOUNT", false, new()));
@@ -390,7 +397,19 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (request == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+				}
+				if (!(request.ProductVariantIdsUpdate.Count() == request.ProductVariantNamesUpdate.Count()
+					&& request.ProductVariantNamesUpdate.Count() == request.ProductVariantDiscountsUpdate.Count()
+					&& request.ProductVariantDiscountsUpdate.Count() == request.ProductVariantPricesUpdate.Count()
+					&& request.ProductVariantPricesUpdate.Count() == request.ProductVariantIdsUpdate.Count())
+					||
+					!(request.ProductVariantNamesAddNew.Count() == request.ProductVariantPricesAddNew.Count()
+					&& request.ProductVariantPricesAddNew.Count() == request.ProductVariantDiscountsAddNew.Count()
+					&& request.ProductVariantDiscountsAddNew.Count() == request.AssetInformationFilesAddNew.Count()
+					&& request.AssetInformationFilesAddNew.Count() == request.ProductVariantNamesAddNew.Count()))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PRODUCTVARIANT", false, new()));
 				}
 				if (request.ProductVariantDiscountsUpdate.Any(x => x > 50) || request.ProductVariantDiscountsAddNew.Any(x => x > 50))
 				{
@@ -467,7 +486,7 @@ namespace DigitalFUHubApi.Controllers
 							Price = request.ProductVariantPricesAddNew[i],
 							Discount = request.ProductVariantDiscountsAddNew[i],
 							ProductId = request.ProductId,
-						}) ;
+						});
 					}
 				}
 
