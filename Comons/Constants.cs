@@ -132,14 +132,20 @@
 		public const int COUPON_STATUS_ALL = 0; 
 		public const int COUPON_STATUS_COMING_SOON = 1; 
 		public const int COUPON_STATUS_ONGOING = 2; 
-		public const int COUPON_STATUS_FINISHED = 3; 
+		public const int COUPON_STATUS_FINISHED = 3;
 
+		//report product status
+		public const int REPORT_PRODUCT_STATUS_ALL = 0;
+		public const int REPORT_PRODUCT_STATUS_VERIFYING = 1;
+		public const int REPORT_PRODUCT_STATUS_REJECT = 2;
+		public const int REPORT_PRODUCT_STATUS_ACCEPT = 3;
 
 		//Feedback
 		public const int NUMBER_DAYS_CAN_MAKE_FEEDBACK = 7;
 
 		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
+		public const string FRONT_END_SELLER_PRODUCT_URL = "/seller/product/";
 
 		// Pagination
 		public const int PAGE_SIZE = 10;

@@ -21,7 +21,7 @@ namespace DTOs.Product
 		public string ProductThumbnail { get; set; } = string.Empty;
 		public long ProductStatusId { get; set; }
 		public int ViewCount { get; set; }
-		public int LikedCount { get; set; }
+		public int LikeCount { get; set; }
 		public int SoldCount { get; set; }
 		public List<GetProductsProductVariantDetailResponseDTO> ProductVariants { get; set; } = new List<GetProductsProductVariantDetailResponseDTO>();
 	}
@@ -30,5 +30,6 @@ namespace DTOs.Product
 		public long ProductVariantId { get; set; }
 		public string ProductVariantName { get; set; } = string.Empty;
 		public long ProductVariantPrice { get; set; }
+		public int Stock { get; set; }
 	}
 }

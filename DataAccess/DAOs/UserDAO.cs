@@ -72,11 +72,11 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void EditUserInfo(int id, User userUpdate)
+		internal void EditUserInfo(User userUpdate)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var user = context.User.First(x => x.UserId == id);
+				var user = context.User.First(x => x.UserId == userUpdate.UserId);
 				user.Avatar = userUpdate.Avatar ?? user.Avatar;
 				user.Fullname = userUpdate.Fullname ?? user.Fullname;
 				user.Username = userUpdate.Username ?? user.Username;

@@ -6,6 +6,7 @@ using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.Product;
+using DTOs.ReportProduct;
 using DTOs.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,8 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IOrderRepository _orderRepository;
 		private readonly ICouponRepository _couponRepository;
 		private readonly JwtTokenService _jwtTokenService;
+		private readonly HubService _hubService;
+		private readonly MailService _mailService;
 		private readonly IMapper _mapper;
 
 		public ProductsController(IConfiguration configuration, 
@@ -50,6 +53,8 @@ namespace DigitalFUHubApi.Controllers
 			_couponRepository = couponRepository;
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
+			_mailService = mailService;
+			_hubService = hubService;
 		}
 
 		#region Get Product Detail
@@ -190,6 +195,57 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Get products of seller - HieuLD6
+		[Authorize("Seller")]
+		[HttpPost("getProducts")]
+		public IActionResult GetProductsSeller(GetProductsOfSellerRequestDTO request)
+		{
+			if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+			{
+				return Unauthorized();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			try
+			{
+				if (request.SoldMin < 0 || request.SoldMax < 0 || request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId) ||
+					(request.SoldMin != 0 && request.SoldMax != 0 && (request.SoldMin > request.SoldMax))
+					)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
+				}
+
+				var numberProducts = _productRepository.GetNumberProductByConditions(request.UserId, string.Empty, request.ProductId, request.ProductName, request.ProductCategory,
+					 request.SoldMin, request.SoldMax, request.ProductStatusId);
+				var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
+
+				if (request.Page > numberPages)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
+
+				List<Product> products = _productRepository
+					.GetProductsOfSeller(request.UserId, request.ProductId, request.ProductName, request.ProductCategory,
+					 request.SoldMin, request.SoldMax, request.ProductStatusId, request.Page);
+
+				var result = new GetProductsResponseDTO
+				{
+					TotalProduct = numberProducts,
+					TotalPage = numberPages,
+					Products = _mapper.Map<List<GetProductsProductDetailResponseDTO>>(products)
+				};
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 		#region Get Product Of Seller
 		[Authorize("Seller")]
 		[HttpGet("Seller/{userId}/{productId}")]
@@ -296,7 +352,8 @@ namespace DigitalFUHubApi.Controllers
 					ProductVariants = productVariants,
 					ProductMedias = productMedias,
 					ProductStatusId = Constants.PRODUCT_STATUS_ACTIVE,
-					UpdateDate = DateTime.Now,
+					DateCreate = DateTime.Now,
+					DateUpdate = DateTime.Now,
 					TotalRatingStar = 0,
 					NumberFeedback = 0,
 				};
@@ -453,6 +510,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get products for admin
+		[Authorize("Admin")]
 		[HttpPost("admin/getProducts")]
 		public IActionResult GetProductsAdmin(GetProductsRequestDTO request)
 		{
@@ -462,24 +520,25 @@ namespace DigitalFUHubApi.Controllers
 			}
 			try
 			{
-				if(request.SoldMin < 0 || (request.SoldMax != 0 && request.SoldMin != 0 ? false : (request.SoldMin > request.SoldMax || request.SoldMin < 0 || request.SoldMax < 0)) ||
-				   request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId))
+				if (request.SoldMin < 0 || request.SoldMax < 0 || request.Page <= 0 || !Constants.PRODUCT_STATUS.Contains(request.ProductStatusId) ||
+					(request.SoldMin != 0 && request.SoldMax != 0 && (request.SoldMin > request.SoldMax))
+					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
 				}
 
-				var numberProducts = _productRepository.GetNumberProductByConditions(request.ShopName, request.ProductId, request.ProductName, request.ProductCategory,
+				var numberProducts = _productRepository.GetNumberProductByConditions(request.ShopId, request.ShopName, request.ProductId, request.ProductName, request.ProductCategory,
 					 request.SoldMin, request.SoldMax, request.ProductStatusId);
 				var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
 
-				if(request.Page > numberPages) 
+				if (request.Page > numberPages)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
 				}
 
 				List<Product> products = _productRepository
-					.GetProductsForAdmin(request.ShopName, request.ProductId, request.ProductName, request.ProductCategory, 
-					 request.SoldMin, request.SoldMax,request.ProductStatusId, request.Page);
+					.GetProductsForAdmin(request.ShopId, request.ShopName, request.ProductId, request.ProductName, request.ProductCategory,
+					 request.SoldMin, request.SoldMax, request.ProductStatusId, request.Page);
 
 				var result = new GetProductsResponseDTO
 				{
@@ -496,5 +555,71 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
+
+		#region Get product detail for admin
+		[Authorize("Admin")]
+		[HttpGet("admin/{id}")]
+		public IActionResult GetProductDetailAdmin(long id)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			try
+			{
+				var product = _productRepository.GetProduct(id);
+				if (product == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				var result = _mapper.Map<ProductDetailAdminResponseDTO>(product);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Update product status for admin
+		[Authorize("Admin")]
+		[HttpPost("admin/update")]
+		public async Task<IActionResult> GetProductDetailAdmin(UpdateProductStatusAdminRequestDTO request)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			try
+			{
+				var product = _productRepository.GetProduct(request.ProductId);
+				if(product == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				_productRepository.UpdateProductStatusAdmin(request.ProductId, request.Status, request.Note);
+				if(request.Status == Constants.PRODUCT_STATUS_BAN)
+				{
+					// send notification
+					await _hubService.SendNotification(product.Shop.UserId, "Sản phẩm đã bị cấm", $"Sản phẩm mã số #{product.ProductId} đã bị cấm", Constants.FRONT_END_SELLER_PRODUCT_URL + "list");
+					// send mail
+					await _mailService.SendEmailAsync(product.Shop.User.Email, $"DigitalFuHub: Sản phẩm mã số #{product.ProductId} đã bị cấm", "Bạn vui lòng truy cập vào webside của chúng tôi để kiểm tra thêm thông tin");
+				}
+				else
+				{
+					// send notification
+					await _hubService.SendNotification(product.Shop.UserId, "Sản phẩm của bạn đã được kích hoạt", $"Sản phẩm mã số #{product.ProductId} đã hoạt động trở lại", Constants.FRONT_END_SELLER_PRODUCT_URL + product.ProductId.ToString());
+				}
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+			#endregion
+
+		}
 	}
 }

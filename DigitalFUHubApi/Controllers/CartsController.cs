@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.SignalR;
 using Comons;
 using DataAccess.DAOs;
 using DataAccess.Repositories;
+using Azure.Core;
+using DigitalFUHubApi.Services;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -25,16 +27,18 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IUserRepository userRepository;
 		private readonly IShopRepository shopRepository;
 		private readonly IAssetInformationRepository assetInformationRepository;
-		private readonly IMapper mapper;
+        private readonly JwtTokenService jwtTokenService;
+        private readonly IMapper mapper;
 
-		public CartsController(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IShopRepository shopRepository, IAssetInformationRepository assetInformationRepository, IMapper mapper)
+		public CartsController(ICartRepository cartRepository, JwtTokenService jwtTokenService, IProductRepository productRepository, IUserRepository userRepository, IShopRepository shopRepository, IAssetInformationRepository assetInformationRepository, IMapper mapper)
 		{
 			this.cartRepository = cartRepository;
 			this.productRepository = productRepository;
 			this.userRepository = userRepository;
 			this.shopRepository = shopRepository;
 			this.assetInformationRepository = assetInformationRepository;
-			this.mapper = mapper;
+			this.jwtTokenService = jwtTokenService;
+            this.mapper = mapper;
 		}
 
 		[HttpPost("addProductToCart")]
@@ -111,19 +115,47 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("GetCartsByUserId/{userId}")]
-        //[Authorize]
-        public IActionResult GetCartsByUserId(long userId)
+		[Authorize]
+		public IActionResult GetCartsByUserId(long userId)
         {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
             try
             {
                 if (userId == 0)
                 {
-                    return BadRequest(new Status());
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Ok = false;
+                    status.Message = "userId invalid!!";
+                    responseData.Status = status;
+                    return Ok(responseData);
                 }
-				List<Cart> carts = cartRepository.GetCartsByUserId(userId);
 
+                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+				var user = userRepository.GetUserById(userId);
+				if (user == null)
+				{
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Ok = false;
+                    status.Message = "user not found!!";
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                List<Cart> carts = cartRepository.GetCartsByUserId(userId);
                 var result = mapper.Map<List<UserCartResponseDTO>>(carts);
-                return Ok(result);
+
+                // Ok
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Ok = true;
+                status.Message = "Success";
+                responseData.Status = status;
+				responseData.Result = result;
+                return Ok(responseData);
             }
             catch (Exception ex)
             {

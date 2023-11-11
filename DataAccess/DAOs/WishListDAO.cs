@@ -38,7 +38,7 @@ namespace DataAccess.DAOs
             {
                 var productIds = context.WishList.Where(x => x.UserId == userId).Select(x => x.ProductId);
                 if (productIds.Count() == 0) return new List<Product>();
-                var products = context.Product.Where(x => productIds.Contains(x.ProductId)).ToList();
+                var products = context.Product.Where(x => productIds.Contains(x.ProductId) && (x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_BAN)).ToList();
 
                 List<ProductVariant> productVariants = new List<ProductVariant>();
                 foreach(var product in products)
@@ -63,6 +63,16 @@ namespace DataAccess.DAOs
             }
         }
 
+        internal bool IsExistWishList(List<long> productIds, long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var resultIsExistWishList = context.WishList.Any(x => x.UserId == userId && productIds.Contains(x.ProductId));
+
+                return resultIsExistWishList;
+            }
+        }
+
         internal void AddWishList (long productId, long userId)
         {
             using (DatabaseContext context = new DatabaseContext())
@@ -72,8 +82,13 @@ namespace DataAccess.DAOs
                     UserId = userId,
                     ProductId = productId
                 };
+				context.WishList.Add(newWishList);
 
-                context.WishList.Add(newWishList);
+				// update number like count number of product
+				var product = context.Product.First(x => x.ProductId == productId);
+                product.LikeCount += 1;
+                context.Product.Update(product);
+
                 context.SaveChanges();
             }
         }
@@ -82,11 +97,15 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                var wishList = context.WishList.FirstOrDefault(x => x.UserId == userId && x.ProductId == productId);
-                if (wishList == null) throw new ArgumentNullException("wish list not found");
-
+                var wishList = context.WishList.First(x => x.UserId == userId && x.ProductId == productId);
                 context.WishList.Remove(wishList);
-                context.SaveChanges();
+
+				// update number like count number of product
+				var product = context.Product.First(x => x.ProductId == productId);
+				product.LikeCount -= 1;
+				context.Product.Update(product);
+
+				context.SaveChanges();
             }
         }
 
@@ -116,21 +135,52 @@ namespace DataAccess.DAOs
                     return (responseCode, message, isOk);
                 }
 
-                var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
-
-                if (product == null)
+                // check own product
+                var shop = context.Shop.FirstOrDefault(x => x.UserId == userId);
+                if (shop != null)
                 {
-                    responseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    message = "Product not found";
-                    isOk = false;
-                    return (responseCode, message, isOk);
+                    var products = context.Product.Where(x => x.ShopId == shop.UserId).ToList();
+                    if (products.Count > 0)
+                    {
+                        var productExisted = products.FirstOrDefault(x => x.ProductId == productId);
+                        if (productExisted != null)
+                        {
+                            responseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                            message = "Can't do it with your own product!";
+                            isOk = false;
+                            return (responseCode, message, isOk);
+                        }
+                    }
                 }
 
+                isOk = true;
                 responseCode = Constants.RESPONSE_CODE_SUCCESS;
                 message = "Success";
                 return (responseCode, message, isOk);
             }
            
+        }
+
+        internal void RemoveWishListSelecteds(List<long> productIds, long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var wishLists = context.WishList.Where(x => x.UserId == userId && productIds.Contains(x.ProductId)).ToList();
+                
+                if (wishLists.Count > 0)
+                {
+                    foreach (var productId in productIds)
+                    {
+						// update number like count number of product
+						var product = context.Product.First(x => x.ProductId == productId);
+						product.LikeCount -= 1;
+						context.Product.Update(product);
+					}
+
+                    context.WishList.RemoveRange(wishLists);
+                    context.SaveChanges();
+                }
+            }
         }
 
 

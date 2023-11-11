@@ -20,12 +20,14 @@ namespace DigitalFUHubApi.Controllers
         private readonly JwtTokenService jwtTokenService;
         private readonly IUserRepository userRepository;
         private readonly IWishListRepository wishListRepository;
+        private readonly IProductRepository productRepository;
         private readonly IMapper mapper;
 
-        public WishListsController(IUserRepository userRepository, JwtTokenService jwtTokenService, IWishListRepository wishListRepository, IMapper mapper) {
+        public WishListsController(IUserRepository userRepository, IProductRepository productRepository, JwtTokenService jwtTokenService, IWishListRepository wishListRepository, IMapper mapper) {
             this.jwtTokenService = jwtTokenService;
             this.userRepository = userRepository;
             this.wishListRepository = wishListRepository;
+            this.productRepository = productRepository;
             this.mapper = mapper;
         }
 
@@ -48,6 +50,45 @@ namespace DigitalFUHubApi.Controllers
                     status.ResponseCode = responseCode;
                     status.Message = message;
                     status.Ok = isOk;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                var product = productRepository.GetProductEntityById(request.ProductId);
+
+                if (product == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "Product not found";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                // check product status
+                if (product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_BAN;
+                    status.Message = "This product has been banned";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                if (product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_REMOVE;
+                    status.Message = "This product has been remove";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                if (product.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_HIDE;
+                    status.Message = "This product has been hide";
+                    status.Ok = false;
                     responseData.Status = status;
                     return Ok(responseData);
                 }
@@ -101,6 +142,17 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
+                var product = productRepository.GetProductEntityById(request.ProductId);
+
+                if (product == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "Product not found";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
                 bool isWishList = wishListRepository.IsExistWishList(request.ProductId, request.UserId);
 
                 if (!isWishList)
@@ -149,6 +201,17 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
+                var product = productRepository.GetProductEntityById(productId);
+
+                if (product == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "Product not found";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
                 bool isWishList = wishListRepository.IsExistWishList(productId, userId);
                 status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
                 status.Message = "Success";
@@ -182,6 +245,9 @@ namespace DigitalFUHubApi.Controllers
                     status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
                     status.Message = "User not found";
                     status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+
                 }
 
                 var products = mapper.Map<List<WishListProductResponseDTO>>(wishListRepository.GetProductFromWishListByUserId(userId));
@@ -191,6 +257,84 @@ namespace DigitalFUHubApi.Controllers
                 status.Ok = true;
                 responseData.Status = status;
                 responseData.Result = products;
+                return Ok(responseData);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost("RemoveSelecteds")]
+        [Authorize]
+        public IActionResult RemoveWishListSelecteds(RemoveWishListSelectedsRequestDTO request)
+        {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
+            try
+            {
+                if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+                if (request.UserId == 0)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "user id invalid!";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                if (request.ProductIds.Count == 0)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "product id invalid!";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                var user = userRepository.GetUserById(request.UserId);
+
+                if (user == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "User not found";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                var resultCheckProductExist = productRepository.CheckProductExist(request.ProductIds);
+
+                if (!resultCheckProductExist)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "Product not found";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                bool resultCheckIsExistWishList = wishListRepository.IsExistWishList(request.ProductIds, request.UserId);
+
+                if (!resultCheckIsExistWishList)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "Wish list does not exist";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                wishListRepository.RemoveWishListSelecteds(request.ProductIds, request.UserId);
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
                 return Ok(responseData);
 
             }

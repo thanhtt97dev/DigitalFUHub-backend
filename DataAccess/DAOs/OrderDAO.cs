@@ -383,10 +383,10 @@ namespace DataAccess.DAOs
 									ProductVariantId = x.ProductVariantId,
 									ProductId = x.ProductId,
 									Price = x.Price,
+									Discount = x.Discount,
 									isActivate = x.isActivate,
 									Product = new Product
 									{
-										Discount = x.Product.Discount,
 										ProductStatusId = x.Product.ProductStatusId,
 										Shop = new Shop
 										{
@@ -410,8 +410,8 @@ namespace DataAccess.DAOs
 								ProductVariantId = item.ProductVariantId,
 								Quantity = item.Quantity,
 								Price = productVariant.Price,
-								Discount = productVariant.Product.Discount,
-								TotalAmount = productVariant.Price * item.Quantity * (100 - productVariant.Product.Discount) / 100,
+								Discount = productVariant.Discount,
+								TotalAmount = productVariant.Price * item.Quantity * (100 - productVariant.Discount) / 100,
 								IsFeedback = false,
 							};
 							orderDetails.Add(orderDetail);
@@ -643,7 +643,8 @@ namespace DataAccess.DAOs
 										Shop = new Shop
 										{
 											UserId = shop.UserId,
-											ShopName = shop.ShopName
+											ShopName = shop.ShopName,
+											Avatar = shop.Avatar
 										},
 										BusinessFee = new BusinessFee
 										{

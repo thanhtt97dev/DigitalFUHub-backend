@@ -21,5 +21,10 @@ namespace DataAccess.Repositories
 		public bool IsExistShop(long userId) =>  ShopDAO.Instance.IsExistShop(userId);
 
 		public void EditShop(Shop shop) => ShopDAO.Instance.EditShop(shop);
+
+		public int GetNumberShopWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId) => ShopDAO.Instance.GetNumberShopWithCondition(shopId, shopEmail, shopName, shopStatusId);
+
+		public List<Shop> GetShopsWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId, int page) => ShopDAO.Instance.GetShopsWithCondition(shopId, shopEmail, shopName, shopStatusId, page);
+
 	}
 }

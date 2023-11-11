@@ -15,6 +15,8 @@ namespace DataAccess.Repositories
         public (string, string, bool) CheckRequestWishListIsValid(long productId, long userId) => WishListDAO.Instance.CheckRequestWishListIsValid(productId, userId);
         public List<Product> GetProductFromWishListByUserId(long userId) => WishListDAO.Instance.GetProductFromWishListByUserId(userId);
         public bool IsExistWishList(long productId, long userId) => WishListDAO.Instance.IsExistWishList(productId, userId);
+        public bool IsExistWishList(List<long> productIds, long userId) => WishListDAO.Instance.IsExistWishList(productIds, userId);
         public void RemoveWishList(long productId, long userId) => WishListDAO.Instance.RemoveWishList(productId, userId);
+        public void RemoveWishListSelecteds(List<long> productIds, long userId) => WishListDAO.Instance.RemoveWishListSelecteds(productIds, userId);
     }
 }

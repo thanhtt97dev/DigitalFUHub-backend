@@ -1,9 +1,11 @@
-﻿using BusinessObject.Entities;
+﻿using AutoMapper;
+using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.Product;
 using DTOs.Seller;
 using DTOs.Shop;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +23,7 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IUserRepository _userRepository;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly StorageService _storageService;
+		private readonly IMapper _mapper;
 
 		public ShopsController(IShopRepository shopRepository, 
 			IUserRepository userRepository, 
@@ -31,6 +34,7 @@ namespace DigitalFUHubApi.Controllers
 			_userRepository = userRepository;
 			_jwtTokenService = jwtTokenService;
 			_storageService = storageService;
+			_mapper = mapper;
 		}
 
 		[Authorize]
@@ -129,6 +133,43 @@ namespace DigitalFUHubApi.Controllers
 			catch (Exception e)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+		}
+		#endregion
+
+		#region Get shops for admin
+		//[Authorize("Admin")]
+		[HttpPost("admin/all")]
+		public IActionResult GetProductsSeller(GetShopsRequestDTO request)
+		{
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			try
+			{
+				if (request.Page <= 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
+
+				var numberShops = _shopRepository.GetNumberShopWithCondition(request.ShopId, request.ShopEmail, request.ShopName, request.ShopStatusId);
+				var numberPages = numberShops / Constants.PAGE_SIZE + 1;
+
+				if (request.Page > numberPages)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
+
+				List<Shop> shops = _shopRepository.GetShopsWithCondition(request.ShopId, request.ShopEmail, request.ShopName, request.ShopStatusId, request.Page);
+
+				var result = _mapper.Map<List<GetShopsResponseDTO>>(shops);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
 		#endregion
