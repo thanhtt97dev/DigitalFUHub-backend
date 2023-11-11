@@ -25,7 +25,11 @@ namespace DigitalFUHubApi.Controllers
 		private readonly StorageService _storageService;
 		private readonly IMapper _mapper;
 
-		public ShopsController(IShopRepository shopRepository, IUserRepository userRepository, JwtTokenService jwtTokenService, StorageService storageService, IMapper mapper)
+		public ShopsController(IShopRepository shopRepository, 
+			IUserRepository userRepository, 
+			JwtTokenService jwtTokenService, 
+			StorageService storageService,
+			IMapper mapper)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
@@ -169,7 +173,69 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-	}
+        #region Get info shop
+        //[Authorize]
+        [HttpPost("GetDetail/{userId}")]
+        public IActionResult GetShopDetail(long userId)
+        {
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
+            try
+            {
+                if (userId == 0)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Ok = false;
+                    status.Message = "user id invalid!";
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                if (userId != _jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+                var user = _userRepository.GetUserById(userId);
+
+                if (user == null)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Ok = false;
+                    status.Message = "user not found!";
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+				Shop? shop = _shopRepository.GetShopById(userId);
+
+				if (shop == null)
+				{
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Ok = false;
+                    status.Message = "shop not found!";
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+				var result = _mapper.Map<List<GetShopsResponseDTO>>(shop);
+
+				// Ok
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Ok = false;
+                status.Message = "Success";
+                responseData.Status = status;
+				responseData.Result = result;
+                return Ok(responseData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+    }
 }

@@ -31,5 +31,6 @@ namespace DataAccess.IRepositories
 		Order? GetOrder(long orderId);
 		OrderDetail? GetOrderDetail(long orderDetailId);
 		(long totalItem, List<Order> orders) GetListOrderByCoupon(long userId, long couponId, int page);
+		List<Order> GetListOrderSeller(long userId, string orderId, string v, DateTime? fromDate, DateTime? toDate, int status);
 	}
 }

@@ -20,11 +20,34 @@ using DTOs.WishList;
 using Google.Apis.Util;
 using DTOs.TransactionCoin;
 using DTOs.Shop;
+using System.Globalization;
 
 namespace DigitalFUHubApi.Comons
 {
 	public class AutoMapperProfile : Profile
 	{
+		private string MapOrderStatusToString(long orderStatus)
+		{
+			switch (orderStatus)
+			{
+				case Constants.ORDER_STATUS_COMPLAINT:
+					return "Đang khiếu nại";
+				case Constants.ORDER_STATUS_CONFIRMED:
+					return "Đã xác nhận";
+				case Constants.ORDER_STATUS_DISPUTE:
+					return "Đang tranh chấp";
+				case Constants.ORDER_STATUS_REJECT_COMPLAINT:
+					return "Từ chối khiếu nại";
+				case Constants.ORDER_STATUS_SELLER_REFUNDED:
+					return "Người bán hoàn trả tiền";
+				case Constants.ORDER_STATUS_SELLER_VIOLATES:
+					return "Người bán vi phạm";
+				case Constants.ORDER_STATUS_WAIT_CONFIRMATION:
+					return "Đợi người mua xác nhận";
+				default:
+					return "";
+			}
+		}
 		public AutoMapperProfile()
 		{
 			CreateMap<User, UserResponeDTO>()
@@ -91,7 +114,7 @@ namespace DigitalFUHubApi.Comons
 
 			CreateMap<TransactionCoin, TransactionCoinOrderDetailResponseDTO>()
 				.ReverseMap();
-			
+
 			CreateMap<TransactionInternal, TransactionInternalOrderDetailResponseDTO>()
 				.ReverseMap();
 
@@ -168,7 +191,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Order, AddOrderRequestDTO>().ReverseMap();
 			CreateMap<Coupon, CouponResponseDTO>()
 				.ForMember(des => des.productIds, act => act.MapFrom(src => src.CouponProducts != null ? src.CouponProducts.Select(x => x.ProductId).ToList() : new List<long>()))
-                .ReverseMap();
+				.ReverseMap();
 			CreateMap<Coupon, SellerCouponResponseDTO>()
 				.ForMember(des => des.ProductsApplied, act => act.MapFrom(src => src.CouponProducts.Select(x => new Product
 				{
@@ -185,8 +208,8 @@ namespace DigitalFUHubApi.Comons
 					CategoryId = x.Product.CategoryId,
 				}).ToList()))
 				.ReverseMap();
-            CreateMap<Product, WishListProductResponseDTO>().ReverseMap();
-            CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
+			CreateMap<Product, WishListProductResponseDTO>().ReverseMap();
+			CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
 
 			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))
@@ -253,6 +276,14 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.TotalNumberOrder, act => act.MapFrom(src => src.Orders.Count()))
 				.ForMember(des => des.TotalProduct, act => act.MapFrom(src => src.Products.Count()))
 				.ForMember(des => des.Revenue, act => act.MapFrom(src => (src.User.TransactionInternals == null) ? 0 : src.User.TransactionInternals.Sum(x => x.PaymentAmount)))
+				.ReverseMap();
+			CreateMap<Order, SellerReportOrderResponseDTO>()
+				.ForMember(des => des.Username, act => act.MapFrom(src => src.User.Username))
+				.ForMember(des => des.TotalAmount, act => act.MapFrom(src => src.TotalAmount.ToString("{0:c}", CultureInfo.GetCultureInfo("vi-VN"))))
+				.ForMember(des => des.TotalCouponDiscount, act => act.MapFrom(src => src.TotalCouponDiscount.ToString("{0:c}", CultureInfo.GetCultureInfo("vi-VN"))))
+				.ForMember(des => des.BusinessFee, act => act.MapFrom(src => src.BusinessFee.Fee + "%"))
+				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("{0:c}", CultureInfo.GetCultureInfo("vi-VN"))))
+				.ForMember(des => des.OrderStatus, act => act.MapFrom(src => MapOrderStatusToString(src.OrderStatusId)))
 				.ReverseMap();
 		}
 	}

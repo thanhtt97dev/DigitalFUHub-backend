@@ -243,7 +243,7 @@ namespace DataAccess.DAOs
 						productE.CategoryId = product.CategoryId;
 						productE.ProductName = product.ProductName;
 						productE.Description = product.Description;
-						productE.Discount = product.Discount;
+						//productE.Discount = product.Discount;
 						productE.ProductStatusId = product.ProductStatusId;
 						if (product.Thumbnail != null)
 						{
@@ -300,6 +300,7 @@ namespace DataAccess.DAOs
 								}
 								productVariant.Name = item.Name;
 								productVariant.Price = item.Price;
+								productVariant.Discount = item.Discount;
 								context.ProductVariant.Update(productVariant);
 							}
 						}
@@ -310,6 +311,7 @@ namespace DataAccess.DAOs
 								isActivate = true,
 								AssetInformations = item.AssetInformations,
 								Price = item.Price,
+								Discount = item.Discount,
 								Name = item.Name,
 								ProductId = productE.ProductId,
 							});
@@ -431,7 +433,7 @@ namespace DataAccess.DAOs
 							&& (string.IsNullOrWhiteSpace(productId) ? true : productId.Trim() == x.ProductId.ToString())
 							&& (string.IsNullOrWhiteSpace(productName) ? true : x.ProductName.ToLower().Contains(productName.ToLower().Trim())));
 				var lsProduct = query
-					.Skip((page - 1) * 10).Take(10)
+					.Skip((page - 1) * Constants.PAGE_SIZE).Take(Constants.PAGE_SIZE)
 					.ToList();
 				return (lsProduct, query.Count());
 			}

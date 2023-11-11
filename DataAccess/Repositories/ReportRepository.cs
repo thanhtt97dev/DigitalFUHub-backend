@@ -2,6 +2,7 @@
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using OfficeOpenXml;
+using OfficeOpenXml.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,15 @@ namespace DataAccess.Repositories
 {
     public class ReportRepository : IReportRepository
     {
-        public async Task<byte[]> ReportUser(int id)
+		public async Task<byte[]> ExportToExcel<T>(List<T> table, string filename)
+		{
+			using ExcelPackage pack = new ExcelPackage();
+			ExcelWorksheet ws = pack.Workbook.Worksheets.Add(filename);
+			ws.Cells["A1"].LoadFromCollection(table, true, TableStyles.Light1);
+			return await pack.GetAsByteArrayAsync();
+		}
+
+		public async Task<byte[]> ReportUser(int id)
         {
             string workSheetName = "Report User";
             using ExcelPackage pack = new ExcelPackage();

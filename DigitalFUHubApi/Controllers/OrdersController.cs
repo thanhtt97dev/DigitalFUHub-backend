@@ -23,17 +23,24 @@ namespace DigitalFUHubApi.Controllers
 	public class OrdersController : ControllerBase
 	{
 		private readonly IOrderRepository _orderRepository;
+		private readonly IReportRepository _reportRepository;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 		private readonly HubService _hubService;
 
-		public OrdersController(IOrderRepository orderRepository, JwtTokenService jwtTokenService, HubService hubService, IMapper mapper)
+		public OrdersController(IOrderRepository orderRepository,
+			IReportRepository reportRepository,
+			JwtTokenService jwtTokenService,
+			IMapper mapper,
+			HubService hubService)
 		{
 			_orderRepository = orderRepository;
+			_reportRepository = reportRepository;
 			_jwtTokenService = jwtTokenService;
-			_hubService = hubService;
 			_mapper = mapper;
+			_hubService = hubService;
 		}
+
 
 		#region Add order (customer)
 		[Authorize("Customer,Seller")]
@@ -171,9 +178,9 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				//check vaild order status
-				if(request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
+				if (request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
 				{
-					if(order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
+					if (order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
 						order.OrderStatusId != Constants.ORDER_STATUS_COMPLAINT &&
 						order.OrderStatusId != Constants.ORDER_STATUS_DISPUTE)
 					{
@@ -278,7 +285,11 @@ namespace DigitalFUHubApi.Controllers
 					|| (string.IsNullOrWhiteSpace(request.FromDate) && !string.IsNullOrWhiteSpace(request.FromDate))
 					|| (!string.IsNullOrWhiteSpace(request.FromDate) && string.IsNullOrWhiteSpace(request.FromDate)))
 				{
-					return BadRequest();
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+				}
+				if (request.Page <= 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
 				}
 
 				int[] acceptedOrderStatus = Constants.ORDER_STATUS;
@@ -291,16 +302,16 @@ namespace DigitalFUHubApi.Controllers
 				DateTime? toDate;
 				string format = "M/d/yyyy";
 
-				fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate, 
+				fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate,
 					format, CultureInfo.InvariantCulture);
-				toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : DateTime.ParseExact(request.ToDate, 
+				toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : DateTime.ParseExact(request.ToDate,
 					format, CultureInfo.InvariantCulture);
 				if (fromDate > toDate && fromDate != null && toDate != null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
 				}
 
-				(long totalItems, List<Order> orders) = _orderRepository.GetListOrderSeller(request.UserId, request.OrderId, 
+				(long totalItems, List<Order> orders) = _orderRepository.GetListOrderSeller(request.UserId, request.OrderId,
 					request.Username.Trim(), fromDate, toDate, request.Status, request.Page);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerListOrderResponseDTO
@@ -317,13 +328,17 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region get list order using coupon (seller)
-		[Authorize("Seller")]		
-		[HttpGet("Seller/Coupon")]		
+		[Authorize("Seller")]
+		[HttpGet("Seller/Coupon")]
 		public IActionResult GetListOrderByCoupon(long couponId, int page)
 		{
+			if (page <= 0)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
+			}
 			(long totalItems, List<Order> orders) = _orderRepository.GetListOrderByCoupon(_jwtTokenService.GetUserIdByAccessToken(User),
 				couponId, page);
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SellerListOrderCouponResponseDTO
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerListOrderCouponResponseDTO
 			{
 				TotalItems = totalItems,
 				Orders = _mapper.Map<List<SellerOrderResponseDTO>>(orders)
@@ -361,7 +376,7 @@ namespace DigitalFUHubApi.Controllers
 				//TotalPayment = order.TotalPayment,
 				TotalCouponDiscount = order.TotalCouponDiscount,
 				BussinessFee = (order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100,
-				AmountSellerReceive = (order.TotalAmount - order.TotalCouponDiscount) - 
+				AmountSellerReceive = (order.TotalAmount - order.TotalCouponDiscount) -
 									((order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100),
 				OrderDetails = order.OrderDetails.Select(od => new SellerOrderDetailProductResponseDTO
 				{
@@ -382,22 +397,22 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Update status dispute (seller)
-		[Authorize("Seller")]		
-		[HttpPost("Seller/Dispute")]		
-		public IActionResult UpdateDisputeOrder(SellerDisputeOrderRequestDTO request) 
+		[Authorize("Seller")]
+		[HttpPost("Seller/Dispute")]
+		public IActionResult UpdateDisputeOrder(SellerDisputeOrderRequestDTO request)
 		{
-			if(!ModelState.IsValid)
+			if (!ModelState.IsValid)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
 			}
 			try
 			{
-				if(request.SellerId != _jwtTokenService.GetUserIdByAccessToken(User))
+				if (request.SellerId != _jwtTokenService.GetUserIdByAccessToken(User))
 				{
 					return Unauthorized();
 				}
 				var order = _orderRepository.GetOrder(request.OrderId);
-				if(order == null) 
+				if (order == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
@@ -451,6 +466,59 @@ namespace DigitalFUHubApi.Controllers
 			catch (Exception e)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+		}
+		#endregion
+
+		#region Export data orders to excel file (seller)
+		[Authorize("Seller")]
+		[HttpPost("Seller/Report")]
+		public async Task<IActionResult> ExportOrdersToExcel(SellerExportOrdersRequestDTO request)
+		{
+			try
+			{
+				if (request == null || request.OrderId == null ||
+					request.Username == null
+					|| (string.IsNullOrWhiteSpace(request.FromDate) && !string.IsNullOrWhiteSpace(request.FromDate))
+					|| (!string.IsNullOrWhiteSpace(request.FromDate) && string.IsNullOrWhiteSpace(request.FromDate)))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+				}
+
+				int[] acceptedOrderStatus = Constants.ORDER_STATUS;
+				if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID STATUS ORDER", false, new()));
+				}
+
+				DateTime? fromDate;
+				DateTime? toDate;
+				string format = "M/d/yyyy";
+
+				fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate,
+					format, CultureInfo.InvariantCulture);
+				toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : DateTime.ParseExact(request.ToDate,
+					format, CultureInfo.InvariantCulture);
+				if (fromDate > toDate && fromDate != null && toDate != null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
+				}
+
+				List<Order> orders = _orderRepository.GetListOrderSeller(_jwtTokenService.GetUserIdByAccessToken(User),
+					request.OrderId, request.Username.Trim(), fromDate, toDate, request.Status);
+				if (orders.Count <= 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NO DATA", false, new()));
+				}
+				string reportname = $"List_Orders_{Guid.NewGuid():N}.xlsx";
+				var exportBytes = await _reportRepository
+					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders), reportname);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
+					File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname)));
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.Message);
 			}
 		}
 		#endregion
