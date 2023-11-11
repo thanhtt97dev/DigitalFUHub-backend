@@ -19,7 +19,7 @@ namespace DataAccess.Repositories
 		public List<User> GetUsers(UserRequestDTO userDTO) => UserDAO.Instance.GetUsers(userDTO);
 		public User? GetUserById(long id) => UserDAO.Instance.GetUserById(id);
 
-		public void EditUserInfo(int id, User user) => UserDAO.Instance.EditUserInfo(id,user);
+		public void EditUserInfo(User user) => UserDAO.Instance.EditUserInfo(user);
 
 		public void Update2FA(int id) => UserDAO.Instance.Update2FA(id);
 

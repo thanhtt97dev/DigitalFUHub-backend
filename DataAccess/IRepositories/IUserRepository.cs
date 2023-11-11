@@ -15,7 +15,7 @@ namespace DataAccess.IRepositories
 		User? GetUserByRefreshToken(string? refreshTokenId);
 		List<User> GetUsers(UserRequestDTO user);
 		User? GetUserById(long id);
-		void EditUserInfo(int id, User user);
+		void EditUserInfo(User user);
 		void Update2FA(int id);
 		void AddUser(User user);
 		User? GetUserByUsername(string username);

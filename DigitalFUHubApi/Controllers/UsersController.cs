@@ -20,6 +20,7 @@
     using DTOs.Seller;
 	using DataAccess.Repositories;
 	using DTOs.Admin;
+    using Azure.Core;
 
 	[Route("api/[controller]")]
 	[ApiController]
@@ -34,15 +35,17 @@
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly TwoFactorAuthenticationService _twoFactorAuthenticationService;
 		private readonly MailService _mailService;
+        private readonly StorageService _storageService;
 
-		public UsersController(IUserRepository userRepository, IMapper mapper,
+        public UsersController(IUserRepository userRepository, IMapper mapper,
 			IRefreshTokenRepository refreshTokenRepository,
 			IAccessTokenRepository accessTokenRepository,
 			ITwoFactorAuthenticationRepository twoFactorAuthenticationRepository,
 			JwtTokenService jwtTokenService,
 			TwoFactorAuthenticationService twoFactorAuthenticationService,
-			MailService mailService
-			)
+			MailService mailService,
+            StorageService storageService
+            )
 		{
 			_userRepository = userRepository;
 			_mapper = mapper;
@@ -52,7 +55,9 @@
 			_twoFactorAuthenticationService = twoFactorAuthenticationService;
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
-		}
+			_storageService = storageService;
+
+        }
 
 		#region SignIn
 		[HttpPost("SignIn")]
@@ -600,18 +605,70 @@
 
 		#region Edit user info
 		[Authorize]
-		[HttpPut("EditUserInfo/{id}")]
-		public IActionResult EditUserInfo(int id, UserUpdateRequestDTO userUpdateRequestDTO)
+		[HttpPut("EditUserInfo")]
+		public async Task<IActionResult> EditUserInfo([FromForm] UserUpdateRequestDTO request)
 		{
-			if (userUpdateRequestDTO == null) return BadRequest();
-			try
+            ResponseData responseData = new ResponseData();
+            Status status = new Status();
+
+            try
 			{
-				User? user = _userRepository.GetUserById(id);
-				if (user == null) return Conflict();
-				var userUpdate = _mapper.Map<User>(userUpdateRequestDTO);
-				_userRepository.EditUserInfo(id, userUpdate);
-				return NoContent();
-			}
+                if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+                if (request == null)
+				{
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "request invalid!";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                User? user = _userRepository.GetUserById(request.UserId);
+
+				if (user == null)
+				{
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "user not found";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                var userUpdate = _mapper.Map<User>(request);
+
+                // Declares
+                string urlNewAvatar = "";
+                string filename = "";
+                DateTime now;
+				//
+
+                // Check update avatar user or not
+                if (request.Avatar != null)
+                {
+                    now = DateTime.Now;
+                    filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
+                        now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
+                        request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
+
+                    urlNewAvatar = await _storageService.UploadFileToAzureAsync(request.Avatar, filename);
+					userUpdate.Avatar = urlNewAvatar;
+
+                    // delete avatar old
+                    await _storageService.RemoveFileFromAzureAsync(user.Avatar.Substring(user.Avatar.LastIndexOf("/") + 1));
+                }
+
+				// Ok
+				_userRepository.EditUserInfo(userUpdate);
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
+                return Ok(responseData);
+            }
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
