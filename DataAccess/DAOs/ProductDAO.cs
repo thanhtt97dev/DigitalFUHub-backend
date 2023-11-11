@@ -558,6 +558,7 @@ namespace DataAccess.DAOs
 														 {
 															 Name = productVariant.Name,
 															 Price = productVariant.Price,
+															 Discount = productVariant.Discount,
 														 }).OrderBy(x => x.Price).ToList(),
 									   Tags = (from tag in context.Tag
 											  where tag.ProductId == id
