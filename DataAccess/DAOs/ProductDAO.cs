@@ -493,6 +493,10 @@ namespace DataAccess.DAOs
 														   ProductVariantId = productVariant.ProductId,
 														   Name = productVariant.Name,
 														   Price = productVariant.Price,
+														   AssetInformations = (from assetInfomation in context.AssetInformation
+																				where assetInfomation.ProductVariantId == productVariant.ProductVariantId && assetInfomation.IsActive
+																				select new AssetInformation() { }
+																			   ).ToList()
 													   })
 													   .OrderBy(x => x.Price)
 													   .ToList(),
@@ -543,6 +547,8 @@ namespace DataAccess.DAOs
 									   DateUpdate = product.DateUpdate,
 									   TotalRatingStar = product.TotalRatingStar,
 									   NumberFeedback = product.NumberFeedback,
+									   ViewCount = product.ViewCount,
+									   LikeCount = product.LikeCount,
 									   SoldCount = product.SoldCount,
 									   Note = product.Note,
 									   ProductStatusId = product.ProductStatusId,
@@ -647,6 +653,10 @@ namespace DataAccess.DAOs
 														   ProductVariantId = productVariant.ProductId,
 														   Name = productVariant.Name,
 														   Price = productVariant.Price,
+														   AssetInformations = (from assetInfomation in context.AssetInformation
+																			   where assetInfomation.ProductVariantId == productVariant.ProductVariantId && assetInfomation.IsActive
+																			   select new AssetInformation() { }
+																			   ).ToList()
 													   })
 													   .OrderBy(x => x.Price)
 													   .ToList(),

@@ -82,8 +82,13 @@ namespace DataAccess.DAOs
                     UserId = userId,
                     ProductId = productId
                 };
+				context.WishList.Add(newWishList);
 
-                context.WishList.Add(newWishList);
+				// update number like count number of product
+				var product = context.Product.First(x => x.ProductId == productId);
+                product.LikeCount += 1;
+                context.Product.Update(product);
+
                 context.SaveChanges();
             }
         }
@@ -92,10 +97,15 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                var wishList = context.WishList.FirstOrDefault(x => x.UserId == userId && x.ProductId == productId);
-
+                var wishList = context.WishList.First(x => x.UserId == userId && x.ProductId == productId);
                 context.WishList.Remove(wishList);
-                context.SaveChanges();
+
+				// update number like count number of product
+				var product = context.Product.First(x => x.ProductId == productId);
+				product.LikeCount -= 1;
+				context.Product.Update(product);
+
+				context.SaveChanges();
             }
         }
 
@@ -159,6 +169,14 @@ namespace DataAccess.DAOs
                 
                 if (wishLists.Count > 0)
                 {
+                    foreach (var productId in productIds)
+                    {
+						// update number like count number of product
+						var product = context.Product.First(x => x.ProductId == productId);
+						product.LikeCount -= 1;
+						context.Product.Update(product);
+					}
+
                     context.WishList.RemoveRange(wishLists);
                     context.SaveChanges();
                 }
