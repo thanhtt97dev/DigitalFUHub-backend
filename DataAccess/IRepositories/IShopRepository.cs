@@ -15,5 +15,7 @@ namespace DataAccess.IRepositories
 		bool IsExistShop(long userId);
 		Shop? GetShopById(long shopId);
 		void EditShop(Shop shop);
+		int GetNumberShopWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId);
+		List<Shop> GetShopsWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId, int page);
 	}
 }

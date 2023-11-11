@@ -19,6 +19,7 @@ using DTOs.Feedback;
 using DTOs.WishList;
 using Google.Apis.Util;
 using DTOs.TransactionCoin;
+using DTOs.Shop;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -244,6 +245,15 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Tags, act => act.MapFrom(src => (src.Tags == null) ? null : src.Tags.Select(x => x.TagName).ToList()))
 				.ReverseMap();
 
+			// shops/admin/all
+			CreateMap<Shop, GetShopsResponseDTO>()
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.UserId))
+				.ForMember(des => des.ShopEmail, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.NumberOrderConfirmed, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED).Count()))
+				.ForMember(des => des.TotalNumberOrder, act => act.MapFrom(src => src.Orders.Count()))
+				.ForMember(des => des.TotalProduct, act => act.MapFrom(src => src.Products.Count()))
+				.ForMember(des => des.Revenue, act => act.MapFrom(src => (src.User.TransactionInternals == null) ? 0 : src.User.TransactionInternals.Sum(x => x.PaymentAmount)))
+				.ReverseMap();
 		}
 	}
 }
