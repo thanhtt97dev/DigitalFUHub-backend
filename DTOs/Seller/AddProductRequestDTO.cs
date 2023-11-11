@@ -11,7 +11,7 @@ namespace DTOs.Seller
 	{
 		public long UserId { get; set; }
 		public string ProductName { get; set;} = null!;
-		public int Discount { get; set;}
+		//public int Discount { get; set;}
 		public string? Description { get; set;}
 		public int Category { get; set;}
 		public IFormFile ThumbnailFile { get; set; } = null!;
@@ -19,6 +19,7 @@ namespace DTOs.Seller
 		public List<string> Tags { get; set; } = null!;
 		public List<string> ProductVariantNames { get; set; } = null!;
 		public List<long> ProductVariantPrices { get; set; } = null!;
+		public List<int> ProductVariantDiscounts { get; set; } = null!;
 		public List<IFormFile> AssetInformationFiles { get; set; } = null!;
 	}
 }

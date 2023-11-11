@@ -29,6 +29,7 @@ namespace DTOs.Product
 		public long ProductVariantId { get; set; }
 		public string? Name { get; set; }
 		public long? Price { get; set; }
+		public int? Discount { get; set; }
 		public virtual ICollection<AssetInformationResponseDTO>? AssetInformations { get; set; }
 	}
 	public class AssetInformationResponseDTO

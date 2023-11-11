@@ -28,7 +28,8 @@ namespace DigitalFUHubApi.Controllers
 		public ShopsController(IShopRepository shopRepository, 
 			IUserRepository userRepository, 
 			JwtTokenService jwtTokenService, 
-			StorageService storageService)
+			StorageService storageService,
+			IMapper mapper)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;

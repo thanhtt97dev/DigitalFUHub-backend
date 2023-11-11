@@ -32,15 +32,17 @@ namespace DigitalFUHubApi.Controllers
 		private readonly MailService _mailService;
 		private readonly IMapper _mapper;
 
-		public ProductsController(IConfiguration configuration, 
-			IProductRepository productRepository, 
-			StorageService storageService, 
-			IShopRepository shopRepository, 
-			IUserRepository userRepository, 
-			IRoleRepository roleRepository, 
-			IOrderRepository orderRepository, 
-			ICouponRepository couponRepository, 
-			JwtTokenService jwtTokenService, 
+		public ProductsController(IConfiguration configuration,
+			IProductRepository productRepository,
+			StorageService storageService,
+			IShopRepository shopRepository,
+			IUserRepository userRepository,
+			IRoleRepository roleRepository,
+			IOrderRepository orderRepository,
+			ICouponRepository couponRepository,
+			JwtTokenService jwtTokenService,
+			HubService hubService,
+			MailService mailService,
 			IMapper mapper)
 		{
 			_configuration = configuration;
@@ -173,12 +175,12 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if(page <= 0)
+				if (page <= 0)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
 				}
 				long userId = _jwtTokenService.GetUserIdByAccessToken(User);
-				(List<Product> products, long totalItems) = _productRepository.GetListProductOfSeller(userId, productId, 
+				(List<Product> products, long totalItems) = _productRepository.GetListProductOfSeller(userId, productId,
 					productName, page);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerGetProductResponseDTO
@@ -285,7 +287,11 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+				}
+				if (request.ProductVariantDiscounts.Any(x => x > 50))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DISCOUNT", false, new()));
 				}
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				// check file upload satisfy file extension
@@ -318,6 +324,7 @@ namespace DigitalFUHubApi.Controllers
 						Name = request.ProductVariantNames[i],
 						Price = request.ProductVariantPrices[i],
 						AssetInformations = assetInformation,
+						Discount = request.ProductVariantDiscounts[i],
 						isActivate = true,
 					});
 				}
@@ -344,7 +351,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					CategoryId = request.Category,
 					Description = request.Description,
-					Discount = request.Discount,
+					Discount = 0,
 					ProductName = request.ProductName,
 					ShopId = request.UserId,
 					Tags = tags,
@@ -384,6 +391,11 @@ namespace DigitalFUHubApi.Controllers
 				if (request == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				}
+				if (request.ProductVariantDiscountsUpdate.Any(x => x > 50) || request.ProductVariantDiscountsAddNew.Any(x => x > 50))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DISCOUNT", false, new()));
+
 				}
 				Product? prod = _productRepository.CheckProductExist(request.UserId, request.ProductId);
 				if (prod == null)
@@ -432,6 +444,7 @@ namespace DigitalFUHubApi.Controllers
 							Price = request.ProductVariantPricesUpdate[i],
 							ProductId = request.ProductId,
 							ProductVariantId = request.ProductVariantIdsUpdate[i],
+							Discount = request.ProductVariantDiscountsUpdate[i],
 							AssetInformations = request.AssetInformationFilesUpdate != null && request.AssetInformationFilesUpdate.Count > 0
 												&& request.AssetInformationFilesUpdate[i] != null ?
 									Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i]) : null
@@ -452,8 +465,9 @@ namespace DigitalFUHubApi.Controllers
 							isActivate = true,
 							Name = request.ProductVariantNamesAddNew[i],
 							Price = request.ProductVariantPricesAddNew[i],
+							Discount = request.ProductVariantDiscountsAddNew[i],
 							ProductId = request.ProductId,
-						});
+						}) ;
 					}
 				}
 
@@ -491,7 +505,7 @@ namespace DigitalFUHubApi.Controllers
 					ProductId = request.ProductId,
 					ProductName = request.ProductName,
 					Description = request.ProductDescription,
-					Discount = request.Discount,
+					Discount = 0,
 					CategoryId = request.CategoryId,
 					Thumbnail = request.ProductThumbnailFileUpdate == null ? null : urlThumbnailNew,
 					ProductStatusId = request.IsActiveProduct ? Constants.PRODUCT_STATUS_ACTIVE : Constants.PRODUCT_STATUS_HIDE
@@ -594,12 +608,12 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				var product = _productRepository.GetProduct(request.ProductId);
-				if(product == null)
+				if (product == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 				_productRepository.UpdateProductStatusAdmin(request.ProductId, request.Status, request.Note);
-				if(request.Status == Constants.PRODUCT_STATUS_BAN)
+				if (request.Status == Constants.PRODUCT_STATUS_BAN)
 				{
 					// send notification
 					await _hubService.SendNotification(product.Shop.UserId, "Sản phẩm đã bị cấm", $"Sản phẩm mã số #{product.ProductId} đã bị cấm", Constants.FRONT_END_SELLER_PRODUCT_URL + "list");
