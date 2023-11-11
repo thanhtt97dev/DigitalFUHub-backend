@@ -344,7 +344,8 @@ namespace DataAccess.DAOs
 										  join conversation in context.Conversations
 											  on userConversation.ConversationId equals conversation.ConversationId
 										  where userConversation.UserId == userId &&
-												userConversation.ConversationId == item.ConversationId
+												userConversation.ConversationId == item.ConversationId &&
+												conversation.IsGroup == false
 										  select userConversation.ConversationId).FirstOrDefault();
 					if (conversationId != 0)
 					{

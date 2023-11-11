@@ -154,11 +154,18 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid || !rates.Contains(request.Rate))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+				}
+				if(request.Page <= 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
 				}
 
-				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : DateTime.ParseExact(request.FromDate, "M/d/yyyy", CultureInfo.InvariantCulture);
-				(long totalItems, List<Order> orders) = _feedbackRepository.GetListFeedbackSeller(request.UserId, request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(), fromDate, request.Rate, request.Page);
+				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : 
+					DateTime.ParseExact(request.FromDate, "M/d/yyyy", CultureInfo.InvariantCulture);
+				(long totalItems, List<Order> orders) = _feedbackRepository.GetListFeedbackSeller(request.UserId, 
+					request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(), 
+					fromDate, request.Rate, request.Page);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ListFeedbackResponseDTO
 				{
 					TotalItems = totalItems,

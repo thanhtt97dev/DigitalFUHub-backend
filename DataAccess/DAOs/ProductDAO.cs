@@ -431,7 +431,7 @@ namespace DataAccess.DAOs
 							&& (string.IsNullOrWhiteSpace(productId) ? true : productId.Trim() == x.ProductId.ToString())
 							&& (string.IsNullOrWhiteSpace(productName) ? true : x.ProductName.ToLower().Contains(productName.ToLower().Trim())));
 				var lsProduct = query
-					.Skip((page - 1) * 10).Take(10)
+					.Skip((page - 1) * Constants.PAGE_SIZE).Take(Constants.PAGE_SIZE)
 					.ToList();
 				return (lsProduct, query.Count());
 			}

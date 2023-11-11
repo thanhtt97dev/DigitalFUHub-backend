@@ -15,4 +15,15 @@ namespace DTOs.Seller
 		public string Username { get; set; } = string.Empty;
 		public long OrderStatusId { get; set; }
 	}
+	public class SellerReportOrderResponseDTO
+	{
+		public long OrderId { get; set; }
+		public string Username { get; set; } = string.Empty;
+		public DateTime OrderDate { get; set; }
+		public string TotalAmount { get; set; } = string.Empty;
+		public string TotalCouponDiscount { get; set; } = string.Empty;
+		public string BusinessFee { get; set; } = string.Empty;
+		public string Profit { get; set; } = string.Empty;
+		public string OrderStatus { get; set; } = string.Empty;
+	}
 }

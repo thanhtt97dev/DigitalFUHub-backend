@@ -102,7 +102,7 @@ namespace DataAccess.DAOs
 					User user = context.User.First(x => x.UserId == userId);
 
 					OrderDetail orderDetail = order.OrderDetails.First(x => x.OrderDetailId == orderDetailId);
-					if(orderDetail.IsFeedback) throw new Exception("NOT FEEDBACK AGAIN.");
+					if (orderDetail.IsFeedback) throw new Exception("NOT FEEDBACK AGAIN.");
 					Product product = context.Product.First(x => x.ProductId == orderDetail.ProductVariant.ProductId);
 
 					//update product
@@ -148,7 +148,7 @@ namespace DataAccess.DAOs
 							OrderId = orderDetail.OrderId,
 							UserId = user.UserId,
 							TransactionCoinTypeId = Constants.TRANSACTION_COIN_TYPE_RECEIVE,
-							FeedbackId = feedback.FeedbackId,	
+							FeedbackId = feedback.FeedbackId,
 							Amount = feedbackBenefit.Coin,
 							DateCreate = DateTime.Now
 						};
@@ -157,7 +157,7 @@ namespace DataAccess.DAOs
 						context.SaveChanges();
 					}
 					context.SaveChanges();
-					transaction.Commit();	
+					transaction.Commit();
 				}
 				catch (Exception e)
 				{
@@ -231,7 +231,7 @@ namespace DataAccess.DAOs
 					.ToList())
 					.Where(x => x.OrderDetails.Count > 0);
 
-					return (query.Count(), query.Skip((page - 1)*5).Take(5).ToList());
+				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE_FEEDBACK).Take(Constants.PAGE_SIZE_FEEDBACK).ToList());
 
 			}
 		}

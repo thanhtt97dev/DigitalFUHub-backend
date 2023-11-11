@@ -32,7 +32,16 @@ namespace DigitalFUHubApi.Controllers
 		private readonly MailService _mailService;
 		private readonly IMapper _mapper;
 
-		public ProductsController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IShopRepository shopRepository, IUserRepository userRepository, IRoleRepository roleRepository, IOrderRepository orderRepository, ICouponRepository couponRepository, JwtTokenService jwtTokenService, IMapper mapper, MailService mailService, HubService hubService)
+		public ProductsController(IConfiguration configuration, 
+			IProductRepository productRepository, 
+			StorageService storageService, 
+			IShopRepository shopRepository, 
+			IUserRepository userRepository, 
+			IRoleRepository roleRepository, 
+			IOrderRepository orderRepository, 
+			ICouponRepository couponRepository, 
+			JwtTokenService jwtTokenService, 
+			IMapper mapper)
 		{
 			_configuration = configuration;
 			_productRepository = productRepository;
@@ -157,15 +166,20 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region get list product of seller
+		#region Get list product of seller
 		[Authorize("Seller")]
 		[HttpGet("Seller/List")]
 		public IActionResult GetListProductBySeller(string productId, string productName, int page)
 		{
 			try
 			{
+				if(page <= 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
+				}
 				long userId = _jwtTokenService.GetUserIdByAccessToken(User);
-				(List<Product> products, long totalItems) = _productRepository.GetListProductOfSeller(userId, productId, productName, page);
+				(List<Product> products, long totalItems) = _productRepository.GetListProductOfSeller(userId, productId, 
+					productName, page);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerGetProductResponseDTO
 				{
@@ -175,7 +189,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+				return BadRequest(e.Message);
 			}
 
 		}

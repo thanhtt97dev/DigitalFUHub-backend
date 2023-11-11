@@ -147,8 +147,10 @@
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 		public const string FRONT_END_SELLER_PRODUCT_URL = "/seller/product/";
 
-		//
+		// Pagination
 		public const int PAGE_SIZE = 10;
+
+		public const int PAGE_SIZE_FEEDBACK = 5;
 	}
 }
 

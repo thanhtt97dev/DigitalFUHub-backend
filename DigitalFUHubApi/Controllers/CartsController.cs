@@ -107,9 +107,8 @@ namespace DigitalFUHubApi.Controllers
 				responseData.Status.Message = "Success!";
 				return Ok(responseData);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex.Message);
                 return BadRequest(new Status());
             }
         }

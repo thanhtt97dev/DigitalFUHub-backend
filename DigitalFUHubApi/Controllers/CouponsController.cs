@@ -37,7 +37,16 @@ namespace DigitalFUHubApi.Controllers
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 
-		public CouponsController(IConfiguration configuration, IProductRepository productRepository, StorageService storageService, IShopRepository shopRepository, IUserRepository userRepository, IRoleRepository roleRepository, IOrderRepository orderRepository, ICouponRepository couponRepository, JwtTokenService jwtTokenService, IMapper mapper)
+		public CouponsController(IConfiguration configuration,
+			IProductRepository productRepository,
+			StorageService storageService,
+			IShopRepository shopRepository,
+			IUserRepository userRepository,
+			IRoleRepository roleRepository,
+			IOrderRepository orderRepository,
+			ICouponRepository couponRepository,
+			JwtTokenService jwtTokenService,
+			IMapper mapper)
 		{
 			_configuration = configuration;
 			_productRepository = productRepository;
@@ -155,13 +164,13 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+				}
+				if (request.Page <= 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
 				}
 
 				string formatDate = "M/d/yyyy";
@@ -170,13 +179,14 @@ namespace DigitalFUHubApi.Controllers
 					formatDate, provider);
 				DateTime? endDate = string.IsNullOrEmpty(request.EndDate) ? null : DateTime.ParseExact(request.EndDate.Trim(),
 					formatDate, provider);
-				(long totalItems, List<Coupon> coupons) = _couponRepository.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User),
+				(long totalItems, List<Coupon> coupons) = _couponRepository
+					.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User),
 					request.CouponCode.Trim(), startDate, endDate, request.IsPublic, request.Status, request.Page);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ListCouponResponseDTO
-					{
-						TotalItems = totalItems,
-						Coupons = _mapper.Map<List<SellerCouponResponseDTO>>(coupons)
-					}
+				{
+					TotalItems = totalItems,
+					Coupons = _mapper.Map<List<SellerCouponResponseDTO>>(coupons)
+				}
 				));
 			}
 			catch (Exception e)
@@ -336,7 +346,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region update coupon finish
-		[Authorize("Seller")]		
+		[Authorize("Seller")]
 		[HttpPost("Edit/Finish/{couponId}")]
 		public IActionResult UpdateCouponFinish(long couponId)
 		{

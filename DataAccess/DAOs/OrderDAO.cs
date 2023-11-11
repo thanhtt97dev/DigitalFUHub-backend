@@ -383,10 +383,10 @@ namespace DataAccess.DAOs
 									ProductVariantId = x.ProductVariantId,
 									ProductId = x.ProductId,
 									Price = x.Price,
+									Discount = x.Discount,
 									isActivate = x.isActivate,
 									Product = new Product
 									{
-										Discount = x.Product.Discount,
 										ProductStatusId = x.Product.ProductStatusId,
 										Shop = new Shop
 										{
@@ -410,8 +410,8 @@ namespace DataAccess.DAOs
 								ProductVariantId = item.ProductVariantId,
 								Quantity = item.Quantity,
 								Price = productVariant.Price,
-								Discount = productVariant.Product.Discount,
-								TotalAmount = productVariant.Price * item.Quantity * (100 - productVariant.Product.Discount) / 100,
+								Discount = productVariant.Discount,
+								TotalAmount = productVariant.Price * item.Quantity * (100 - productVariant.Discount) / 100,
 								IsFeedback = false,
 							};
 							orderDetails.Add(orderDetail);
@@ -1121,7 +1121,7 @@ namespace DataAccess.DAOs
 							&& (status == 0 ? true : x.OrderStatusId == status)
 							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
 					.OrderByDescending(x => x.OrderDate);
-					return (query.Count(), query.Skip((page - 1) * 10).Take(10).ToList());
+					return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE).Take(Constants.PAGE_SIZE).ToList());
 
 
 			}
@@ -1302,7 +1302,26 @@ namespace DataAccess.DAOs
 				var query = context.Order.Include(x => x.User).
 					Where(x => x.ShopId == userId && x.OrderCoupons.Any(x => x.CouponId == couponId));
 
-				return (query.Count(), query.Skip((page - 1) * 10).Take(10).ToList());
+				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE).Take(Constants.PAGE_SIZE).ToList());
+			}
+		}
+
+		internal List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+					.Include(x => x.User)
+					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
+							&& (fromDate != null && toDate != null ? x.OrderDate >= fromDate && x.OrderDate <= toDate : true)
+							&& (status == 0 ? true : x.OrderStatusId == status)
+							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
+					.OrderByDescending(x => x.OrderDate)
+					.ToList();
 			}
 		}
 	}
