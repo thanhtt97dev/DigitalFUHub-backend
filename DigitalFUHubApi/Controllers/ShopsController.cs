@@ -22,7 +22,10 @@ namespace DigitalFUHubApi.Controllers
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly StorageService _storageService;
 
-		public ShopsController(IShopRepository shopRepository, IUserRepository userRepository, JwtTokenService jwtTokenService, StorageService storageService)
+		public ShopsController(IShopRepository shopRepository, 
+			IUserRepository userRepository, 
+			JwtTokenService jwtTokenService, 
+			StorageService storageService)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;

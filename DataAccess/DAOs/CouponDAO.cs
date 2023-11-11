@@ -98,7 +98,7 @@ namespace DataAccess.DAOs
 							&& (isPublic == null ? true : c.IsPublic == isPublic)
 							)
 					.OrderByDescending(x => x.CouponId);
-				List<Coupon> coupons = query.Skip((page - 1) * 10).Take(10).ToList();
+				List<Coupon> coupons = query.Skip((page - 1) * Constants.PAGE_SIZE).Take(Constants.PAGE_SIZE).ToList();
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 
 				return (query.Count(), coupons);

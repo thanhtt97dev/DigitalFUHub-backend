@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using DTOs.Seller;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace DataAccess.IRepositories
     public interface IReportRepository
     {
         Task<byte[]> ReportUser(int id);
+        Task<byte[]> ExportToExcel<T>(List<T> table, string filename);
     }
 }
