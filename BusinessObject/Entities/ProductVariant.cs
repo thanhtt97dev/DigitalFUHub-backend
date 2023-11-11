@@ -16,6 +16,7 @@ namespace BusinessObject.Entities
         public long ProductId { get; set; }
         public string? Name { get; set; }
         public long Price { get; set; }
+		public int Discount { get; set; }
 		public bool isActivate { get; set; }
 
 		[ForeignKey(nameof(ProductId))]
