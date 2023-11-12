@@ -1,4 +1,5 @@
-﻿using DataAccess.DAOs;
+﻿using BusinessObject.Entities;
+using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,8 @@ namespace DataAccess.Repositories
 {
 	public class ReportProductRepository : IReportProductRepository
 	{
-		public void UpdateReportProduct(long reportProductId, int status, string note) => ReportProductDAO.Instance.UpdateReportProduct(reportProductId, status, note);
+        public void AddReportProduct(ReportProduct reportProduct) => ReportProductDAO.Instance.AddReportProduct(reportProduct);
+        public void UpdateReportProduct(long reportProductId, int status, string note) => ReportProductDAO.Instance.UpdateReportProduct(reportProductId, status, note);
 
 
 	}

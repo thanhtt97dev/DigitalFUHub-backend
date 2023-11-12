@@ -42,5 +42,15 @@ namespace DataAccess.DAOs
 				context.SaveChanges();
 			}
 		}
-	}
+
+		internal void AddReportProduct (ReportProduct reportProduct)
+		{
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                context.ReportProduct.Add(reportProduct);
+                context.SaveChanges();
+            }
+        }
+
+    }
 }

@@ -194,6 +194,7 @@ namespace DataAccess.DAOs
 					Thumbnail = product.Thumbnail,
 					Description = product.Description,
 					CategoryId = product.CategoryId,
+					SoldCount = product.SoldCount,
 					ProductStatusId = product.ProductStatusId,
                     TotalRatingStar = product.TotalRatingStar,
                     NumberFeedback = product.NumberFeedback,

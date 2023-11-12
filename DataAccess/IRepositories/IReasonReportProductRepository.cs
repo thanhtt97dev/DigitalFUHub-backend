@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepositories
 {
-	public interface IReportProductRepository
-	{
-		void UpdateReportProduct(long reportProductId, int status, string note);
-		void AddReportProduct(ReportProduct reportProduct);
-
+    public interface IReasonReportProductRepository
+    {
+        List<ReasonReportProduct> GetAll();
+        ReasonReportProduct? GetEntityById(int reasonReportProductId);
     }
 }

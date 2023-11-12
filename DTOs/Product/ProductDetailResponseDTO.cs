@@ -19,6 +19,7 @@ namespace DTOs.Product
 		public long CategoryId { get; set; }
         public long Quantity { get; set; } = 0;
         public long TotalRatingStar { get; set; }
+        public int SoldCount { get; set; }
         public long NumberFeedback { get; set; }
         public long ProductStatusId { get; set; }
         public List<string>? ProductMedias { get; set; }
