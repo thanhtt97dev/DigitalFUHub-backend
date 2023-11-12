@@ -130,13 +130,13 @@ namespace DataAccess.DAOs
                                                                          Name = productVariant.Name,
                                                                          Price = productVariant.Price,
                                                                          isActivate = productVariant.isActivate,
+                                                                         Discount = productVariant.Discount,
                                                                          Product = (from product in context.Product
                                                                                    where product.ProductId == productVariant.ProductId
                                                                                    select new Product
                                                                                    {
                                                                                        ProductId = product.ProductId,
                                                                                        ProductName = product.ProductName,
-                                                                                       Discount = product.Discount,
                                                                                        Thumbnail = product.Thumbnail,
                                                                                        ProductStatusId = product.ProductStatusId,
 																				   }).First(),

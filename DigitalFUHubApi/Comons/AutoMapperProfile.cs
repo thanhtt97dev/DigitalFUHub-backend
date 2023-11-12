@@ -158,7 +158,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductVariantActivate, act => act.MapFrom(src => src.ProductVariant.isActivate))
 				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductVariant.Product.ProductId))
 				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductVariant.Product.ProductName))
-				.ForMember(des => des.ProductDiscount, act => act.MapFrom(src => src.ProductVariant.Product.Discount))
+				.ForMember(des => des.ProductVariantDiscount, act => act.MapFrom(src => src.ProductVariant.Discount))
 				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.ProductVariant.Product.Thumbnail))
 				.ForMember(des => des.ProductActivate, act => act.MapFrom(src => src.ProductVariant.Product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE))
 				.ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariant.AssetInformations.Count()))

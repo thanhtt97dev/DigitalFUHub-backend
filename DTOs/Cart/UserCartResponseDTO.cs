@@ -23,7 +23,7 @@ namespace DTOs.Cart
 		public bool ProductVariantActivate { get; set; }
 		public long ProductId { get; set; }
 		public string ProductName { get; set; } = string.Empty;
-		public int ProductDiscount { get; set; }
+		public int ProductVariantDiscount { get; set; }
 		public string? ProductThumbnail { get; set; }
 		public bool ProductActivate { get; set; }
 		public int Quantity { get; set; }
