@@ -10,6 +10,7 @@ using DTOs.ReportProduct;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -112,7 +113,9 @@ namespace DigitalFUHubApi.Controllers
                     responseData.Status = status;
                 }
 
-                if (request.Description.Length < minLength || request.Description.Length > maxLength)
+                string trimmedDescription = Regex.Replace(request.Description, @"\s+", " ");
+
+                if (trimmedDescription.Length < minLength || trimmedDescription.Length > maxLength)
                 {
                     status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
                     status.Ok = false;
