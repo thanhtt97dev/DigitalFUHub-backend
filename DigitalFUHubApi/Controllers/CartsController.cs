@@ -115,7 +115,7 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("GetCartsByUserId/{userId}")]
-		//[Authorize]
+		[Authorize]
 		public IActionResult GetCartsByUserId(long userId)
         {
             ResponseData responseData = new ResponseData();
@@ -131,10 +131,10 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
-                //if (userId != jwtTokenService.GetUserIdByAccessToken(User))
-                //{
-                //    return Unauthorized();
-                //}
+				if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 
 				var user = userRepository.GetUserById(userId);
 				if (user == null)

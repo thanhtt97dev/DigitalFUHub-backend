@@ -16,7 +16,6 @@ namespace DTOs.Product
         public string? ProductName { get; set; }
         public string? Thumbnail { get; set; }
         public string? Description { get; set; }
-        public int Discount { get; set; }
 		public long CategoryId { get; set; }
         public long Quantity { get; set; } = 0;
         public long TotalRatingStar { get; set; }

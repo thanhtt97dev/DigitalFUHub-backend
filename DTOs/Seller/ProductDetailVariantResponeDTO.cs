@@ -11,6 +11,7 @@ namespace DTOs.Seller
 		public long ProductVariantId { get; set; }
 		public string? Name { get; set; }
 		public long? Price { get; set; }
-		public long? Quantity { get; set; }
+        public int Discount { get; set; }
+        public long? Quantity { get; set; }
 	}
 }
