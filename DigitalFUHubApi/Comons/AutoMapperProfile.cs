@@ -230,7 +230,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.ProductVariant.Name))
 				.ForMember(des => des.Content, act => act.MapFrom(src => src.Feedback == null ? "" : src.Feedback.Content))
 				.ForMember(des => des.Rate, act => act.MapFrom(src => src.Feedback == null ? 0 : src.Feedback.Rate))
-				.ForMember(des => des.FeedbackDate, act => act.MapFrom(src => src.Feedback == null ? new DateTime() : src.Feedback.UpdateDate))
+				.ForMember(des => des.FeedbackDate, act => act.MapFrom(src => src.Feedback == null ? new DateTime() : src.Feedback.DateUpdate))
 				.ForMember(des => des.UrlImageFeedback, act => act.MapFrom(src => src.Feedback == null ? null : src.Feedback.FeedbackMedias))
 				.ReverseMap();
 			CreateMap<FeedbackMedia, string>()
@@ -288,6 +288,15 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.BusinessFee, act => act.MapFrom(src => src.BusinessFee.Fee + "%"))
 				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("{0:c}", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.OrderStatus, act => act.MapFrom(src => MapOrderStatusToString(src.OrderStatusId)))
+				.ReverseMap();
+
+			//feedback/search
+			CreateMap<Feedback, SearchFeedbackResponseDTO>()
+				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
+				.ForMember(des => des.UserName, act => act.MapFrom(src => src.User.Username))
+				.ForMember(des => des.UserAvatar, act => act.MapFrom(src => src.User.Avatar))
+				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.OrderDetail.ProductVariant.Name))
+				.ForMember(des => des.Medias, act => act.MapFrom(src => (src.FeedbackMedias == null) ? null : src.FeedbackMedias.Select(x => x.Url).ToList()))
 				.ReverseMap();
 		}
 	}

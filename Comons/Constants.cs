@@ -142,6 +142,15 @@
 
 		//Feedback
 		public const int NUMBER_DAYS_CAN_MAKE_FEEDBACK = 7;
+		public const int FEEDBACK_TYPE_ALL = 0;
+		public const int FEEDBACK_TYPE_1_STAR = 1;
+		public const int FEEDBACK_TYPE_2_STAR = 2;
+		public const int FEEDBACK_TYPE_3_STAR = 3;
+		public const int FEEDBACK_TYPE_4_STAR = 4;
+		public const int FEEDBACK_TYPE_5_STAR = 5;
+		public const int FEEDBACK_TYPE_HAVE_COMMENT = 6;
+		public const int FEEDBACK_TYPE_HAVE_MEDIA = 7;
+		public static int[] FEEDBACK_TYPES = new int[] { FEEDBACK_TYPE_ALL, FEEDBACK_TYPE_1_STAR , FEEDBACK_TYPE_2_STAR , FEEDBACK_TYPE_3_STAR , FEEDBACK_TYPE_4_STAR, FEEDBACK_TYPE_5_STAR, FEEDBACK_TYPE_HAVE_COMMENT , FEEDBACK_TYPE_HAVE_MEDIA };
 
 		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";

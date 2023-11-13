@@ -34,6 +34,38 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 
+		#region Get feedbacks for customer
+		[HttpPost("search")]
+		public IActionResult Search(SearchFeedbackRequestDTO request)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+			if (!Constants.FEEDBACK_TYPES.Contains(request.Type))
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid feedback type", false, new()));
+			}
+			try
+			{
+				int numberFeedBacks = _feedbackRepository.GetNumberFeedbackWithCondition(request.ProductId, request.Type, request.Page);
+				var numberPages = numberFeedBacks / Constants.PAGE_SIZE + 1;
+
+				if (request.Page > numberPages)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
+
+				List<Feedback> feedbacks = _feedbackRepository.GetFeedbacksWithCondition(request.ProductId, request.Type, request.Page);
+
+				var result = _mapper.Map<List<SearchFeedbackResponseDTO>>(feedbacks);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Succes", true, result));
+			}
+			catch (ArgumentException ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 		#region Get all feedback
 		[HttpGet("GetAll")]
 		public IActionResult GetAll(long productId)
@@ -127,7 +159,7 @@ namespace DigitalFUHubApi.Controllers
 					Content = x?.Feedback?.Content ?? "",
 					Rate = x.Feedback?.Rate ?? 0,
 					Quantity = x.Quantity,
-					Date = x.Feedback?.UpdateDate ?? new DateTime(),
+					Date = x.Feedback?.DateUpdate ?? new DateTime(),
 					Thumbnail = x.ProductVariant.Product.Thumbnail ?? "",
 					UrlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
 				}).ToList();
