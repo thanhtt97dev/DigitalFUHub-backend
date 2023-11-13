@@ -15,5 +15,7 @@ namespace DataAccess.IRepositories
 		List<FeedbackResponseDTO> GetFeedbacks(long productId);
 		(long, List<Order>) GetListFeedbackSeller(long userId, string orderId, string userName, string productName, 
 			string productVariantName, DateTime? fromDate, int rate, int page);
+		int GetNumberFeedbackWithCondition(long productId, int type, int page);
+		List<Feedback> GetFeedbacksWithCondition(long productId, int type, int page);
 	}
 }

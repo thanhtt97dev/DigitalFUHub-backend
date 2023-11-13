@@ -19,7 +19,8 @@ namespace BusinessObject.Entities
 		public int FeedbackBenefitId { get; set; }
 		public string? Content { get; set; }
         public int Rate { get; set; }
-        public DateTime UpdateDate { get; set; }
+		public DateTime DateCreate { get; set; }
+		public DateTime DateUpdate { get; set; }
         [ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; } = null!;
         [ForeignKey(nameof(UserId))]

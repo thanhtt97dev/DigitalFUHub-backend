@@ -5,6 +5,7 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.Feedback;
 using DTOs.Product;
 using DTOs.ReportProduct;
 using DTOs.Seller;

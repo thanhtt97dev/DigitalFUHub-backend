@@ -15,6 +15,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using DTOs.User;
 using System.Security.Cryptography.X509Certificates;
 using Comons;
+using System.Linq.Expressions;
 
 namespace DataAccess.DAOs
 {
@@ -70,7 +71,7 @@ namespace DataAccess.DAOs
 						FeedbackId = feedback.FeedbackId,
 						Content = feedback.Content,
 						Rate = feedback.Rate,
-						UpdateAt = feedback.UpdateDate,
+						UpdateAt = feedback.DateUpdate,
 						User = new UserResponeDTO
 						{
 							UserId = feedback.User.UserId,
@@ -123,7 +124,8 @@ namespace DataAccess.DAOs
 						FeedbackBenefitId = feedbackBenefit.FeedbackBenefitId,
 						ProductId = product.ProductId,
 						UserId = userId,
-						UpdateDate = DateTime.Now,
+						DateCreate = DateTime.Now,
+						DateUpdate = DateTime.Now,
 					};
 					if (urlImages.Count > 0)
 					{
@@ -212,7 +214,7 @@ namespace DataAccess.DAOs
 						},
 						OrderDetails = x.OrderDetails.Where(od => od.IsFeedback == true
 							&& (rate == 0 ? true : od.Feedback.Rate == rate)
-							&& (fromDate == null ? true : fromDate.Value.Date <= od.Feedback.UpdateDate.Date)
+							&& (fromDate == null ? true : fromDate.Value.Date <= od.Feedback.DateUpdate.Date)
 							&& (od.ProductVariant.Product.ProductName ?? "").ToLower().Contains(productName.ToLower())
 							&& (od.ProductVariant.Name ?? "").ToLower().Contains(productVariantName.ToLower()))
 							.Select(od => new OrderDetail
@@ -222,7 +224,7 @@ namespace DataAccess.DAOs
 								{
 									Content = od.Feedback.Content ?? "",
 									Rate = od.Feedback.Rate,
-									UpdateDate = od.Feedback.UpdateDate,
+									DateUpdate = od.Feedback.DateUpdate,
 									FeedbackMedias = od.Feedback.FeedbackMedias,
 								},
 								ProductVariant = od.ProductVariant,
@@ -233,6 +235,93 @@ namespace DataAccess.DAOs
 
 				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE_FEEDBACK).Take(Constants.PAGE_SIZE_FEEDBACK).ToList());
 
+			}
+		}
+
+		internal int GetNumberFeedbackWithCondition(long productId, int type, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var result = (from feedback in context.Feedback
+								 where
+								 feedback.ProductId == productId &&
+								 (type == Constants.FEEDBACK_TYPE_ALL) &&
+								 ((type == Constants.FEEDBACK_TYPE_1_STAR) ? true : feedback.Rate == 1) &&
+								 ((type == Constants.FEEDBACK_TYPE_2_STAR) ? true : feedback.Rate == 2) &&
+								 ((type == Constants.FEEDBACK_TYPE_3_STAR) ? true : feedback.Rate == 3) &&
+								 ((type == Constants.FEEDBACK_TYPE_4_STAR) ? true : feedback.Rate == 4) &&
+								 ((type == Constants.FEEDBACK_TYPE_5_STAR) ? true : feedback.Rate == 5) &&
+								 ((type == Constants.FEEDBACK_TYPE_HAVE_COMMENT) ? true : !string.IsNullOrEmpty(feedback.Content)) &&
+								 ((type == Constants.FEEDBACK_TYPE_HAVE_MEDIA) ?
+									 true
+									 :
+									 (from feedbackMedia in context.FeedbackMedia
+									  where feedbackMedia.FeedbackId == feedback.FeedbackId
+									  select new { }
+									 ).Count() > 0
+								 )
+								 select new { }
+								).Count();
+
+				return result;
+			}
+		}
+
+		internal List<Feedback> GetFeedbacksWithCondition(long productId, int type, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var feedbacks = (from feedback in context.Feedback
+								 join user in context.User
+									on feedback.UserId equals user.UserId
+								 join orderDetail in context.OrderDetail
+									on feedback.OrderDetailId equals orderDetail.OrderDetailId
+								 join productVariant in context.ProductVariant
+									on orderDetail.ProductVariantId equals productVariant.ProductVariantId
+								 where
+								 feedback.ProductId == productId &&
+								 (type == Constants.FEEDBACK_TYPE_ALL) ||
+								 (
+									 ((type == Constants.FEEDBACK_TYPE_1_STAR) ? true : feedback.Rate == 1) &&
+									 ((type == Constants.FEEDBACK_TYPE_2_STAR) ? true : feedback.Rate == 2) &&
+									 ((type == Constants.FEEDBACK_TYPE_3_STAR) ? true : feedback.Rate == 3) &&
+									 ((type == Constants.FEEDBACK_TYPE_4_STAR) ? true : feedback.Rate == 4) &&
+									 ((type == Constants.FEEDBACK_TYPE_5_STAR) ? true : feedback.Rate == 5) &&
+									 ((type == Constants.FEEDBACK_TYPE_HAVE_COMMENT) ? true : !string.IsNullOrEmpty(feedback.Content)) &&
+									 ((type == Constants.FEEDBACK_TYPE_HAVE_MEDIA) ?
+										 true
+										 :
+										 (from feedbackMedia in context.FeedbackMedia
+										  where feedbackMedia.FeedbackId == feedback.FeedbackId
+										  select new { }
+										 ).Count() > 0
+									 )
+								 )
+								 select new Feedback
+								 {
+									 FeedbackId = feedback.FeedbackId,
+									 User = new User
+									 {
+										 UserId = user.UserId,
+										 Username = user.Username,
+										 Avatar = user.Avatar
+									 },
+									 OrderDetail = new OrderDetail
+									 {
+										 ProductVariant = new ProductVariant
+										 {
+											 Name = productVariant.Name,
+										 }
+									 },
+									 Content = feedback.Content,
+									 Rate = feedback.Rate,
+									 DateUpdate = feedback.DateUpdate,
+									 FeedbackMedias = context.FeedbackMedia.Where(x => x.FeedbackId == feedback.FeedbackId).ToList(),	
+								 }
+								)
+								.OrderBy(x => x.DateUpdate)
+								.ToList();
+				return feedbacks;
 			}
 		}
 	}
