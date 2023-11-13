@@ -187,6 +187,33 @@ namespace DataAccess.DAOs
 					LastTimeOnline = sellerInfo.LastTimeOnline
 				};
 
+				var feedbacks = (from feedback in context.Feedback
+								 where
+									feedback.ProductId == productId
+								select new Feedback 
+								{
+									Rate = feedback.Rate,
+									Content = feedback.Content,
+									FeedbackMedias = context.FeedbackMedia.
+															Where(x => x.FeedbackId == feedback.FeedbackId)
+															.Select(x => new FeedbackMedia {})
+															.ToList(),
+								}
+								).ToList();
+
+				ProductDetailFeedBackGeneralInfo feedBackGeneralInfo = new ProductDetailFeedBackGeneralInfo
+				{
+					TotalRatingStar = product.TotalRatingStar,
+					TotalFeedback = product.NumberFeedback,
+					TotalFeedbackFiveStar = feedbacks.Count(x => x.Rate == 5),
+					TotalFeedbackFourStar = feedbacks.Count(x => x.Rate == 4),
+					TotalFeedbackThreeStar = feedbacks.Count(x => x.Rate == 3),
+					TotalFeedbackTwoStar = feedbacks.Count(x => x.Rate == 2),
+					TotalFeedbackOneStar = feedbacks.Count(x => x.Rate == 1),
+					TotalFeedbackHaveComment = feedbacks.Count(x => !string.IsNullOrEmpty(x.Content)),
+					TotalFeedbackHaveMedia = feedbacks.Count(x => x.FeedbackMedias.Count() > 0),
+				};
+
 				ProductDetailResponseDTO productDetailResponse = new ProductDetailResponseDTO()
 				{
 					ProductId = product.ProductId,
@@ -202,7 +229,8 @@ namespace DataAccess.DAOs
 					ProductVariants = variants,
 					ProductMedias = medias,
 					Tags = tags,
-					Shop = shop
+					Shop = shop,
+					FeedBackGeneralInfo = feedBackGeneralInfo
 				};
 
 				return productDetailResponse;
