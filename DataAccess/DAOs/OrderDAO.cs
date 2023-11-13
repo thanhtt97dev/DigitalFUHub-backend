@@ -744,6 +744,7 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Order
+					.Include(x => x.HistoryOrderStatus)
 					.Include(x => x.OrderCoupons)
 					.ThenInclude(x => x.Coupon)
 					.Include(x => x.Shop)
@@ -1095,6 +1096,7 @@ namespace DataAccess.DAOs
 			{
 				return context.Order
 					.Include(x => x.OrderCoupons)
+					.Include(x => x.HistoryOrderStatus)
 					.Include(x => x.Shop)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.Feedback)
@@ -1117,7 +1119,8 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
-							&& (fromDate != null && toDate != null ? x.OrderDate >= fromDate && x.OrderDate <= toDate : true)
+							&& (fromDate != null && toDate != null ? x.OrderDate.Date >= fromDate.Value.Date 
+							&& x.OrderDate.Date <= toDate.Value.Date : true)
 							&& (status == 0 ? true : x.OrderStatusId == status)
 							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
 					.OrderByDescending(x => x.OrderDate);
@@ -1317,7 +1320,8 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
-							&& (fromDate != null && toDate != null ? x.OrderDate >= fromDate && x.OrderDate <= toDate : true)
+							&& (fromDate != null && toDate != null ? x.OrderDate.Date >= fromDate.Value.Date 
+							&& x.OrderDate.Date <= toDate.Value.Date : true)
 							&& (status == 0 ? true : x.OrderStatusId == status)
 							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
 					.OrderByDescending(x => x.OrderDate)

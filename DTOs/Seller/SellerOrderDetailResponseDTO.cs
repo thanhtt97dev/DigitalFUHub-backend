@@ -20,9 +20,11 @@ namespace DTOs.Seller
 		public long TotalCouponDiscount { get; set; }
 		//public long TotalCoinDiscount { get; set; }
 		//public long TotalPayment { get; set; }
+		public string CouponCode { get; set; } = string.Empty;
 		public long BussinessFee { get; set; }
 		public long AmountSellerReceive { get; set; }
 		public long StatusId { get; set; }
+		public List<SellerHistoryOrderResponseDTO> HistoryOrderStatus { get; set; } = null!;
 		public List<SellerOrderDetailProductResponseDTO> OrderDetails { get; set; } = null!;
 	}
 	public class SellerOrderDetailProductResponseDTO
@@ -37,5 +39,12 @@ namespace DTOs.Seller
 		public long Price { get; set; }
 		public long Discount { get; set; }
 		public long TotalAmount { get; set; }
+	}
+	public class SellerHistoryOrderResponseDTO
+	{
+		public long OrderId { get; set; }
+		public long OrderStatusId { get; set; }
+		public DateTime DateCreate { get; set; }
+		public string Note { get; set; } = string.Empty;
 	}
 }

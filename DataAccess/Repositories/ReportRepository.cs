@@ -13,13 +13,8 @@ namespace DataAccess.Repositories
 {
     public class ReportRepository : IReportRepository
     {
-		public async Task<byte[]> ExportToExcel<T>(List<T> table, string filename)
-		{
-			using ExcelPackage pack = new ExcelPackage();
-			ExcelWorksheet ws = pack.Workbook.Worksheets.Add(filename);
-			ws.Cells["A1"].LoadFromCollection(table, true, TableStyles.Light1);
-			return await pack.GetAsByteArrayAsync();
-		}
+        public async Task<byte[]> ExportToExcel<T>(List<T> table, string filename)
+        => await ReportDAO.Instance.ExportToExcel<T>(table, filename);
 
 		public async Task<byte[]> ReportUser(int id)
         {

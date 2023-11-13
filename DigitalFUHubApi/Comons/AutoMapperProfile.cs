@@ -283,10 +283,11 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 			CreateMap<Order, SellerReportOrderResponseDTO>()
 				.ForMember(des => des.Username, act => act.MapFrom(src => src.User.Username))
-				.ForMember(des => des.TotalAmount, act => act.MapFrom(src => src.TotalAmount.ToString("{0:c}", CultureInfo.GetCultureInfo("vi-VN"))))
-				.ForMember(des => des.TotalCouponDiscount, act => act.MapFrom(src => src.TotalCouponDiscount.ToString("{0:c}", CultureInfo.GetCultureInfo("vi-VN"))))
-				.ForMember(des => des.BusinessFee, act => act.MapFrom(src => src.BusinessFee.Fee + "%"))
-				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("{0:c}", CultureInfo.GetCultureInfo("vi-VN"))))
+				.ForMember(des => des.OrderDate, act => act.MapFrom(src => src.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")))
+				.ForMember(des => des.TotalAmount, act => act.MapFrom(src => src.TotalAmount.ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
+				.ForMember(des => des.TotalCouponDiscount, act => act.MapFrom(src => src.TotalCouponDiscount.ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
+				.ForMember(des => des.BusinessFee, act => act.MapFrom(src => src.BusinessFee.Fee))
+				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.OrderStatus, act => act.MapFrom(src => MapOrderStatusToString(src.OrderStatusId)))
 				.ReverseMap();
 		}

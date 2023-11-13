@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace DTOs.Order
 		public long TotalPayment { get; set; }
 		public long StatusId { get; set; }
 		public List<OrderDetailProductResponseDTO> OrderDetails { get; set; } = null!;
+		public List<HistoryOrderStatusResponseDTO> HistoryOrderStatus { get; set; } = null!;
 	}
 	public class OrderDetailProductResponseDTO
 	{
@@ -42,5 +44,13 @@ namespace DTOs.Order
 		public List<string> AssetInformations { get; set; } = null!;
 		public int FeebackRate { get; set; }
 		public bool IsFeedback { get; set; }
+	}
+	public class HistoryOrderStatusResponseDTO
+	{
+		public long OrderId { get; set; }
+		public long OrderStatusId { get; set; }
+		public DateTime DateCreate { get; set; }
+		public string Note { get; set; } = string.Empty;
+
 	}
 }

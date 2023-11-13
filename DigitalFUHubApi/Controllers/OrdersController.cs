@@ -228,6 +228,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 
 				}
+#pragma warning disable CS8604 // Possible null reference argument.
 				OrderProductResponseDTO responseData = new OrderProductResponseDTO
 				{
 					OrderId = order.OrderId,
@@ -241,6 +242,13 @@ namespace DigitalFUHubApi.Controllers
 					TotalCoinDiscount = order.TotalCoinDiscount,
 					TotalCouponDiscount = order.TotalCouponDiscount,
 					TotalPayment = order.TotalPayment,
+					HistoryOrderStatus = order.HistoryOrderStatus.Select(x => new HistoryOrderStatusResponseDTO
+					{
+						OrderId = x.OrderId,
+						OrderStatusId = x.OrderStatusId,
+						DateCreate = x.DateCreate,
+						Note = x.Note
+					}).OrderBy(x => x.DateCreate).ToList(),
 					OrderDetails = order.OrderDetails.Select(od => new OrderDetailProductResponseDTO
 					{
 						Discount = od.Discount,
@@ -258,6 +266,7 @@ namespace DigitalFUHubApi.Controllers
 						FeebackRate = od?.Feedback?.Rate ?? 0
 					}).ToList(),
 				};
+#pragma warning restore CS8604 // Possible null reference argument.
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, responseData));
 			}
 			catch (Exception e)
@@ -361,6 +370,7 @@ namespace DigitalFUHubApi.Controllers
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
 			}
 
+#pragma warning disable CS8604 // Possible null reference argument.
 			SellerOrderDetailResponseDTO response = new SellerOrderDetailResponseDTO
 			{
 				OrderId = order.OrderId,
@@ -374,10 +384,18 @@ namespace DigitalFUHubApi.Controllers
 				TotalAmount = order.TotalAmount,
 				//TotalCoinDiscount = order.TotalCoinDiscount,
 				//TotalPayment = order.TotalPayment,
+				CouponCode = order.OrderCoupons.FirstOrDefault()?.Coupon?.CouponCode??"",
 				TotalCouponDiscount = order.TotalCouponDiscount,
 				BussinessFee = (order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100,
 				AmountSellerReceive = (order.TotalAmount - order.TotalCouponDiscount) -
 									((order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100),
+				HistoryOrderStatus = order.HistoryOrderStatus.Select(x => new SellerHistoryOrderResponseDTO
+				{
+					OrderId = x.OrderId,
+					OrderStatusId = x.OrderStatusId,
+					DateCreate = x.DateCreate,
+					Note = x.Note
+				}).OrderBy(x => x.DateCreate).ToList(),
 				OrderDetails = order.OrderDetails.Select(od => new SellerOrderDetailProductResponseDTO
 				{
 					Discount = od.Discount,
@@ -392,6 +410,7 @@ namespace DigitalFUHubApi.Controllers
 					TotalAmount = od.TotalAmount,
 				}).ToList(),
 			};
+#pragma warning restore CS8604 // Possible null reference argument.
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
 		}
 		#endregion
