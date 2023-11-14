@@ -165,7 +165,7 @@ namespace DataAccess.DAOs
 				}
 
 				long shopId = product.Shop.UserId;
-				var productOfShop = context.Product.Where(x => x.ShopId == shopId);
+				var productOfShop = context.Product.Where(x => x.ShopId == shopId).ToList();
 				long productNumber = productOfShop.Count();
 				long feedbachNumber = 0;
 				foreach (Product item in productOfShop)
