@@ -188,7 +188,7 @@
 			{
 				bool result = _jwtTokenService.ValidateTokenConfirmEmail(token);
 				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_FAILD,
-					result ? "SUCCESS" : "INVALID", result, new()));
+					result ? "Success" : "Invalid", result, new()));
 			}
 			catch (Exception e)
 			{
@@ -204,7 +204,7 @@
 		{
 			if (string.IsNullOrWhiteSpace(email))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 			}
 			else
 			{
@@ -213,15 +213,15 @@
 					User? user = _userRepository.GetUserByEmail(email.Trim());
 					if (user == null)
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 					}
 					if (!user.IsConfirm)
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM, "INVALID", false, new()));
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM, "Not confirm email", false, new()));
 					}
 					if (string.IsNullOrEmpty(user.Username))
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE, "INVALID", false, new()));
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE, "Username not register", false, new()));
 					}
 					string newPassword = Util.Instance.RandomPassword8Chars();
 					string passwordHash = Util.Instance.Sha256Hash(newPassword);
@@ -247,13 +247,13 @@
 			User? user = _userRepository.GetUserByEmail(email);
 			if (user == null)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 			}
 			else
 			{
 				if (user.IsConfirm)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_CONFIRM_PASSWORD_IS_CONFIRMED, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_CONFIRM_PASSWORD_IS_CONFIRMED, "Not confirm email", false, new()));
 				}
 				else
 				{
@@ -261,7 +261,7 @@
 					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
 				}
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 		}
 		#endregion
 
@@ -724,14 +724,14 @@
 		{
 			if (string.IsNullOrWhiteSpace(email))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 			}
 			User? user = _userRepository.GetUserByEmail(email);
 			if (user == null)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 		}
 		#endregion
 
@@ -741,14 +741,14 @@
 		{
 			if (string.IsNullOrWhiteSpace(username))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 			}
 			User? user = _userRepository.GetUserByUsername(username);
 			if (user == null)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 		}
 		#endregion
 

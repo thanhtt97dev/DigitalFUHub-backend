@@ -24,18 +24,21 @@ namespace DigitalFUHubApi.Controllers
 	{
 		private readonly IOrderRepository _orderRepository;
 		private readonly IReportRepository _reportRepository;
+		private readonly IShopRepository _shopRepository;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 		private readonly HubService _hubService;
 
 		public OrdersController(IOrderRepository orderRepository,
 			IReportRepository reportRepository,
+			IShopRepository shopRepository,
 			JwtTokenService jwtTokenService,
 			IMapper mapper,
 			HubService hubService)
 		{
 			_orderRepository = orderRepository;
 			_reportRepository = reportRepository;
+			_shopRepository = shopRepository;
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 			_hubService = hubService;
@@ -102,7 +105,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
 				}
 				List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 				OrderResponseDTO orderResponse = new OrderResponseDTO()
@@ -139,7 +142,7 @@ namespace DigitalFUHubApi.Controllers
 					}).ToList()
 
 				};
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, orderResponse));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, orderResponse));
 			}
 			catch (Exception e)
 			{
@@ -163,18 +166,18 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
 				}
 
 				if (request.StatusId != Constants.ORDER_STATUS_COMPLAINT && request.StatusId != Constants.ORDER_STATUS_CONFIRMED)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "INVALID STATUS ORDER", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid status order", false, new()));
 				}
 
 				Order? order = _orderRepository.GetOrderCustomer(request.OrderId, request.UserId, request.ShopId);
 				if (order == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 
 				//check vaild order status
@@ -206,7 +209,7 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 		}
 		#endregion
 
@@ -225,7 +228,7 @@ namespace DigitalFUHubApi.Controllers
 				Order? order = _orderRepository.GetOrderCustomer(orderId, userId);
 				if (order == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 
 				}
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -267,7 +270,7 @@ namespace DigitalFUHubApi.Controllers
 					}).ToList(),
 				};
 #pragma warning restore CS8604 // Possible null reference argument.
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, responseData));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, responseData));
 			}
 			catch (Exception e)
 			{
@@ -294,17 +297,17 @@ namespace DigitalFUHubApi.Controllers
 					|| (string.IsNullOrWhiteSpace(request.FromDate) && !string.IsNullOrWhiteSpace(request.FromDate))
 					|| (!string.IsNullOrWhiteSpace(request.FromDate) && string.IsNullOrWhiteSpace(request.FromDate)))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 				if (request.Page <= 0)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 				}
 
 				int[] acceptedOrderStatus = Constants.ORDER_STATUS;
 				if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID STATUS ORDER", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid status order", false, new()));
 				}
 
 				DateTime? fromDate;
@@ -317,13 +320,13 @@ namespace DigitalFUHubApi.Controllers
 					format, CultureInfo.InvariantCulture);
 				if (fromDate > toDate && fromDate != null && toDate != null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
 
 				(long totalItems, List<Order> orders) = _orderRepository.GetListOrderSeller(request.UserId, request.OrderId,
 					request.Username.Trim(), fromDate, toDate, request.Status, request.Page);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerListOrderResponseDTO
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SellerListOrderResponseDTO
 				{
 					TotalItems = totalItems,
 					Orders = _mapper.Map<List<SellerOrderResponseDTO>>(orders)
@@ -343,11 +346,11 @@ namespace DigitalFUHubApi.Controllers
 		{
 			if (page <= 0)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 			}
 			(long totalItems, List<Order> orders) = _orderRepository.GetListOrderByCoupon(_jwtTokenService.GetUserIdByAccessToken(User),
 				couponId, page);
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerListOrderCouponResponseDTO
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SellerListOrderCouponResponseDTO
 			{
 				TotalItems = totalItems,
 				Orders = _mapper.Map<List<SellerOrderResponseDTO>>(orders)
@@ -367,7 +370,7 @@ namespace DigitalFUHubApi.Controllers
 			Order? order = _orderRepository.GetOrderDetailSeller(userId, orderId);
 			if (order == null)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 			}
 
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -411,7 +414,7 @@ namespace DigitalFUHubApi.Controllers
 				}).ToList(),
 			};
 #pragma warning restore CS8604 // Possible null reference argument.
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, response));
 		}
 		#endregion
 
@@ -422,7 +425,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 			}
 			try
 			{
@@ -442,7 +445,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId, request.Note);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
@@ -459,7 +462,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.Note))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 			}
 			try
 			{
@@ -480,7 +483,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateStatusOrderRefund(request.SellerId, request.OrderId, request.Note.Trim());
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
@@ -490,7 +493,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Export data orders to excel file (seller)
-		//[Authorize("Seller")]
+		[Authorize("Seller")]
 		[HttpPost("Seller/Report")]
 		public async Task<IActionResult> ExportOrdersToExcel(SellerExportOrdersRequestDTO request)
 		{
@@ -501,13 +504,13 @@ namespace DigitalFUHubApi.Controllers
 					|| (string.IsNullOrWhiteSpace(request.FromDate) && !string.IsNullOrWhiteSpace(request.FromDate))
 					|| (!string.IsNullOrWhiteSpace(request.FromDate) && string.IsNullOrWhiteSpace(request.FromDate)))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 
 				int[] acceptedOrderStatus = Constants.ORDER_STATUS;
 				if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID STATUS ORDER", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid status order", false, new()));
 				}
 
 				DateTime? fromDate;
@@ -520,22 +523,25 @@ namespace DigitalFUHubApi.Controllers
 					format, CultureInfo.InvariantCulture);
 				if (fromDate > toDate && fromDate != null && toDate != null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
-
-				//List<Order> orders = _orderRepository.GetListOrderSeller(_jwtTokenService.GetUserIdByAccessToken(User),
-				List<Order> orders = _orderRepository.GetListOrderSeller(request.UserId,
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if(shop == null) { 
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid shop", false, new()));
+				}
+				List<Order> orders = _orderRepository.GetListOrderSeller(_jwtTokenService.GetUserIdByAccessToken(User),
 					request.OrderId, request.Username.Trim(), fromDate, toDate, request.Status);
 				if (orders.Count <= 0)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NO DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "No data", false, new()));
 				}
-				string reportname = $"List_Orders_{Guid.NewGuid():N}.xlsx";
+				DateTime now = DateTime.Now;
+				string reportname =  string.Format("{0}{1}{2}{3}{4}{5}{6}.xlsx", now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour);
 				var exportBytes = await _reportRepository
-					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders), reportname, fromDate, toDate);
-				//return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
-				//	File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname)));
-				return File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname);
+					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders), 
+					reportname, fromDate, toDate, shop.ShopName);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true,
+					File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname)));
 			}
 			catch (Exception e)
 			{

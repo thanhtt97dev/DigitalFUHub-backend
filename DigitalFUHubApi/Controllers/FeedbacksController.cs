@@ -99,7 +99,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 
 				var orderDetail = _orderRepository.GetOrderDetail(request.OrderDetailId);
@@ -110,7 +110,7 @@ namespace DigitalFUHubApi.Controllers
 
 				if (orderDetail.Order.OrderStatusId != Constants.ORDER_STATUS_CONFIRMED)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM, "Order's status confirm not yet!", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM, "Order's status confirm not yet", false, new()));
 				}
 
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
@@ -139,7 +139,7 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 		}
 		#endregion
 
@@ -152,7 +152,7 @@ namespace DigitalFUHubApi.Controllers
 				Order? order = _feedbackRepository.GetFeedbackDetail(orderId, userId);
 				if (order == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 				List<CustomerFeedbackDetailOrderResponseDTO> response = order.OrderDetails.Where(x => x.IsFeedback == true).Select(x => new CustomerFeedbackDetailOrderResponseDTO
 				{
@@ -167,7 +167,7 @@ namespace DigitalFUHubApi.Controllers
 					Thumbnail = x.ProductVariant.Product.Thumbnail ?? "",
 					UrlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
 				}).ToList();
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, response));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, response));
 			}
 			catch (Exception e)
 			{
@@ -190,11 +190,11 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid || !rates.Contains(request.Rate))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 				if(request.Page <= 0)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 				}
 
 				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : 
@@ -202,7 +202,7 @@ namespace DigitalFUHubApi.Controllers
 				(long totalItems, List<Order> orders) = _feedbackRepository.GetListFeedbackSeller(request.UserId, 
 					request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(), 
 					fromDate, request.Rate, request.Page);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ListFeedbackResponseDTO
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new ListFeedbackResponseDTO
 				{
 					TotalItems = totalItems,
 					Feedbacks = _mapper.Map<List<SellerFeedbackResponseDTO>>(orders)

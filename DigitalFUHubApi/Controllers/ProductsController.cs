@@ -178,13 +178,13 @@ namespace DigitalFUHubApi.Controllers
 			{
 				if (page <= 0)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 				}
 				long userId = _jwtTokenService.GetUserIdByAccessToken(User);
 				(List<Product> products, long totalItems) = _productRepository.GetListProductOfSeller(userId, productId,
 					productName, page);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new SellerGetProductResponseDTO
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SellerGetProductResponseDTO
 				{
 					Products = products,
 					TotalItems = totalItems
@@ -263,9 +263,9 @@ namespace DigitalFUHubApi.Controllers
 				Product? product = _productRepository.GetProductByShop(userId, productId);
 				if (product == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<ProductResponseDTO>(product)));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, _mapper.Map<ProductResponseDTO>(product)));
 			}
 			catch (Exception e)
 			{
@@ -288,18 +288,18 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 				if (!(request.ProductVariantNames.Count() == request.ProductVariantPrices.Count()
 					&& request.ProductVariantPrices.Count() == request.ProductVariantDiscounts.Count()
 					&& request.ProductVariantDiscounts.Count() == request.AssetInformationFiles.Count()
 					&& request.AssetInformationFiles.Count() == request.ProductVariantNames.Count()))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PRODUCTVARIANT", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant", false, new()));
 				}
 				if (request.ProductVariantDiscounts.Any(x => x > 50))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DISCOUNT", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant discount", false, new()));
 				}
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				// check file upload satisfy file extension
@@ -309,7 +309,7 @@ namespace DigitalFUHubApi.Controllers
 					||
 					!fileExtension.Contains(request.ThumbnailFile.FileName.Substring(request.ThumbnailFile.FileName.LastIndexOf("."))))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID FILE", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid file", false, new()));
 				}
 
 				DateTime now;
@@ -375,7 +375,7 @@ namespace DigitalFUHubApi.Controllers
 
 				_productRepository.AddProduct(product);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 
 			}
 			catch (Exception e)
@@ -398,7 +398,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (request == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 				if (!(request.ProductVariantIdsUpdate.Count() == request.ProductVariantNamesUpdate.Count()
 					&& request.ProductVariantNamesUpdate.Count() == request.ProductVariantDiscountsUpdate.Count()
@@ -410,17 +410,17 @@ namespace DigitalFUHubApi.Controllers
 					&& request.ProductVariantDiscountsAddNew.Count() == request.AssetInformationFilesAddNew.Count()
 					&& request.AssetInformationFilesAddNew.Count() == request.ProductVariantNamesAddNew.Count()))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PRODUCTVARIANT", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant", false, new()));
 				}
 				if (request.ProductVariantDiscountsUpdate.Any(x => x > 50) || request.ProductVariantDiscountsAddNew.Any(x => x > 50))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DISCOUNT", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant discount", false, new()));
 
 				}
 				Product? prod = _productRepository.CheckProductExist(request.UserId, request.ProductId);
 				if (prod == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 
 				string filename = "";
@@ -534,7 +534,7 @@ namespace DigitalFUHubApi.Controllers
 				_productRepository.EditProduct(product, productVariantsAddNew, productVariantsUpdate,
 					listTagAddNew, listProductDetailImagesAddNew, request.ProductDetailImagesCurrent);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
