@@ -245,23 +245,25 @@ namespace DataAccess.DAOs
 				var result = (from feedback in context.Feedback
 							  where
 								  feedback.ProductId == productId &&
-								  (type == Constants.FEEDBACK_TYPE_ALL) ||
 								  (
-									  ((type == Constants.FEEDBACK_TYPE_1_STAR) ? feedback.Rate == 1 : true) &&
-									  ((type == Constants.FEEDBACK_TYPE_2_STAR) ? feedback.Rate == 2 : true) &&
-									  ((type == Constants.FEEDBACK_TYPE_3_STAR) ? feedback.Rate == 3 : true) &&
-									  ((type == Constants.FEEDBACK_TYPE_4_STAR) ? feedback.Rate == 4 : true) &&
-									  ((type == Constants.FEEDBACK_TYPE_5_STAR) ? feedback.Rate == 5 : true) &&
-									  ((type == Constants.FEEDBACK_TYPE_HAVE_COMMENT) ? !string.IsNullOrEmpty(feedback.Content) : true) &&
-									  ((type == Constants.FEEDBACK_TYPE_HAVE_MEDIA) ?
-										  (from feedbackMedia in context.FeedbackMedia
-										   where feedbackMedia.FeedbackId == feedback.FeedbackId
-										   select new { }
-										  ).Count() > 0
-										  :
-										  true
+									(type == Constants.FEEDBACK_TYPE_ALL) ||
+									  (
+										  ((type == Constants.FEEDBACK_TYPE_1_STAR) ? feedback.Rate == 1 : true) &&
+										  ((type == Constants.FEEDBACK_TYPE_2_STAR) ? feedback.Rate == 2 : true) &&
+										  ((type == Constants.FEEDBACK_TYPE_3_STAR) ? feedback.Rate == 3 : true) &&
+										  ((type == Constants.FEEDBACK_TYPE_4_STAR) ? feedback.Rate == 4 : true) &&
+										  ((type == Constants.FEEDBACK_TYPE_5_STAR) ? feedback.Rate == 5 : true) &&
+										  ((type == Constants.FEEDBACK_TYPE_HAVE_COMMENT) ? !string.IsNullOrEmpty(feedback.Content) : true) &&
+										  ((type == Constants.FEEDBACK_TYPE_HAVE_MEDIA) ?
+											  (from feedbackMedia in context.FeedbackMedia
+											   where feedbackMedia.FeedbackId == feedback.FeedbackId
+											   select new { }
+											  ).Count() > 0
+											  :
+											  true
+										  )
 									  )
-								  )
+									)
 							  select new { }
 								).Count();
 
@@ -282,21 +284,23 @@ namespace DataAccess.DAOs
 									on orderDetail.ProductVariantId equals productVariant.ProductVariantId
 								 where
 									 feedback.ProductId == productId &&
-									 (type == Constants.FEEDBACK_TYPE_ALL) ||
 									 (
-										 ((type == Constants.FEEDBACK_TYPE_1_STAR) ? feedback.Rate == 1 : true) &&
-										 ((type == Constants.FEEDBACK_TYPE_2_STAR) ? feedback.Rate == 2 : true) &&
-										 ((type == Constants.FEEDBACK_TYPE_3_STAR) ? feedback.Rate == 3 : true) &&
-										 ((type == Constants.FEEDBACK_TYPE_4_STAR) ? feedback.Rate == 4 : true) &&
-										 ((type == Constants.FEEDBACK_TYPE_5_STAR) ? feedback.Rate == 5 : true) &&
-										 ((type == Constants.FEEDBACK_TYPE_HAVE_COMMENT) ? !string.IsNullOrEmpty(feedback.Content) : true) &&
-										 ((type == Constants.FEEDBACK_TYPE_HAVE_MEDIA) ?
-											 (from feedbackMedia in context.FeedbackMedia
-											  where feedbackMedia.FeedbackId == feedback.FeedbackId
-											  select new { }
-											 ).Count() > 0
-											 :
-											 true
+										 (type == Constants.FEEDBACK_TYPE_ALL) ||
+										 (
+											 ((type == Constants.FEEDBACK_TYPE_1_STAR) ? feedback.Rate == 1 : true) &&
+											 ((type == Constants.FEEDBACK_TYPE_2_STAR) ? feedback.Rate == 2 : true) &&
+											 ((type == Constants.FEEDBACK_TYPE_3_STAR) ? feedback.Rate == 3 : true) &&
+											 ((type == Constants.FEEDBACK_TYPE_4_STAR) ? feedback.Rate == 4 : true) &&
+											 ((type == Constants.FEEDBACK_TYPE_5_STAR) ? feedback.Rate == 5 : true) &&
+											 ((type == Constants.FEEDBACK_TYPE_HAVE_COMMENT) ? !string.IsNullOrEmpty(feedback.Content) : true) &&
+											 ((type == Constants.FEEDBACK_TYPE_HAVE_MEDIA) ?
+												 (from feedbackMedia in context.FeedbackMedia
+												  where feedbackMedia.FeedbackId == feedback.FeedbackId
+												  select new { }
+												 ).Count() > 0
+												 :
+												 true
+											 )
 										 )
 									 )
 								 select new Feedback
