@@ -24,9 +24,10 @@ namespace DTOs.Product
         public long ProductStatusId { get; set; }
         public List<string>? ProductMedias { get; set; }
         public ProductDetailShopResponseDTO Shop { get; set; } = null!;
-        public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }
+		public List<ProductDetailVariantResponeDTO>? ProductVariants { get; set; }
         public List<TagResponseDTO>? Tags { get; set; }
-    }
+		public ProductDetailFeedBackGeneralInfo? FeedBackGeneralInfo { get; set; }
+	}
 
 
 

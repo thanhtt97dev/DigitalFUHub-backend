@@ -16,6 +16,6 @@ namespace DTOs.WishList
         public int Discount { get; set; }
         public string? Thumbnail { get; set; }
         public long ProductStatusId { get; set; }
-        public List<WishListProductVariantResponseDTO>? ProductVariants { get; set; }
+        public WishListProductVariantResponseDTO? ProductVariant { get; set; }
     }
 }

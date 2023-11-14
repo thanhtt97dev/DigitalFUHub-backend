@@ -212,7 +212,9 @@ namespace DigitalFUHubApi.Comons
 					CategoryId = x.Product.CategoryId,
 				}).ToList()))
 				.ReverseMap();
-			CreateMap<Product, WishListProductResponseDTO>().ReverseMap();
+			CreateMap<Product, WishListProductResponseDTO>()
+                .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.First() : null))
+                .ReverseMap();
 			CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
 
 			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>()
@@ -292,12 +294,12 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 
 			//feedback/search
-			CreateMap<Feedback, SearchFeedbackResponseDTO>()
+			CreateMap<Feedback, SearchFeedbackDetailResponseDTO>()
 				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.UserName, act => act.MapFrom(src => src.User.Username))
 				.ForMember(des => des.UserAvatar, act => act.MapFrom(src => src.User.Avatar))
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.OrderDetail.ProductVariant.Name))
-				.ForMember(des => des.Medias, act => act.MapFrom(src => (src.FeedbackMedias == null) ? null : src.FeedbackMedias.Select(x => x.Url).ToList()))
+				.ForMember(des => des.FeedbackMedias, act => act.MapFrom(src => (src.FeedbackMedias == null) ? null : src.FeedbackMedias.Select(x => x.Url).ToList()))
 				.ReverseMap();
 		}
 	}
