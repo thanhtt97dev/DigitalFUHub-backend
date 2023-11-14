@@ -43,11 +43,20 @@ namespace DataAccess.DAOs
 
 		}
 
-		internal async Task<byte[]> ExportToExcel<T>(List<T> table, string filename)
+		internal async Task<byte[]> ExportToExcel<T>(List<T> table, string filename, DateTime? fromDate, DateTime? toDate)
 		{
 			using ExcelPackage pack = new ExcelPackage();
 			ExcelWorksheet ws = pack.Workbook.Worksheets.Add(filename);
-			ws.Cells["A1"].LoadFromCollection(table, true, TableStyles.Light1);
+			using (ExcelRange rangeMerge = ws.Cells["A1:H1"])
+			{
+				string title = $"BÁO CÁO DANH SÁCH CÁC ĐƠN HÀNG \n " +
+					$"{(fromDate != null && toDate != null ? $"({fromDate.Value.ToString("dd/MM/yyyy")} - {toDate.Value.ToString("dd/MM/yyyy")})" :"")}";
+				rangeMerge.Merge = true;
+				rangeMerge.Value = title;
+				rangeMerge.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+				rangeMerge.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+			}
+			ws.Cells["A2"].LoadFromCollection(table, true, TableStyles.Light1);
 			return await pack.GetAsByteArrayAsync();
 		}
 		#endregion

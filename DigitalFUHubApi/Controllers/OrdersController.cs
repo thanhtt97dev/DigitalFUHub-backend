@@ -490,7 +490,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Export data orders to excel file (seller)
-		[Authorize("Seller")]
+		//[Authorize("Seller")]
 		[HttpPost("Seller/Report")]
 		public async Task<IActionResult> ExportOrdersToExcel(SellerExportOrdersRequestDTO request)
 		{
@@ -523,7 +523,8 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATE", false, new()));
 				}
 
-				List<Order> orders = _orderRepository.GetListOrderSeller(_jwtTokenService.GetUserIdByAccessToken(User),
+				//List<Order> orders = _orderRepository.GetListOrderSeller(_jwtTokenService.GetUserIdByAccessToken(User),
+				List<Order> orders = _orderRepository.GetListOrderSeller(request.UserId,
 					request.OrderId, request.Username.Trim(), fromDate, toDate, request.Status);
 				if (orders.Count <= 0)
 				{
@@ -531,9 +532,10 @@ namespace DigitalFUHubApi.Controllers
 				}
 				string reportname = $"List_Orders_{Guid.NewGuid():N}.xlsx";
 				var exportBytes = await _reportRepository
-					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders), reportname);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
-					File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname)));
+					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders), reportname, fromDate, toDate);
+				//return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true,
+				//	File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname)));
+				return File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname);
 			}
 			catch (Exception e)
 			{
