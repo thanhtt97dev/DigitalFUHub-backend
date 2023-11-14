@@ -8,6 +8,12 @@ namespace DTOs.Feedback
 {
 	public class SearchFeedbackResponseDTO
 	{
+		public int TotalFeedback {get; set;}
+		public List<SearchFeedbackDetailResponseDTO>? Feedbacks {  get; set; }	
+	}
+
+	public class SearchFeedbackDetailResponseDTO
+	{
 		public long FeedbackId { get; set; }
 		public long UserId { get; set; }
 		public string UserName { get; set; } = string.Empty;
