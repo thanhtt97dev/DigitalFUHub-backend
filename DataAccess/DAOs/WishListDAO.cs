@@ -43,9 +43,9 @@ namespace DataAccess.DAOs
                 List<ProductVariant> productVariants = new List<ProductVariant>();
                 foreach(var product in products)
                 {
-                    var productVariant = context.ProductVariant.Where(x => x.ProductId == product.ProductId && x.isActivate == true).ToList();
+                    var productVariant = context.ProductVariant.Where(x => x.ProductId == product.ProductId && x.isActivate == true).OrderBy(x => x.Price - (x.Price * x.Discount / 100)).ToList();
                     if (productVariant.Count() > 0) {
-                        productVariants.AddRange(productVariant);
+                        productVariants.Add(productVariant[0]);
                     }
                 }
 
