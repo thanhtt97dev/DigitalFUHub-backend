@@ -55,7 +55,11 @@ namespace DigitalFUHubApi.Controllers
 
 				List<Feedback> feedbacks = _feedbackRepository.GetFeedbacksWithCondition(request.ProductId, request.Type, request.Page);
 
-				var result = _mapper.Map<List<SearchFeedbackResponseDTO>>(feedbacks);
+				var result = new SearchFeedbackResponseDTO
+				{
+					TotalFeedback = numberFeedBacks,
+					Feedbacks = _mapper.Map<List<SearchFeedbackDetailResponseDTO>>(feedbacks)
+				};
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Succes", true, result));
 			}

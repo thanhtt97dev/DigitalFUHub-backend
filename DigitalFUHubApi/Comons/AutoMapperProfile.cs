@@ -294,7 +294,7 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 
 			//feedback/search
-			CreateMap<Feedback, SearchFeedbackResponseDTO>()
+			CreateMap<Feedback, SearchFeedbackDetailResponseDTO>()
 				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.UserName, act => act.MapFrom(src => src.User.Username))
 				.ForMember(des => des.UserAvatar, act => act.MapFrom(src => src.User.Avatar))
