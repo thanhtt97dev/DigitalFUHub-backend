@@ -212,7 +212,9 @@ namespace DigitalFUHubApi.Comons
 					CategoryId = x.Product.CategoryId,
 				}).ToList()))
 				.ReverseMap();
-			CreateMap<Product, WishListProductResponseDTO>().ReverseMap();
+			CreateMap<Product, WishListProductResponseDTO>()
+                .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.First() : null))
+                .ReverseMap();
 			CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
 
 			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>()
