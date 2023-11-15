@@ -220,7 +220,15 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Product, WishListProductResponseDTO>()
                 .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.First() : null))
                 .ReverseMap();
-			CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
+			CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
+                .ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() : 0))
+                .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
+                .ReverseMap();
+
+            CreateMap<ProductVariant, ShopDetailCustomerProductVariantDetailResponseDTO>()
+				.ReverseMap();
+
+            CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
 
 			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))

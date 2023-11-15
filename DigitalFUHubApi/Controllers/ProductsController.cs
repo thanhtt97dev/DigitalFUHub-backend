@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
@@ -9,6 +10,7 @@ using DTOs.Feedback;
 using DTOs.Product;
 using DTOs.ReportProduct;
 using DTOs.Seller;
+using DTOs.Shop;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -652,8 +654,52 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
-			#endregion
 
-		}
-	}
+        }
+        #endregion
+
+
+        #region Get Products (Shop Detail Customer)
+        [HttpGet("GetAll")]
+        public IActionResult GetProductByUserId(long userId, int page)
+        {
+            try
+            {
+                ResponseData responseData = new ResponseData();
+                Status status = new Status();
+                if (page <= 0)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "Invalid param";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+
+                var numberProducts = _productRepository.GetNumberProductByConditions(userId);
+                var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
+                if (page > numberPages)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+                }
+
+                List<Product> products = _productRepository.GetProductByUserId(userId, page);
+
+                var result = new ShopDetailCustomerProductResponseDTO
+                {
+                    TotalProduct = numberProducts,
+                    TotalPage = numberPages,
+                    Products = _mapper.Map<List<ShopDetailCustomerProductDetailResponseDTO>>(products)
+                };
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+    }
 }

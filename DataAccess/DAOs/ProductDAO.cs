@@ -488,7 +488,20 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
+        internal int GetNumberProductByConditions(long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				return context.Product
+					.Where(x => x.ShopId == userId &&
+					x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+					||
+					x.ProductStatusId == Constants.PRODUCT_STATUS_BAN).Count();
+            }
+        }
+
+
+        internal List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -710,7 +723,46 @@ namespace DataAccess.DAOs
 				return product;
             }
         }
-	}
+
+        internal List<Product> GetProductByUserId(long userId, int page)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var products = (from product in context.Product
+								where product.ShopId == userId
+								&&
+								product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+								||
+                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
+                                select new Product
+								{
+                                    ProductId = product.ProductId,
+                                    ProductName = product.ProductName,
+                                    Thumbnail = product.Thumbnail,
+                                    ProductStatusId = product.ProductStatusId,
+                                    ProductVariants = (from productVariant in context.ProductVariant
+													   where productVariant.ProductId == product.ProductId
+													   select new ProductVariant
+													   {
+                                                           ProductVariantId = productVariant.ProductId,
+                                                           Discount = productVariant.Discount,
+														   Price = productVariant.Price,
+                                                           AssetInformations = (from assetInformation in context.AssetInformation
+																				where assetInformation.ProductVariantId == productVariant.ProductVariantId
+																				&&
+																				assetInformation.IsActive
+																				select new AssetInformation { }).ToList()
+                                                       }).ToList()
+                                }
+					).Skip((page - 1) * Constants.PAGE_SIZE)
+					 .Take(Constants.PAGE_SIZE)
+					 .ToList();
+
+
+				return products;
+            }
+        }
+    }
 }
 
 

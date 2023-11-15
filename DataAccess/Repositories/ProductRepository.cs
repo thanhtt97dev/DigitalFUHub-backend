@@ -54,5 +54,9 @@ namespace DataAccess.Repositories
         public Product? GetProductEntityById(long productId) => ProductDAO.Instance.GetProductEntityById(productId);
 
 		public bool CheckProductExist(List<long> productIds) => ProductDAO.Instance.CheckProductExist(productIds);
+
+        public List<Product> GetProductByUserId(long userId, int page) => ProductDAO.Instance.GetProductByUserId(userId, page);
+
+        public int GetNumberProductByConditions(long userId) => ProductDAO.Instance.GetNumberProductByConditions(userId);
     }
 }
