@@ -404,48 +404,46 @@ namespace DigitalFUHubApi.Controllers
 		#region Create Withdraw Transaction
 		[Authorize]
 		[HttpPost("CreateWithdrawTransaction")]
-		public IActionResult CreateWithdrawTransaction(CreateTransactionRequestDTO requestDTO)
+		public IActionResult CreateWithdrawTransaction(CreateTransactionRequestDTO request)
 		{
+			if (!ModelState.IsValid) return BadRequest();
 			try
 			{
-				ResponseData responseData = new ResponseData();
-				Status status = new Status();
-				if (requestDTO.UserId == 0 || requestDTO.Amount == 0)
+				if (request.UserId == 0 || request.Amount == 0)
 				{
 					return BadRequest();
 				}
-
-				// get customer
-				var customer = userRepository.GetUserById(requestDTO.UserId);
-				if(customer == null) 
+				
+				if(!(request.Amount >= Constants.MIN_PRICE_CAN_WITHDRAW && request.Amount <= Constants.MAX_PRICE_CAN_WITHDRAW))
 				{
-					status.Message = "User not found!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid feedback type", false, new()));
 				}
 
-				// check balance
-				if(customer.AccountBalance < requestDTO.Amount)
+				var customer = userRepository.GetUserById(request.UserId);
+				if(customer == null) 
 				{
-					status.Message = "Insufficient balance!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "User not found!", false, new()));
+				}
+
+				if (customer.AccountBalance < request.Amount)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_INSUFFICIENT_BALANCE, "Insufficient balance!", false, new()));
+				}
+
+				var numberWithdrawTransactionMakedInToday = bankRepository.GetNumberWithdrawTransactionMakedInToday(request.UserId);
+				if(numberWithdrawTransactionMakedInToday > Constants.NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY) 
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_EXCEEDED_REQUESTS_CREATED, "Exceeded number of requests created!", false, new()));
 				}
 
 				// create withdraw tranascation
-				var transaction = mapper.Map<WithdrawTransaction>(requestDTO);
-				transaction.Code = Util.GetRandomString(10) + requestDTO.UserId + Constants.BANK_TRANSACTION_CODE_KEY;
+				var transaction = mapper.Map<WithdrawTransaction>(request);
+				transaction.Code = Util.GetRandomString(10) + request.UserId + Constants.BANK_TRANSACTION_CODE_KEY;
 				bankRepository.CreateWithdrawTransaction(transaction);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				return Ok(responseData);
+				var accountBalance = customer.AccountBalance - request.Amount;
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, accountBalance));
 			}
 			catch (Exception)
 			{

@@ -38,5 +38,8 @@ namespace DataAccess.Repositories
 		public string UpdateListWithdrawTransactionPaid(List<long> transactionIds) => BankDAO.Instance.UpdateListWithdrawTransactionPaid(transactionIds);
 
 		public void RejectWithdrawTransaction(long withdrawTransactionId, string? note) => BankDAO.Instance.RejectWithdrawTransaction(withdrawTransactionId, note);
+
+		public int GetNumberWithdrawTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberWithdrawTransactionMakedInToday(userId);
+
 	}
 }

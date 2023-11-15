@@ -437,5 +437,20 @@ namespace DataAccess.DAOs
 				
 			}
 		}
+
+		internal int GetNumberWithdrawTransactionMakedInToday(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var result = context.WithdrawTransaction
+											.Where(x => 
+											x.UserId == userId && 
+											x.RequestDate > DateTime.Now.Date && x.RequestDate < DateTime.Now)
+											.Select(x => new {})
+											.Count();
+				return result;
+			}
+			
+		}
 	}
 }

@@ -27,7 +27,10 @@
 		public const string RESPONSE_CODE_BANK_WITHDRAW_REJECT = "BANK_03";
 		public const string RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND = "BANK_04";
 
-        public const string RESPONSE_CODE_PRODUCT_ACTIVE = "PRODUCT_01";
+		public const string RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_INSUFFICIENT_BALANCE = "WITHDRAW_REQUEST_01";
+		public const string RESPONSE_CODE_BANK_CUSTOMER_REQUEST_EXCEEDED_REQUESTS_CREATED = "WITHDRAW_REQUEST_02";
+
+		public const string RESPONSE_CODE_PRODUCT_ACTIVE = "PRODUCT_01";
         public const string RESPONSE_CODE_PRODUCT_BAN = "PRODUCT_02";
         public const string RESPONSE_CODE_PRODUCT_REMOVE = "PRODUCT_03";
         public const string RESPONSE_CODE_PRODUCT_HIDE = "PRODUCT_04";
@@ -54,6 +57,8 @@
 		public const string RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE = "ORDER_STATUS_01";
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
+
+		
 
 
 		//SignalR
@@ -158,8 +163,12 @@
 
 		// Pagination
 		public const int PAGE_SIZE = 10;
-
 		public const int PAGE_SIZE_FEEDBACK = 5;
+
+		//withdraw transaction
+		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
+		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
+		public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 	}
 }
 
