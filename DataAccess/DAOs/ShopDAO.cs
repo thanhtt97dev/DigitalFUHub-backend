@@ -24,8 +24,6 @@ namespace DataAccess.DAOs
 			}
 		}
 
-
-
 		internal void AddShop(string avatarUrl, string shopName, long userId, string shopDescription)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -192,6 +190,18 @@ namespace DataAccess.DAOs
 				return shops;
 			}
 		}
-	}
+
+		internal Shop? GetShopDetail (long userId)
+		{
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var shop = context.Shop.FirstOrDefault(x => x.UserId == userId && x.IsActive == true);
+				if (shop == null) return null;
+				var products = context.Product.Where(x => x.ShopId == shop.UserId && x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_BAN).ToList();
+                shop.Products = products;
+                return shop;
+            }
+        }
+    }
 }
 

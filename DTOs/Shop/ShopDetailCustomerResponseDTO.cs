@@ -11,7 +11,9 @@ namespace DTOs.Shop
         public long UserId { get; set; }
         public string Avatar { get; set; } = string.Empty;
         public string ShopName { get; set; } = null!;
-        public long FeedbackNumber { get; set; }
+        public string? Description { get; set; }
+        public long TotalRatingStar { get; set; }
+        public long NumberFeedback { get; set; }
         public long ProductNumber { get; set; }
         public DateTime DateCreate { get; set; }
         public bool IsOnline { get; set; }

@@ -26,5 +26,6 @@ namespace DataAccess.Repositories
 
 		public List<Shop> GetShopsWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId, int page) => ShopDAO.Instance.GetShopsWithCondition(shopId, shopEmail, shopName, shopStatusId, page);
 
-	}
+        public Shop? GetShopDetail(long userId) => ShopDAO.Instance.GetShopDetail(userId);
+    }
 }
