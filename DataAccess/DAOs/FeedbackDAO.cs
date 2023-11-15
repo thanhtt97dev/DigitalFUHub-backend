@@ -309,7 +309,7 @@ namespace DataAccess.DAOs
 									 User = new User
 									 {
 										 UserId = user.UserId,
-										 Username = user.Username,
+										 Fullname = user.Fullname,
 										 Avatar = user.Avatar
 									 },
 									 OrderDetail = new OrderDetail
