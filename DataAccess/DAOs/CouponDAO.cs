@@ -230,7 +230,7 @@ namespace DataAccess.DAOs
 					}
 					else
 					{
-						throw new Exception("Invalid");
+						throw new Exception("Exceed time can't end");
 					}
 				}
 				catch (Exception e)

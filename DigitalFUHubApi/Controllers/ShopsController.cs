@@ -38,17 +38,20 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 		}
 
+		#region check exist shop name
 		[Authorize]
 		[HttpGet("IsExistShopName/{shopName}")]
 		public IActionResult CheckExistShopName(string shopName)
 		{
 			if (string.IsNullOrWhiteSpace(shopName))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 			}
 			bool result = _shopRepository.IsExistShopName(shopName.Trim());
-			return Ok(new ResponseData(!result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_NOT_ACCEPT, !result ? "SUCCESS" : "INVALID", !result, new()));
+			return Ok(new ResponseData(!result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_NOT_ACCEPT, !result ? "Success" : "Invalid", !result, new()));
 		}
+		#endregion
+
 		#region get info shop of seller
 		[Authorize("Seller")]
 		[HttpGet("Seller/Get")]
@@ -75,7 +78,7 @@ namespace DigitalFUHubApi.Controllers
 				|| string.IsNullOrWhiteSpace(request.ShopDescription)
 				|| !fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf("."))))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 			}
 			try
 			{
@@ -89,7 +92,7 @@ namespace DigitalFUHubApi.Controllers
 					request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
 				string avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				_shopRepository.AddShop(avatarUrl, request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
@@ -108,7 +111,7 @@ namespace DigitalFUHubApi.Controllers
 				|| (request.AvatarFile != null &&
 				!fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")))))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 			}
 			try
 			{

@@ -143,9 +143,9 @@ namespace DigitalFUHubApi.Controllers
 				Coupon? coupon = _couponRepository.GetCoupon(couponId, userId);
 				if (coupon == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "NOT FOUND", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<SellerCouponResponseDTO>(coupon)));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, _mapper.Map<SellerCouponResponseDTO>(coupon)));
 			}
 			catch (Exception e)
 			{
@@ -166,11 +166,11 @@ namespace DigitalFUHubApi.Controllers
 			{
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 				if (request.Page <= 0)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID PAGE", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 				}
 
 				string formatDate = "M/d/yyyy";
@@ -182,7 +182,7 @@ namespace DigitalFUHubApi.Controllers
 				(long totalItems, List<Coupon> coupons) = _couponRepository
 					.GetListCouponsByShop(_jwtTokenService.GetUserIdByAccessToken(User),
 					request.CouponCode.Trim(), startDate, endDate, request.IsPublic, request.Status, request.Page);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ListCouponResponseDTO
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new ListCouponResponseDTO
 				{
 					TotalItems = totalItems,
 					Coupons = _mapper.Map<List<SellerCouponResponseDTO>>(coupons)
@@ -211,7 +211,7 @@ namespace DigitalFUHubApi.Controllers
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
 					|| string.IsNullOrWhiteSpace(request.CouponName))
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 
 				DateTime startDT = DateTime.Parse(request.StartDate);
@@ -234,7 +234,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					if (request.ProductsApplied == null || request.ProductsApplied.Count == 0)
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID DATA", false, new()));
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid products applied", false, new()));
 					}
 					else
 					{
@@ -249,7 +249,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 				_couponRepository.AddCoupon(coupon);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
@@ -274,7 +274,7 @@ namespace DigitalFUHubApi.Controllers
 					|| string.IsNullOrWhiteSpace(request.CouponName)
 					)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 
 				DateTime startDT = DateTime.Parse(request.StartDate);
@@ -302,7 +302,7 @@ namespace DigitalFUHubApi.Controllers
 				};
 				_couponRepository.UpdateCoupon(coupon);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
@@ -324,19 +324,19 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 
 
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 				coupon.IsPublic = request.IsPublic;
 				_couponRepository.UpdateStatusCoupon(coupon);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
@@ -345,7 +345,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region update coupon finish
+		#region update coupon program end
 		[Authorize("Seller")]
 		[HttpPost("Edit/Finish/{couponId}")]
 		public IActionResult UpdateCouponFinish(long couponId)
@@ -375,18 +375,18 @@ namespace DigitalFUHubApi.Controllers
 				}
 				if (!ModelState.IsValid)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "INVALID", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
 				coupon.IsActive = false;
 				_couponRepository.UpdateStatusCoupon(coupon);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
 			{
@@ -402,13 +402,13 @@ namespace DigitalFUHubApi.Controllers
 		{
 			if (string.IsNullOrWhiteSpace(couponCode) || !Regex.IsMatch(couponCode, "^[a-zA-Z0-9]{4,}$"))
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "INVALID", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 			}
 			try
 			{
 				bool result = _couponRepository.IsExistCouponCode(_jwtTokenService.GetUserIdByAccessToken(User), couponCode.Trim(), actionMode);
 				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_FAILD : Constants.RESPONSE_CODE_SUCCESS,
-					result ? "INVALID" : "SUCCESS",
+					result ? "Invalid" : "Success",
 					!result,
 					new()));
 			}
