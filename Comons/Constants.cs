@@ -5,7 +5,7 @@
 
 		//MB bank config
 		public const string BANK_ID_MB_BANK = "970422";
-		public const int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 15;
+		public const int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 3;
 		public const string BANK_TRANSACTION_CODE_KEY = "FU";
 
 		public const string MB_BANK_RESPONE_CODE_SUCCESS = "00";
@@ -27,7 +27,12 @@
 		public const string RESPONSE_CODE_BANK_WITHDRAW_REJECT = "BANK_03";
 		public const string RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND = "BANK_04";
 
-        public const string RESPONSE_CODE_PRODUCT_ACTIVE = "PRODUCT_01";
+		public const string RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_INSUFFICIENT_BALANCE = "WITHDRAW_REQUEST_01";
+		public const string RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_REQUESTS_CREATED = "WITHDRAW_REQUEST_02";
+
+		public const string RESPONSE_CODE_BANK_CUSTOMER_REQUEST_DEPOSIT_EXCEEDED_REQUESTS_CREATED = "DEPOSIT_REQUEST_01";
+
+		public const string RESPONSE_CODE_PRODUCT_ACTIVE = "PRODUCT_01";
         public const string RESPONSE_CODE_PRODUCT_BAN = "PRODUCT_02";
         public const string RESPONSE_CODE_PRODUCT_REMOVE = "PRODUCT_03";
         public const string RESPONSE_CODE_PRODUCT_HIDE = "PRODUCT_04";
@@ -54,6 +59,8 @@
 		public const string RESPONSE_CODE_ORDER_STATUS_CHANGED_BEFORE = "ORDER_STATUS_01";
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
+
+		
 
 
 		//SignalR
@@ -158,8 +165,15 @@
 
 		// Pagination
 		public const int PAGE_SIZE = 10;
-
 		public const int PAGE_SIZE_FEEDBACK = 5;
+
+		//withdraw, deposit transaction
+		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
+		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
+		public const int MIN_PRICE_CAN_WITHDRAW = 500000;
+		public const int NUMBER_DEPOSIT_REQUEST_CAN_MAKE_A_DAY = 100;
+		public const int MAX_PRICE_CAN_DEPOSIT = 10000000;
+		public const int MIN_PRICE_CAN_DEPOSIT = 10000;
 	}
 }
 

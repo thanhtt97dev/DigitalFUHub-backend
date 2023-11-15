@@ -27,5 +27,7 @@ namespace DataAccess.IRepositories
 		void UpdateWithdrawTransactionPaid(long transactionId);
 		string UpdateListWithdrawTransactionPaid(List<long> transactionIds);
 		void RejectWithdrawTransaction(long withdrawTransactionId, string? note);
+		int GetNumberWithdrawTransactionMakedInToday(long userId);
+		int GetNumberDepositTransactionMakedInToday(long userId);
 	}
 }
