@@ -15,6 +15,7 @@ using Microsoft.Data.SqlClient.Server;
 using Comons;
 using System.Transactions;
 using DTOs.Admin;
+using Azure.Core;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -379,19 +380,32 @@ namespace DigitalFUHubApi.Controllers
 		#region Create Deposit Transaction
 		[Authorize]
 		[HttpPost("CreateDepositTransaction")]
-		public IActionResult CreateDepositTransaction(CreateTransactionRequestDTO depositTransactionDTO)
+		public IActionResult CreateDepositTransaction(CreateTransactionRequestDTO request)
 		{
+			if (!ModelState.IsValid) return BadRequest();
 			try
 			{
-				var transaction = mapper.Map<DepositTransaction>(depositTransactionDTO);
-				transaction.Code = Util.GetRandomString(10) + depositTransactionDTO.UserId + Constants.BANK_TRANSACTION_CODE_KEY;
+				if (!(request.Amount >= Constants.MIN_PRICE_CAN_DEPOSIT && request.Amount <= Constants.MAX_PRICE_CAN_DEPOSIT))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid feedback type", false, new()));
+				}
+
+				var numberDepositTransactionMakedInToday = bankRepository.GetNumberDepositTransactionMakedInToday(request.UserId);
+				if (numberDepositTransactionMakedInToday > Constants.NUMBER_DEPOSIT_REQUEST_CAN_MAKE_A_DAY)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_DEPOSIT_EXCEEDED_REQUESTS_CREATED, "Exceeded number of requests created!", false, new()));
+				}
+
+				var transaction = mapper.Map<DepositTransaction>(request);
+				transaction.Code = Util.GetRandomString(10) + request.UserId + Constants.BANK_TRANSACTION_CODE_KEY;
 				bankRepository.CreateDepositTransaction(transaction);
 				var result = new DepositTransactionResponeDTO()
 				{
 					Amount = transaction.Amount,
 					Code = transaction.Code
 				};
-				return Ok(result);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, result));
 			}
 			catch (Exception)
 			{
@@ -433,7 +447,7 @@ namespace DigitalFUHubApi.Controllers
 				var numberWithdrawTransactionMakedInToday = bankRepository.GetNumberWithdrawTransactionMakedInToday(request.UserId);
 				if(numberWithdrawTransactionMakedInToday > Constants.NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY) 
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_EXCEEDED_REQUESTS_CREATED, "Exceeded number of requests created!", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_REQUESTS_CREATED, "Exceeded number of requests created!", false, new()));
 				}
 
 				// create withdraw tranascation

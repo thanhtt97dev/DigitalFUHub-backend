@@ -41,5 +41,7 @@ namespace DataAccess.Repositories
 
 		public int GetNumberWithdrawTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberWithdrawTransactionMakedInToday(userId);
 
+		public int GetNumberDepositTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberDepositTransactionMakedInToday(userId);
+
 	}
 }
