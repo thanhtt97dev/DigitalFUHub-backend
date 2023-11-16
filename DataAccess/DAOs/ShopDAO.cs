@@ -195,11 +195,40 @@ namespace DataAccess.DAOs
 		{
             using (DatabaseContext context = new DatabaseContext())
             {
-				var shop = context.Shop.FirstOrDefault(x => x.UserId == userId && x.IsActive == true);
-				if (shop == null) return null;
-				var products = context.Product.Where(x => x.ShopId == shop.UserId && x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_BAN).ToList();
-                shop.Products = products;
-                return shop;
+				var result = (from shop in context.Shop
+							  join user in context.User
+							  on shop.UserId equals user.UserId
+                              where shop.UserId == userId
+							  &&
+							  shop.IsActive == true
+							  select new Shop
+							  {
+                                  UserId = shop.UserId,
+                                  Avatar = shop.Avatar,
+                                  ShopName = shop.ShopName,
+								  DateCreate = shop.DateCreate,
+                                  Description = shop.Description,
+								  User = new User
+                                  {
+                                      IsOnline = user.IsOnline,
+                                      LastTimeOnline = user.LastTimeOnline,
+                                  },
+								  Products = (from product in context.Product
+											  where product.ShopId == shop.UserId
+											  &&
+											  product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+											  ||
+                                              product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
+                                              select new Product
+											  {
+                                                  TotalRatingStar = product.TotalRatingStar,
+                                                  NumberFeedback = product.NumberFeedback,
+
+                                              }).ToList()
+
+                              }).FirstOrDefault();
+
+                return result;
             }
         }
     }
