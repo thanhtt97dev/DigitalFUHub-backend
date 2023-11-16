@@ -38,11 +38,12 @@ namespace DigitalFUHubApi.Hubs
 
 			// check user has been open in orther divice
 			var isUserConnectd = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
-			if (isUserConnectd) return;
 
 			// add new connection
 			var currentConnectionId = hubService.GetConnectionIdFromHubCaller(Context);
 			connectionManager.AddConnection(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB, currentConnectionId);
+
+			if (isUserConnectd) return;
 
 			// get all user has conversation with current user
 			List<UserConversationDTO> recipients = conversationRepository.GetRecipientUserIdHasConversation(userId);
