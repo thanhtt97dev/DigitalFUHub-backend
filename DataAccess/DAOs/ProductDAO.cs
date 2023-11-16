@@ -488,15 +488,20 @@ namespace DataAccess.DAOs
 			}
 		}
 
-        internal int GetNumberProductByConditions(long userId)
+        internal int GetNumberProductByConditions(long userId, string productName)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-				return context.Product
-					.Where(x => x.ShopId == userId &&
-					x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-					||
-					x.ProductStatusId == Constants.PRODUCT_STATUS_BAN).Count();
+				return (from product in context.Product
+						where product.ShopId == userId
+						&&
+                        product.ProductName.ToUpper().Contains(productName.ToUpper().Trim())
+						&&
+                        product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+						||
+                        product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
+						select new {})
+						.Count();
             }
         }
 
@@ -724,13 +729,15 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal List<Product> GetProductByUserId(long userId, int page)
+        internal List<Product> GetProductByUserId(long userId, int page, string productName)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
 				var products = (from product in context.Product
 								where product.ShopId == userId
 								&&
+                                product.ProductName.ToUpper().Contains(productName.ToUpper().Trim())
+                                &&
 								product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 								||
                                 product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
@@ -739,6 +746,9 @@ namespace DataAccess.DAOs
                                     ProductId = product.ProductId,
                                     ProductName = product.ProductName,
                                     Thumbnail = product.Thumbnail,
+                                    TotalRatingStar = product.TotalRatingStar,
+                                    NumberFeedback = product.NumberFeedback,
+                                    SoldCount = product.SoldCount,
                                     ProductStatusId = product.ProductStatusId,
                                     ProductVariants = (from productVariant in context.ProductVariant
 													   where productVariant.ProductId == product.ProductId
@@ -757,7 +767,6 @@ namespace DataAccess.DAOs
 					).Skip((page - 1) * Constants.PAGE_SIZE)
 					 .Take(Constants.PAGE_SIZE)
 					 .ToList();
-
 
 				return products;
             }

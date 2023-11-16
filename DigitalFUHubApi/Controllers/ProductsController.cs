@@ -660,14 +660,18 @@ namespace DigitalFUHubApi.Controllers
 
 
         #region Get Products (Shop Detail Customer)
-        [HttpGet("GetAll")]
-        public IActionResult GetProductByUserId(long userId, int page)
+        [HttpPost("GetAll")]
+        public IActionResult GetProductByUserId(ShopDetailCustomerSearchParamProductRequestDTO request)
         {
+			if (!ModelState.IsValid)
+			{
+                return BadRequest();
+            }
             try
             {
                 ResponseData responseData = new ResponseData();
                 Status status = new Status();
-                if (page <= 0)
+                if (request.Page <= 0)
                 {
                     status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
                     status.Message = "Invalid param";
@@ -676,21 +680,21 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(responseData);
                 }
 
-
-                var numberProducts = _productRepository.GetNumberProductByConditions(userId);
+                var numberProducts = _productRepository.GetNumberProductByConditions(request.UserId, request.ProductName);
                 var numberPages = numberProducts / Constants.PAGE_SIZE + 1;
-                if (page > numberPages)
+                if (request.Page > numberPages)
                 {
                     return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
                 }
 
-                List<Product> products = _productRepository.GetProductByUserId(userId, page);
+                List<Product> products = _productRepository.GetProductByUserId(request.UserId, request.Page, request.ProductName);
+				List<ShopDetailCustomerProductDetailResponseDTO> productResponses = _mapper.Map<List<ShopDetailCustomerProductDetailResponseDTO>>(products);
 
                 var result = new ShopDetailCustomerProductResponseDTO
                 {
                     TotalProduct = numberProducts,
                     TotalPage = numberPages,
-                    Products = _mapper.Map<List<ShopDetailCustomerProductDetailResponseDTO>>(products)
+                    Products = productResponses
                 };
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));

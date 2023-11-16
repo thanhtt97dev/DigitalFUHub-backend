@@ -31,8 +31,8 @@ namespace DataAccess.IRepositories
 		List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
 		Product? GetProduct(long id);
 		void UpdateProductStatusAdmin(long productId, int status, string note);
-		int GetNumberProductByConditions(long userId);
-        List<Product> GetProductByUserId(long userId, int page);
+		int GetNumberProductByConditions(long userId, string productName);
+        List<Product> GetProductByUserId(long userId, int page, string productName);
         List<Product> GetProductsOfSeller(long userId, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
     }
 }
