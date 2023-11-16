@@ -493,14 +493,14 @@ namespace DataAccess.DAOs
             using (DatabaseContext context = new DatabaseContext())
             {
 				return (from product in context.Product
-						where product.ShopId == userId
-						&&
-                        product.ProductName.ToUpper().Contains(productName.ToUpper().Trim())
-						&&
-                        product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-						||
-                        product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
-						select new {})
+                        where product.ShopId == userId
+                                &&
+                                (product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
+                                &&
+                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                ||
+                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN))
+                        select new {})
 						.Count();
             }
         }
@@ -736,34 +736,34 @@ namespace DataAccess.DAOs
 				var products = (from product in context.Product
 								where product.ShopId == userId
 								&&
-                                product.ProductName.ToUpper().Contains(productName.ToUpper().Trim())
-                                &&
-								product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                (product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
+								&&
+								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 								||
-                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
-                                select new Product
+								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN))
+								select new Product
 								{
-                                    ProductId = product.ProductId,
-                                    ProductName = product.ProductName,
-                                    Thumbnail = product.Thumbnail,
-                                    TotalRatingStar = product.TotalRatingStar,
-                                    NumberFeedback = product.NumberFeedback,
-                                    SoldCount = product.SoldCount,
-                                    ProductStatusId = product.ProductStatusId,
-                                    ProductVariants = (from productVariant in context.ProductVariant
+									ProductId = product.ProductId,
+									ProductName = product.ProductName,
+									Thumbnail = product.Thumbnail,
+									TotalRatingStar = product.TotalRatingStar,
+									NumberFeedback = product.NumberFeedback,
+									SoldCount = product.SoldCount,
+									ProductStatusId = product.ProductStatusId,
+									ProductVariants = (from productVariant in context.ProductVariant
 													   where productVariant.ProductId == product.ProductId
 													   select new ProductVariant
 													   {
-                                                           ProductVariantId = productVariant.ProductId,
-                                                           Discount = productVariant.Discount,
+														   ProductVariantId = productVariant.ProductId,
+														   Discount = productVariant.Discount,
 														   Price = productVariant.Price,
-                                                           AssetInformations = (from assetInformation in context.AssetInformation
+														   AssetInformations = (from assetInformation in context.AssetInformation
 																				where assetInformation.ProductVariantId == productVariant.ProductVariantId
 																				&&
 																				assetInformation.IsActive
 																				select new AssetInformation { }).ToList()
-                                                       }).ToList()
-                                }
+													   }).ToList()
+								}
 					).Skip((page - 1) * Constants.PAGE_SIZE)
 					 .Take(Constants.PAGE_SIZE)
 					 .ToList();
