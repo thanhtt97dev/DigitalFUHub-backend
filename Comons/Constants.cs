@@ -166,9 +166,10 @@
 		// Pagination
 		public const int PAGE_SIZE = 10;
 		public const int PAGE_SIZE_FEEDBACK = 5;
+        public const int PAGE_SIZE_PRODUCT = 30;
 
-		//withdraw, deposit transaction
-		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
+        //withdraw, deposit transaction
+        public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int NUMBER_DEPOSIT_REQUEST_CAN_MAKE_A_DAY = 100;

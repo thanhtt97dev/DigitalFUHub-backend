@@ -764,8 +764,8 @@ namespace DataAccess.DAOs
 																				select new AssetInformation { }).ToList()
 													   }).ToList()
 								}
-					).Skip((page - 1) * Constants.PAGE_SIZE)
-					 .Take(Constants.PAGE_SIZE)
+					).Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT)
+					 .Take(Constants.PAGE_SIZE_PRODUCT)
 					 .ToList();
 
 				return products;
