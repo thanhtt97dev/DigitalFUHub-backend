@@ -553,7 +553,7 @@ namespace DigitalFUHubApi.Controllers
 		#region Get list orders (admin)
 		[Authorize("Admin")]
 		[HttpPost("Admin/All")]
-		public IActionResult GetOrders(OrdersRequestDTO requestDTO)
+		public IActionResult GetOrders(OrdersRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
 
@@ -561,7 +561,7 @@ namespace DigitalFUHubApi.Controllers
 			Status status = new Status();
 
 			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
-			if (!acceptedOrderStatus.Contains(requestDTO.Status) && requestDTO.Status != Constants.ORDER_ALL)
+			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
 			{
 				status.Message = "Invalid order status!";
 				status.Ok = false;
@@ -578,37 +578,27 @@ namespace DigitalFUHubApi.Controllers
 				string format = "M/d/yyyy";
 				try
 				{
-					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
 					if (fromDate > toDate)
 					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
 					}
 				}
 				catch (FormatException)
 				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
 				}
 				long orderId;
-				long.TryParse(requestDTO.OrderId, out orderId);
+				long.TryParse(request.OrderId, out orderId);
 
-				var orders = _orderRepository.GetOrders(orderId, requestDTO.CustomerEmail, requestDTO.ShopName, fromDate, toDate, requestDTO.Status);
+				long shopId;
+				long.TryParse(request.ShopId, out shopId);
+
+				var orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, shopId, request.ShopName, fromDate, toDate, request.Status);
 				var result = _mapper.Map<List<OrdersResponseDTO>>(orders);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{

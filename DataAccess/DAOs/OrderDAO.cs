@@ -211,7 +211,7 @@ namespace DataAccess.DAOs
 		#endregion
 
 		#region Get orders with conditions
-		internal List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status)
+		internal List<Order> GetOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime fromDate, DateTime toDate, int status)
 		{
 			List<Order> orders = new List<Order>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -241,10 +241,12 @@ namespace DataAccess.DAOs
 							.Where(x =>
 								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
 								x.User.Email.Contains(customerEmail) &&
+								((shopId == 0) ? true : x.Shop.UserId == shopId) &&
 								x.Shop.ShopName.Contains(shopName) &&
 								(orderId == 0 ? true : x.OrderId == orderId) &&
 								(status == 0 ? true : x.OrderStatusId == status)
-							).OrderByDescending(x => x.OrderDate).ToList();
+							).OrderByDescending(x => x.OrderDate)
+							.ToList();
 
 			}
 			return orders;

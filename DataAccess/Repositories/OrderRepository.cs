@@ -19,7 +19,7 @@ namespace DataAccess.Repositories
 		public void UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(int days) => OrderDAO.Instance.UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(days);
 		public void UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(int days) => OrderDAO.Instance.UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(days);
 
-		public List<Order> GetOrders(long orderId, string customerEmail, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopName, fromDate, toDate, status);
+		public List<Order> GetOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopId, shopName, fromDate, toDate, status);
 
 		public (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin) => OrderDAO.Instance.AddOrder(userId, orders, isUseCoin);
 
