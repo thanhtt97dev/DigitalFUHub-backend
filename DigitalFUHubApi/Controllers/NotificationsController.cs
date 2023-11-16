@@ -136,7 +136,7 @@ namespace DigitalFUHubApi.Controllers
 					responseData.Add(notif);
 
                 }
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, JsonConvert.SerializeObject(_mapper.Map<List<NotificationRespone>>(responseData))));
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<List<NotificationRespone>>(responseData)));
             }
 			catch (Exception e)
 			{
