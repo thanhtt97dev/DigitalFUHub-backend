@@ -46,7 +46,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				int numberFeedBacks = _feedbackRepository.GetNumberFeedbackWithCondition(request.ProductId, request.Type, request.Page);
-				var numberPages = numberFeedBacks / Constants.PAGE_SIZE + 1;
+				var numberPages = numberFeedBacks / Constants.PAGE_SIZE_FEEDBACK + 1;
 
 				if (request.Page > numberPages)
 				{

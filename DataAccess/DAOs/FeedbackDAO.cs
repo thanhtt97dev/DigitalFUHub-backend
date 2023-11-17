@@ -325,6 +325,8 @@ namespace DataAccess.DAOs
 									 FeedbackMedias = context.FeedbackMedia.Where(x => x.FeedbackId == feedback.FeedbackId).ToList(),	
 								 }
 								)
+								.Skip((page - 1) * Constants.PAGE_SIZE_FEEDBACK)
+								.Take(Constants.PAGE_SIZE_FEEDBACK)
 								.OrderBy(x => x.DateUpdate)
 								.ToList();
 				return feedbacks;
