@@ -36,7 +36,7 @@ namespace DigitalFUHubApi.Hubs
 			//Update DB User
 			userRepository.UpdateUserOnlineStatus(userId, true);
 
-			// check user has been open in orther divice
+			// check user has been open in other divice
 			var isUserConnectd = connectionManager.CheckUserConnected(userId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 
 			// add new connection
@@ -51,22 +51,26 @@ namespace DigitalFUHubApi.Hubs
 			// send status online to all recipients online
 			foreach (var recipient in recipients)
 			{
-				var isRecipientConnectd = connectionManager.CheckUserConnected(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
-				if (!isRecipientConnectd) continue;
-
-				var connectionIds = connectionManager.GetConnections(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
-				if (connectionIds == null || connectionIds.Count == 0) continue;
 				if (recipient.IsGroup)
 				{
 					int numberMemeberInGroupOnline = 0;
+					var connectionIds = new List<string>();
 					// count number user remaning existed online
 					foreach (var memberUserId in recipient.MembersInGroup)
 					{
 						var isMemberOnline = connectionManager.CheckUserConnected(memberUserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
-						if (isMemberOnline) numberMemeberInGroupOnline++;
+						if (isMemberOnline) 
+						{ 
+							numberMemeberInGroupOnline++;
+							var connectionIdsOfMemberOnline = connectionManager.GetConnections(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+							if (connectionIdsOfMemberOnline == null) continue;
+							connectionIds.AddRange(connectionIdsOfMemberOnline);
+						}
 					}
-					if (numberMemeberInGroupOnline > 1)
+					if (numberMemeberInGroupOnline >= 1)
 					{
+						if (connectionIds == null || connectionIds.Count == 0) continue;
+
 						foreach (var connectionId in connectionIds)
 						{
 							await SendUserOnlineStatus(recipient.ConversationId, true, connectionId, userId);
@@ -75,7 +79,12 @@ namespace DigitalFUHubApi.Hubs
 				}
 				else
 				{
+					var isRecipientConnectd = connectionManager.CheckUserConnected(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
+					if (!isRecipientConnectd) continue;
+
+					var connectionIds = connectionManager.GetConnections(recipient.UserId, Constants.SIGNAL_R_USER_ONLINE_STATUS_HUB);
 					if (connectionIds == null || connectionIds.Count == 0) continue;
+
 					foreach (var connectionId in connectionIds)
 					{
 						await SendUserOnlineStatus(recipient.ConversationId, true, connectionId, userId);
