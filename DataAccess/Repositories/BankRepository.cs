@@ -39,7 +39,7 @@ namespace DataAccess.Repositories
 
 		public void RejectWithdrawTransaction(long withdrawTransactionId, string? note) => BankDAO.Instance.RejectWithdrawTransaction(withdrawTransactionId, note);
 
-		public int GetNumberWithdrawTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberWithdrawTransactionMakedInToday(userId);
+		public (int, long) GetDataWithdrawTransactionMakedToday(long userId) => BankDAO.Instance.GetDataWithdrawTransactionMakedToday(userId);
 
 		public int GetNumberDepositTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberDepositTransactionMakedInToday(userId);
 

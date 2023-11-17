@@ -438,17 +438,24 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal int GetNumberWithdrawTransactionMakedInToday(long userId)
+		internal (int, long) GetDataWithdrawTransactionMakedToday(long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var result = context.WithdrawTransaction
-											.Where(x => 
-											x.UserId == userId && 
+											.Where(x =>
+											x.UserId == userId &&
 											x.RequestDate > DateTime.Now.Date && x.RequestDate < DateTime.Now)
-											.Select(x => new {})
-											.Count();
-				return result;
+											.Select(x => 
+												new WithdrawTransaction
+												{
+													Amount = x.Amount
+												}
+											)
+											.ToList();
+				var totalRequestMaked = result.Count();
+				var totalAmountMaked = result.Sum(x => x.Amount);
+				return (totalRequestMaked, totalAmountMaked);
 			}
 			
 		}

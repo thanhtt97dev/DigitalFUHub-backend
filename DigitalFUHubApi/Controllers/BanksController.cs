@@ -439,15 +439,26 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "User not found!", false, new()));
 				}
 
+				if(customer.Status == false)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "User has been baned!", false, new()));
+				}
+
 				if (customer.AccountBalance < request.Amount)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_INSUFFICIENT_BALANCE, "Insufficient balance!", false, new()));
 				}
 
-				var numberWithdrawTransactionMakedInToday = bankRepository.GetNumberWithdrawTransactionMakedInToday(request.UserId);
-				if(numberWithdrawTransactionMakedInToday > Constants.NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY) 
+				(int numberWithdrawRequestMakedToday, long totalAnountWithdrawRequestMakedToday) = bankRepository.GetDataWithdrawTransactionMakedToday(request.UserId);
+
+				if (numberWithdrawRequestMakedToday > Constants.NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY) 
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_REQUESTS_CREATED, "Exceeded number of requests created!", false, new()));
+				}
+
+				if(totalAnountWithdrawRequestMakedToday > Constants.MAX_PRICE_CAN_WITHDRAW)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_AMOUNT_A_DAY, "Exceeded total amount can make a day", false, totalAnountWithdrawRequestMakedToday));
 				}
 
 				// create withdraw tranascation
