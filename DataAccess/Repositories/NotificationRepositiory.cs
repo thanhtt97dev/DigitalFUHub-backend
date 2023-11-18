@@ -11,7 +11,7 @@ namespace DataAccess.Repositories
 {
     public class NotificationRepositiory : INotificationRepositiory
 	{
-		public List<Notification> GetNotifications(long userId, int offset) => NotificationDAO.Instance.GetNotifications(userId, offset);
+		public List<Notification> GetNotifications(long userId, int index) => NotificationDAO.Instance.GetNotifications(userId, index);
 
         public Notification GetNotificationById(int notificationId) => NotificationDAO.Instance.GetNotificationById(notificationId);
 
@@ -21,5 +21,9 @@ namespace DataAccess.Repositories
 
         public void EditReadAllNotifications(int userId) => NotificationDAO.Instance.EditReadAllNotifications(userId);
 
-    }
+		public int GetTotalNumberNotification(long userId) => NotificationDAO.Instance.GetTotalNumberNotification(userId);
+
+		public int GetTotalNumberNotificationUnRead(long userId) => NotificationDAO.Instance.GetTotalNumberNotificationUnRead(userId);
+
+	}
 }

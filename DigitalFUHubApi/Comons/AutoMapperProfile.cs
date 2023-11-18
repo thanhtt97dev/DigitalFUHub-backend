@@ -59,7 +59,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<User, UserUpdateRequestDTO>().ReverseMap();
 			CreateMap<User, UserOnlineStatusResponseDTO>().ReverseMap();
 			CreateMap<Role, RoleDTO>().ReverseMap();
-			CreateMap<Notification, NotificationRespone>().ReverseMap();
+			CreateMap<Notification, NotificationResponeDTO>().ReverseMap();
 			CreateMap<DepositTransaction, CreateTransactionRequestDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, CreateTransactionRequestDTO>().ReverseMap();
 			CreateMap<Bank, BankResponeDTO>().ReverseMap();
@@ -315,6 +315,10 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductVariantName, act => act.MapFrom(src => src.OrderDetail.ProductVariant.Name))
 				.ForMember(des => des.FeedbackMedias, act => act.MapFrom(src => (src.FeedbackMedias == null) ? null : src.FeedbackMedias.Select(x => x.Url).ToList()))
 				.ReverseMap();
+
+			CreateMap<Notification, NotificationDetailResponeDTO>()
+				.ReverseMap();
+
 		}
 	}
 }

@@ -29,13 +29,17 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Notification> GetNotifications(long userId, int offset)
+		internal List<Notification> GetNotifications(long userId, int index)
 		{
 			List<Notification> notifications = new List<Notification>();	
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				notifications = context.Notification.Where(x => x.UserId == userId)
-					.OrderByDescending(x => x.DateCreated).Skip(offset).Take(5).ToList();
+				notifications = context.Notification
+									.Where(x => x.UserId == userId)
+									.OrderByDescending(x => x.DateCreated)
+									.Skip(index)
+									.Take(5)
+									.ToList();
 			}
 			return notifications;	
 		}
@@ -81,5 +85,21 @@ namespace DataAccess.DAOs
                 context.SaveChanges();
             }
         }
-    }
+
+		internal int GetTotalNumberNotification(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Notification.Where(x => x.UserId == userId).Count();
+			}
+		}
+
+		internal int GetTotalNumberNotificationUnRead(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Notification.Where(x => x.UserId == userId && x.IsReaded == false).Count();
+			}
+		}
+	}
 }

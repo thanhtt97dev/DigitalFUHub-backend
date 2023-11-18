@@ -65,7 +65,7 @@ namespace DigitalFUHubApi.Controllers
 					{
 						await _hubContext.Clients.Clients(connection)
 							.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION,
-							JsonConvert.SerializeObject(_mapper.Map<NotificationRespone>(notification)));
+							JsonConvert.SerializeObject(_mapper.Map<NotificationResponeDTO>(notification)));
 					}
 				}
 				
@@ -106,8 +106,8 @@ namespace DigitalFUHubApi.Controllers
             try
             {
                 _notificationRepositiory.EditReadAllNotifications(id);
-                return NoContent();
-            }
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new {}));
+			}
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -118,31 +118,46 @@ namespace DigitalFUHubApi.Controllers
         #region Fetch More Notifications
         [Authorize]
         [HttpPost("fetchMoreNotifications")]
-        public IActionResult FetchMoreNotifications([FromBody] GetAllOrderRequestDTO request)
+        public IActionResult FetchMoreNotifications([FromBody] NotificationRequestDTO request)
         {
+			if (!ModelState.IsValid) return BadRequest();
             try
 			{
-				var notifications = _notificationRepositiory.GetNotifications(request.UserId, request.Offset);
-                List<NotificationRespone> responseData = new List<NotificationRespone>();
-				foreach (var notification in notifications)
-				{
-                    NotificationRespone notif = new NotificationRespone();
-					notif.NotificationId = notification.NotificationId;
-					notif.Title = notification.Title;
-					notif.Content = notification.Content;
-					notif.Link = notification.Link;
-					notif.DateCreated = notification.DateCreated;
-					notif.IsReaded = notification.IsReaded;
-					responseData.Add(notif);
+				var totalNotification = _notificationRepositiory.GetTotalNumberNotification(request.UserId);
 
-                }
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, _mapper.Map<List<NotificationRespone>>(responseData)));
+				var notifications = _notificationRepositiory.GetNotifications(request.UserId, request.Index);
+				var result = new NotificationResponeDTO
+				{
+					TotalNotification = totalNotification,
+					Notifications = _mapper.Map<ICollection<NotificationDetailResponeDTO>>(notifications)
+				};
+                
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
             }
 			catch (Exception e)
 			{
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
-        #endregion
-    }
+		#endregion
+
+		#region Get total notification un read
+		[Authorize]
+		[HttpGet("getNumberNotificationUnRead")]
+		public IActionResult GetTotalNotificationUnRead(long userId)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+			try
+			{
+				var result = _notificationRepositiory.GetTotalNumberNotificationUnRead(userId);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+		}
+		#endregion
+	}
 }

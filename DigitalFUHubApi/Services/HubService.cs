@@ -85,7 +85,7 @@ namespace DigitalFUHubApi.Services
 				{
 					await notificationHub.Clients.Clients(connection)
 						.SendAsync(Constants.SIGNAL_R_NOTIFICATION_HUB_RECEIVE_NOTIFICATION,
-						JsonConvert.SerializeObject(mapper.Map<NotificationRespone>(notification)));
+						JsonConvert.SerializeObject(mapper.Map<NotificationDetailResponeDTO>(notification)));
 				}
 			}
 		}
