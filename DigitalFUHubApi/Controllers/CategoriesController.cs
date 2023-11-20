@@ -31,5 +31,6 @@ namespace DigitalFUHubApi.Controllers
 				Result = categories
 			};
 		}
+
 	}
 }

@@ -58,5 +58,9 @@ namespace DataAccess.Repositories
         public List<Product> GetProductByUserId(long userId, int page, string productName) => ProductDAO.Instance.GetProductByUserId(userId, page, productName);
 
         public int GetNumberProductByConditions(long userId, string productName) => ProductDAO.Instance.GetNumberProductByConditions(userId, productName);
+
+        public int GetNumberProductByConditions(long categoryId) => ProductDAO.Instance.GetNumberProductByConditions(categoryId);
+
+        public List<Product> GetProductForHomePageCustomer(int page, long categoryId, bool isOrderFeedback, bool isOrderSoldCount) => ProductDAO.Instance.GetProductForHomePageCustomer(page, categoryId, isOrderFeedback, isOrderSoldCount);
     }
 }

@@ -704,6 +704,54 @@ namespace DigitalFUHubApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+		#endregion
+
+
+		#region Get Products (Home Page Customer)
+		[HttpPost("GetProductHomePageCustomer")]
+        public IActionResult GetProductForHomePageCustomer(HomePageCustomerSearchParamProductRequestDTO request)
+        {
+			if (!ModelState.IsValid)
+			{
+                return BadRequest();
+            }
+            try
+            {
+                ResponseData responseData = new ResponseData();
+                Status status = new Status();
+                if (request.Page <= 0)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "Invalid param";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
+
+                var numberProducts = _productRepository.GetNumberProductByConditions(request.CategoryId);
+                var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT_HOME_PAGE + 1;
+                if (request.Page > numberPages)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+                }
+
+                List<Product> products = _productRepository.GetProductForHomePageCustomer(request.Page, request.CategoryId, request.IsOrderFeedback, request.IsOrderSoldCount);
+				
+				List<HomePageCustomerProductDetailResponseDTO> productResponses = _mapper.Map<List<HomePageCustomerProductDetailResponseDTO>>(products);
+
+                var result = new HomePageCustomerProductResponseDTO
+                {
+                    TotalProduct = numberProducts,
+                    Products = productResponses
+                };
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
         #endregion
     }
 }

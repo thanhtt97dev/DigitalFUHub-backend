@@ -32,7 +32,9 @@ namespace DataAccess.IRepositories
 		Product? GetProduct(long id);
 		void UpdateProductStatusAdmin(long productId, int status, string note);
 		int GetNumberProductByConditions(long userId, string productName);
+		int GetNumberProductByConditions(long categoryId);
         List<Product> GetProductByUserId(long userId, int page, string productName);
+		List<Product> GetProductForHomePageCustomer(int page, long categoryId, bool isOrderFeedback, bool isOrderSoldCount);
         List<Product> GetProductsOfSeller(long userId, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
     }
 }

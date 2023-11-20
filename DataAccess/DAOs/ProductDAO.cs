@@ -771,6 +771,70 @@ namespace DataAccess.DAOs
 				return products;
             }
         }
+
+
+        internal List<Product> GetProductForHomePageCustomer(int page, long categoryId, bool isOrderFeedback, bool isOrderSoldCount)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var query = (from product in context.Product
+							 where (categoryId == 0 ? true : product.CategoryId == categoryId)
+							 select new Product
+							 {
+								 ProductId = product.ProductId,
+								 ProductName = product.ProductName,
+								 Thumbnail = product.Thumbnail,
+								 TotalRatingStar = product.TotalRatingStar,
+								 NumberFeedback = product.NumberFeedback,
+								 SoldCount = product.SoldCount,
+								 ProductStatusId = product.ProductStatusId,
+								 ProductVariants = (from productVariant in context.ProductVariant
+													where productVariant.ProductId == product.ProductId
+													select new ProductVariant
+													{
+														ProductVariantId = productVariant.ProductId,
+														Discount = productVariant.Discount,
+														Price = productVariant.Price,
+														AssetInformations = (from assetInformation in context.AssetInformation
+																			 where assetInformation.ProductVariantId == productVariant.ProductVariantId
+																			 &&
+																			 assetInformation.IsActive
+																			 select new AssetInformation { }).ToList()
+													}).ToList()
+							 }
+					);
+
+				// Sort descending by total star / number feedback
+				if (isOrderFeedback) {
+					query = query.OrderByDescending(x => x.TotalRatingStar / x.NumberFeedback);
+				}
+
+                // Sort descending by sold count
+                if (isOrderSoldCount) {
+					query = query.OrderByDescending(x => x.SoldCount);
+
+				}
+
+                return query.Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
+                     .Take(Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
+                     .ToList();
+            }
+        }
+
+        internal int GetNumberProductByConditions(long categoryId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                return (from product in context.Product
+                        where (categoryId == 0 ? true : product.CategoryId == categoryId)
+                                &&
+                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                ||
+                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
+                        select new { })
+                        .Count();
+            }
+        }
     }
 }
 
