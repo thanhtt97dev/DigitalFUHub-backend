@@ -116,7 +116,7 @@ namespace DataAccess.DAOs
 
 					if (shop == null || coup != null || coupon.StartDate >= coupon.EndDate)
 					{
-						throw new Exception("INVALID");
+						throw new Exception("Invalid coupon");
 					}
 					if (coupon.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
 					{
@@ -126,7 +126,7 @@ namespace DataAccess.DAOs
 #pragma warning restore CS8604 // Possible null reference argument.
 						if (isExist)
 						{
-							throw new Exception("INVALID");
+							throw new Exception("Invalid coupon");
 						}
 					}
 					context.Coupon.Add(coupon);

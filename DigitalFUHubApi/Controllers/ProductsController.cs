@@ -284,13 +284,20 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
-				if (!ModelState.IsValid)
+				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				//{
+				//	return Unauthorized();
+				//}
+				if (!ModelState.IsValid
+					|| string.IsNullOrWhiteSpace(request.ProductName)
+					|| string.IsNullOrWhiteSpace(request.Description)
+					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
+				}
+				if (request.Tags == null || request.Tags.Count == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
 				}
 				if (!(request.ProductVariantNames.Count() == request.ProductVariantPrices.Count()
 					&& request.ProductVariantPrices.Count() == request.ProductVariantDiscounts.Count()
@@ -299,9 +306,17 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant", false, new()));
 				}
-				if (request.ProductVariantDiscounts.Any(x => x > 50))
+				if (request.ProductVariantNames.Any(x => string.IsNullOrWhiteSpace(x)))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant name", false, new()));
+				}
+				if (request.ProductVariantDiscounts.Any(x => x < Constants.MIN_PERCENT_PRODUCT_VARIANT_DISCOUNT || x > Constants.MAX_PERCENT_PRODUCT_VARIANT_DISCOUNT))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant discount", false, new()));
+				}
+				if (request.ProductVariantPrices.Any(x => x < Constants.MIN_PRICE_PRODUCT_VARIANT || x > Constants.MAX_PRICE_PRODUCT_VARIANT))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant price", false, new()));
 				}
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				// check file upload satisfy file extension
@@ -394,13 +409,20 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
-				if (request == null)
+				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				//{
+				//	return Unauthorized();
+				//}
+				if (request == null
+					|| string.IsNullOrWhiteSpace(request.ProductName)
+					|| string.IsNullOrWhiteSpace(request.ProductDescription)
+					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
+				}
+				if (request.Tags == null || request.Tags.Count == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
 				}
 				if (!(request.ProductVariantIdsUpdate.Count() == request.ProductVariantNamesUpdate.Count()
 					&& request.ProductVariantNamesUpdate.Count() == request.ProductVariantDiscountsUpdate.Count()
@@ -414,10 +436,21 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant", false, new()));
 				}
-				if (request.ProductVariantDiscountsUpdate.Any(x => x > 50) || request.ProductVariantDiscountsAddNew.Any(x => x > 50))
+				if (request.ProductVariantNamesAddNew.Any(x => string.IsNullOrWhiteSpace(x)) ||
+					request.ProductVariantNamesUpdate.Any(x => string.IsNullOrWhiteSpace(x)))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant name", false, new()));
+				}
+				if (request.ProductVariantDiscountsUpdate.Any(x => x < Constants.MIN_PERCENT_PRODUCT_VARIANT_DISCOUNT || x > Constants.MAX_PERCENT_PRODUCT_VARIANT_DISCOUNT)
+					|| request.ProductVariantDiscountsAddNew.Any(x => x < Constants.MIN_PERCENT_PRODUCT_VARIANT_DISCOUNT || x > Constants.MAX_PERCENT_PRODUCT_VARIANT_DISCOUNT))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant discount", false, new()));
 
+				}
+				if (request.ProductVariantPricesUpdate.Any(x => x < Constants.MIN_PRICE_PRODUCT_VARIANT || x > Constants.MAX_PRICE_PRODUCT_VARIANT)
+					|| request.ProductVariantPricesAddNew.Any(x => x < Constants.MIN_PRICE_PRODUCT_VARIANT || x > Constants.MAX_PRICE_PRODUCT_VARIANT))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid productvariant price", false, new()));
 				}
 				Product? prod = _productRepository.CheckProductExist(request.UserId, request.ProductId);
 				if (prod == null)
@@ -655,103 +688,103 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 
-        }
-        #endregion
+		}
+		#endregion
 
 
-        #region Get Products (Shop Detail Customer)
-        [HttpPost("GetAll")]
-        public IActionResult GetProductByUserId(ShopDetailCustomerSearchParamProductRequestDTO request)
-        {
+		#region Get Products (Shop Detail Customer)
+		[HttpPost("GetAll")]
+		public IActionResult GetProductByUserId(ShopDetailCustomerSearchParamProductRequestDTO request)
+		{
 			if (!ModelState.IsValid)
 			{
-                return BadRequest();
-            }
-            try
-            {
-                ResponseData responseData = new ResponseData();
-                Status status = new Status();
-                if (request.Page <= 0)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Message = "Invalid param";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				return BadRequest();
+			}
+			try
+			{
+				ResponseData responseData = new ResponseData();
+				Status status = new Status();
+				if (request.Page <= 0)
+				{
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					status.Message = "Invalid param";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
-                var numberProducts = _productRepository.GetNumberProductByConditions(request.UserId, request.ProductName);
-                var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT + 1;
-                if (request.Page > numberPages)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
-                }
+				var numberProducts = _productRepository.GetNumberProductByConditions(request.UserId, request.ProductName);
+				var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT + 1;
+				if (request.Page > numberPages)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
-                List<Product> products = _productRepository.GetProductByUserId(request.UserId, request.Page, request.ProductName);
+				List<Product> products = _productRepository.GetProductByUserId(request.UserId, request.Page, request.ProductName);
 				List<ShopDetailCustomerProductDetailResponseDTO> productResponses = _mapper.Map<List<ShopDetailCustomerProductDetailResponseDTO>>(products);
 
-                var result = new ShopDetailCustomerProductResponseDTO
-                {
-                    TotalProduct = numberProducts,
-                    TotalPage = numberPages,
-                    Products = productResponses
-                };
+				var result = new ShopDetailCustomerProductResponseDTO
+				{
+					TotalProduct = numberProducts,
+					TotalPage = numberPages,
+					Products = productResponses
+				};
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 		#endregion
 
 
 		#region Get Products (Home Page Customer)
 		[HttpPost("GetProductHomePageCustomer")]
-        public IActionResult GetProductForHomePageCustomer(HomePageCustomerSearchParamProductRequestDTO request)
-        {
+		public IActionResult GetProductForHomePageCustomer(HomePageCustomerSearchParamProductRequestDTO request)
+		{
 			if (!ModelState.IsValid)
 			{
-                return BadRequest();
-            }
-            try
-            {
-                ResponseData responseData = new ResponseData();
-                Status status = new Status();
-                if (request.Page <= 0)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Message = "Invalid param";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				return BadRequest();
+			}
+			try
+			{
+				ResponseData responseData = new ResponseData();
+				Status status = new Status();
+				if (request.Page <= 0)
+				{
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					status.Message = "Invalid param";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
-                var numberProducts = _productRepository.GetNumberProductByConditions(request.CategoryId);
-                var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT_HOME_PAGE + 1;
-                if (request.Page > numberPages)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
-                }
+				var numberProducts = _productRepository.GetNumberProductByConditions(request.CategoryId);
+				var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT_HOME_PAGE + 1;
+				if (request.Page > numberPages)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
-                List<Product> products = _productRepository.GetProductForHomePageCustomer(request.Page, request.CategoryId, request.IsOrderFeedback, request.IsOrderSoldCount);
-				
+				List<Product> products = _productRepository.GetProductForHomePageCustomer(request.Page, request.CategoryId, request.IsOrderFeedback, request.IsOrderSoldCount);
+
 				List<HomePageCustomerProductDetailResponseDTO> productResponses = _mapper.Map<List<HomePageCustomerProductDetailResponseDTO>>(products);
 
-                var result = new HomePageCustomerProductResponseDTO
-                {
-                    TotalProduct = numberProducts,
-                    Products = productResponses
-                };
+				var result = new HomePageCustomerProductResponseDTO
+				{
+					TotalProduct = numberProducts,
+					Products = productResponses
+				};
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        #endregion
-    }
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+	}
 }

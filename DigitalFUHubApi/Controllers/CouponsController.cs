@@ -203,19 +203,31 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
+				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				//{
+				//	return Unauthorized();
+				//}
+				Regex rxCouponCode = new Regex(Constants.REGEX_COUPON_CODE);
 				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
-					|| string.IsNullOrWhiteSpace(request.CouponName))
+					|| string.IsNullOrWhiteSpace(request.CouponName)
+					|| !rxCouponCode.IsMatch(request.CouponCode)
+					|| request.MinTotalOrderValue < Constants.MIN_PRICE_OF_MIN_ORDER_TOTAL_VALUE
+					|| request.MinTotalOrderValue > Constants.MAX_PRICE_OF_MIN_ORDER_TOTAL_VALUE
+					|| request.PriceDiscount < Constants.MIN_PRICE_DISCOUNT_COUPON
+					|| (request.MinTotalOrderValue != 0 && request.PriceDiscount > (request.MinTotalOrderValue * Constants.MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON))
+					|| (request.MinTotalOrderValue == 0 && request.PriceDiscount > Constants.MAX_PRICE_DISCOUNT_COUPON))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
 
 				DateTime startDT = DateTime.Parse(request.StartDate);
 				DateTime endDT = DateTime.Parse(request.EndDate);
+				if (endDT.Subtract(startDT) < new TimeSpan(1, 0, 0))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "The coupon program lasts at least 1 hour",
+						false, new()));
+				}
 				Coupon coupon = new Coupon
 				{
 					IsPublic = request.IsPublic,
@@ -265,13 +277,19 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
+				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				//{
+				//	return Unauthorized();
+				//}
+				Regex rxCouponCode = new Regex(Constants.REGEX_COUPON_CODE);
 				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
 					|| string.IsNullOrWhiteSpace(request.CouponName)
+					|| !rxCouponCode.IsMatch(request.CouponCode)
+					|| request.MinTotalOrderValue < Constants.MIN_PRICE_OF_MIN_ORDER_TOTAL_VALUE
+					|| request.MinTotalOrderValue > Constants.MAX_PRICE_OF_MIN_ORDER_TOTAL_VALUE
+					|| request.PriceDiscount < Constants.MIN_PRICE_DISCOUNT_COUPON
+					|| (request.MinTotalOrderValue != 0 && request.PriceDiscount > (request.MinTotalOrderValue * Constants.MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON))
 					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
@@ -279,6 +297,11 @@ namespace DigitalFUHubApi.Controllers
 
 				DateTime startDT = DateTime.Parse(request.StartDate);
 				DateTime endDT = DateTime.Parse(request.EndDate);
+				if (endDT.Subtract(startDT) < new TimeSpan(1, 0, 0))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "The coupon program lasts at least 1 hour",
+						false, new()));
+				}
 				Coupon coupon = new Coupon
 				{
 					CouponId = request.CouponId,

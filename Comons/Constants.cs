@@ -34,11 +34,11 @@
 		public const string RESPONSE_CODE_BANK_CUSTOMER_REQUEST_DEPOSIT_EXCEEDED_REQUESTS_CREATED = "DEPOSIT_REQUEST_01";
 
 		public const string RESPONSE_CODE_PRODUCT_ACTIVE = "PRODUCT_01";
-        public const string RESPONSE_CODE_PRODUCT_BAN = "PRODUCT_02";
-        public const string RESPONSE_CODE_PRODUCT_REMOVE = "PRODUCT_03";
-        public const string RESPONSE_CODE_PRODUCT_HIDE = "PRODUCT_04";
+		public const string RESPONSE_CODE_PRODUCT_BAN = "PRODUCT_02";
+		public const string RESPONSE_CODE_PRODUCT_REMOVE = "PRODUCT_03";
+		public const string RESPONSE_CODE_PRODUCT_HIDE = "PRODUCT_04";
 
-        public const string RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY = "ORDER_01";
+		public const string RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY = "ORDER_01";
 		public const string RESPONSE_CODE_ORDER_COUPON_NOT_EXISTED = "ORDER_02";
 		public const string RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE = "ORDER_03";
 		public const string RESPONSE_CODE_ORDER_NOT_ELIGIBLE = "ORDER_04";
@@ -61,7 +61,7 @@
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
 
-		
+
 
 
 		//SignalR
@@ -132,14 +132,14 @@
 		public const bool USER_CONVERSATION_TYPE_IS_READ = true;
 
 		//Coupon Type
-		public const int COUPON_TYPE_ALL_PRODUCTS = 1; 
+		public const int COUPON_TYPE_ALL_PRODUCTS = 1;
 		public const int COUPON_TYPE_ALL_PRODUCTS_OF_SHOP = 2;
-		public const int COUPON_TYPE_SPECIFIC_PRODUCTS = 3; 
+		public const int COUPON_TYPE_SPECIFIC_PRODUCTS = 3;
 
 		// Coupon Status
-		public const int COUPON_STATUS_ALL = 0; 
-		public const int COUPON_STATUS_COMING_SOON = 1; 
-		public const int COUPON_STATUS_ONGOING = 2; 
+		public const int COUPON_STATUS_ALL = 0;
+		public const int COUPON_STATUS_COMING_SOON = 1;
+		public const int COUPON_STATUS_ONGOING = 2;
 		public const int COUPON_STATUS_FINISHED = 3;
 
 		//report product status
@@ -158,7 +158,7 @@
 		public const int FEEDBACK_TYPE_5_STAR = 5;
 		public const int FEEDBACK_TYPE_HAVE_COMMENT = 6;
 		public const int FEEDBACK_TYPE_HAVE_MEDIA = 7;
-		public static int[] FEEDBACK_TYPES = new int[] { FEEDBACK_TYPE_ALL, FEEDBACK_TYPE_1_STAR , FEEDBACK_TYPE_2_STAR , FEEDBACK_TYPE_3_STAR , FEEDBACK_TYPE_4_STAR, FEEDBACK_TYPE_5_STAR, FEEDBACK_TYPE_HAVE_COMMENT , FEEDBACK_TYPE_HAVE_MEDIA };
+		public static int[] FEEDBACK_TYPES = new int[] { FEEDBACK_TYPE_ALL, FEEDBACK_TYPE_1_STAR, FEEDBACK_TYPE_2_STAR, FEEDBACK_TYPE_3_STAR, FEEDBACK_TYPE_4_STAR, FEEDBACK_TYPE_5_STAR, FEEDBACK_TYPE_HAVE_COMMENT, FEEDBACK_TYPE_HAVE_MEDIA };
 
 		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
@@ -169,16 +169,32 @@
 		public const int PAGE_SIZE_FEEDBACK = 5;
 		public const int PAGE_SIZE_NOTIFICATION = 5;
 		public const int PAGE_SIZE_PRODUCT = 30;
-        public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
+		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
 
-        //withdraw, deposit transaction
-        public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
+		//withdraw, deposit transaction
+		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
 		public const int NUMBER_DEPOSIT_REQUEST_CAN_MAKE_A_DAY = 100;
 		public const int MAX_PRICE_CAN_DEPOSIT = 10000000;
 		public const int MIN_PRICE_CAN_DEPOSIT = 10000;
+
+		public const string REGEX_USERNAME_SIGN_UP = "^(?=[a-z])[a-z\\d]{6,12}$";
+		public const string REGEX_PASSWORD_SIGN_UP = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$";
+
+		public const long MIN_PERCENT_PRODUCT_VARIANT_DISCOUNT = 0;
+		public const int MAX_PERCENT_PRODUCT_VARIANT_DISCOUNT = 50;
+		public const long MIN_PRICE_PRODUCT_VARIANT = 1000;
+		public const long MAX_PRICE_PRODUCT_VARIANT = 100000000;
+
+		public const string REGEX_COUPON_CODE = "^[a-zA-Z0-9]{4,10}$";
+		public const long MIN_PRICE_OF_MIN_ORDER_TOTAL_VALUE = 0;
+		public const long MAX_PRICE_OF_MIN_ORDER_TOTAL_VALUE = 100000000;
+		public const long MIN_PRICE_DISCOUNT_COUPON = 1000;
+		public const float MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON = 0.7f;
+		public const float MAX_PRICE_DISCOUNT_COUPON = 100000000;
+
 	}
 }
 
