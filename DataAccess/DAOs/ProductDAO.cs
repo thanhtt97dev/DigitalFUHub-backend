@@ -132,6 +132,7 @@ namespace DataAccess.DAOs
 				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
 				List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
 
+				// product variant
 				List<ProductDetailVariantResponeDTO> variants = new List<ProductDetailVariantResponeDTO>();
 				foreach (var variant in productVariants)
 				{
@@ -148,12 +149,14 @@ namespace DataAccess.DAOs
 					productQuantity += productVariantResp?.Quantity ?? 0;
 				}
 
+				// medias
 				List<string> medias = new List<string>();
 				foreach (var media in productMedias)
 				{
 					medias.Add(media.Url);
 				}
 
+				// tags
 				List<TagResponseDTO> tags = new List<TagResponseDTO>();
 				foreach (var tag in productTags)
 				{
@@ -164,13 +167,14 @@ namespace DataAccess.DAOs
 					});
 				}
 
+				// number feedback and product
 				long shopId = product.Shop.UserId;
 				var productOfShop = context.Product.Where(x => x.ShopId == shopId).ToList();
 				long productNumber = productOfShop.Count();
 				long feedbachNumber = 0;
 				foreach (Product item in productOfShop)
 				{
-					feedbachNumber += context.Feedback.Where(x => x.ProductId == item.ProductId).Count();
+					feedbachNumber += item.NumberFeedback;
 				}
 
 				var sellerInfo = context.User.First(x => x.UserId == shopId);
@@ -779,7 +783,11 @@ namespace DataAccess.DAOs
             {
 				var query = (from product in context.Product
 							 where (categoryId == 0 ? true : product.CategoryId == categoryId)
-							 select new Product
+								&&
+                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                ||
+                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
+                             select new Product
 							 {
 								 ProductId = product.ProductId,
 								 ProductName = product.ProductName,
