@@ -190,15 +190,15 @@ namespace DataAccess.DAOs
 				var feedbacks = (from feedback in context.Feedback
 								 where
 									feedback.ProductId == productId
-								select new Feedback 
-								{
-									Rate = feedback.Rate,
-									Content = feedback.Content,
-									FeedbackMedias = context.FeedbackMedia.
-															Where(x => x.FeedbackId == feedback.FeedbackId)
-															.Select(x => new FeedbackMedia {})
-															.ToList(),
-								}
+								 select new Feedback
+								 {
+									 Rate = feedback.Rate,
+									 Content = feedback.Content,
+									 FeedbackMedias = context.FeedbackMedia.
+															 Where(x => x.FeedbackId == feedback.FeedbackId)
+															 .Select(x => new FeedbackMedia { })
+															 .ToList(),
+								 }
 								).ToList();
 
 				ProductDetailFeedBackGeneralInfo feedBackGeneralInfo = new ProductDetailFeedBackGeneralInfo
@@ -223,9 +223,9 @@ namespace DataAccess.DAOs
 					CategoryId = product.CategoryId,
 					SoldCount = product.SoldCount,
 					ProductStatusId = product.ProductStatusId,
-                    TotalRatingStar = product.TotalRatingStar,
-                    NumberFeedback = product.NumberFeedback,
-                    Quantity = productQuantity,
+					TotalRatingStar = product.TotalRatingStar,
+					NumberFeedback = product.NumberFeedback,
+					Quantity = productQuantity,
 					ProductVariants = variants,
 					ProductMedias = medias,
 					Tags = tags,
@@ -442,18 +442,18 @@ namespace DataAccess.DAOs
 			}
 		}
 
-        internal bool CheckProductExist(List<long> productIds)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal bool CheckProductExist(List<long> productIds)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				bool isExist = context.Product.Any(x => productIds.Contains(x.ProductId));
 
 				return isExist;
 
-            }
-        }
+			}
+		}
 
-        internal (List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page)
+		internal (List<Product>, long) GetListProductOfSeller(long userId, string productId, string productName, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -483,30 +483,30 @@ namespace DataAccess.DAOs
 						((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
 						((soldMin == 0) ? true : product.SoldCount >= soldMin) &&
 						((soldMax == 0) ? true : product.SoldCount <= soldMax)
-						select new {}
+						select new { }
 						).Count();
 			}
 		}
 
-        internal int GetNumberProductByConditions(long userId, string productName)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal int GetNumberProductByConditions(long userId, string productName)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				return (from product in context.Product
-                        where product.ShopId == userId
-                                &&
-                                (product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
-                                &&
-                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-                                ||
-                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN))
-                        select new {})
+						where product.ShopId == userId
+								&&
+								(product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
+								&&
+								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+								||
+								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN))
+						select new { })
 						.Count();
-            }
-        }
+			}
+		}
 
 
-        internal List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
+		internal List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -517,10 +517,10 @@ namespace DataAccess.DAOs
 								product.ProductName.Contains(productName.Trim()) &&
 								((shopId == 0) ? true : product.ShopId == shopId) &&
 								((productId == 0) ? true : product.ProductId == productId) &&
-								((productCategory == 0) ? true : product.CategoryId == productCategory)&&
+								((productCategory == 0) ? true : product.CategoryId == productCategory) &&
 								((productStatusId == 0) ? true : product.ProductStatusId == productStatusId) &&
 								((soldMin == 0) ? true : product.SoldCount >= soldMin) &&
-								((soldMax == 0) ? true : product.SoldCount <= soldMax) 
+								((soldMax == 0) ? true : product.SoldCount <= soldMax)
 								select new Product
 								{
 									ProductId = product.ProductId,
@@ -529,7 +529,7 @@ namespace DataAccess.DAOs
 									ViewCount = product.ViewCount,
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
-									ProductStatusId = product.ProductStatusId,	
+									ProductStatusId = product.ProductStatusId,
 									Shop = new Shop
 									{
 										UserId = shop.UserId,
@@ -582,11 +582,11 @@ namespace DataAccess.DAOs
 										   ShopName = shop.ShopName,
 										   Avatar = shop.Avatar,
 										   User = (from seller in context.User
-												  where seller.UserId == shop.UserId
-												  select new User
-												  {
-													  Email = seller.Email
-												  }).First()
+												   where seller.UserId == shop.UserId
+												   select new User
+												   {
+													   Email = seller.Email
+												   }).First()
 									   },
 									   ProductName = product.ProductName,
 									   Description = product.Description,
@@ -602,28 +602,28 @@ namespace DataAccess.DAOs
 									   Note = product.Note,
 									   ProductStatusId = product.ProductStatusId,
 									   ProductVariants = (from productVariant in context.ProductVariant
-														 where productVariant.ProductId == id && productVariant.isActivate
-														 select new ProductVariant
-														 {
-															 Name = productVariant.Name,
-															 Price = productVariant.Price,
-															 Discount = productVariant.Discount,
-														 }).OrderBy(x => x.Price).ToList(),
+														  where productVariant.ProductId == id && productVariant.isActivate
+														  select new ProductVariant
+														  {
+															  Name = productVariant.Name,
+															  Price = productVariant.Price,
+															  Discount = productVariant.Discount,
+														  }).OrderBy(x => x.Price).ToList(),
 									   Tags = (from tag in context.Tag
-											  where tag.ProductId == id
-											  select new Tag
-											  {
-												  TagName = tag.TagName
-											  }).ToList(),
+											   where tag.ProductId == id
+											   select new Tag
+											   {
+												   TagName = tag.TagName
+											   }).ToList(),
 									   ProductMedias = (from productMedia in context.ProductMedia
-													   where productMedia.ProductId == id
-													   select new ProductMedia
-													   {
-														   Url = productMedia.Url
-													   }).ToList(),
+														where productMedia.ProductId == id
+														select new ProductMedia
+														{
+															Url = productMedia.Url
+														}).ToList(),
 									   ReportProducts = (from reportProduct in context.ReportProduct
 														 join reasonReportProduct in context.ReasonReportProduct
-														     on reportProduct.ReasonReportProductId equals reasonReportProduct.ReasonReportProductId
+															 on reportProduct.ReasonReportProductId equals reasonReportProduct.ReasonReportProductId
 														 join user in context.User
 															 on reportProduct.UserId equals user.UserId
 														 where reportProduct.ProductId == id
@@ -645,7 +645,7 @@ namespace DataAccess.DAOs
 															 Description = reportProduct.Description,
 															 DateCreate = reportProduct.DateCreate,
 															 Note = reportProduct.Note,
-															 ReportProductStatusId= reportProduct.ReportProductStatusId,	
+															 ReportProductStatusId = reportProduct.ReportProductStatusId,
 														 }).ToList()
 
 								   })
@@ -674,7 +674,7 @@ namespace DataAccess.DAOs
 				var products = (from product in context.Product
 								join shop in context.Shop
 									 on product.ShopId equals shop.UserId
-								where 
+								where
 								product.ProductName.Contains(productName.Trim()) &&
 								product.ShopId == userId &&
 								((productId == 0) ? true : product.ProductId == productId) &&
@@ -704,8 +704,8 @@ namespace DataAccess.DAOs
 														   Name = productVariant.Name,
 														   Price = productVariant.Price,
 														   AssetInformations = (from assetInfomation in context.AssetInformation
-																			   where assetInfomation.ProductVariantId == productVariant.ProductVariantId && assetInfomation.IsActive
-																			   select new AssetInformation() { }
+																				where assetInfomation.ProductVariantId == productVariant.ProductVariantId && assetInfomation.IsActive
+																				select new AssetInformation() { }
 																			   ).ToList()
 													   })
 													   .OrderBy(x => x.Price)
@@ -719,24 +719,24 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Product? GetProductEntityById (long productId)
+		internal Product? GetProductEntityById(long productId)
 		{
-            using (DatabaseContext context = new DatabaseContext())
-            {
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				var product = context.Product.FirstOrDefault(x => x.ProductId == productId);
 
 				return product;
-            }
-        }
+			}
+		}
 
-        internal List<Product> GetProductByUserId(long userId, int page, string productName)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal List<Product> GetProductByUserId(long userId, int page, string productName)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				var products = (from product in context.Product
 								where product.ShopId == userId
 								&&
-                                (product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
+								(product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
 								&&
 								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 								||
@@ -769,14 +769,14 @@ namespace DataAccess.DAOs
 					 .ToList();
 
 				return products;
-            }
-        }
+			}
+		}
 
 
-        internal List<Product> GetProductForHomePageCustomer(int page, long categoryId, bool isOrderFeedback, bool isOrderSoldCount)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal List<Product> GetProductForHomePageCustomer(int page, long categoryId, bool isOrderFeedback, bool isOrderSoldCount)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				var query = (from product in context.Product
 							 where (categoryId == 0 ? true : product.CategoryId == categoryId)
 							 select new Product
@@ -805,37 +805,94 @@ namespace DataAccess.DAOs
 					);
 
 				// Sort descending by total star / number feedback
-				if (isOrderFeedback) {
+				if (isOrderFeedback)
+				{
 					query = query.OrderByDescending(x => x.TotalRatingStar / x.NumberFeedback);
 				}
 
-                // Sort descending by sold count
-                if (isOrderSoldCount) {
+				// Sort descending by sold count
+				if (isOrderSoldCount)
+				{
 					query = query.OrderByDescending(x => x.SoldCount);
 
 				}
 
-                return query.Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
-                     .Take(Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
-                     .ToList();
-            }
-        }
+				return query.Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
+					 .Take(Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
+					 .ToList();
+			}
+		}
 
-        internal int GetNumberProductByConditions(long categoryId)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                return (from product in context.Product
-                        where (categoryId == 0 ? true : product.CategoryId == categoryId)
-                                &&
-                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-                                ||
-                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
-                        select new { })
-                        .Count();
-            }
-        }
-    }
+		internal int GetNumberProductByConditions(long categoryId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return (from product in context.Product
+						where (categoryId == 0 ? true : product.CategoryId == categoryId)
+								&&
+								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+								||
+								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
+						select new { })
+						.Count();
+			}
+		}
+
+		internal List<Product> GetListProductForSearchHint(string keyword)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				string keywordSearch = keyword.Trim().ToLower();
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+				return context.Product.Include(x => x.Tags)
+					.Where(x => x.ProductName.ToLower().Contains(keywordSearch)
+					|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
+					.OrderByDescending(x => x.SoldCount)
+					.Take(Constants.LIMIT_SEARCH_HINT)
+					.ToList();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8604 // Possible null reference argument.
+			}
+		}
+
+		internal (long totalItems, List<Product> productSearched) GetListProductSearched(string keyword, long categoryId,
+			int rating, long? minPrice, long? maxPrice, long sort, int page)
+		{
+#pragma warning disable CS8604 // Possible null reference argument.
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				string keywordSearch = keyword.Trim().ToLower();
+				var query = context.Product.Include(x => x.Tags).Include(x => x.ProductVariants)
+					.Where(x => x.ProductName.ToLower().Contains(keywordSearch) && x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+						&& (categoryId == Constants.ALL_CATEGORY ? true : x.CategoryId == categoryId)
+						&& (rating == Constants.FEEDBACK_TYPE_ALL ? true : (x.NumberFeedback != 0 && x.TotalRatingStar / x.NumberFeedback >= rating))
+						&& (minPrice == null ? true : x.ProductVariants.Any(pv => (pv.Price - (pv.Price * pv.Discount / 100)) >= minPrice))
+						&& (maxPrice == null ? true : x.ProductVariants.Any(pv => (pv.Price - (pv.Price * pv.Discount / 100)) <= maxPrice))
+					);
+				if (sort == Constants.SORTED_BY_DATETIME)
+				{
+					query = query.OrderByDescending(x => x.DateCreate);
+				}
+				else if (sort == Constants.SORTED_BY_PRICE_ASC)
+				{
+					query = query.OrderBy(x => x.ProductVariants.Min(pv => pv.Price - (pv.Price * pv.Discount / 100)));
+				}
+				else if (sort == Constants.SORTED_BY_PRICE_DESC)
+				{
+					query = query.OrderByDescending(x => x.ProductVariants.Min(pv => pv.Price - (pv.Price * pv.Discount / 100)));
+
+				}
+				else
+				{
+					query = query.OrderByDescending(x => x.SoldCount);
+				}
+
+				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE_SEARCH_PRODUCT).Take(Constants.PAGE_SIZE_SEARCH_PRODUCT).ToList());
+			}
+#pragma warning restore CS8604 // Possible null reference argument.
+		}
+	}
 }
 
 

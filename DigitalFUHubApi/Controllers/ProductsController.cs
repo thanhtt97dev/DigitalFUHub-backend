@@ -277,7 +277,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Add new product
+		#region Add product
 		[Authorize("Seller")]
 		[HttpPost("Add")]
 		public async Task<IActionResult> AddProduct([FromForm] AddProductRequestDTO request)
@@ -784,6 +784,33 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
+		}
+		#endregion
+
+		#region Search Product
+		[HttpPost("Search")]
+		public IActionResult SearchProduct(SearchProductRequestDTO request)
+		{
+			if(string.IsNullOrWhiteSpace(request.Keyword))
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid keyword search", false, new()));
+			}
+
+			if (request.MinPrice >= request.MaxPrice)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid range price", false, new()));
+			}
+			if (request.Page <= 0)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
+			}
+			(long totalItems, List<Product> products) = _productRepository.GetListProductSearched(request.Keyword, 
+				request.Category, request.Rating ,request.MinPrice, request.MaxPrice, request.Sort, request.Page);
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SearchProductResponseDTO
+			{
+				TotalItems = totalItems,
+				Products = _mapper.Map<List<HomePageCustomerProductDetailResponseDTO>>(products)
+			}));
 		}
 		#endregion
 	}
