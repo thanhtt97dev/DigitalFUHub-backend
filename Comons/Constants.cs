@@ -169,7 +169,8 @@
 		public const int PAGE_SIZE_FEEDBACK = 5;
 		public const int PAGE_SIZE_NOTIFICATION = 5;
 		public const int PAGE_SIZE_PRODUCT = 30;
-		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
+        public const int PAGE_SIZE_PRODUCT_WISH_LIST = 30;
+        public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
 
 		//withdraw, deposit transaction
 		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
