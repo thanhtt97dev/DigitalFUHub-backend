@@ -605,64 +605,51 @@ namespace DigitalFUHubApi.Controllers
 		#region Get history withdraw transaction of a user
 		[Authorize]
 		[HttpPost("HistoryWithdraw/{id}")]
-		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO requestDTO)
+		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO request)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0 || requestDTO == null ||
-					requestDTO.FromDate == null ||
-					requestDTO.ToDate == null) return BadRequest();
+				if (id == 0 || request == null || request.FromDate == null ||
+					request.ToDate == null) return BadRequest();
 
-				DateTime fromDate;
-				DateTime toDate;
-				try
+				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(request.Status) &&
+					request.Status != Constants.WITHDRAW_TRANSACTION_ALL)
 				{
-					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
+				}
+
+				DateTime? fromDate = null;
+				DateTime? toDate = null;
+
+				if(!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.FromDate))
+				{
+					try
 					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
+						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+						if (fromDate > toDate)
+						{
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
+						}
+					}
+					catch (FormatException)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
 					}
 				}
-				catch (FormatException)
-				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
-				}
+				
 
 				long withdrawTransactionId;
-				long.TryParse(requestDTO.WithdrawTransactionId, out withdrawTransactionId);
+				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
 
-				if(!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(requestDTO.Status) && 
-					requestDTO.Status != Constants.WITHDRAW_TRANSACTION_ALL)
-				{
-					status.Message = "Invalid transaction's status";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
-				}
-
-				var withdraws = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, requestDTO.Status);
+				var withdraws = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, request.Status);
 
 				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(withdraws);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, result));
 			}
 			catch (Exception ex)
 			{
