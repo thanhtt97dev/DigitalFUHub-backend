@@ -229,17 +229,17 @@ namespace DigitalFUHubApi.Controllers
         }
 
         [HttpPost("GetAll")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetWishListByUserId(WishListCustomerParamRequestDTO request)
         {
             ResponseData responseData = new ResponseData();
             Status status = new Status();
             try
             {
-                //if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
-                //{
-                //    return Unauthorized();
-                //}
+                if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
 
                 var user = userRepository.GetUserById(request.UserId);
                 if (user == null)
