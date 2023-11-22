@@ -252,7 +252,7 @@ namespace DataAccess.DAOs
 			return deposits;
 		}
 
-		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime fromDate, DateTime toDate, int status)
+		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status)
 		{
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -266,8 +266,8 @@ namespace DataAccess.DAOs
 								 on userBank.BankId equals bank.BankId
 							 where
 							 (1 == 1) &&
-							 withdraw.UserId == userId &&	
-							 fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate &&
+							 withdraw.UserId == userId &&
+							 (fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true &&
 							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
 							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status)
 							 select new WithdrawTransaction

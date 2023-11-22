@@ -169,11 +169,13 @@
 		public const int PAGE_SIZE_FEEDBACK = 5;
 		public const int PAGE_SIZE_NOTIFICATION = 5;
 		public const int PAGE_SIZE_PRODUCT = 30;
-        public const int PAGE_SIZE_PRODUCT_WISH_LIST = 30;
-        public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
+		public const int PAGE_SIZE_PRODUCT_WISH_LIST = 30;
+		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
+		public const int PAGE_SIZE_SEARCH_PRODUCT = 20;
+		public const int LIMIT_SEARCH_HINT = 10;
 
-		//withdraw, deposit transaction
-		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
+        //withdraw, deposit transaction
+        public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
@@ -196,6 +198,11 @@
 		public const float MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON = 0.7f;
 		public const float MAX_PRICE_DISCOUNT_COUPON = 100000000;
 
+		public const int ALL_CATEGORY = 0;
+		public const int SORTED_BY_DATETIME = 1;
+		public const int SORTED_BY_SALE = 2;
+		public const int SORTED_BY_PRICE_ASC = 3;
+		public const int SORTED_BY_PRICE_DESC = 4;
 	}
 }
 
