@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace DTOs.Bank
 {
-	public class HistoryWithdrawResponsetDTO
+	public class HistoryWithdrawResponseDTO
+	{
+		public int Total { get; set; }
+		public List<HistoryWithdrawDetail> WithdrawTransactions { get; set; } = new List<HistoryWithdrawDetail>();
+	}
+	public class HistoryWithdrawDetail
 	{
 		public long WithdrawTransactionId { get; set; }
 		public long UserId { get; set; }

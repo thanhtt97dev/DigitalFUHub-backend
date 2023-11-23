@@ -640,14 +640,24 @@ namespace DigitalFUHubApi.Controllers
 						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
 					}
 				}
-				
+
 
 				long withdrawTransactionId;
 				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
 
-				var withdraws = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, request.Status);
+				var totalRecord = bankRepository.GetNumberWithdrawTransactionWithCondition(id, withdrawTransactionId, fromDate, toDate, request.Status);
+				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
+				if (request.Page > numberPages || request.Page == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
-				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(withdraws);
+				var withdraws = bankRepository.GetWithdrawTransaction(id, withdrawTransactionId, fromDate, toDate, request.Status, request.Page);
+				var result = new HistoryWithdrawResponseDTO
+				{
+					Total = totalRecord,
+					WithdrawTransactions = mapper.Map<List<HistoryWithdrawDetail>>(withdraws)
+				};
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, result));
 			}
@@ -712,7 +722,7 @@ namespace DigitalFUHubApi.Controllers
 
 				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate,requestDTO.BankId,requestDTO.CreditAccount, requestDTO.Status);
 
-				var result = mapper.Map<List<HistoryWithdrawResponsetDTO>>(deposits);
+				var result = mapper.Map<List<HistoryWithdrawDetail>>(deposits);
 
 				status.Message = "Success!";
 				status.Ok = true;
@@ -720,6 +730,23 @@ namespace DigitalFUHubApi.Controllers
 				responseData.Status = status;
 				responseData.Result = result;
 				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Cancel withdraw transaction of user
+		[Authorize]
+		[HttpPut("CancelWithdraw/{id}")]
+		public IActionResult CancelWithdrawTransaction(int id)
+		{
+			try 
+			{ 
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, new {}));
 			}
 			catch (Exception ex)
 			{

@@ -15,5 +15,6 @@ namespace DTOs.Bank
 		public long BankId { get; set; }
 		public string? CreditAccount { get; set; }
 		public int Status { get; set; }
+		public int Page { get;set; }
 	}
 }

@@ -252,7 +252,7 @@ namespace DataAccess.DAOs
 			return deposits;
 		}
 
-		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status)
+		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
 		{
 			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -290,9 +290,36 @@ namespace DataAccess.DAOs
 								 },
 								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
 							 }
-							).OrderByDescending(x => x.RequestDate).ToList();
+							)
+							.OrderByDescending(x => x.RequestDate)
+							.Skip((page - 1) * Constants.PAGE_SIZE)
+							.Take(Constants.PAGE_SIZE)
+							.ToList();
 			}
 			return withdraws;
+		}
+
+		internal int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var withdraws = (from withdraw in context.WithdrawTransaction
+								 join user in context.User
+									 on withdraw.UserId equals user.UserId
+								 join userBank in context.UserBank
+									 on withdraw.UserBankId equals userBank.UserBankId
+								 join bank in context.Bank
+									 on userBank.BankId equals bank.BankId
+								 where
+								 (1 == 1) &&
+								 withdraw.UserId == userId &&
+								 (fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true &&
+								 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+								 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status)
+								 select new { }
+								).Count();
+				return withdraws;
+			}
 		}
 
 		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, long bankId, string creditAccount, int status)
@@ -473,5 +500,7 @@ namespace DataAccess.DAOs
 				return result;
 			}
 		}
+
+		
 	}
 }
