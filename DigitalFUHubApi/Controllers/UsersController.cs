@@ -111,10 +111,12 @@
 						Email = payload.Email,
 						TwoFactorAuthentication = false,
 						RoleId = Constants.CUSTOMER_ROLE,
+						Username = _userRepository.GenerateRandomUsername(payload.Email),
 						SignInGoogle = true,
 						Status = true,
 						IsConfirm = true,
-						Fullname = payload.Name
+						Fullname = payload.Name,
+						IsChangeUsername = false
 					};
 					_userRepository.AddUser(newUser);
 					user = _userRepository.GetUserByEmail(payload.Email);
@@ -165,6 +167,7 @@
 					AccountBalance = 0,
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
+					IsChangeUsername = false
 				};
 				_userRepository.AddUser(userSignUp);
 
