@@ -13,5 +13,6 @@ namespace DTOs.Bank
 		public string FromDate { get; set; } = null!;
 		public string ToDate { get; set; } = null!;
 		public int TransactionInternalTypeId { get; set; }
+		public int Page { get; set; }
 	}
 }

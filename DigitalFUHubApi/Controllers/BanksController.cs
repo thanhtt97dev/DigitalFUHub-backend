@@ -483,17 +483,13 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("HistoryDeposit/{id}")]
 		public IActionResult GetHistoryDepositTransaction(int id, HistoryDepositRequestDTO request)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0 || request == null ||
-					request.FromDate == null ||
-					request.ToDate == null) return BadRequest();
+				if (id == 0 || request == null || request.FromDate == null ||request.ToDate == null) return BadRequest();
 
 				DateTime? fromDate = null;
 				DateTime? toDate = null;
+				string format = "M/d/yyyy";
 				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.ToDate))
 				{
 					try

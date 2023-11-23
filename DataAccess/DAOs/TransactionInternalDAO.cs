@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
+using Comons;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -34,21 +35,44 @@ namespace DataAccess.DAOs
 			throw new NotImplementedException();
 		}
 
-		internal List<TransactionInternal> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId)
+		internal List<TransactionInternal> GetHistoryTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionTypeId, int page)
 		{
-			List<TransactionInternal> transactions = new List<TransactionInternal>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				transactions = context.TransactionInternal
+				var transactions = context.TransactionInternal
 								.Include(x => x.User)
-								.Where(x =>
-									fromDate <= x.DateCreate && toDate >= x.DateCreate &&
+								.Where
+								(x =>
+									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
 									x.User.Email.Contains(email) &&
 									(orderId == 0 ? true : x.OrderId == orderId) &&
 									(transactionTypeId == 0 ? true : x.TransactionInternalTypeId == transactionTypeId)
-									).OrderByDescending(x => x.DateCreate).ToList();
+								)
+								.OrderByDescending(x => x.DateCreate)
+								.Skip((page - 1) * Constants.PAGE_SIZE)
+								.Take(Constants.PAGE_SIZE)
+								.ToList();
+				return transactions;
+
 			}
-			return transactions;
+		}
+
+		internal int GetNumberTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionTypeId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transactions = context.TransactionInternal
+								.Include(x => x.User)
+								.Where
+								(x =>
+									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
+									x.User.Email.Contains(email) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionTypeId == 0 ? true : x.TransactionInternalTypeId == transactionTypeId)
+								)
+								.Count();
+				return transactions;
+			}
 		}
 	}
 }

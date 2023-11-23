@@ -10,6 +10,7 @@ namespace DataAccess.IRepositories
 	public interface ITransactionInternalRepository
 	{
 		void AddTransactionsForOrderConfirmed(Order order);
-		List<TransactionInternal> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionTypeId);
+		List<TransactionInternal> GetHistoryTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionTypeId, int page);
+		int GetNumberTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId);
 	}
 }
