@@ -167,7 +167,7 @@
 					AccountBalance = 0,
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
-					IsChangeUsername = false
+					IsChangeUsername = true
 				};
 				_userRepository.AddUser(userSignUp);
 
