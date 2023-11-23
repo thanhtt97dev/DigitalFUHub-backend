@@ -152,3 +152,4 @@ E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\refint\Business
 E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
 E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
 E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll
+E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.sourcelink.json

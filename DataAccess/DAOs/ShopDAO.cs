@@ -1,6 +1,7 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
 using Comons;
+using DTOs.MbBank;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.DAOs
@@ -110,7 +111,7 @@ namespace DataAccess.DAOs
 					Shop? shop = context.Shop.FirstOrDefault(x => x.UserId == shopEdit.UserId);
 					if (shop == null) throw new Exception("Not Found");
 					shop.Description = shopEdit.Description;
-					if(!string.IsNullOrEmpty(shopEdit.Avatar))
+					if (!string.IsNullOrEmpty(shopEdit.Avatar))
 					{
 						shop.Avatar = shopEdit.Avatar;
 					}
@@ -146,43 +147,43 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var shops = (from shop in context.Shop
-							  join user in context.User
-								 on shop.UserId equals user.UserId
-							  where
-							  ((shopId == 0) ? true : shop.UserId == shopId) &&
-							  user.Email.Contains(shopEmail.Trim()) &&
-							  shop.ShopName.Contains(shopName.Trim()) &&
-							  ((shopStatusId == 0) ? true : shop.IsActive == (shopStatusId == 1))
-							  select new Shop
-							  {
-								  UserId = shop.UserId,
-								  ShopName = shop.ShopName,
-								  Avatar = shop.Avatar,
-								  DateCreate = shop.DateCreate,
-								  IsActive = shop.IsActive,
-								  User = new User
-								  {
-									  Email = user.Email,
-									  TransactionInternals = (from transactionInternal in context.TransactionInternal
+							 join user in context.User
+								on shop.UserId equals user.UserId
+							 where
+							 ((shopId == 0) ? true : shop.UserId == shopId) &&
+							 user.Email.Contains(shopEmail.Trim()) &&
+							 shop.ShopName.Contains(shopName.Trim()) &&
+							 ((shopStatusId == 0) ? true : shop.IsActive == (shopStatusId == 1))
+							 select new Shop
+							 {
+								 UserId = shop.UserId,
+								 ShopName = shop.ShopName,
+								 Avatar = shop.Avatar,
+								 DateCreate = shop.DateCreate,
+								 IsActive = shop.IsActive,
+								 User = new User
+								 {
+									 Email = user.Email,
+									 TransactionInternals = (from transactionInternal in context.TransactionInternal
 															 where transactionInternal.UserId == shop.UserId && transactionInternal.TransactionInternalTypeId == Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT
 															 select new TransactionInternal
 															 {
 																 PaymentAmount = transactionInternal.PaymentAmount
 															 }
-															 ).ToList(),
-								  },
-								  Orders = (from order in context.Order
+															).ToList(),
+								 },
+								 Orders = (from order in context.Order
 										   where order.ShopId == shop.UserId
-										   select new Order 
+										   select new Order
 										   {
-											   OrderStatusId = order.OrderStatusId,	
+											   OrderStatusId = order.OrderStatusId,
 										   }
-										   ).ToList(),
-								  Products = (from product in context.Product
-											where product.ShopId == shop.UserId
-											select new Product {}
-										   ).ToList()
-							  }
+										  ).ToList(),
+								 Products = (from product in context.Product
+											 where product.ShopId == shop.UserId
+											 select new Product { }
+										  ).ToList()
+							 }
 							 )
 							 .Skip((page - 1) * Constants.PAGE_SIZE)
 							 .Take(Constants.PAGE_SIZE)
@@ -191,46 +192,112 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Shop? GetShopDetail (long userId)
+		internal Shop? GetShopDetail(long userId)
 		{
-            using (DatabaseContext context = new DatabaseContext())
-            {
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				var result = (from shop in context.Shop
 							  join user in context.User
 							  on shop.UserId equals user.UserId
-                              where shop.UserId == userId
+							  where shop.UserId == userId
 							  &&
 							  shop.IsActive == true
 							  select new Shop
 							  {
-                                  UserId = shop.UserId,
-                                  Avatar = shop.Avatar,
-                                  ShopName = shop.ShopName,
+								  UserId = shop.UserId,
+								  Avatar = shop.Avatar,
+								  ShopName = shop.ShopName,
 								  DateCreate = shop.DateCreate,
-                                  Description = shop.Description,
+								  Description = shop.Description,
 								  User = new User
-                                  {
-                                      IsOnline = user.IsOnline,
-                                      LastTimeOnline = user.LastTimeOnline,
-                                  },
+								  {
+									  IsOnline = user.IsOnline,
+									  LastTimeOnline = user.LastTimeOnline,
+									  Username = user.Username
+								  },
 								  Products = (from product in context.Product
 											  where product.ShopId == shop.UserId
 											  &&
 											  product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 											  ||
-                                              product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
-                                              select new Product
+											  product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
+											  select new Product
 											  {
-                                                  TotalRatingStar = product.TotalRatingStar,
-                                                  NumberFeedback = product.NumberFeedback,
+												  TotalRatingStar = product.TotalRatingStar,
+												  NumberFeedback = product.NumberFeedback,
 
-                                              }).ToList()
+											  }).ToList()
 
-                              }).FirstOrDefault();
+							  }).FirstOrDefault();
 
-                return result;
-            }
-        }
-    }
+				return result;
+			}
+		}
+
+		internal Shop? GetMostPopularShop(string keyword)
+		{
+			using (var context = new DatabaseContext())
+			{
+				string keywordSearch = keyword.Trim().ToLower();
+				Shop? mostPopularShop = context.Shop.Include(x => x.User).Include(x => x.Products)
+					.Where(x => x.Products.Any(x => x.ProductName.ToLower().Contains(keywordSearch)) && x.IsActive == true)
+					.OrderByDescending(x => x.Products.Where(pr => pr.ProductName.ToLower().Contains(keywordSearch)).Max(pr => pr.SoldCount))
+					.FirstOrDefault();
+				if (mostPopularShop == null)
+				{
+					return null;
+				}
+				return GetShopDetail(mostPopularShop.UserId);
+			}
+		}
+
+		internal (long, List<Shop>) GetListShop(string keyword, int page)
+		{
+			using (var context = new DatabaseContext())
+			{
+				string keywordSearch = keyword.Trim().ToLower();
+				var result = (from shop in context.Shop.Include(x => x.Products)
+							  join user in context.User
+							  on shop.UserId equals user.UserId
+							  where shop.ShopName.ToLower().Contains(keyword)
+							  || user.Username.Contains(keyword)
+							  || shop.Products.Any(x => x.ProductName.Contains(keyword))
+							  &&
+							  shop.IsActive == true
+							  select new Shop
+							  {
+								  UserId = shop.UserId,
+								  Avatar = shop.Avatar,
+								  ShopName = shop.ShopName,
+								  DateCreate = shop.DateCreate,
+								  Description = shop.Description,
+								  User = new User
+								  {
+									  IsOnline = user.IsOnline,
+									  LastTimeOnline = user.LastTimeOnline,
+									  Username = user.Username
+								  },
+								  Products = (from product in context.Product
+											  where product.ShopId == shop.UserId
+											  &&
+											  product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+											  ||
+											  product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
+											  select new Product
+											  {
+												  TotalRatingStar = product.TotalRatingStar,
+												  NumberFeedback = product.NumberFeedback,
+
+											  }).ToList()
+
+							  });
+									
+				return (result.Count(), 
+					result.Skip((page - 1) * Constants.PAGE_SIZE_SEARCH_SHOP)
+					.Take(Constants.PAGE_SIZE_SEARCH_SHOP).ToList());
+
+			}
+		}
+	}
 }
 

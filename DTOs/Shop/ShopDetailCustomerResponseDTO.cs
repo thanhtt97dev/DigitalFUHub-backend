@@ -22,6 +22,7 @@ namespace DTOs.Shop
 
     public class ShopDetailCustomerUserResponseDTO
     {
+        public string Username { get; set; } = string.Empty;
         public bool IsOnline { get; set; }
         public DateTime LastTimeOnline { get; set; }
     }

@@ -171,6 +171,7 @@
 		public const int PAGE_SIZE_PRODUCT = 30;
 		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
 		public const int PAGE_SIZE_SEARCH_PRODUCT = 20;
+		public const int PAGE_SIZE_SEARCH_SHOP = 10;
 		public const int LIMIT_SEARCH_HINT = 10;
 
 		//withdraw, deposit transaction

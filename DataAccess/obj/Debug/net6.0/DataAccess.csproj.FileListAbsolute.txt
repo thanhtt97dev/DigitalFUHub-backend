@@ -193,3 +193,4 @@ E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.dll
 E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\refint\DataAccess.dll
 E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.pdb
 E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\ref\DataAccess.dll
+E:\Capstone\DigitalFUHub-backend\DataAccess\obj\Debug\net6.0\DataAccess.sourcelink.json
