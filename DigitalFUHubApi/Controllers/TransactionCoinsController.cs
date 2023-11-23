@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Comons;
 using DataAccess.IRepositories;
 using DigitalFUHubApi.Comons;
+using DTOs.Bank;
 using DTOs.TransactionCoin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -25,66 +27,57 @@ namespace DigitalFUHubApi.Controllers
 		#region Get History transaction coin 
 		[Authorize(Roles = "Admin")]
 		[HttpPost("GetHistoryTransactionCoin")]
-		public IActionResult GetHistoryTransactionInternal(HistoryTransactionCoinRequestDTO requestDTO)
+		public IActionResult GetHistoryTransactionInternal(HistoryTransactionCoinRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
 
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-
 			const int TRANSACTION_TYPE_ALL = 0;
 			int[] transactionTypes = Constants.TRANSACTION_COIN_STATUS_TYPE;
-			if (!transactionTypes.Contains(requestDTO.TransactionCoinTypeId) && requestDTO.TransactionCoinTypeId != TRANSACTION_TYPE_ALL)
+			if (!transactionTypes.Contains(request.TransactionCoinTypeId) && request.TransactionCoinTypeId != TRANSACTION_TYPE_ALL)
 			{
-				status.Message = "Invalid transaction type id!";
-				status.Ok = false;
-				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction type", false, new()));
 			}
 
 			try
 			{
-
-				DateTime fromDate;
-				DateTime toDate;
+				DateTime? fromDate = null;
+				DateTime? toDate = null;
 				string format = "M/d/yyyy";
-				try
+				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.ToDate))
 				{
-					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
+					try
 					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
+						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+						if (fromDate > toDate)
+						{
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
+						}
+					}
+					catch (FormatException)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
 					}
 				}
-				catch (FormatException)
+				
+				long orderId;
+				long.TryParse(request.OrderId, out orderId);
+
+				var totalRecord = transactionCoinRepository.GetNumberTransactionCoin(orderId, request.Email, fromDate, toDate, request.TransactionCoinTypeId);
+				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
+				if (request.Page > numberPages || request.Page == 0)
 				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
 				}
 
-				long orderId;
-				long.TryParse(requestDTO.OrderId, out orderId);
-
-				var transactions = transactionCoinRepository.GetHistoryTransactionInternal(orderId, requestDTO.Email, fromDate, toDate, requestDTO.TransactionCoinTypeId);
-
-				var result = mapper.Map<List<HistoryTransactionCoinResponseDTO>>(transactions);
-
-
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				var transactions = transactionCoinRepository.GetHistoryTransactionCoin(orderId, request.Email, fromDate, toDate, request.TransactionCoinTypeId, request.Page);
+				
+				var result = new
+				{
+					Total = totalRecord,
+					TransactionCoins = mapper.Map<List<HistoryTransactionCoinResponseDTO>>(transactions)
+				};
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{

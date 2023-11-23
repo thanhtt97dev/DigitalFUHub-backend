@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.Entities;
+using Comons;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,21 +30,43 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<TransactionCoin> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionCoinTypeId)
+		internal int GetNumberTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId)
 		{
-			List<TransactionCoin> transactions = new List<TransactionCoin>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				transactions = context.TransactionCoin
+				var transactions = context.TransactionCoin
 								.Include(x => x.User)
-								.Where(x =>
-									fromDate <= x.DateCreate && toDate >= x.DateCreate &&
+								.Where
+								(x =>
+									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
 									x.User.Email.Contains(email) &&
 									(orderId == 0 ? true : x.OrderId == orderId) &&
 									(transactionCoinTypeId == 0 ? true : x.TransactionCoinTypeId == transactionCoinTypeId)
-									).OrderByDescending(x => x.DateCreate).ToList();
+								)
+								.Count();
+				return transactions;
 			}
-			return transactions;
+		}
+
+		internal List<TransactionCoin> GetHistoryTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transactions = context.TransactionCoin
+								.Include(x => x.User)
+								.Where
+								(x =>
+									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
+									x.User.Email.Contains(email) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionCoinTypeId == 0 ? true : x.TransactionCoinTypeId == transactionCoinTypeId)
+								)
+								.OrderByDescending(x => x.DateCreate)
+								.Skip((page - 1) * Constants.PAGE_SIZE)
+								.Take(Constants.PAGE_SIZE)
+								.ToList();
+				return transactions;
+			}
 		}
 	}
 }

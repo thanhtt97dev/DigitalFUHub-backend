@@ -13,5 +13,6 @@ namespace DTOs.TransactionCoin
 		public string FromDate { get; set; } = null!;
 		public string ToDate { get; set; } = null!;
 		public int TransactionCoinTypeId { get; set; }
+		public int Page { get; set; }
 	}
 }

@@ -11,8 +11,8 @@ namespace DataAccess.Repositories
 {
 	public class TransactionCoinRepository : ITransactionCoinRepository
 	{
-		public List<TransactionCoin> GetHistoryTransactionInternal(long orderId, string email, DateTime fromDate, DateTime toDate, int transactionCoinTypeId) => TransactionCoinDAO.Instance.GetHistoryTransactionInternal(orderId, email, fromDate, toDate, transactionCoinTypeId);
-
+		public List<TransactionCoin> GetHistoryTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId, int page) => TransactionCoinDAO.Instance.GetHistoryTransactionCoin(orderId, email, fromDate, toDate, transactionCoinTypeId, page);
+		public int GetNumberTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId) => TransactionCoinDAO.Instance.GetNumberTransactionCoin(orderId, email, fromDate, toDate, transactionCoinTypeId);
 
 	}
 }
