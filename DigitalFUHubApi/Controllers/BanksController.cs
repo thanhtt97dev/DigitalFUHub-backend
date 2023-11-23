@@ -520,7 +520,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
 				}
 
-				var totalRecord = bankRepository.GetNumberDepositTransaction(id, depositTransactionId, fromDate, toDate, request.Status);
+				var totalRecord = bankRepository.GetNumberDepositTransaction(id, depositTransactionId, string.Empty, fromDate, toDate, request.Status);
 				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
 				if (request.Page > numberPages || request.Page == 0)
 				{
@@ -531,7 +531,7 @@ namespace DigitalFUHubApi.Controllers
 				var result = new HistoryDepositResponseDTO
 				{
 					Total = totalRecord,
-					DepositTransactions = deposits
+					DepositTransactions = mapper.Map<List<HistoryDepositResponeDTO>>(deposits)
 				};
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
@@ -546,52 +546,54 @@ namespace DigitalFUHubApi.Controllers
 		#region Get history deposit transaction sucess for admin
 		[Authorize(Roles = "Admin")]
 		[HttpPost("HistoryDeposit")]
-		public IActionResult GetHistoryDepositTransactionSuccess(HistoryDepositForAdminRequestDTO historyDepositRequestDTO)
+		public IActionResult GetHistoryDepositTransactionSuccess(HistoryDepositForAdminRequestDTO request)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			string format = "M/d/yyyy";
 			try
 			{
-				if (historyDepositRequestDTO == null || historyDepositRequestDTO.Email == null ||
-					historyDepositRequestDTO.FromDate == null || historyDepositRequestDTO.ToDate == null) return BadRequest();
+				if (request == null || request.Email == null ||
+					request.FromDate == null || request.ToDate == null) return BadRequest();
 
-				DateTime fromDate;
-				DateTime toDate;
-				try
+				DateTime? fromDate = null;
+				DateTime? toDate = null;
+				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.FromDate))
 				{
-					fromDate = DateTime.ParseExact(historyDepositRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(historyDepositRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
+					try
 					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
+						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+						if (fromDate > toDate)
+						{
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
+						}
+					}
+					catch (FormatException)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
 					}
 				}
-				catch (FormatException)
-				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
-				}
+				
 
 				long depositTransactionId;
-				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
+				long.TryParse(request.DepositTransactionId, out depositTransactionId);
 
-				var deposits = bankRepository.GetDepositTransactionSucess(depositTransactionId, historyDepositRequestDTO.Email, fromDate, toDate);
-				var result = mapper.Map<List<HistoryDepositResponeDTO>>(deposits);
+				var totalRecord = bankRepository.GetNumberDepositTransaction(0, depositTransactionId, request.Email, fromDate, toDate, 1);
+				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
+				if (request.Page > numberPages || request.Page == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
-				status.Message = "Success!";
-				status.Ok = false;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				var deposits = bankRepository.GetDepositTransactionSucess(depositTransactionId, request.Email, fromDate, toDate, request.Page);
+				var result = new HistoryDepositResponseDTO
+				{
+					Total = totalRecord,
+					DepositTransactions = mapper.Map<List<HistoryDepositResponeDTO>>(deposits)
+				};
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{

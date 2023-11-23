@@ -12,5 +12,6 @@ namespace DTOs.Bank
 		public string? Email { get; set; }
 		public string? FromDate { get; set; }
 		public string? ToDate { get; set; }
+		public int Page { get; set; }	
 	}
 }
