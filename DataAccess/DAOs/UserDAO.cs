@@ -167,8 +167,8 @@ namespace DataAccess.DAOs
 			{
 				var users = context.User
 							.Include(x => x.Role)
-							.Where(x => 
-								x.Email.Contains(email) && x.Fullname.Contains(fullName) && 
+							.Where(x =>
+								x.Email.Contains(email) && x.Fullname.Contains(fullName) &&
 								x.RoleId != Constants.ADMIN_ROLE &&
 								(userId == 0 ? true : x.UserId == userId) &&
 								(roleId == 0 ? true : x.RoleId == roleId) &&
@@ -185,7 +185,7 @@ namespace DataAccess.DAOs
 				var user = context.User.FirstOrDefault(x => x.UserId == id);
 				if (user == null) return null;
 
-				return user;	
+				return user;
 			}
 		}
 
@@ -202,10 +202,10 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var user = context.User.FirstOrDefault(x => x.UserId == userId);
-				if(user == null) return;
-				if(user.Status == false) return;
-				if(isOnline && user.IsOnline == isOnline) return;
-				if(!isOnline && user.IsOnline == isOnline) return;
+				if (user == null) return;
+				if (user.Status == false) return;
+				if (isOnline && user.IsOnline == isOnline) return;
+				if (!isOnline && user.IsOnline == isOnline) return;
 				if (isOnline)
 				{
 					user.IsOnline = true;
@@ -216,6 +216,41 @@ namespace DataAccess.DAOs
 					user.LastTimeOnline = DateTime.Now;
 				}
 				context.SaveChanges();
+			}
+		}
+
+		internal string GenerateRandomUsername(string email)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				string chars = "qwertyuiopasdfghjklzxcvbnm123456789";
+				string firstPartEmail = email.Split("@")[0];
+				while (true)
+				{
+					string firstFourCharacter = "";
+					Random rd = new Random();
+					if (firstPartEmail.Length > 4)
+					{
+						firstFourCharacter = firstPartEmail.Substring(0, 4);
+					}
+					else
+					{
+						firstFourCharacter = firstPartEmail;
+					}
+					string username = firstFourCharacter;
+					int numberCharConcat = rd.Next(4 - firstFourCharacter.Length == 0 ? 2 : 4 + 2 - firstFourCharacter.Length, 9);
+					for (int i = 0; i < numberCharConcat; i++)
+					{
+						username += chars[rd.Next(0, chars.Length)];
+					}
+
+					if (!context.User.Any(x => x.Username == username))
+					{
+						return username;
+					}
+
+				}
+
 			}
 		}
 	}

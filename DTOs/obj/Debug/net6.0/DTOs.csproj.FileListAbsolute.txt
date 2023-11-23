@@ -163,3 +163,4 @@ E:\Capstone\DigitalFUHub-backend\DTOs\obj\Debug\net6.0\DTOs.dll
 E:\Capstone\DigitalFUHub-backend\DTOs\obj\Debug\net6.0\refint\DTOs.dll
 E:\Capstone\DigitalFUHub-backend\DTOs\obj\Debug\net6.0\DTOs.pdb
 E:\Capstone\DigitalFUHub-backend\DTOs\obj\Debug\net6.0\ref\DTOs.dll
+E:\Capstone\DigitalFUHub-backend\DTOs\obj\Debug\net6.0\DTOs.sourcelink.json

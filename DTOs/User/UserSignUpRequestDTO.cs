@@ -10,14 +10,17 @@ namespace DTOs.User
     public class UserSignUpRequestDTO
     {
         [Required]
+        [RegularExpression("^(?=[a-z])[a-z\\d]{6,12}$")]
         public string Username { get; set; } = string.Empty;
         [Required]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; } = string.Empty;
         [Required]
+        [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$")]
         public string Password { get; set; } = string.Empty;
         [Required]
         [Compare(nameof(Password))]
-        public string ConfirmPassword { get; set; } = string.Empty;
+		public string ConfirmPassword { get; set; } = string.Empty;
         [Required]
         public string Fullname { get; set; } = string.Empty;
     }

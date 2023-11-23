@@ -213,7 +213,51 @@ namespace DigitalFUHubApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        #endregion
+		#endregion
 
-    }
+		#region Get most popular shop 
+		[HttpGet("MostPopular")]
+		public IActionResult GetMostPopularShop(string keyword)
+		{
+			if(string.IsNullOrWhiteSpace(keyword))
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid keyword search", false, new()));
+			}
+			Shop? shop = _shopRepository.GetMostPopularShop(keyword);
+			if(shop == null)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+			}
+			ShopDetailCustomerResponseDTO response = _mapper.Map<ShopDetailCustomerResponseDTO>(shop);
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, response));
+		}
+		#endregion
+
+		#region Get 
+		[HttpGet("Search")]
+		public IActionResult GetShopsSearched(string keyword, int page)
+		{
+			if (string.IsNullOrWhiteSpace(keyword))
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid keyword search", false, new()));
+			}
+			if(page <= 0)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
+			}
+			(long totalItems, List<Shop> listShop) = _shopRepository.GetListShop(keyword, page);
+			if (listShop.Count == 0)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+			}
+			List<ShopDetailCustomerResponseDTO> response = _mapper.Map<List<ShopDetailCustomerResponseDTO>>(listShop);
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SearchShopResponseDTO
+			{
+				Shops = response,
+				TotalItems = totalItems
+			}));
+		}
+		#endregion
+
+	}
 }

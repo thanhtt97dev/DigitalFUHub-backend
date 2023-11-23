@@ -18,6 +18,7 @@ namespace DataAccess.IRepositories
 		int GetNumberShopWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId);
 		List<Shop> GetShopsWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId, int page);
 		Shop? GetShopDetail(long userId);
-
-    }
+		Shop? GetMostPopularShop(string keyword);
+		(long, List<Shop>) GetListShop(string keyword, int page);
+	}
 }

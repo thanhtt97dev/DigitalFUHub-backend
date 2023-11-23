@@ -28,6 +28,7 @@ namespace BusinessObject.Entities
 		public long Coin { get; set; }
 		public bool SignInGoogle { get; set; }
         public bool IsConfirm { get; set; }
+        public bool IsChangeUsername { get; set; }
 		public DateTime LastTimeOnline { get; set; }
 		public bool IsOnline { get; set; }
 
