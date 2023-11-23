@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DTOs.WishList
 {
-    public class RemoveWishListSelectedsRequestDTO
+    public class WishListCustomerParamRequestDTO
     {
         public long UserId { get; set; }
-        public List<long> ProductIds { get; set; } = new List<long>();
+        public int Page { get; set; }
     }
 }

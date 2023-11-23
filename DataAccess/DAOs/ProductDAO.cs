@@ -815,7 +815,7 @@ namespace DataAccess.DAOs
 				// Sort descending by total star / number feedback
 				if (isOrderFeedback)
 				{
-					query = query.OrderByDescending(x => x.TotalRatingStar / x.NumberFeedback);
+					query = query.OrderByDescending(x => x.NumberFeedback != 0 ? x.TotalRatingStar / x.NumberFeedback : 0);
 				}
 
 				// Sort descending by sold count

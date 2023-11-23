@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.WishList
 {
-    public class WishListProductVariantResponseDTO
+    public class WishListCustomerProductVariantResponseDTO
     {
         public long ProductVariantId { get; set; }
         public int Discount { get; set; }

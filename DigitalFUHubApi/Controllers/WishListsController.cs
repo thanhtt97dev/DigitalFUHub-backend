@@ -3,8 +3,10 @@ using Azure.Core;
 using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
+using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.Product;
 using DTOs.WishList;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,7 +35,7 @@ namespace DigitalFUHubApi.Controllers
 
         [HttpPost("Add")]
         [Authorize]
-        public IActionResult AddWishList(AddWishListRequestDTO request)
+        public IActionResult AddWishList(WishListCustomerAddRequestDTO request)
         {
             ResponseData responseData = new ResponseData();
             Status status = new Status();
@@ -121,7 +123,7 @@ namespace DigitalFUHubApi.Controllers
 
         [HttpPost("Remove")]
         [Authorize]
-        public IActionResult RemoveWishList(RemoveWishListRequestDTO request)
+        public IActionResult RemoveWishList(WishListCustomerRemoveRequestDTO request)
         {
             ResponseData responseData = new ResponseData();
             Status status = new Status();
@@ -226,20 +228,20 @@ namespace DigitalFUHubApi.Controllers
             }
         }
 
-        [HttpGet("GetByUserId/{userId}")]
+        [HttpPost("GetAll")]
         [Authorize]
-        public IActionResult GetWishListByUserId(long userId)
+        public IActionResult GetWishListByUserId(WishListCustomerParamRequestDTO request)
         {
             ResponseData responseData = new ResponseData();
             Status status = new Status();
             try
             {
-                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+                if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
                 {
                     return Unauthorized();
                 }
 
-                var user = userRepository.GetUserById(userId);
+                var user = userRepository.GetUserById(request.UserId);
                 if (user == null)
                 {
                     status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
@@ -250,14 +252,33 @@ namespace DigitalFUHubApi.Controllers
 
                 }
 
-                var products = mapper.Map<List<WishListProductResponseDTO>>(wishListRepository.GetProductFromWishListByUserId(userId));
+                if (request.Page <= 0)
+                {
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "Invalid param";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
+                }
 
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                responseData.Result = products;
-                return Ok(responseData);
+                var numberProducts = wishListRepository.GetNumberProductByConditions(request.UserId);
+                var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT_WISH_LIST + 1;
+                if (request.Page > numberPages)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+                }
+
+                var products = wishListRepository.GetProductFromWishListByUserId(request.UserId, request.Page);
+
+                List<WishListCustomerProductDetailResponseDTO> productResponses = mapper.Map<List<WishListCustomerProductDetailResponseDTO>>(products);
+
+                var result = new WishListCustomerProductResponseDTO
+                {
+                    TotalProduct = numberProducts,
+                    Products = productResponses
+                };
+
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, result));
 
             }
             catch (Exception ex)
@@ -268,7 +289,7 @@ namespace DigitalFUHubApi.Controllers
 
         [HttpPost("RemoveSelecteds")]
         [Authorize]
-        public IActionResult RemoveWishListSelecteds(RemoveWishListSelectedsRequestDTO request)
+        public IActionResult RemoveWishListSelecteds(WishListCustomertRemoveSelectedsRequestDTO request)
         {
             ResponseData responseData = new ResponseData();
             Status status = new Status();

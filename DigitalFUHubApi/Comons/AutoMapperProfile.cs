@@ -218,12 +218,18 @@ namespace DigitalFUHubApi.Comons
 					CategoryId = x.Product.CategoryId,
 				}).ToList()))
 				.ReverseMap();
-			CreateMap<Product, WishListProductResponseDTO>()
-                .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.First() : null))
+
+            // Wish List <Customer>
+            CreateMap<Product, WishListCustomerProductDetailResponseDTO>()
+			.ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() : 0))
+			.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
+			.ReverseMap();
+
+            CreateMap<ProductVariant, WishListCustomerProductVariantResponseDTO>()
                 .ReverseMap();
 
-			// Shop Detail Customer
-			CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
+            // Shop Detail <Customer>
+            CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
                 .ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() : 0))
                 .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
                 .ReverseMap();
@@ -232,7 +238,7 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 			//
 
-            // Home Page Customer
+            // Home Page <Customer>
             CreateMap<Product, HomePageCustomerProductDetailResponseDTO>()
 				.ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() : 0))
 				.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
@@ -243,7 +249,7 @@ namespace DigitalFUHubApi.Comons
 			//
 
 
-            CreateMap<ProductVariant, WishListProductVariantResponseDTO>().ReverseMap();
+            CreateMap<ProductVariant, WishListCustomerProductVariantResponseDTO>().ReverseMap();
 
 			CreateMap<TransactionCoin, HistoryTransactionCoinResponseDTO>()
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))

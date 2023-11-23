@@ -32,24 +32,66 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal List<Product> GetProductFromWishListByUserId (long userId)
+        internal List<Product> GetProductFromWishListByUserId (long userId, int page)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
+                // product id of user in wish list
                 var productIds = context.WishList.Where(x => x.UserId == userId).Select(x => x.ProductId);
-                if (productIds.Count() == 0) return new List<Product>();
-                var products = context.Product.Where(x => productIds.Contains(x.ProductId) && (x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE || x.ProductStatusId == Constants.PRODUCT_STATUS_BAN)).ToList();
 
-                List<ProductVariant> productVariants = new List<ProductVariant>();
-                foreach(var product in products)
-                {
-                    var productVariant = context.ProductVariant.Where(x => x.ProductId == product.ProductId && x.isActivate == true).OrderBy(x => x.Price - (x.Price * x.Discount / 100)).ToList();
-                    if (productVariant.Count() > 0) {
-                        productVariants.Add(productVariant[0]);
-                    }
-                }
+                var products = (from product in context.Product
+                             where productIds.Contains(product.ProductId)
+                                &&
+                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                ||
+                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
+                             select new Product
+                             {
+                                 ProductId = product.ProductId,
+                                 ProductName = product.ProductName,
+                                 Thumbnail = product.Thumbnail,
+                                 TotalRatingStar = product.TotalRatingStar,
+                                 NumberFeedback = product.NumberFeedback,
+                                 SoldCount = product.SoldCount,
+                                 ProductStatusId = product.ProductStatusId,
+                                 ProductVariants = (from productVariant in context.ProductVariant
+                                                    where productVariant.ProductId == product.ProductId
+                                                    select new ProductVariant
+                                                    {
+                                                        ProductVariantId = productVariant.ProductId,
+                                                        Discount = productVariant.Discount,
+                                                        Price = productVariant.Price,
+                                                        AssetInformations = (from assetInformation in context.AssetInformation
+                                                                             where assetInformation.ProductVariantId == productVariant.ProductVariantId
+                                                                             &&
+                                                                             assetInformation.IsActive
+                                                                             select new AssetInformation { }).ToList()
+                                                    }).ToList()
+                             }
+                                ).Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_WISH_LIST)
+                                         .Take(Constants.PAGE_SIZE_PRODUCT_WISH_LIST)
+                                         .ToList();
 
+              
                 return products;
+            }
+        }
+
+
+        internal int GetNumberProductByConditions(long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                // product id of user in wish list
+                var productIds = context.WishList.Where(x => x.UserId == userId).Select(x => x.ProductId);
+
+                return (from product in context.Product
+                                where productIds.Contains(product.ProductId)
+                                   &&
+                                   (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                   ||
+                                   product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
+                                select new Product {}).Count();
             }
         }
 
