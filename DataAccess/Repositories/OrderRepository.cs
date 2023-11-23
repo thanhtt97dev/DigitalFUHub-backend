@@ -18,9 +18,8 @@ namespace DataAccess.Repositories
 	{
 		public void UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(int days) => OrderDAO.Instance.UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(days);
 		public void UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(int days) => OrderDAO.Instance.UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(days);
-
-		public List<Order> GetOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime fromDate, DateTime toDate, int status) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopId, shopName, fromDate, toDate, status);
-
+		public int GetNumberOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status) => OrderDAO.Instance.GetNumberOrders(orderId, customerEmail, shopId, shopName, fromDate, toDate, status);
+		public List<Order> GetOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status, int page) => OrderDAO.Instance.GetOrders(orderId, customerEmail, shopId, shopName, fromDate, toDate, status, page);
 		public (string, string, int, Order) AddOrder(long userId, List<ShopProductRequestAddOrderDTO> orders, bool isUseCoin) => OrderDAO.Instance.AddOrder(userId, orders, isUseCoin);
 
 		public Order? GetOrderInfoAdmin(long orderId) => OrderDAO.Instance.GetOrderInfoAdmin(orderId);
@@ -63,5 +62,6 @@ namespace DataAccess.Repositories
 		public List<Order> GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, DateTime? toDate, int status)
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
 
+		
 	}
 }
