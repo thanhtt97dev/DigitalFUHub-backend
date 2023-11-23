@@ -481,62 +481,60 @@ namespace DigitalFUHubApi.Controllers
 		#region Get history deposit transaction of a user
 		[Authorize]
 		[HttpPost("HistoryDeposit/{id}")]
-		public IActionResult GetHistoryDepositTransaction(int id, HistoryDepositRequestDTO historyDepositRequestDTO)
+		public IActionResult GetHistoryDepositTransaction(int id, HistoryDepositRequestDTO request)
 		{
 			ResponseData responseData = new ResponseData();
 			Status status = new Status();
 			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0 || historyDepositRequestDTO == null ||
-					historyDepositRequestDTO.FromDate == null ||
-					historyDepositRequestDTO.ToDate == null) return BadRequest();
+				if (id == 0 || request == null ||
+					request.FromDate == null ||
+					request.ToDate == null) return BadRequest();
 
-				DateTime fromDate;
-				DateTime toDate;
-				try
+				DateTime? fromDate = null;
+				DateTime? toDate = null;
+				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.FromDate))
 				{
-					fromDate = DateTime.ParseExact(historyDepositRequestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(historyDepositRequestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
+					try
 					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
+						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+						if (fromDate > toDate)
+						{
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
+						}
 					}
-				}
-				catch (FormatException)
-				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					catch (FormatException)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
+					}
 				}
 
 				long depositTransactionId;
-				long.TryParse(historyDepositRequestDTO.DepositTransactionId, out depositTransactionId);
+				long.TryParse(request.DepositTransactionId, out depositTransactionId);
 
 				// 0 : All, 1: paid, 2: unpay
-				if(historyDepositRequestDTO.Status != 0 && historyDepositRequestDTO.Status != 1 && 
-					historyDepositRequestDTO.Status != 2){
-					status.Message = "Invalid transaction's status";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+				if(request.Status != 0 && request.Status != 1 && request.Status != 2)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
 				}
 
-				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, historyDepositRequestDTO.Status);
+				var totalRecord = bankRepository.GetNumberDepositTransaction(id, depositTransactionId, fromDate, toDate, request.Status);
+				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
+				if (request.Page > numberPages || request.Page == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
-				status.Message = "Success!";
-				status.Ok = false;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = deposits;
-				return Ok(responseData);
+				var deposits = bankRepository.GetDepositTransaction(id, depositTransactionId, fromDate, toDate, request.Status, request.Page);
+				var result = new HistoryDepositResponseDTO
+				{
+					Total = totalRecord,
+					DepositTransactions = deposits
+				};
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{

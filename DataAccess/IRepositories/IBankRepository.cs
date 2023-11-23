@@ -18,7 +18,7 @@ namespace DataAccess.IRepositories
 		UserBank? GetUserBank(int userId);
 		void CreateDepositTransaction(DepositTransaction transaction);
 		void CreateWithdrawTransaction(WithdrawTransaction transaction);
-		List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status);
+		List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page);
 		List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string email,DateTime fromDate, DateTime toDate);
 		int GetNumberWithdrawTransactionWithCondition(int id, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status);
 		List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page);
@@ -31,5 +31,6 @@ namespace DataAccess.IRepositories
 		(int, long) GetDataWithdrawTransactionMakedToday(long userId);
 		int GetNumberDepositTransactionMakedInToday(long userId);
 		void UpdateWithdrawTransactionCancel(int id);
+		int GetNumberDepositTransaction(int id, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status);
 	}
 }

@@ -221,17 +221,38 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status)
+		internal int GetNumberDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var deposits = context.DepositTransaction
+							.Where
+							(x =>
+								(fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true &&
+								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+								(status == 0 ? true : x.IsPay == (status == 1))
+							)
+							.Count();
+				return deposits;
+			}
+		}
+
+		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
 		{
 			List<DepositTransaction> deposits = new List<DepositTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				deposits = context.DepositTransaction
-							.Where(x =>
-								fromDate <= x.RequestDate && toDate >= x.RequestDate && 
+							.Where
+							(x =>
+								(fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true &&
 								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
 								(status == 0 ? true : x.IsPay == (status == 1))
-								).OrderByDescending(x => x.RequestDate).ToList();
+							)
+							.OrderByDescending(x => x.RequestDate)
+							.Skip((page - 1) * Constants.PAGE_SIZE)
+							.Take(Constants.PAGE_SIZE)
+							.ToList();
 			}
 			return deposits;
 		}

@@ -23,8 +23,8 @@ namespace DataAccess.Repositories
 		public void CreateDepositTransaction(DepositTransaction transaction) => BankDAO.Instance.CreateDepositTransaction(transaction);
 		public void CreateWithdrawTransaction(WithdrawTransaction transaction) => BankDAO.Instance.CreateWithdrawTransaction(transaction);
 		public void UpdateUserBankStatus(UserBank userBank) => BankDAO.Instance.UpdateUserBankStatus(userBank);
-
-		public List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime fromDate, DateTime toDate, int status) => BankDAO.Instance.GetDepositTransaction(userId, depositTransactionId, fromDate, toDate, status);
+		public int GetNumberDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status) => BankDAO.Instance.GetNumberDepositTransaction(userId, depositTransactionId, fromDate, toDate, status);
+		public List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page) => BankDAO.Instance.GetDepositTransaction(userId, depositTransactionId, fromDate, toDate, status, page);
 		public List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string email, DateTime fromDate, DateTime toDate) => BankDAO.Instance.GetDepositTransactionSucess(depositTransactionId, email, fromDate, toDate);
 
 		public int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status) => BankDAO.Instance.GetNumberWithdrawTransactionWithCondition(userId, withdrawTransactionId, fromDate, toDate, status);
@@ -47,6 +47,6 @@ namespace DataAccess.Repositories
 
 		public int GetNumberDepositTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberDepositTransactionMakedInToday(userId);
 
-	
+		
 	}
 }
