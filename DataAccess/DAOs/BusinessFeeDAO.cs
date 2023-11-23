@@ -30,14 +30,14 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<BusinessFeeResponseDTO> GetBusinessFee(long businessFeeId, int maxFee, DateTime fromDate, DateTime toDate)
+		internal List<BusinessFeeResponseDTO> GetBusinessFee(long businessFeeId, int maxFee, DateTime? fromDate, DateTime? toDate)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var fees = (from businessFee in context.BusinessFee
 							where (1 == 1) &&
 							(businessFeeId != 0 ? businessFee.BusinessFeeId == businessFeeId : true) &&
-							fromDate <= businessFee.StartDate && toDate >= businessFee.StartDate &&
+							(fromDate != null && toDate != null) ? fromDate <= businessFee.StartDate && toDate >= businessFee.StartDate : true &&
 							businessFee.Fee <= maxFee
 							select new BusinessFeeResponseDTO 
 							{

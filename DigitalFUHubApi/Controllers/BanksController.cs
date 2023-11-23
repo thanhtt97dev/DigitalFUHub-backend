@@ -494,7 +494,7 @@ namespace DigitalFUHubApi.Controllers
 
 				DateTime? fromDate = null;
 				DateTime? toDate = null;
-				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.FromDate))
+				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.ToDate))
 				{
 					try
 					{

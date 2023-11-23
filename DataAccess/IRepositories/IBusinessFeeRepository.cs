@@ -10,7 +10,7 @@ namespace DataAccess.IRepositories
 {
 	public interface IBusinessFeeRepository
 	{
-		List<BusinessFeeResponseDTO> GetBusinessFee(long businessFeeId, int maxFee, DateTime fromDate, DateTime toDate);
+		List<BusinessFeeResponseDTO> GetBusinessFee(long businessFeeId, int maxFee, DateTime? fromDate, DateTime? toDate);
 		void AddNewBusinessFee(long fee);
 	}
 }

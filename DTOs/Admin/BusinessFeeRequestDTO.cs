@@ -10,7 +10,7 @@ namespace DTOs.Admin
 	{
 		public string? BusinessFeeId { get; set; }
 		public int MaxFee { get; set; }
-		public string FromDate { get; set; } = null!;
-		public string ToDate { get; set; } = null!;
+		public string? FromDate { get; set; } = null!;
+		public string? ToDate { get; set; } = null!;
 	}
 }
