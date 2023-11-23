@@ -744,7 +744,20 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult CancelWithdrawTransaction(int id)
 		{
 			try 
-			{ 
+			{
+				if (!ModelState.IsValid) return BadRequest();
+				
+				var withdrawTransaction = bankRepository.GetWithdrawTransaction(id);
+				if(withdrawTransaction == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "not found", false, new { }));
+				}
+				if(withdrawTransaction.WithdrawTransactionStatusId != Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_CHANGED_BEFORE, "status changed", false, new { }));
+				}
+
+				bankRepository.UpdateWithdrawTransactionCancel(id);
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, new {}));
 			}

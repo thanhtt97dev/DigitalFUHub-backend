@@ -30,6 +30,6 @@ namespace DataAccess.IRepositories
 		void RejectWithdrawTransaction(long withdrawTransactionId, string? note);
 		(int, long) GetDataWithdrawTransactionMakedToday(long userId);
 		int GetNumberDepositTransactionMakedInToday(long userId);
-		
+		void UpdateWithdrawTransactionCancel(int id);
 	}
 }

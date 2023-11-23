@@ -385,6 +385,36 @@ namespace DataAccess.DAOs
 			}
 		}
 
+		internal void UpdateWithdrawTransactionCancel(int id)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == id);
+					if (withDrawTransaction == null) throw new Exception();
+					if (withDrawTransaction.WithdrawTransactionStatusId != Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
+					{
+						throw new Exception();
+					}
+					withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_CANCEL;
+					context.WithdrawTransaction.Update(withDrawTransaction);
+					context.SaveChanges();
+
+					var customer = context.User.First(x => x.UserId == withDrawTransaction.UserId);
+					customer.AccountBalance += withDrawTransaction.Amount;
+					context.User.Update(customer);
+					context.SaveChanges();
+					transaction.Commit();
+				}
+				catch(Exception) 
+				{
+					transaction.Rollback();
+				}
+			}
+		}
+
 		internal void UpdateWithdrawTransaction(long transactionId)
 		{
 			using (DatabaseContext context = new DatabaseContext())

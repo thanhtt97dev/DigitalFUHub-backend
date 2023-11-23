@@ -222,6 +222,7 @@ namespace BusinessObject
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 1, Name = "In processing"},
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 2, Name = "Paid"},
 				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 3, Name = "Reject"},
+				new WithdrawTransactionStatus{WithdrawTransactionStatusId = 4, Name = "Cancel"},
 			});
 			modelBuilder.Entity<CouponType>().HasData(new CouponType[]
 			{
