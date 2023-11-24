@@ -27,5 +27,7 @@ namespace DataAccess.IRepositories
 		bool CheckUsersExisted(List<long> userIds);
 		void UpdateUserOnlineStatus(long userId, bool isOnline);
 		string GenerateRandomUsername(string email);
-	}
+        User? GetUserByUserNameOtherUserId(long userId, string userName);
+		void ActiveUserNameAndPassword(long userId, string userName, string password);
+    }
 }
