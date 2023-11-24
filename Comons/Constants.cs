@@ -62,11 +62,13 @@
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
 
+        public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_USERNAME_01";
 
 
 
-		//SignalR
-		public const string SIGNAL_R_CHAT_HUB = "chatHub";
+
+        //SignalR
+        public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
 		public const string SIGNAL_R_NOTIFICATION_HUB = "notificationHub";
@@ -165,6 +167,7 @@
 		//URL front-end
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 		public const string FRONT_END_SELLER_PRODUCT_URL = "/seller/product/";
+		public const string FRONT_END_SELLER_ORDER_DETAIL_URL = "/seller/order/";
 
 		// Pagination
 		public const int PAGE_SIZE = 10;

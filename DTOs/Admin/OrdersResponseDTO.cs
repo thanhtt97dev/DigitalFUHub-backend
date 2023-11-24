@@ -12,7 +12,11 @@ namespace DTOs.Admin
 		public DateTime OrderDate { get; set; }
 		public long TotalAmount { get; set; }
 		public long TotalCouponDiscount { get; set; }
+		public long TotalCoinDiscount { get; set; }
 		public long TotalPayment { get; set; }
+		public long TotalRefundSeller { get; set; }
+		public long TotalBenefit { get; set; }
+		public int BusinessFee { get; set; }	
 		public long CustomerId { get; set; }
 		public string CustomerEmail { get; set; } = string.Empty;
 		public long SellerId { get; set; }

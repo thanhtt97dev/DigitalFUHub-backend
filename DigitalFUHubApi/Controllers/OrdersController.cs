@@ -52,37 +52,22 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				ResponseData responseData = new ResponseData();
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
-				if (!ModelState.IsValid)
-				{
-					return BadRequest();
-				}
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
+				if (!ModelState.IsValid) return BadRequest();
+
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
 					_orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
 
-				responseData.Status.ResponseCode = responseCode;
-				responseData.Status.Ok = responseCode == Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status.Message = message;
-
-				if (responseCode == Constants.RESPONSE_CODE_ORDER_NOT_ENOUGH_QUANTITY)
-				{
-					responseData.Result = numberQuantityAvailable;
-				}
-
 				if (responseCode == Constants.RESPONSE_CODE_SUCCESS)
 				{
-					// send notification
-					var title = "Mua hàng thành công";
-					var content = $"Mã đơn số {orderInfo.OrderId} đã mua thành công với tổng giá trị đơn hàng {orderInfo.TotalPayment}đ";
-					var link = Constants.FRONT_END_HISTORY_ORDER_URL + orderInfo.OrderId;
-					await _hubService.SendNotification(request.UserId, title, content, link);
+					// send notification to seller
+					var title = $"Đơn hàng mới";
+					var content = $"Mã đơn hàng #{orderInfo.OrderId}";
+					var link = Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + orderInfo.OrderId;
+					await _hubService.SendNotification(orderInfo.ShopId, title, content, link);
 				}
 
-				return Ok(responseData);
+				return Ok(new ResponseData(responseCode, message, true, numberQuantityAvailable));
 			}
 			catch (Exception ex)
 			{
@@ -99,14 +84,10 @@ namespace DigitalFUHubApi.Controllers
 
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
-				if (!ModelState.IsValid)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
-				}
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
+
+				if (!ModelState.IsValid) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
+
 				List<Order> orders = _orderRepository.GetAllOrderByUser(request.UserId, request.StatusId, request.Limit, request.Offset);
 				OrderResponseDTO orderResponse = new OrderResponseDTO()
 				{
@@ -146,7 +127,6 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (Exception e)
 			{
-
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
 
@@ -156,7 +136,7 @@ namespace DigitalFUHubApi.Controllers
 		#region Update status order (customer)
 		[Authorize("Customer,Seller")]
 		[HttpPost("Customer/Edit/Status")]
-		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
+		public IActionResult UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
 		{
 			try
 			{
@@ -199,11 +179,6 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId, request.Note);
-
-				string title = $"{(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "Xác nhận đơn hàng thành công." : "Đơn hàng đang được khiếu nại.")}";
-				string content = $"Mã đơn số {request.OrderId} {(request.StatusId == Constants.ORDER_STATUS_CONFIRMED ? "đã được xác nhận." : "đang khiếu nại.")}";
-				string link = Constants.FRONT_END_HISTORY_ORDER_URL + request.OrderId;
-				await _hubService.SendNotification(request.UserId, title, content, link);
 			}
 			catch (Exception e)
 			{
@@ -387,7 +362,7 @@ namespace DigitalFUHubApi.Controllers
 				TotalAmount = order.TotalAmount,
 				//TotalCoinDiscount = order.TotalCoinDiscount,
 				//TotalPayment = order.TotalPayment,
-				CouponCode = order.OrderCoupons.FirstOrDefault()?.Coupon?.CouponCode??"",
+				CouponCode = order.OrderCoupons.FirstOrDefault()?.Coupon?.CouponCode ?? "",
 				TotalCouponDiscount = order.TotalCouponDiscount,
 				BussinessFee = (order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100,
 				AmountSellerReceive = (order.TotalAmount - order.TotalCouponDiscount) -
@@ -526,7 +501,8 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
 				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
-				if(shop == null) { 
+				if (shop == null)
+				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid shop", false, new()));
 				}
 				List<Order> orders = _orderRepository.GetListOrderSeller(_jwtTokenService.GetUserIdByAccessToken(User),
@@ -536,9 +512,9 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "No data", false, new()));
 				}
 				DateTime now = DateTime.Now;
-				string reportname =  string.Format("{0}{1}{2}{3}{4}{5}{6}.xlsx", now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour);
+				string reportname = string.Format("{0}{1}{2}{3}{4}{5}{6}.xlsx", now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour);
 				var exportBytes = await _reportRepository
-					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders), 
+					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders),
 					reportname, fromDate, toDate, shop.ShopName);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true,
 					File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname)));
@@ -556,48 +532,55 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult GetOrders(OrdersRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
-
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-
 			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
 			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
 			{
-				status.Message = "Invalid order status!";
-				status.Ok = false;
-				status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new {}));
 			}
 
 			try
 			{
 
-				DateTime fromDate;
-				DateTime toDate;
+				DateTime? fromDate = null;
+				DateTime? toDate = null;
 				string format = "M/d/yyyy";
-				try
+				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.ToDate))
 				{
-					fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
+					try
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
+						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+						if (fromDate > toDate)
+						{
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
+						}
+					}
+					catch (FormatException)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
 					}
 				}
-				catch (FormatException)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
-				}
+				
 				long orderId;
 				long.TryParse(request.OrderId, out orderId);
 
 				long shopId;
 				long.TryParse(request.ShopId, out shopId);
 
-				var orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, shopId, request.ShopName, fromDate, toDate, request.Status);
-				var result = _mapper.Map<List<OrdersResponseDTO>>(orders);
+				var totalRecord = _orderRepository.GetNumberOrders(orderId, request.CustomerEmail, shopId, request.ShopName, fromDate, toDate, request.Status);
+				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
+				if (request.Page > numberPages || request.Page == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
+				var orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, shopId, request.ShopName, fromDate, toDate, request.Status, request.Page);
+				
+				var result = new
+				{
+					Total = totalRecord,
+					Orders = _mapper.Map<List<OrdersResponseDTO>>(orders)
+				};
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
@@ -613,30 +596,17 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult GetOrder(int id)
 		{
 			if (!ModelState.IsValid) return BadRequest();
-
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-
 			try
 			{
 				var order = _orderRepository.GetOrderInfoAdmin(id);
 				if (order == null)
 				{
-					status.Message = "Order not existed!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Order not existed!", false, new { }));
 				}
 
 				var result = _mapper.Map<OrderInfoResponseDTO>(order);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Order not existed!", true, result));
 			}
 			catch (Exception ex)
 			{
@@ -651,19 +621,13 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult UpdateOrderStatus(UpdateOrderStatusRequestDTO request)
 		{
 			if (request.OrderId == 0 || request.Status == 0) return BadRequest();
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 
 			try
 			{
 				int[] statusAccepted = { Constants.ORDER_STATUS_DISPUTE, Constants.ORDER_STATUS_REJECT_COMPLAINT, Constants.ORDER_STATUS_SELLER_VIOLATES };
 				if (!statusAccepted.Contains(request.Status))
 				{
-					status.Message = "Invalid order status!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Invalid order status", false, new { }));
 				}
 
 				if (request.Status != Constants.ORDER_STATUS_REJECT_COMPLAINT && request.Status != Constants.ORDER_STATUS_SELLER_VIOLATES)
@@ -692,20 +656,11 @@ namespace DigitalFUHubApi.Controllers
 				}
 				else
 				{
-					status.Message = "Invalid order status!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new { }));
 				}
 
 				// check seller have VIOLATE 
-
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new { }));
 			}
 			catch (Exception ex)
 			{

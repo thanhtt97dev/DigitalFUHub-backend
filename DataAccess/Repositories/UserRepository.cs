@@ -45,5 +45,9 @@ namespace DataAccess.Repositories
 
 		public string GenerateRandomUsername(string email)
 		=> UserDAO.Instance.GenerateRandomUsername(email);
-	}
+
+        public User? GetUserByUserNameOtherUserId(long userId, string userName) => UserDAO.Instance.GetUserByUserNameOtherUserId(userId, userName);
+
+        public void ActiveUserNameAndPassword(long userId, string userName, string password) => UserDAO.Instance.ActiveUserNameAndPassword(userId, userName, password);
+    }
 }

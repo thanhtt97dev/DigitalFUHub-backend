@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.Style;
 using System;
 using System.Diagnostics;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -210,8 +211,31 @@ namespace DataAccess.DAOs
 		}
 		#endregion
 
+		#region Get total record with condition
+		internal int GetNumberOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var orders = context.Order
+							.Include(x => x.User)
+							.Include(x => x.Shop)
+							.Where
+							(x =>
+								(fromDate != null && toDate != null) ? fromDate <= x.OrderDate && toDate >= x.OrderDate : true &&
+								x.User.Email.Contains(customerEmail) &&
+								((shopId == 0) ? true : x.Shop.UserId == shopId) &&
+								x.Shop.ShopName.Contains(shopName) &&
+								(orderId == 0 ? true : x.OrderId == orderId) &&
+								(status == 0 ? true : x.OrderStatusId == status)
+							)
+							.Count();
+				return orders;
+			}
+		}
+		#endregion
+
 		#region Get orders with conditions
-		internal List<Order> GetOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime fromDate, DateTime toDate, int status)
+		internal List<Order> GetOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status, int page)
 		{
 			List<Order> orders = new List<Order>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -219,6 +243,7 @@ namespace DataAccess.DAOs
 				orders = context.Order
 							.Include(x => x.User)
 							.Include(x => x.Shop)
+							.Include(x => x.BusinessFee)
 							.Select(o => new Order
 							{
 								OrderId = o.OrderId,
@@ -226,6 +251,11 @@ namespace DataAccess.DAOs
 								TotalPayment = o.TotalPayment,
 								TotalAmount = o.TotalAmount,
 								TotalCouponDiscount = o.TotalCouponDiscount,
+								TotalCoinDiscount = o.TotalCoinDiscount,
+								BusinessFee = new BusinessFee
+								{
+									Fee = o.BusinessFee.Fee
+								},
 								User = new User
 								{
 									UserId = o.User.UserId,
@@ -239,13 +269,16 @@ namespace DataAccess.DAOs
 								OrderStatusId = o.OrderStatusId
 							})
 							.Where(x =>
-								fromDate <= x.OrderDate && toDate >= x.OrderDate &&
+								(fromDate != null && toDate != null) ? fromDate <= x.OrderDate && toDate >= x.OrderDate : true &&
 								x.User.Email.Contains(customerEmail) &&
 								((shopId == 0) ? true : x.Shop.UserId == shopId) &&
 								x.Shop.ShopName.Contains(shopName) &&
 								(orderId == 0 ? true : x.OrderId == orderId) &&
 								(status == 0 ? true : x.OrderStatusId == status)
-							).OrderByDescending(x => x.OrderDate)
+							)
+							.OrderByDescending(x => x.OrderDate)
+							.Skip((page - 1) * Constants.PAGE_SIZE)
+							.Take(Constants.PAGE_SIZE)
 							.ToList();
 
 			}

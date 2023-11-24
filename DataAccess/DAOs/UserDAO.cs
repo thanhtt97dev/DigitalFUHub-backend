@@ -253,5 +253,37 @@ namespace DataAccess.DAOs
 
 			}
 		}
-	}
+
+        internal User? GetUserByUserNameOtherUserId(long userId, string userName)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var result = (from user in context.User
+							  where user.UserId != userId
+							  &&
+							  user.Username.ToUpper().Trim().Equals(userName.ToUpper().Trim())
+							  select new User { }).FirstOrDefault();
+
+				return result;
+            }
+        }
+
+        internal void ActiveUserNameAndPassword(long userId, string userName, string password)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var userFind = context.User.FirstOrDefault(x => x.UserId == userId);
+
+				if (userFind == null) throw new ArgumentNullException(nameof(userFind));
+
+				userFind.Username = userName;
+				userFind.Password = password;
+				userFind.IsChangeUsername = true;
+
+				context.SaveChanges();
+            }
+        }
+
+
+    }
 }
