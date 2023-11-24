@@ -16,6 +16,7 @@ namespace DTOs.User
         public string? RoleName { get; set; }
         public string? Email { get; set; }
         public string? Username { get; set; }
+        public bool IsChangeUsername { get; set; }
         public string? Avatar { get; set; }
         public bool TwoFactorAuthentication { get; set; }
         public bool? Status { get; set; }
