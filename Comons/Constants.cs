@@ -206,6 +206,9 @@
 		public const int SORTED_BY_SALE = 2;
 		public const int SORTED_BY_PRICE_ASC = 3;
 		public const int SORTED_BY_PRICE_DESC = 4;
+
+		public const int STATISTIC_BY_MONTH = 0;
+		public const int STATISTIC_BY_YEAR = 1;
 	}
 }
 

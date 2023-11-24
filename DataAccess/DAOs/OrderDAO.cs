@@ -726,13 +726,13 @@ namespace DataAccess.DAOs
 																DateCreate = transactionCoin.DateCreate
 															}).ToList(),
 										HistoryOrderStatus = (from historyOrderStatus in context.HistoryOrderStatus
-															 where historyOrderStatus.OrderId == orderId
-															 select new HistoryOrderStatus
-															 {
-																 OrderStatusId = historyOrderStatus.OrderStatusId,
-																 DateCreate = historyOrderStatus.DateCreate,
-																 Note = historyOrderStatus.Note
-															 }).ToList()
+															  where historyOrderStatus.OrderId == orderId
+															  select new HistoryOrderStatus
+															  {
+																  OrderStatusId = historyOrderStatus.OrderStatusId,
+																  DateCreate = historyOrderStatus.DateCreate,
+																  Note = historyOrderStatus.Note
+															  }).ToList()
 									}
 									).FirstOrDefault();
 				return orderInfo;
@@ -1056,7 +1056,8 @@ namespace DataAccess.DAOs
 								context.TransactionInternal.AddRange(transactionInternals);
 							}
 							historyOrderStatus.OrderStatusId = Constants.ORDER_STATUS_CONFIRMED;
-						}else if(status == Constants.ORDER_STATUS_COMPLAINT)
+						}
+						else if (status == Constants.ORDER_STATUS_COMPLAINT)
 						{
 							historyOrderStatus.OrderStatusId = Constants.ORDER_STATUS_COMPLAINT;
 						}
@@ -1110,7 +1111,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal (long, List<Order>) GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, 
+		internal (long, List<Order>) GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate,
 			DateTime? toDate, int status, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -1121,12 +1122,12 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
-							&& (fromDate != null && toDate != null ? x.OrderDate.Date >= fromDate.Value.Date 
+							&& (fromDate != null && toDate != null ? x.OrderDate.Date >= fromDate.Value.Date
 							&& x.OrderDate.Date <= toDate.Value.Date : true)
 							&& (status == 0 ? true : x.OrderStatusId == status)
 							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
 					.OrderByDescending(x => x.OrderDate);
-					return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE).Take(Constants.PAGE_SIZE).ToList());
+				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE).Take(Constants.PAGE_SIZE).ToList());
 
 
 			}
@@ -1322,11 +1323,28 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
-							&& (fromDate != null && toDate != null ? x.OrderDate.Date >= fromDate.Value.Date 
+							&& (fromDate != null && toDate != null ? x.OrderDate.Date >= fromDate.Value.Date
 							&& x.OrderDate.Date <= toDate.Value.Date : true)
 							&& (status == 0 ? true : x.OrderStatusId == status)
 							&& (string.IsNullOrWhiteSpace(orderId) ? true : x.OrderId.ToString() == orderId.Trim()))
 					.OrderByDescending(x => x.OrderDate)
+					.ToList();
+			}
+		}
+
+		internal List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOders)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.Where(x => x.ShopId == userId && x.OrderStatusId == typeOders
+						&& (month == 0 ? true : x.OrderDate.Month == month)
+						&& year == x.OrderDate.Year)
+					.OrderBy(x => x.OrderDate)
 					.ToList();
 			}
 		}
