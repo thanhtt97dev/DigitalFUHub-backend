@@ -42,7 +42,7 @@ namespace DataAccess.Repositories
 
 		public Order? GetOrderCustomer(long orderId, long customerId) => OrderDAO.Instance.GetOrderCustomer(orderId, customerId);
 
-		public (long, List<Order>) GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate, 
+		public (long, List<Order>) GetListOrderSeller(long userId, string orderId, string username, DateTime? fromDate,
 			DateTime? toDate, int status, int page)
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status, page);
 
@@ -63,5 +63,7 @@ namespace DataAccess.Repositories
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
 
 		
+		public List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOders)
+		=> OrderDAO.Instance.GetListOrderOfShop(userId, month, year, typeOders);
 	}
 }

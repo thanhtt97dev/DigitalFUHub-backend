@@ -62,11 +62,13 @@
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
 
+        public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_USERNAME_01";
 
 
 
-		//SignalR
-		public const string SIGNAL_R_CHAT_HUB = "chatHub";
+
+        //SignalR
+        public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
 		public const string SIGNAL_R_NOTIFICATION_HUB = "notificationHub";
@@ -207,6 +209,9 @@
 		public const int SORTED_BY_SALE = 2;
 		public const int SORTED_BY_PRICE_ASC = 3;
 		public const int SORTED_BY_PRICE_DESC = 4;
+
+		public const int STATISTIC_BY_MONTH = 0;
+		public const int STATISTIC_BY_YEAR = 1;
 	}
 }
 

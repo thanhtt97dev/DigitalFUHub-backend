@@ -21,8 +21,10 @@
 	using DataAccess.Repositories;
 	using DTOs.Admin;
     using Azure.Core;
+    using Quartz.Util;
+    using System.Text.RegularExpressions;
 
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
@@ -529,8 +531,6 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-
-				string username = user.Email.Split('@')[0];
 				user.Email = Util.HideCharacters(user.Email, 5);
 
 				return Ok(_mapper.Map<UserResponeDTO>(user));
@@ -682,7 +682,7 @@
 		#region Get Coin
 		[Authorize]
 		[HttpGet("GetCoin/{userId}")]
-		public IActionResult UpdateBalance(long userId)
+		public IActionResult GetCoin(long userId)
 		{
 			ResponseData response = new ResponseData();
 			try
@@ -753,10 +753,66 @@
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 		}
-		#endregion
+        #endregion
 
-		#region Get all users for admin
-		[Authorize(Roles = "Admin")]
+        #region Active UserName and Password
+        [HttpPost("ActiveUserNameAndPassword")]
+        [Authorize]
+        public IActionResult ActiveUserNameAndPassword(ActiveUserNameAndPasswordRequestDTO request)
+        {
+            try
+            {
+                if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+                if (!Regex.IsMatch(request.Username, Constants.REGEX_USERNAME_SIGN_UP))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "UserName Invalid", false, new()));
+                }
+
+				//if (!Regex.IsMatch(request.Password, Constants.REGEX_PASSWORD_SIGN_UP))
+				//{
+				//	return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Password Invalid", false, new()));
+				//}
+
+				// check user exists
+				var user = _userRepository.GetUserById(request.UserId);
+
+				if (user == null)
+				{
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "User not found", false, new()));
+                }
+
+				if (user.IsChangeUsername)
+				{
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "This user has an activated username and password", false, new()));
+                }
+
+                var userFind = _userRepository.GetUserByUserNameOtherUserId(request.UserId, request.Username);
+
+                // check username exist
+                if (userFind != null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS, "UserName already exists", false, new()));
+                }
+
+				_userRepository.ActiveUserNameAndPassword(request.UserId, request.Username, request.Password);
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+
+
+
+        #region Get all users for admin
+        [Authorize(Roles = "Admin")]
 		[HttpPost("GetUsers")]
 		public IActionResult GetUsers(UsersRequestDTO requestDTO)
 		{
