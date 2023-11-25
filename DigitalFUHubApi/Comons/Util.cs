@@ -53,6 +53,22 @@ namespace DigitalFUHubApi.Comons
 		}
 		#endregion
 
+		#region Get file
+		public static byte[]? GetFile(string fileName)
+		{
+			string fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+			try
+			{
+				return File.ReadAllBytes(fullPath);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+			
+		}
+		#endregion
+
 		#region Read file
 		public static string ReadFile(string fileName)
 		{
@@ -64,7 +80,6 @@ namespace DigitalFUHubApi.Comons
 
 		#region Write file
 		public static void WriteFile(string fileName, object data)
-
 		{
 			string fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
 			var options = new JsonSerializerOptions { WriteIndented = true };
