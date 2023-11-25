@@ -65,63 +65,39 @@ namespace DigitalFUHubApi.Controllers
         [Authorize]
         public IActionResult AddReportProduct ([FromForm] AddReportProductRequestDTO request)
         {
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
+                if (!ModelState.IsValid) return BadRequest();
 
                 int minLength = 10;
                 int maxLength = 50;
 
-                if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
-                {
-                    return Unauthorized();
-                }
+                if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
 
                 var user = userRepository.GetUserById(request.UserId);
-
                 if (user == null)
                 {
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Ok = false;
-                    status.Message = "user not found!!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found!!", false, new()));
+				}
 
                 var product = productRepository.GetProductEntityById(request.ProductId);
-
                 if (product == null)
                 {
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Ok = false;
-                    status.Message = "product not found!!";
-                    responseData.Status = status;
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "product not found!!", false, new()));
+				}
 
                 var reason = reasonReportProductRepository.GetEntityById(request.ReasonReportProductId);
-
                 if (reason == null)
                 {
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Ok = false;
-                    status.Message = "reason not found!!";
-                    responseData.Status = status;
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "reason not found!!", false, new()));
                 }
 
                 string trimmedDescription = Regex.Replace(request.Description, @"\s+", " ");
 
                 if (trimmedDescription.Length < minLength || trimmedDescription.Length > maxLength)
                 {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Ok = false;
-                    status.Message = "Description for this reason should have 10 - 50 characters";
-                    responseData.Status = status;
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Description for this reason should have 10 - 50 characters!", false, new()));
+				}
 
                 // Ok
                 ReportProduct reportProduct = mapper.Map<ReportProduct>(request);
@@ -129,13 +105,9 @@ namespace DigitalFUHubApi.Controllers
                 reportProduct.ReportProductStatusId = Constants.REPORT_PRODUCT_STATUS_VERIFYING;
                 reportProductRepository.AddReportProduct(reportProduct);
 
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", true, new()));
 
-            }
+			}
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);

@@ -26,21 +26,15 @@ namespace DigitalFUHubApi.Controllers
 
 
         [HttpGet("GetAll")]
-        //[Authorize]
         public IActionResult GetAllReasonReportProducts ()
         {
-            ResponseData responseData = new ResponseData();
             try
             {
                 var reasons = reasonReportProductRepository.GetAll();
                 var reasonResponse = mapper.Map<List<ReasonReportProductResponseDTO>>(reasons);
-                // OK
-                responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                responseData.Status.Ok = true;
-                responseData.Status.Message = "Success!";
-                responseData.Result = reasonResponse;
-                return Ok(responseData);
-            }
+				// OK
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, reasonResponse));
+			}
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);

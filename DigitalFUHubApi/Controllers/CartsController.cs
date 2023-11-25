@@ -107,7 +107,7 @@ namespace DigitalFUHubApi.Controllers
                 var result = mapper.Map<List<UserCartResponseDTO>>(carts);
 
 				// Ok
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", false, result));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, result));
             }
             catch (Exception ex)
             {
@@ -149,7 +149,7 @@ namespace DigitalFUHubApi.Controllers
                 // update quantity in cart
                 cartRepository.UpdateQuantityCartDetail(request.CartDetailId, request.Quantity);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", true, new()));
 			}
             catch (Exception ex)
             {
