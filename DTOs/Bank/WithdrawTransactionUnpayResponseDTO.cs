@@ -6,12 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.Bank
 {
-	public class HistoryWithdrawResponseDTO
-	{
-		public int Total { get; set; }
-		public List<HistoryWithdrawDetail> WithdrawTransactions { get; set; } = new List<HistoryWithdrawDetail>();
-	}
-	public class HistoryWithdrawDetail
+	public class WithdrawTransactionUnpayResponseDTO
 	{
 		public long WithdrawTransactionId { get; set; }
 		public long UserId { get; set; }
@@ -24,7 +19,7 @@ namespace DTOs.Bank
 		public string CreditAccount { get; set; } = null!;
 		public string BankName { get; set; } = string.Empty;
 		public string BankCode { get; set; } = null!;
+		public string BankId { get; set; } = null!;
 		public long WithdrawTransactionStatusId { get; set; }
-
 	}
 }

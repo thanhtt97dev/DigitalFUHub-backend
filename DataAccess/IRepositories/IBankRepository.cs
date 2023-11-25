@@ -20,9 +20,9 @@ namespace DataAccess.IRepositories
 		void CreateWithdrawTransaction(WithdrawTransaction transaction);
 		List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page);
 		List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string? email,DateTime? fromDate, DateTime? toDate, int page);
-		int GetNumberWithdrawTransactionWithCondition(int id, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status);
+		int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status);
 		List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page);
-		List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId,string email, DateTime fromDate, DateTime toDate,long bankId, string creditAccount, int status);
+		List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId,string email, DateTime? fromDate, DateTime? toDate,long bankId, string creditAccount, int status, int page);
 		WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId);
 		WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId);
 		void UpdateWithdrawTransactionPaid(long transactionId);
@@ -32,5 +32,6 @@ namespace DataAccess.IRepositories
 		int GetNumberDepositTransactionMakedInToday(long userId);
 		void UpdateWithdrawTransactionCancel(int id);
 		int GetNumberDepositTransaction(int id, long depositTransactionId, string? email,  DateTime? fromDate, DateTime? toDate, int status);
+		List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount);
 	}
 }

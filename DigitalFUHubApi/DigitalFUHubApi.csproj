@@ -31,4 +31,8 @@
     <ProjectReference Include="..\DTOs\DTOs.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Files\Excels\" />
+  </ItemGroup>
+
 </Project>

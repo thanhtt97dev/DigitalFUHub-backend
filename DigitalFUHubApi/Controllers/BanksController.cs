@@ -16,6 +16,7 @@ using Comons;
 using System.Transactions;
 using DTOs.Admin;
 using Azure.Core;
+using OfficeOpenXml.Style;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -62,8 +63,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpGet("user/{id}")]
 		public IActionResult GetUserBankAccount(int id)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (id == 0) return BadRequest();
@@ -74,20 +73,11 @@ namespace DigitalFUHubApi.Controllers
 				var bank = bankRepository.GetUserBank(id);
 				if (bank == null)
 				{
-					status.Message = "Not found user's bank account!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found user's bank account!", false, new()));
 				}
 
 				var result = mapper.Map<BankAccountResponeDTO>(bank);
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, result));
 			}
 			catch (Exception ex)
 			{
@@ -101,8 +91,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("InquiryAccountName")]
 		public async Task<IActionResult> InquiryAccountName(BankInquiryAccountNameRequestDTO inquiryAccountNameRequestDTO)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (inquiryAccountNameRequestDTO == null ||
@@ -117,42 +105,27 @@ namespace DigitalFUHubApi.Controllers
 
 				if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SAME_URI_IN_SAME_TIME)
 				{
-					status.Message = "Request many time in same time!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-					responseData.Status = status;
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Request many time in same time!", false, new()));
 				}
 				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SESSION_INVALID)
 				{
-					status.Message = "Third-party's session invalid";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-					responseData.Status = status;
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Third-party's session invalid", false, new()));
 				}
 				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR)
 				{
-					status.Message = "Search data err";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-					responseData.Status = status;
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Search data err", false, new()));
 				}
 				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND)
 				{
-					status.Message = "Not found";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
+				/*
 				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
 				{
-					status.Message = "Success";
-					status.Ok = true;
-					status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-					responseData.Status = status;
-					responseData.Result = mbBankResponse.Result;
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, mbBankResponse.Result));
 				}
-
-				return Ok(responseData);
+				*/
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, mbBankResponse.Result));
 			}
 			catch (Exception ex)
 			{
@@ -283,8 +256,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("UpdateBankAccount")]
 		public async Task<IActionResult> UpdateBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (bankLinkAccountRequestDTO == null) return BadRequest();
@@ -306,11 +277,7 @@ namespace DigitalFUHubApi.Controllers
 				bool acceptUpdate = Util.CompareDateEqualGreaterThanDaysCondition(userBankAccount.UpdateAt, Constants.NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT);
 				if (!acceptUpdate) //RULE 1
 				{
-					status.Message = "After 15 days can update";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "After few days can update", false, new()));
 				}
 
 				BankInquiryAccountNameRequestDTO bankInquiryAccount = new BankInquiryAccountNameRequestDTO()
@@ -322,11 +289,7 @@ namespace DigitalFUHubApi.Controllers
 				var mbBank = await mbBankService.InquiryAccountName(bankInquiryAccount);
 				if (mbBank == null || mbBank.Result == null) //RULE2 2
 				{
-					status.Message = "Third-party's server err";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Third-party's server err", false, new()));
 				}
 				else
 				{
@@ -334,19 +297,12 @@ namespace DigitalFUHubApi.Controllers
 					{
 						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND) //RULE 3
 						{
-							status.Message = "Not found";
-							status.Ok = false;
-							status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-							responseData.Status = status;
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 						}
 						else //RULE 2
 						{
-							status.Message = "Third-party's server err";
-							status.Ok = false;
-							status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-							responseData.Status = status;
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Third-party's server err", false, new()));
 						}
-						return Ok(responseData);
 					}
 				}
 				var benName = mbBank.Result;
@@ -363,12 +319,7 @@ namespace DigitalFUHubApi.Controllers
 				bankRepository.UpdateUserBankStatus(userBankAccount);
 				bankRepository.AddUserBank(userBank);
 
-				status.Message = "Update user's bank account success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Update user's bank account success!", true, new()));
 			}
 			catch (Exception ex)
 			{
@@ -487,24 +438,10 @@ namespace DigitalFUHubApi.Controllers
 			{
 				if (id == 0 || request == null || request.FromDate == null ||request.ToDate == null) return BadRequest();
 
-				DateTime? fromDate = null;
-				DateTime? toDate = null;
-				string format = "M/d/yyyy";
-				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.ToDate))
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
 				{
-					try
-					{
-						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-						if (fromDate > toDate)
-						{
-							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
-						}
-					}
-					catch (FormatException)
-					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
-					}
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
 
 				long depositTransactionId;
@@ -544,33 +481,13 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("HistoryDeposit")]
 		public IActionResult GetHistoryDepositTransactionSuccess(HistoryDepositForAdminRequestDTO request)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-			string format = "M/d/yyyy";
 			try
 			{
-				if (request == null || request.Email == null ||
-					request.FromDate == null || request.ToDate == null) return BadRequest();
-
-				DateTime? fromDate = null;
-				DateTime? toDate = null;
-				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.FromDate))
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
 				{
-					try
-					{
-						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-						if (fromDate > toDate)
-						{
-							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
-						}
-					}
-					catch (FormatException)
-					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
-					}
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
-				
 
 				long depositTransactionId;
 				long.TryParse(request.DepositTransactionId, out depositTransactionId);
@@ -603,13 +520,9 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("HistoryWithdraw/{id}")]
 		public IActionResult GetHistoryWithdrawTransaction(int id, HistoryWithdrawRequestDTO request)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-			string format = "M/d/yyyy";
 			try
 			{
-				if (id == 0 || request == null || request.FromDate == null ||
-					request.ToDate == null) return BadRequest();
+				if (id == 0 || request == null || request.FromDate == null || request.ToDate == null) return BadRequest();
 
 				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(request.Status) &&
 					request.Status != Constants.WITHDRAW_TRANSACTION_ALL)
@@ -617,31 +530,16 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
 				}
 
-				DateTime? fromDate = null;
-				DateTime? toDate = null;
-
-				if(!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.FromDate))
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
 				{
-					try
-					{
-						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-						if (fromDate > toDate)
-						{
-							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
-						}
-					}
-					catch (FormatException)
-					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
-					}
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
-
 
 				long withdrawTransactionId;
 				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
 
-				var totalRecord = bankRepository.GetNumberWithdrawTransactionWithCondition(id, withdrawTransactionId, fromDate, toDate, request.Status);
+				var totalRecord = bankRepository.GetNumberWithdrawTransactionWithCondition(id, withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount, request.Status);
 				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
 				if (request.Page > numberPages || request.Page == 0)
 				{
@@ -667,65 +565,68 @@ namespace DigitalFUHubApi.Controllers
 		#region Get history withdraw transaction for admin
 		[Authorize(Roles ="Admin")]
 		[HttpPost("HistoryWithdrawAll")]
-		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO requestDTO)
+		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO request)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-			string format = "M/d/yyyy";
+			if (!ModelState.IsValid) return BadRequest();
 			try
 			{
-				if (requestDTO == null ||requestDTO.Email == null ||
-					requestDTO.FromDate == null ||requestDTO.ToDate == null ||
-					requestDTO.CreditAccount == null
-					) return BadRequest();
-
-				DateTime fromDate;
-				DateTime toDate;
-				try
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
 				{
-					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
-					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
-					}
-				}
-				catch (FormatException)
-				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
 
-				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(requestDTO.Status) &&
-					requestDTO.Status != Constants.WITHDRAW_TRANSACTION_ALL)
+				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(request.Status) && request.Status != Constants.WITHDRAW_TRANSACTION_ALL)
 				{
-					status.Message = "Invalid transaction's status";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
 				}
 
 				long withdrawTransactionId;
-				long.TryParse(requestDTO.WithdrawTransactionId, out withdrawTransactionId);
+				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
 
-				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate,requestDTO.BankId,requestDTO.CreditAccount, requestDTO.Status);
+				var totalRecord = bankRepository.GetNumberWithdrawTransactionWithCondition(0, withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount, request.Status);
+				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
+				if (request.Page > numberPages || request.Page == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
-				var result = mapper.Map<List<HistoryWithdrawDetail>>(deposits);
+				var withdraws = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount, request.Status, request.Page);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				var result = new
+				{
+					Total = totalRecord,
+					WithdrawTransactions = mapper.Map<List<HistoryWithdrawDetail>>(withdraws)
+				};
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get all withdraw transaction unpay
+		[Authorize(Roles = "Admin")]
+		[HttpPost("GetAllWithdrawUnPay")]
+		public IActionResult GetAllWithdrawUnPay(WithdrawTransactionUnPayRequestDTO request)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+			try
+			{
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				long withdrawTransactionId;
+				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
+
+				var withdraws = bankRepository.GetAllWithdrawTransactionUnPay(withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount);
+				var result = mapper.Map<List<WithdrawTransactionUnpayResponseDTO  >>(withdraws);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{
@@ -769,8 +670,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("WithdrawTransactionBill")]
 		public IActionResult GetWithdrawTransactionBill(WithdrawTransactionBillRequestDTO requestDTO)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (requestDTO.UserId == 0 || requestDTO.WithdrawTransactionId == 0) return BadRequest();
@@ -778,58 +677,32 @@ namespace DigitalFUHubApi.Controllers
 
 				if(withdrawTransaction == null)
 				{
-					status.Message = "Withdraw bill not found!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Withdraw bill not found!", false, new()));
 				}
 
 				if (withdrawTransaction.UserId != requestDTO.UserId)
 				{
-					status.Message = "You not have permitsion to view this data!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_UN_AUTHORIZE;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_UN_AUTHORIZE, "You not have permitsion to view this data!", false, new()));
 				}
 
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
 				{
-					status.Message = "Withdraw transaction hasn't paid!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY, "Withdraw transaction hasn't paid!", false, new()));
 				}
 
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_REJECT)
 				{
-					status.Message = "Withdraw transaction hasn been rejected!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_REJECT;
-					responseData.Status = status;
-					responseData.Result = withdrawTransaction.Note ?? string.Empty;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_REJECT, "Withdraw transaction hasn been rejected!", false, withdrawTransaction.Note ?? string.Empty));
 				}
 
 				var bill = bankRepository.GetWithdrawTransactionBill(requestDTO.WithdrawTransactionId);
 				if(bill == null)
 				{
-					status.Message = "Withdraw bill has been in process in partner bank!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND, "Withdraw bill has been in process in partner bank!", false, new()));
 				}
 
 				var result = mapper.Map<WithdrawTransactionBillDTO>(bill);
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, result));
 			}
 			catch (Exception ex)
 			{
@@ -844,8 +717,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("WithdrawTransactionBillAdmin")]
 		public IActionResult GetWithdrawTransactionBillForAdmin(WithdrawTransactionBillRequestDTO requestDTO)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (requestDTO.UserId == 0 || requestDTO.WithdrawTransactionId == 0) return BadRequest();
@@ -853,50 +724,27 @@ namespace DigitalFUHubApi.Controllers
 
 				if (withdrawTransaction == null)
 				{
-					status.Message = "Withdraw bill not found!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Withdraw bill not found!", false, new()));
 				}
-
 
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
 				{
-					status.Message = "Withdraw transaction hasn't paid!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_UNPAY, "Withdraw transaction hasn't paid!", false, new()));
 				}
 
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_REJECT)
 				{
-					status.Message = "Withdraw transaction hasn been rejected!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_REJECT;
-					responseData.Result = withdrawTransaction.Note ?? string.Empty;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_REJECT, "Withdraw transaction hasn been rejected!", false, withdrawTransaction.Note ?? string.Empty));
 				}
 
 				var bill = bankRepository.GetWithdrawTransactionBill(requestDTO.WithdrawTransactionId);
 				if (bill == null)
 				{
-					status.Message = "Withdraw bill has been in process in partner bank!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_BILL_NOT_FOUND, "Withdraw bill has been in process in partner bank!", false, new()));
 				}
 
 				var result = mapper.Map<WithdrawTransactionBillDTO>(bill);
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, result));
 			}
 			catch (Exception ex)
 			{
@@ -911,35 +759,21 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("ConfirmTransfer")]
 		public IActionResult ConfirmTransferWithdrawSuccess(ConfirmTransferWithdrawSuccessRequestDTO requestDTO)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (requestDTO.Id == 0) return BadRequest();
 				var withdrawTransaction = bankRepository.GetWithdrawTransaction(requestDTO.Id);
 				if (withdrawTransaction == null)
 				{
-					status.Message = "Withdraw bill not found!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Withdraw bill not found!", false, new()));
 				}
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID)
 				{
-					status.Message = "Withdraw transaction has been paid!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID, "Withdraw transaction has been paid!", false, new()));
 				}
 
 				bankRepository.UpdateWithdrawTransactionPaid(requestDTO.Id);
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception ex)
 			{
@@ -963,35 +797,19 @@ namespace DigitalFUHubApi.Controllers
 
 				if(responeCode == Constants.RESPONSE_CODE_DATA_NOT_FOUND) 
 				{
-					status.Message = "A withdraw transaction not found!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "A withdraw transaction not found!", false, new()));
 				}
 				if (responeCode == Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID)
 				{
-					status.Message = "A withdraw has been paid!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_WITHDRAW_PAID, "A withdraw has been paid!", false, new()));
 				}
 
 				if (responeCode == Constants.RESPONSE_CODE_FAILD)
 				{
-					status.Message = "Sever err!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Sever err!", false, new()));
 				}
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new()));
 			}
 			catch (Exception ex)
 			{
@@ -1015,31 +833,21 @@ namespace DigitalFUHubApi.Controllers
 
 				if (withdrawTransaction == null)
 				{
-					status.Message = "Withdraw transaction not existed!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Withdraw transaction not existed!", false, new()));
 				}
 
 				if (withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID ||
 					withdrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_REJECT)
 				{
-					status.Message = $"Withdraw transaction has been " +
+					
+					var message = $"Withdraw transaction has been " +
 						$"{(withdrawTransaction.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID ? "Paid" : "Rejected")}!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, message, false, new()));
 				}
 
 				bankRepository.RejectWithdrawTransaction(requestDTO.WithdrawTransactionId, requestDTO.Note);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new()));
 			}
 			catch (Exception ex)
 			{
