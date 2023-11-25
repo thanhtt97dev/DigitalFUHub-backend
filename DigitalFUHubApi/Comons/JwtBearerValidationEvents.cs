@@ -43,7 +43,7 @@ namespace DigitalFUHubApi.Comons
 
 			long userId;
 			long.TryParse(userIdStr, out userId);
-
+			/*
 			var dbContext = context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
 			var user = dbContext.User.FirstOrDefault(x => x.UserId == userId);
 			if (user == null || !user.Status)
@@ -51,6 +51,7 @@ namespace DigitalFUHubApi.Comons
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
 			}
+			
 
 			var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.IsRevoked == false);
 			if (accessToken == null)
@@ -63,6 +64,7 @@ namespace DigitalFUHubApi.Comons
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
 			}
+			*/
 
 			StringValues headerValues;
 			context.Request.Headers.TryGetValue("session-userid", out headerValues);

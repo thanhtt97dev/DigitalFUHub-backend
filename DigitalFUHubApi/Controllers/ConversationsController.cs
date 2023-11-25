@@ -212,7 +212,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
 				}
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", false, conversationId));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, conversationId));
 			}
 			catch (Exception ex)
 			{
@@ -222,7 +222,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get conversation detail
+		#region Get list conversation of a user
 		[HttpGet("getConversations")]
 		[Authorize]
 		public IActionResult GetConversations(long userId)
@@ -239,7 +239,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				List<ConversationResponseDTO> userConversations = conversationRepository.GetUsersConversations(userId);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Success!", true, userConversations));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, userConversations));
 
 			}
 			catch (Exception ex)
@@ -364,8 +364,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpGet("GetConversationsUnRead/{userId}")]
 		public IActionResult GetConversationsUnRead(long userId)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (userId == 0)
