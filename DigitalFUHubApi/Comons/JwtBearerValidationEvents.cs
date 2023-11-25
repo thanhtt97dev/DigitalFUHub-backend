@@ -41,8 +41,8 @@ namespace DigitalFUHubApi.Comons
 				userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
 			}
 
-			int userId;
-			int.TryParse(userIdStr, out userId);
+			long userId;
+			long.TryParse(userIdStr, out userId);
 
 			var dbContext = context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
 			var user = dbContext.User.FirstOrDefault(x => x.UserId == userId);
@@ -66,7 +66,8 @@ namespace DigitalFUHubApi.Comons
 
 			StringValues headerValues;
 			context.Request.Headers.TryGetValue("session-userid", out headerValues);
-			if (headerValues.FirstOrDefault() == null || !string.Equals(userId.ToString(), headerValues.FirstOrDefault()))
+			long.TryParse(headerValues.FirstOrDefault(), out long s_userId);
+			if (headerValues.FirstOrDefault() == null || s_userId == 0 || userId != s_userId)
 			{
 				context.Fail("Unauthorized");
 			}

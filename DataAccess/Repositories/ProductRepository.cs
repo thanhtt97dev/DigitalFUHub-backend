@@ -69,5 +69,8 @@ namespace DataAccess.Repositories
 		public (long totalItems, List<Product> productSearched) GetListProductSearched(string keyword, long categoryId,
 			int rating, long? minPrice, long? maxPrice, long sort, int page)
 		=> ProductDAO.Instance.GetListProductSearched(keyword, categoryId, rating, minPrice, maxPrice, sort, page);
+
+		public long GetNumberProductsOutOfStock(long userId)
+		=> ProductDAO.Instance.GetNumberProductsOutOfStock(userId);
 	}
 }

@@ -3,10 +3,12 @@ using Comons;
 using DataAccess.DAOs;
 using DataAccess.IRepositories;
 using DTOs.Order;
+using DTOs.Statistic;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,7 +65,14 @@ namespace DataAccess.Repositories
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
 
 		
-		public List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOders)
-		=> OrderDAO.Instance.GetListOrderOfShop(userId, month, year, typeOders);
+		public List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOrders)
+		=> OrderDAO.Instance.GetListOrderOfShop(userId, month, year, typeOrders);
+
+		public List<Order> GetListOrderOfCurrentMonth(long userId)
+		=> OrderDAO.Instance.GetListOrderOfCurrentMonth(userId);
+
+		public List<StatisticNumberOrdersOfStatusResponseDTO> GetNumberOrderByStatus(long userId)
+		=> OrderDAO.Instance.GetNumberOrderByStatus(userId);
+
 	}
 }

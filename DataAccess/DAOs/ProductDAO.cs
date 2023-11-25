@@ -854,8 +854,9 @@ namespace DataAccess.DAOs
 #pragma warning disable CS8604 // Possible null reference argument.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 				return context.Product.Include(x => x.Tags)
-					.Where(x => x.ProductName.ToLower().Contains(keywordSearch)
-					|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
+					.Where(x => x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE 
+					&& (x.ProductName.ToLower().Contains(keywordSearch)
+					|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch))))
 					.OrderByDescending(x => x.SoldCount)
 					.Take(Constants.LIMIT_SEARCH_HINT)
 					.ToList();
@@ -871,13 +872,17 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				string keywordSearch = keyword.Trim().ToLower();
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 				var query = context.Product.Include(x => x.Tags).Include(x => x.ProductVariants)
-					.Where(x => x.ProductName.ToLower().Contains(keywordSearch) && x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+					.Where(x => (x.ProductName.ToLower().Contains(keywordSearch) 
+							|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
+						&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 						&& (categoryId == Constants.ALL_CATEGORY ? true : x.CategoryId == categoryId)
 						&& (rating == Constants.FEEDBACK_TYPE_ALL ? true : (x.NumberFeedback != 0 && x.TotalRatingStar / x.NumberFeedback >= rating))
-						&& (minPrice == null ? true : x.ProductVariants.Any(pv => (pv.Price - (pv.Price * pv.Discount / 100)) >= minPrice))
-						&& (maxPrice == null ? true : x.ProductVariants.Any(pv => (pv.Price - (pv.Price * pv.Discount / 100)) <= maxPrice))
+						&& (minPrice == null ? true : x.ProductVariants.All(pv => (pv.Price - (pv.Price * pv.Discount / 100)) >= minPrice))
+						&& (maxPrice == null ? true : x.ProductVariants.All(pv => (pv.Price - (pv.Price * pv.Discount / 100)) <= maxPrice))
 					);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 				if (sort == Constants.SORTED_BY_DATETIME)
 				{
 					query = query.OrderByDescending(x => x.DateCreate);
@@ -889,16 +894,33 @@ namespace DataAccess.DAOs
 				else if (sort == Constants.SORTED_BY_PRICE_DESC)
 				{
 					query = query.OrderByDescending(x => x.ProductVariants.Min(pv => pv.Price - (pv.Price * pv.Discount / 100)));
-
 				}
 				else
 				{
 					query = query.OrderByDescending(x => x.SoldCount);
 				}
 
-				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE_SEARCH_PRODUCT).Take(Constants.PAGE_SIZE_SEARCH_PRODUCT).ToList());
+				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE_SEARCH_PRODUCT)
+					.Take(Constants.PAGE_SIZE_SEARCH_PRODUCT).ToList());
 			}
 #pragma warning restore CS8604 // Possible null reference argument.
+		}
+
+		internal long GetNumberProductsOutOfStock(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+#pragma warning disable CS8604 // Possible null reference argument.
+				return context.Product
+					.Include(x => x.ProductVariants)
+					.ThenInclude(x => x.AssetInformations)
+					.Count(x => x.ShopId == userId
+						&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+						&& x.ProductVariants.All(pv => pv.AssetInformations.Count(ai => ai.IsActive == true) == 0));
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+			}
 		}
 	}
 }
