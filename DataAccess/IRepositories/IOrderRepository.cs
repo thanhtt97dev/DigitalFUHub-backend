@@ -1,5 +1,6 @@
 ﻿using BusinessObject.Entities;
 using DTOs.Order;
+using DTOs.Statistic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,5 +35,7 @@ namespace DataAccess.IRepositories
 		List<Order> GetListOrderSeller(long userId, string orderId, string v, DateTime? fromDate, DateTime? toDate, int status);
 		int GetNumberOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status);
 		List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOders);
+		List<Order> GetListOrderOfCurrentMonth(long userId);
+		List<StatisticNumberOrdersOfStatusResponseDTO> GetNumberOrderByStatus(long userId);
 	}
 }

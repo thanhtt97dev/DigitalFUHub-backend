@@ -18,11 +18,13 @@ namespace DigitalFUHubApi.Controllers
 	public class StatisticsController : ControllerBase
 	{
 		private readonly IOrderRepository _orderRepository;
+		private readonly IProductRepository _productRepository;
 		private readonly JwtTokenService _jwtTokenService;
 
-		public StatisticsController(IOrderRepository orderRepository, JwtTokenService jwtTokenService)
+		public StatisticsController(IOrderRepository orderRepository, IProductRepository productRepository, JwtTokenService jwtTokenService)
 		{
 			_orderRepository = orderRepository;
+			_productRepository = productRepository;
 			_jwtTokenService = jwtTokenService;
 		}
 
@@ -94,12 +96,64 @@ namespace DigitalFUHubApi.Controllers
 				{
 					TypeStatistic = Constants.STATISTIC_BY_YEAR,
 					DataStatistics = query2.ToList()
-				})) ;
+				}));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				return BadRequest();
+				return BadRequest(e.Message);
 			}
+		}
+		#endregion
+
+		#region 
+		[Authorize("Seller")]
+		[HttpGet("CurrentMonth")]
+		public IActionResult StatisticSalesCurrentMonth()
+		{
+			try
+			{
+				List<Order> orders = _orderRepository.GetListOrderOfCurrentMonth(_jwtTokenService.GetUserIdByAccessToken(User));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new
+				{
+					Revenue = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
+										- ((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)))),
+					Profit = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
+											- (((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)) * (x?.BusinessFee?.Fee ?? 0) / 100))),
+					TotalOrders = orders.Count
+				}));
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.Message);
+			}
+		}
+		#endregion
+
+		#region 
+		[Authorize("Seller")]
+		[HttpGet("TodoList")]
+		public IActionResult GetTodoList()
+		{
+			try
+			{
+				List<StatisticNumberOrdersOfStatusResponseDTO> ordersStatus = _orderRepository.GetNumberOrderByStatus(_jwtTokenService.GetUserIdByAccessToken(User));
+				long productsOutOfStock = _productRepository.GetNumberProductsOutOfStock(_jwtTokenService.GetUserIdByAccessToken(User));
+				long totalOrdersWaitConfirm = ordersStatus.FirstOrDefault(x => x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION)?.Count ?? 0;
+				long totalOrdersComplaint = ordersStatus.FirstOrDefault(x => x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT)?.Count ?? 0;
+				long totalOrdersDispute = ordersStatus.FirstOrDefault(x => x.OrderStatusId == Constants.ORDER_STATUS_DISPUTE)?.Count ?? 0;
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new
+				{
+					TotalOrdersWaitConfirm = totalOrdersWaitConfirm,
+					TotalOrdersComplaint = totalOrdersComplaint,
+					TotalOrdersDispute = totalOrdersDispute,
+					TotalProductsOutOfStock = productsOutOfStock,
+				}));
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.Message);
+			}
+			
 		}
 		#endregion
 	}

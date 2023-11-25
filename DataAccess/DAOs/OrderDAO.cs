@@ -2,10 +2,12 @@
 using BusinessObject.Entities;
 using Comons;
 using DTOs.Order;
+using DTOs.Statistic;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml.Style;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.DAOs
@@ -1379,6 +1381,38 @@ namespace DataAccess.DAOs
 						&& year == x.OrderDate.Year)
 					.OrderBy(x => x.OrderDate)
 					.ToList();
+			}
+		}
+
+		internal List<Order> GetListOrderOfCurrentMonth(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				DateTime now = DateTime.Now;
+				return context.Order
+					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.Where(x => x.ShopId == userId && x.OrderDate.Month == now.Month && x.OrderDate.Year == now.Year)
+					.ToList();
+			}
+		}
+
+		internal List<StatisticNumberOrdersOfStatusResponseDTO> GetNumberOrderByStatus(long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION
+							|| x.OrderStatusId == Constants.ORDER_STATUS_DISPUTE
+							|| x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT)
+					.GroupBy(x => x.OrderStatusId)
+					.Select(x => new StatisticNumberOrdersOfStatusResponseDTO
+					{
+						OrderStatusId = x.Key,
+						Count = x.Count()
+					}).ToList();
+
 			}
 		}
 	}
