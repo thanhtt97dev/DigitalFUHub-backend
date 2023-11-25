@@ -32,5 +32,6 @@ namespace DataAccess.IRepositories
 		int GetNumberDepositTransactionMakedInToday(long userId);
 		void UpdateWithdrawTransactionCancel(int id);
 		int GetNumberDepositTransaction(int id, long depositTransactionId, string? email,  DateTime? fromDate, DateTime? toDate, int status);
+		List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount);
 	}
 }

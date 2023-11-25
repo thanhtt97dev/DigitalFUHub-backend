@@ -607,6 +607,34 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Get all withdraw transaction unpay
+		[Authorize(Roles = "Admin")]
+		[HttpPost("GetAllWithdrawUnPay")]
+		public IActionResult GetAllWithdrawUnPay(WithdrawTransactionUnPayRequestDTO request)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+			try
+			{
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				long withdrawTransactionId;
+				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
+
+				var withdraws = bankRepository.GetAllWithdrawTransactionUnPay(withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount);
+				var result = mapper.Map<List<WithdrawTransactionUnpayResponseDTO  >>(withdraws);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 		#region Cancel withdraw transaction of user
 		[Authorize]
 		[HttpPut("CancelWithdraw/{id}")]

@@ -25,6 +25,7 @@ namespace DataAccess.Repositories
 		public int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status) => BankDAO.Instance.GetNumberWithdrawTransactionWithCondition(userId, withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount, status);
 		public List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page) => BankDAO.Instance.GetWithdrawTransaction(userId, withdrawTransactionId, fromDate, toDate, status, page);
 		public List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status, int page) => BankDAO.Instance.GetAllWithdrawTransaction(withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount,  status, page);
+		public List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount) => BankDAO.Instance.GetAllWithdrawTransactionUnPay(withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount);
 		public WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransaction(withdrawTransactionId);
 		public WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransactionBill(withdrawTransactionId);
 		public void UpdateWithdrawTransactionPaid(long transactionId) => BankDAO.Instance.UpdateWithdrawTransaction(transactionId);
@@ -34,6 +35,7 @@ namespace DataAccess.Repositories
 		public (int, long) GetDataWithdrawTransactionMakedToday(long userId) => BankDAO.Instance.GetDataWithdrawTransactionMakedToday(userId);
 		public int GetNumberDepositTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberDepositTransactionMakedInToday(userId);
 
-
+		
+		
 	}
 }
