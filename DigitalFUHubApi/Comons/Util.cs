@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using Azure.Core;
+using BusinessObject.Entities;
 using OfficeOpenXml;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -219,6 +220,33 @@ namespace DigitalFUHubApi.Comons
 				}
 			}
 			return result;
+		}
+		#endregion
+
+		#region Get from date - to date
+		public static (bool, DateTime?, DateTime?) GetFromDateToDate(string? from, string? to)
+		{
+			DateTime? fromDate = null;
+			DateTime? toDate = null;
+			string format = "M/d/yyyy";
+			if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to))
+			{
+				try
+				{
+					fromDate = DateTime.ParseExact(from, format, System.Globalization.CultureInfo.InvariantCulture);
+					toDate = DateTime.ParseExact(to, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+					if (fromDate > toDate)
+					{
+						return (false, null, null);
+					}
+				}
+				catch (FormatException)
+				{
+					return (false, null, null);
+				}
+
+			}
+			return (false, fromDate, toDate);
 		}
 		#endregion
 
