@@ -308,6 +308,7 @@ namespace DataAccess.DAOs
 								 Amount = withdraw.Amount,
 								 Code = withdraw.Code,
 								 RequestDate = withdraw.RequestDate,
+								 PaidDate = withdraw.PaidDate,
 								 UserBank = new UserBank
 								 {
 									 CreditAccount = userBank.CreditAccount,
