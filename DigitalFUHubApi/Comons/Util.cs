@@ -246,7 +246,7 @@ namespace DigitalFUHubApi.Comons
 				}
 
 			}
-			return (false, fromDate, toDate);
+			return (true, fromDate, toDate);
 		}
 		#endregion
 

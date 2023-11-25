@@ -28,28 +28,12 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult GetBusinessFee(BusinessFeeRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
-
-			ResponseData responseData = new ResponseData();
 			try
 			{
-				DateTime? fromDate = null;
-				DateTime? toDate = null;
-				string format = "M/d/yyyy";
-				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.ToDate))
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
 				{
-					try
-					{
-						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-						if (fromDate > toDate)
-						{
-							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
-						}
-					}
-					catch (FormatException)
-					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
-					}
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
 
 				long businessFeeId;
@@ -77,10 +61,7 @@ namespace DigitalFUHubApi.Controllers
 			{
 				businessFeeRepository.AddNewBusinessFee(request.Fee);
 
-				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status.Ok = true;
-				responseData.Status.Message = "Success!";
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new {}));
 			}
 			catch (Exception ex)
 			{
