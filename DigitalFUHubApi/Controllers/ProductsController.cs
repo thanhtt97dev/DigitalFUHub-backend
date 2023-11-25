@@ -22,44 +22,21 @@ namespace DigitalFUHubApi.Controllers
 	[ApiController]
 	public class ProductsController : ControllerBase
 	{
-		private readonly IConfiguration _configuration;
 		private readonly IProductRepository _productRepository;
 		private readonly StorageService _storageService;
-		private readonly IShopRepository _shopRepository;
-		private readonly IUserRepository _userRepository;
-		private readonly IRoleRepository _roleRepository;
-		private readonly IOrderRepository _orderRepository;
-		private readonly ICouponRepository _couponRepository;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly HubService _hubService;
 		private readonly MailService _mailService;
 		private readonly IMapper _mapper;
 
-		public ProductsController(IConfiguration configuration,
-			IProductRepository productRepository,
-			StorageService storageService,
-			IShopRepository shopRepository,
-			IUserRepository userRepository,
-			IRoleRepository roleRepository,
-			IOrderRepository orderRepository,
-			ICouponRepository couponRepository,
-			JwtTokenService jwtTokenService,
-			HubService hubService,
-			MailService mailService,
-			IMapper mapper)
+		public ProductsController(IProductRepository productRepository, StorageService storageService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper)
 		{
-			_configuration = configuration;
 			_productRepository = productRepository;
 			_storageService = storageService;
-			_shopRepository = shopRepository;
-			_userRepository = userRepository;
-			_roleRepository = roleRepository;
-			_orderRepository = orderRepository;
-			_couponRepository = couponRepository;
 			_jwtTokenService = jwtTokenService;
-			_mapper = mapper;
-			_mailService = mailService;
 			_hubService = hubService;
+			_mailService = mailService;
+			_mapper = mapper;
 		}
 
 		#region Get Product Detail
@@ -72,59 +49,32 @@ namespace DigitalFUHubApi.Controllers
 			{
 				if (productId == 0)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					status.Message = "Invalid";
-					status.Ok = false;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid!!", false, new()));
 				}
 
 				var product = _productRepository.GetProductById(productId);
-
 				if (product == null)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					status.Message = "Product not found!";
-					status.Ok = false;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!", false, new()));
 				}
 
 				// check product status
 				if (product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_BAN;
-					status.Message = "This product has been banned";
-					status.Ok = false;
-					responseData.Status = status;
-					responseData.Result = product;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_BAN, "This product has been banned!", false, product));
 				}
 
 				if (product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_REMOVE;
-					status.Message = "This product has been remove";
-					status.Ok = false;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_REMOVE, "This product has been remove!", false, new {}));
 				}
 
 				if (product.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_HIDE;
-					status.Message = "This product has been hide";
-					status.Ok = false;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_HIDE, "This product has been hide!", false, new { }));
 				}
 
-				status.ResponseCode = Constants.RESPONSE_CODE_PRODUCT_ACTIVE;
-				status.Message = "Success";
-				status.Ok = true;
-				responseData.Status = status;
-				responseData.Result = product;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_ACTIVE, "Success!", false, product));
 
 			}
 			catch (Exception ex)
@@ -691,26 +641,16 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-
 		#region Get Products (Shop Detail Customer)
 		[HttpPost("GetAll")]
 		public IActionResult GetProductByUserId(ShopDetailCustomerSearchParamProductRequestDTO request)
 		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest();
-			}
+			if (!ModelState.IsValid) return BadRequest();
 			try
 			{
-				ResponseData responseData = new ResponseData();
-				Status status = new Status();
 				if (request.Page <= 0)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					status.Message = "Invalid param";
-					status.Ok = false;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "TInvalid param", false, new { }));
 				}
 
 				var numberProducts = _productRepository.GetNumberProductByConditions(request.UserId, request.ProductName);
@@ -739,26 +679,16 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-
 		#region Get Products (Home Page Customer)
 		[HttpPost("GetProductHomePageCustomer")]
 		public IActionResult GetProductForHomePageCustomer(HomePageCustomerSearchParamProductRequestDTO request)
 		{
-			if (!ModelState.IsValid)
-			{
-				return BadRequest();
-			}
+			if (!ModelState.IsValid) return BadRequest();
 			try
 			{
-				ResponseData responseData = new ResponseData();
-				Status status = new Status();
 				if (request.Page <= 0)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					status.Message = "Invalid param";
-					status.Ok = false;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "TInvalid param", false, new { }));
 				}
 
 				var numberProducts = _productRepository.GetNumberProductByConditions(request.CategoryId);
