@@ -19,6 +19,7 @@ namespace DTOs.Bank
 		public long Amount { get; set; }
 		public string Code { get; set; } = null!;
 		public DateTime RequestDate { get; set; }
+		public DateTime? PaidDate { get; set; }
 		public string CreditAccountName { get; set; } = null!;
 		public string CreditAccount { get; set; } = null!;
 		public string BankName { get; set; } = string.Empty;

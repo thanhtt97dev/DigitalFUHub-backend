@@ -71,6 +71,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Avatar, act => act.MapFrom(src => src.User.Avatar)).ReverseMap();
 			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, HistoryWithdrawDetail>()
+				.ForMember(des => des.PaidDate, act => act.MapFrom(src => src.PaidDate))
 				.ForMember(des => des.BankName, act => act.MapFrom(src => src.UserBank.Bank.BankName))
 				.ForMember(des => des.CreditAccountName, act => act.MapFrom(src => src.UserBank.CreditAccountName))
 				.ForMember(des => des.Email, act => act.MapFrom(src => src.User.Email))

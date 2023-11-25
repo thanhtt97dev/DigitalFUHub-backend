@@ -22,9 +22,9 @@ namespace DataAccess.Repositories
 		public int GetNumberDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status) => BankDAO.Instance.GetNumberDepositTransaction(userId, depositTransactionId, email, fromDate, toDate, status);
 		public List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page) => BankDAO.Instance.GetDepositTransaction(userId, depositTransactionId, fromDate, toDate, status, page);
 		public List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int page) => BankDAO.Instance.GetDepositTransactionSucess(depositTransactionId, email, fromDate, toDate, page);
-		public int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status) => BankDAO.Instance.GetNumberWithdrawTransactionWithCondition(userId, withdrawTransactionId, fromDate, toDate, status);
+		public int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status) => BankDAO.Instance.GetNumberWithdrawTransactionWithCondition(userId, withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount, status);
 		public List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page) => BankDAO.Instance.GetWithdrawTransaction(userId, withdrawTransactionId, fromDate, toDate, status, page);
-		public List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime fromDate, DateTime toDate, long bankId, string creditAccount, int status) => BankDAO.Instance.GetAllWithdrawTransaction(withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount,  status);
+		public List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status, int page) => BankDAO.Instance.GetAllWithdrawTransaction(withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount,  status, page);
 		public WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransaction(withdrawTransactionId);
 		public WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId) => BankDAO.Instance.GetWithdrawTransactionBill(withdrawTransactionId);
 		public void UpdateWithdrawTransactionPaid(long transactionId) => BankDAO.Instance.UpdateWithdrawTransaction(transactionId);
@@ -34,6 +34,6 @@ namespace DataAccess.Repositories
 		public (int, long) GetDataWithdrawTransactionMakedToday(long userId) => BankDAO.Instance.GetDataWithdrawTransactionMakedToday(userId);
 		public int GetNumberDepositTransactionMakedInToday(long userId) => BankDAO.Instance.GetNumberDepositTransactionMakedInToday(userId);
 
-		
+
 	}
 }

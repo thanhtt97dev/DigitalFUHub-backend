@@ -16,6 +16,7 @@ using Comons;
 using System.Transactions;
 using DTOs.Admin;
 using Azure.Core;
+using OfficeOpenXml.Style;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -641,7 +642,7 @@ namespace DigitalFUHubApi.Controllers
 				long withdrawTransactionId;
 				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
 
-				var totalRecord = bankRepository.GetNumberWithdrawTransactionWithCondition(id, withdrawTransactionId, fromDate, toDate, request.Status);
+				var totalRecord = bankRepository.GetNumberWithdrawTransactionWithCondition(id, withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount, request.Status);
 				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
 				if (request.Page > numberPages || request.Page == 0)
 				{
@@ -667,65 +668,55 @@ namespace DigitalFUHubApi.Controllers
 		#region Get history withdraw transaction for admin
 		[Authorize(Roles ="Admin")]
 		[HttpPost("HistoryWithdrawAll")]
-		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO requestDTO)
+		public IActionResult GetHistoryWithdrawTransactionForAdmin(HistoryWithdrawRequestDTO request)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-			string format = "M/d/yyyy";
+			if (!ModelState.IsValid) return BadRequest();
 			try
 			{
-				if (requestDTO == null ||requestDTO.Email == null ||
-					requestDTO.FromDate == null ||requestDTO.ToDate == null ||
-					requestDTO.CreditAccount == null
-					) return BadRequest();
-
-				DateTime fromDate;
-				DateTime toDate;
-				try
+				DateTime? fromDate = null;
+				DateTime? toDate = null;
+				string format = "M/d/yyyy";
+				if (!string.IsNullOrEmpty(request.FromDate) && !string.IsNullOrEmpty(request.ToDate))
 				{
-					fromDate = DateTime.ParseExact(requestDTO.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
-					toDate = DateTime.ParseExact(requestDTO.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
-					if (fromDate > toDate)
+					try
 					{
-						status.Message = "From date must be less than to date";
-						status.Ok = false;
-						status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-						responseData.Status = status;
-						return Ok(responseData);
+						fromDate = DateTime.ParseExact(request.FromDate, format, System.Globalization.CultureInfo.InvariantCulture);
+						toDate = DateTime.ParseExact(request.ToDate, format, System.Globalization.CultureInfo.InvariantCulture).AddDays(1);
+						if (fromDate > toDate)
+						{
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "From date must be less than to date", false, new()));
+						}
 					}
-				}
-				catch (FormatException)
-				{
-					status.Message = "Invalid datetime";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					catch (FormatException)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid datetime", false, new()));
+					}
+
 				}
 
-				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(requestDTO.Status) &&
-					requestDTO.Status != Constants.WITHDRAW_TRANSACTION_ALL)
+				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(request.Status) && request.Status != Constants.WITHDRAW_TRANSACTION_ALL)
 				{
-					status.Message = "Invalid transaction's status";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
 				}
 
 				long withdrawTransactionId;
-				long.TryParse(requestDTO.WithdrawTransactionId, out withdrawTransactionId);
+				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
 
-				var deposits = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, requestDTO.Email, fromDate, toDate,requestDTO.BankId,requestDTO.CreditAccount, requestDTO.Status);
+				var totalRecord = bankRepository.GetNumberWithdrawTransactionWithCondition(0, withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount, request.Status);
+				var numberPages = totalRecord / Constants.PAGE_SIZE + 1;
+				if (request.Page > numberPages || request.Page == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
 
-				var result = mapper.Map<List<HistoryWithdrawDetail>>(deposits);
+				var withdraws = bankRepository.GetAllWithdrawTransaction(withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount, request.Status, request.Page);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				var result = new
+				{
+					Total = totalRecord,
+					WithdrawTransactions = mapper.Map<List<HistoryWithdrawDetail>>(withdraws)
+				};
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{
