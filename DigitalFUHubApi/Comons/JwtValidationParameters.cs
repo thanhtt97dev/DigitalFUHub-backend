@@ -14,7 +14,7 @@ namespace DigitalFUHubApi.Comons
 
 			ValidateIssuer = false;
 			ValidateAudience = false;
-			ValidateIssuerSigningKey = true;
+			//ValidateIssuerSigningKey = true;
 			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"] ?? string.Empty));
 			/*
 			ValidateIssuer = true;
