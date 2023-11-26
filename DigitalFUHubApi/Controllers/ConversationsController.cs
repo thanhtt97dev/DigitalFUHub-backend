@@ -47,9 +47,9 @@ namespace DigitalFUHubApi.Controllers
             this.jwtTokenService = jwtTokenService;
         }
 
-        #region Send message
-        [HttpPost("SendMessage")]
-        [Authorize]
+		#region Send message
+		[Authorize]
+		[HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage([FromForm] SendMessageConversationRequestDTO request)
         {
              
@@ -200,8 +200,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get conversation id
-		[HttpPost("GetConversation")]
 		[Authorize]
+		[HttpPost("GetConversation")]
 		public IActionResult GetConversation(GetConversationIdRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
@@ -223,8 +223,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get list conversation of a user
-		[HttpGet("getConversations")]
 		[Authorize]
+		[HttpGet("getConversations")]
 		public IActionResult GetConversations(long userId)
 		{
 			try
@@ -250,8 +250,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Add new conversation
-		[HttpPost("add")]
 		[Authorize]
+		[HttpPost("add")]
 		public IActionResult AddConversation([FromBody] AddConversationRequestDTO addConversation)
 		{
 			try
@@ -299,8 +299,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get messages of a conversation
-		[HttpGet("getMessages")]
 		[Authorize]
+		[HttpGet("getMessages")]
 		public IActionResult GetMessages(long conversationId)
 		{
 			try
@@ -330,8 +330,8 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get number conversation un read
-		[HttpGet("getNumberConversationUnRead")]
 		[Authorize]
+		[HttpGet("getNumberConversationUnRead")]
 		public IActionResult GetNumberConversationUnRead(long userId)
 		{
 			try
