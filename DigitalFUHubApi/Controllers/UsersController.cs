@@ -506,12 +506,6 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-
-				string accessToken = Util.GetAccessToken(HttpContext);
-
-				var userIdInAccessToken = _jwtTokenService.GetUserIdByAccessToken(User);
-				if (user.UserId != userIdInAccessToken) return NotFound();
-
 				return Ok(_mapper.Map<UserSignInResponseDTO>(user));
 			}
 			catch (Exception ex)
@@ -552,8 +546,6 @@
 			{
 				var user = _userRepository.GetUserById(id);
 				if (user == null) return NotFound();
-
-
 				return Ok(_mapper.Map<UserOnlineStatusResponseDTO>(user));
 			}
 			catch (Exception ex)
@@ -569,40 +561,25 @@
 		public IActionResult GetCustomerBalance(int userId)
 
 		{
-			ResponseData response = new ResponseData();
 			try
 			{
 				if (userId == 0)
 				{
-					response.Status.Ok = false;
-					response.Status.Message = "Invalid";
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					return Ok(response);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 				}
 
 				var user = _userRepository.GetUserById(userId);
 
 				if (user == null)
 				{
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					response.Status.Ok = false;
-					response.Status.Message = "Data not found!";
-					return Ok(response);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
 				}
-
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				response.Status.Message = "Success";
-				response.Status.Ok = true;
-				response.Result = user.AccountBalance;
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, user.AccountBalance));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
-			return Ok(response);
 		}
 		#endregion
 
@@ -616,29 +593,16 @@
 
             try
 			{
-                if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-                {
-                    return Unauthorized();
-                }
-
                 if (request == null)
 				{
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Message = "request invalid!";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
                 }
 
                 User? user = _userRepository.GetUserById(request.UserId);
 
 				if (user == null)
 				{
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Message = "user not found";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "not found", false, new()));
                 }
 
                 var userUpdate = _mapper.Map<User>(request);
@@ -666,12 +630,8 @@
 
 				// Ok
 				_userRepository.EditUserInfo(userUpdate);
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                return Ok(responseData);
-            }
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+			}
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -684,40 +644,26 @@
 		[HttpGet("GetCoin/{userId}")]
 		public IActionResult GetCoin(long userId)
 		{
-			ResponseData response = new ResponseData();
 			try
 			{
 				if (userId == 0)
 				{
-					response.Status.Ok = false;
-					response.Status.Message = "Invalid";
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					return Ok(response);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 				}
 
 				var user = _userRepository.GetUserById(userId);
 
 				if (user == null)
 				{
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					response.Status.Ok = false;
-					response.Status.Message = "Data not found!";
-					return Ok(response);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
 				}
 
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				response.Status.Message = "Success";
-				response.Status.Ok = true;
-				response.Result = new UserCoinResponseDTO { Coin = user.Coin };
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new UserCoinResponseDTO { Coin = user.Coin }));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-				response.Status.Ok = false;
-				response.Status.Message = "Invalid";
-				return Ok(response);
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
-			return Ok(response);
 		}
 		#endregion
 
@@ -823,9 +769,6 @@
 				return BadRequest();
 			}
 
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-
 			try
 			{
 				long userId = 0;
@@ -834,12 +777,7 @@
 				var users = _userRepository.GetUsers(userId, requestDTO.Email, requestDTO.FullName, requestDTO.RoleId, requestDTO.Status);
 				var result = _mapper.Map<List<UsersResponseDTO>>(users);
 
-				status.Message = "Success!";
-				status.Ok = true;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, result));
 			}
 			catch (Exception ex)
 			{
@@ -854,17 +792,10 @@
 		public IActionResult GetUser(int id)
 		{
 			if (id == 0) return BadRequest();
-			ResponseData responseData = new ResponseData();
-
 			try
 			{
 
-
-				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status.Ok = true;
-				responseData.Status.Message = "Success!";
-
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, new()));
 			}
 			catch (Exception ex)
 			{

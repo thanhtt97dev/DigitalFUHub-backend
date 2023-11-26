@@ -28,7 +28,7 @@ namespace DigitalFUHubApi.Comons
 		public override Task TokenValidated(TokenValidatedContext context)
 		{
 			// Retrieve user's info from token claims
-			string? jwtId = string.Empty;
+			//string? jwtId = string.Empty;
 			string? userIdStr = string.Empty;
 			if (context.SecurityToken is JwtSecurityToken jwtSecurityToken)
 			{
@@ -37,7 +37,7 @@ namespace DigitalFUHubApi.Comons
 					context.Fail("Unauthorized");
 					return base.TokenValidated(context);
 				}
-				jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
+				//jwtId = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
 				userIdStr = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
 			}
 
@@ -69,7 +69,7 @@ namespace DigitalFUHubApi.Comons
 			StringValues headerValues;
 			context.Request.Headers.TryGetValue("session-userid", out headerValues);
 			long.TryParse(headerValues.FirstOrDefault(), out long s_userId);
-			if (headerValues.FirstOrDefault() == null || s_userId == 0 || userId != s_userId)
+			if (headerValues.FirstOrDefault() == null || s_userId == 0 || userId == 0 || userId != s_userId)
 			{
 				context.Fail("Unauthorized");
 			}
