@@ -115,8 +115,7 @@ namespace DigitalFUHubApi.Controllers
 				List<Order> orders = _orderRepository.GetListOrderOfCurrentMonth(_jwtTokenService.GetUserIdByAccessToken(User));
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new
 				{
-					Revenue = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
-										- ((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)))),
+					Revenue = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)))),
 					Profit = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
 											- (((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)) * (x?.BusinessFee?.Fee ?? 0) / 100))),
 					TotalOrders = orders.Count
