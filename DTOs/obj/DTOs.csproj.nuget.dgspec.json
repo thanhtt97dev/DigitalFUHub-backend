@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj": {}
+    "D:\\FU\\Capstone Project\\backend\\DTOs\\DTOs.csproj": {}
   },
   "projects": {
-    "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj": {
+    "D:\\FU\\Capstone Project\\backend\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\backend\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\backend\\BusinessObject\\BusinessObject.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\backend\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -81,21 +85,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj": {
+    "D:\\FU\\Capstone Project\\backend\\DTOs\\DTOs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj",
+        "projectUniqueName": "D:\\FU\\Capstone Project\\backend\\DTOs\\DTOs.csproj",
         "projectName": "DTOs",
-        "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\DTOs.csproj",
+        "projectPath": "D:\\FU\\Capstone Project\\backend\\DTOs\\DTOs.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "E:\\Capstone\\DigitalFUHub-backend\\DTOs\\obj\\",
+        "outputPath": "D:\\FU\\Capstone Project\\backend\\DTOs\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -109,8 +117,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "E:\\Capstone\\DigitalFUHub-backend\\BusinessObject\\BusinessObject.csproj"
+              "D:\\FU\\Capstone Project\\backend\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\FU\\Capstone Project\\backend\\BusinessObject\\BusinessObject.csproj"
               }
             }
           }
@@ -146,7 +154,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }

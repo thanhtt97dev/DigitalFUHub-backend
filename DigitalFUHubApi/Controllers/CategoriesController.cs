@@ -20,16 +20,7 @@ namespace DigitalFUHubApi.Controllers
 		public ActionResult<ResponseData> GetAll()
 		{
 			List<Category> categories = _categoryRepository.GetAll();
-			return new ResponseData
-			{
-				Status = new Status
-				{
-					Message = "",
-					Ok = true,
-					ResponseCode = Constants.RESPONSE_CODE_SUCCESS
-				},
-				Result = categories
-			};
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", false, categories));
 		}
 
 	}

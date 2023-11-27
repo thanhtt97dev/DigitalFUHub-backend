@@ -153,3 +153,17 @@ E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.
 E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
 E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll
 E:\Capstone\DigitalFUHub-backend\BusinessObject\obj\Debug\net6.0\BusinessObject.sourcelink.json
+D:\FU\Capstone Project\backend\BusinessObject\bin\Debug\net6.0\BusinessObject.deps.json
+D:\FU\Capstone Project\backend\BusinessObject\bin\Debug\net6.0\BusinessObject.runtimeconfig.json
+D:\FU\Capstone Project\backend\BusinessObject\bin\Debug\net6.0\BusinessObject.dll
+D:\FU\Capstone Project\backend\BusinessObject\bin\Debug\net6.0\BusinessObject.pdb
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.AssemblyReference.cache
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.GeneratedMSBuildEditorConfig.editorconfig
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfoInputs.cache
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.AssemblyInfo.cs
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.csproj.CoreCompileInputs.cache
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.dll
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\refint\BusinessObject.dll
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.pdb
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\BusinessObject.genruntimeconfig.cache
+D:\FU\Capstone Project\backend\BusinessObject\obj\Debug\net6.0\ref\BusinessObject.dll

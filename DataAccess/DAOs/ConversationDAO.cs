@@ -123,40 +123,37 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				List<long> listUserId = new List<long>();
-				listUserId.AddRange(addConversation.RecipientIds);
-				listUserId.Add(addConversation.UserId);
-
-				var userConversation = context.UserConversation.ToList();
-				if (userConversation != null)
+				if(addConversation.RecipientIds.Count == 1) // not group
 				{
-					var groupUserConversation = userConversation
-					 .GroupBy(x => x.ConversationId)
-					 .Select(group => new
-					 {
-						 ConversationId = group.Key,
-						 Count = group.Distinct().Count()
-					 }).ToList();
-
-					if (groupUserConversation != null && groupUserConversation.Count > 0)
-					{
-						foreach (var item in groupUserConversation)
-						{
-							if (item.Count == listUserId.Count)
-							{
-								long conversationId = item.ConversationId;
-								var findUserConversation = context.UserConversation.Where(x => x.ConversationId == conversationId && listUserId.Contains(x.UserId)).ToList();
-								if (findUserConversation.Count == item.Count)
-								{
-									return conversationId;
-								}
-							}
-						}
-					}
+					var conversationIdsCurrentUser = context.UserConversation
+													.Include(x => x.Conversation)
+													.Where
+													(x =>
+														x.UserId == addConversation.UserId &&
+														x.Conversation.IsGroup == false
+													)
+													.Select(x => x.ConversationId)
+													.ToList();
+					// find conversationId of current user with Recipient
+					var conversationId = context.UserConversation
+													.Where
+													(x =>
+														x.UserId == addConversation.RecipientIds[0] &&
+														conversationIdsCurrentUser.Contains(x.ConversationId)
+													)
+													.Select(x => x.ConversationId)
+													.FirstOrDefault();
+					if (conversationId != 0) return conversationId;
 				}
+
+
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
+					List<long> listUserId = new List<long>();
+					listUserId.AddRange(addConversation.RecipientIds);
+					listUserId.Add(addConversation.UserId);
+
 					Conversation conversation = new Conversation
 					{
 						ConversationName = addConversation.ConversationName ?? null,

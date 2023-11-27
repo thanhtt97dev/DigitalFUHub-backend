@@ -47,19 +47,13 @@ namespace DigitalFUHubApi.Controllers
             this.jwtTokenService = jwtTokenService;
         }
 
-        [HttpPost("SendMessage")]
-        [Authorize]
+		#region Send message
+		[Authorize]
+		[HttpPost("SendMessage")]
         public async Task<IActionResult> SendMessage([FromForm] SendMessageConversationRequestDTO request)
         {
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            // Response
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
+             
+            if (!ModelState.IsValid) return BadRequest();
 
             if (request.UserId != jwtTokenService.GetUserIdByAccessToken(User))
             {
@@ -70,12 +64,8 @@ namespace DigitalFUHubApi.Controllers
             var conversation = conversationRepository.GetConversationById(request.ConversationId);
             if (conversation == null)
             {
-                status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                status.Ok = false;
-                status.Message = "Data not found!";
-                responseData.Status = status;
-                return Ok(responseData);
-            }
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
+			}
 
             // Check users recipient and user sender existed
             List<long> userIdInConverstion = new List<long>();
@@ -85,21 +75,13 @@ namespace DigitalFUHubApi.Controllers
             bool resultCheckUsersExisted = userRepository.CheckUsersExisted(userIdInConverstion);
             if (!resultCheckUsersExisted)
             {
-                status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                status.Ok = false;
-                status.Message = "Data not found!";
-                responseData.Status = status;
-                return Ok(responseData);
-            }
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
+			}
 
             // Check sends many types of messages at once
             if (request.Content != null && request.Image != null)
             {
-                status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                status.Ok = false;
-                status.Message = "Cannot send multiple types of messages at the same time!";
-                responseData.Status = status;
-                return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Cannot send multiple types of messages at the same time!", false, new()));
             }
 
             // Declares variable
@@ -131,11 +113,7 @@ namespace DigitalFUHubApi.Controllers
                     IFormFile fileRequest = request.Image;
                     if (!fileExtension.Contains(fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf("."))))
                     {
-                        status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                        status.Ok = false;
-                        status.Message = "Invalid file!";
-                        responseData.Status = status;
-                        return Ok(responseData);
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid file!", false, new()));
                     }
 
                     // Declares variable
@@ -176,11 +154,7 @@ namespace DigitalFUHubApi.Controllers
                         IsDelete = false
                     };
                 } else {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Ok = false;
-                    status.Message = "Message is not allowed to be null!";
-                    responseData.Status = status;
-                    return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Message is not allowed to be null!", false, new()));
                 }
 
                
@@ -215,44 +189,30 @@ namespace DigitalFUHubApi.Controllers
                     }
                 }
 
-                // Ok
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Ok = true;
-                status.Message = "Success";
-                responseData.Status = status;
-                return Ok(responseData);
+				// Ok
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new()));
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-
         }
+		#endregion
 
+		#region Get conversation id
+		[Authorize]
 		[HttpPost("GetConversation")]
-        [Authorize]
-        public IActionResult GetConversation(GetConversationIdRequestDTO request)
+		public IActionResult GetConversation(GetConversationIdRequestDTO request)
 		{
-            if (!ModelState.IsValid)
-			{
-				return BadRequest();
-			}
+			if (!ModelState.IsValid) return BadRequest();
 			try
 			{
-				ResponseData responseData = new ResponseData();
-                var conversationId = conversationRepository.GetConversation(request.ShopId, request.UserId);
-                if(conversationId == 0)
-                {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Data not found!";
-					return Ok(responseData);
+				var conversationId = conversationRepository.GetConversation(request.ShopId, request.UserId);
+				if (conversationId == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
 				}
-				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status.Ok = true;
-				responseData.Status.Message = "Success!";
-                responseData.Result = conversationId;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, conversationId));
 			}
 			catch (Exception ex)
 			{
@@ -260,232 +220,166 @@ namespace DigitalFUHubApi.Controllers
 			}
 
 		}
+		#endregion
 
+		#region Get list conversation of a user
+		[Authorize]
 		[HttpGet("getConversations")]
-        [Authorize]
-        public IActionResult GetConversations(long userId)
-        {
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
-            try
-            {
-                if (userId == 0) {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Ok = false;
-                    status.Message = "Invalid file!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+		public IActionResult GetConversations(long userId)
+		{
+			try
+			{
+				if (userId == 0) return BadRequest();
+				if (userId != jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
 
-                var user = userRepository.GetUserById(userId);
-                if (user == null)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Ok = false;
-                    status.Message = "Data not found!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				var user = userRepository.GetUserById(userId);
+				if (user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
+				}
 
-                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
-                {
-                    return Unauthorized();
-                }
+				List<ConversationResponseDTO> userConversations = conversationRepository.GetUsersConversations(userId);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, userConversations));
 
-                List<ConversationResponseDTO> userConversations = conversationRepository.GetUsersConversations(userId);
-                responseData.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                responseData.Status.Ok = true;
-                responseData.Status.Message = "Success!";
-                responseData.Result = userConversations;
-                return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
-            } catch (Exception ex) {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+		#region Add new conversation
+		[Authorize]
+		[HttpPost("add")]
+		public IActionResult AddConversation([FromBody] AddConversationRequestDTO addConversation)
+		{
+			try
+			{
+				if (addConversation.UserId != jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
 
-        [HttpPost("add")]
-        [Authorize]
-        public IActionResult AddConversation([FromBody] AddConversationRequestDTO addConversation)
-        {
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
-            try
-            {
+				(string responseCode, string message, bool isOk) = conversationRepository.ValidateAddConversation(addConversation);
 
-                if (addConversation.UserId != jwtTokenService.GetUserIdByAccessToken(User))
-                {
-                    return Unauthorized();
-                }
+				if (!isOk)
+				{
+					return Ok(new ResponseData(responseCode, message, isOk, new()));
+				}
 
-                (string responseCode, string message, bool isOk) = conversationRepository.ValidateAddConversation(addConversation);
-                
-                if (!isOk)
-                {
-                    status.ResponseCode = responseCode;
-                    status.Message = message;
-                    status.Ok = isOk;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				// Add conversation
+				long conversationId = conversationRepository.AddConversation(addConversation);
 
-                // Add conversation
-                long conversationId = conversationRepository.AddConversation(addConversation);
+				// Get connectionId of user recipient
+				foreach (long recipientId in addConversation.RecipientIds)
+				{
+					List<ConversationResponseDTO> conversationResponse = conversationRepository
+																		.GetUsersConversations(recipientId);
+					ConversationResponseDTO? conversation = conversationResponse.FirstOrDefault(x => x.ConversationId == conversationId);
+					if (conversation != null)
+					{
+						HashSet<string>? connectionIds = connectionManager
+															.GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
+						if (connectionIds != null)
+						{
+							foreach (string connectionId in connectionIds)
+							{
+								hubContext.Clients.Clients(connectionId)
+									.SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, conversation);
+							}
+						}
+					}
+				}
 
-                // Get connectionId of user recipient
-                foreach (long recipientId in addConversation.RecipientIds)
-                {
-                    List<ConversationResponseDTO> conversationResponse = conversationRepository
-                                                                        .GetUsersConversations(recipientId);
-                    ConversationResponseDTO? conversation = conversationResponse.FirstOrDefault(x => x.ConversationId == conversationId);
-                    if (conversation != null)
-                    {
-                        HashSet<string>? connectionIds = connectionManager
-                                                            .GetConnections(recipientId, Constants.SIGNAL_R_CHAT_HUB);
-                        if (connectionIds != null)
-                        {
-                            foreach (string connectionId in connectionIds)
-                            {
-                                hubContext.Clients.Clients(connectionId)
-                                    .SendAsync(Constants.SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE, conversation);
-                            }
-                        }
-                    }
-                }
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, conversationId));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                responseData.Result = conversationId;
-                return Ok(conversationId);
-            }
-            catch (Exception ex) {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+		#region Get messages of a conversation
+		[Authorize]
+		[HttpGet("getMessages")]
+		public IActionResult GetMessages(long conversationId)
+		{
+			try
+			{
+				if (conversationId == 0)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new {}));
+				}
 
+				// Check conversation existed
+				var conversation = conversationRepository.GetConversationById(conversationId);
 
-        [HttpGet("getMessages")]
-        [Authorize]
-        public IActionResult GetMessages(long conversationId)
-        {
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
-            try
-            {
-                if (conversationId == 0)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Ok = false;
-                    status.Message = "Invalid!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				if (conversation == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found", false, new { }));
+				}
 
-                // Check conversation existed
-                var conversation = conversationRepository.GetConversationById(conversationId);
+				List<MessageConversationResponseDTO> messages = mapper
+								.Map<List<MessageConversationResponseDTO>>(conversationRepository.GetMessages(conversationId));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, messages));
+			}
+			catch (ArgumentException ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
-                if (conversation == null)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Ok = false;
-                    status.Message = "Data not found!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+		#region Get number conversation un read
+		[Authorize]
+		[HttpGet("getNumberConversationUnRead")]
+		public IActionResult GetNumberConversationUnRead(long userId)
+		{
+			try
+			{
+				if (userId == 0) return BadRequest();
 
-                List<MessageConversationResponseDTO> messages = mapper
-                                .Map<List<MessageConversationResponseDTO>>(conversationRepository.GetMessages(conversationId));
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                responseData.Result = messages;
-                return Ok(responseData);
-            }
-            catch (ArgumentException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+				if (userId != jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 
-        [HttpGet("getNumberConversationUnRead")]
-        [Authorize]
-        public IActionResult GetNumberConversationUnRead(long userId)
-        {
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
-            try
-            {
+				var user = userRepository.GetUserById(userId);
+				if (user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found", false, new { }));
+				}
 
-                if (userId == 0)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Message = "Invalid";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+				long numberConversation = conversationRepository.GetNumberConversationUnReadOfUser(userId);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, numberConversation));
+			}
+			catch (ArgumentException ex)
+			{
+				Console.WriteLine(ex.Message);
+				return BadRequest(new Status());
+			}
+		}
+		#endregion
 
-                if (userId != jwtTokenService.GetUserIdByAccessToken(User))
-                {
-                    return Unauthorized();
-                }
-
-                var user = userRepository.GetUserById(userId);
-
-                if (user == null)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Message = "user not found!";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
-
-                long numberConversation = conversationRepository.GetNumberConversationUnReadOfUser(userId);
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                responseData.Result = numberConversation;
-                return Ok(responseData);
-            }
-            catch (ArgumentException ex)
-            {
-                Console.WriteLine(ex.Message);
-                return BadRequest(new Status());
-            }
-        }
-
+		#region Get conversation un read detail
 		[HttpGet("GetConversationsUnRead/{userId}")]
 		public IActionResult GetConversationsUnRead(long userId)
-        {
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
-            try
-            {
-                if (userId == 0)
-                {
-                    return BadRequest();
-                }
+		{
+			try
+			{
+				if (userId == 0)
+				{
+					return BadRequest();
+				}
 
-                var result = conversationRepository.GetConversationsUnRead(userId);
+				var result = conversationRepository.GetConversationsUnRead(userId);
 
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				status.Message = "Success";
-				status.Ok = true;
-				responseData.Status = status;
-				responseData.Result = result;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-
-
-    }
+		#endregion
+	}
 }

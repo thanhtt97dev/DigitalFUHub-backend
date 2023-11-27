@@ -47,44 +47,26 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-				ResponseData responseData = new ResponseData();
-				ResponseData responseDataNotFound = new ResponseData
-                {
-                    Status = new Status 
-                    { 
-                        ResponseCode= Constants.RESPONSE_CODE_DATA_NOT_FOUND,
-                        Ok = false,
-                        Message = "Data not found!"
-                    }
-                };
-				if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
+				if (!ModelState.IsValid) return BadRequest();
 
-                if(request.Quantity <= 0 || request.UserId == request.ShopId) 
-                {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Invalid params!";
-					return Ok(responseData);
-				}
+                if(request.Quantity <= 0 || request.UserId == request.ShopId)
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid params", false, new()));
 
 				//check product, customer, shop existed
 				ProductVariant? productVariant = productRepository.GetProductVariant(request.ProductVariantId);
-                if (productVariant == null) return Ok(responseDataNotFound);
+                if (productVariant == null)
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
 				User? user = userRepository.GetUserById(request.UserId);
-				if (user == null) return Ok(responseDataNotFound);
+				if (user == null)
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
 				Shop? shop = shopRepository.GetShopById(request.ShopId);
-				if (shop == null) return Ok(responseDataNotFound);
+				if (shop == null)
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Data not found!", false, new()));
 
 				// check product in shop
 				if (!cartRepository.CheckProductVariantInShop(request.ShopId, request.ProductVariantId))
                 {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Product variant  not existed in shop!";
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_PRODUCT_VARIANT_NOT_IN_SHOP, "Product variant  not existed in shop!", false, new()));
 				}
 
 				// check valid quantity to add product ti cart
@@ -92,20 +74,12 @@ namespace DigitalFUHubApi.Controllers
 
 				if (!isValidQuantityAddProductToCart)
                 {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Not enough quantity to add!";
-                    responseData.Result = numberAssetInfomation;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY, "Not enough quantity to add!", false, numberAssetInfomation));
 				}
 
                 cartRepository.AddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
 
-
-				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
-                responseData.Status.Ok = true;
-				responseData.Status.Message = "Success!";
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", false, new()));
             }
             catch (Exception)
             {
@@ -118,44 +92,22 @@ namespace DigitalFUHubApi.Controllers
 		[Authorize]
 		public IActionResult GetCartsByUserId(long userId)
         {
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
             try
             {
                 if (userId == 0)
-                {
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Ok = false;
-                    status.Message = "userId invalid!!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "userId invalid!!", false, new()));
 
-				if (userId != jwtTokenService.GetUserIdByAccessToken(User))
-				{
-					return Unauthorized();
-				}
+				if (userId != jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
 
 				var user = userRepository.GetUserById(userId);
 				if (user == null)
-				{
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Ok = false;
-                    status.Message = "user not found!!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found!", false, new()));
 
-                List<Cart> carts = cartRepository.GetCartsByUserId(userId);
+				List<Cart> carts = cartRepository.GetCartsByUserId(userId);
                 var result = mapper.Map<List<UserCartResponseDTO>>(carts);
 
-                // Ok
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Ok = true;
-                status.Message = "Success";
-                responseData.Status = status;
-				responseData.Result = result;
-                return Ok(responseData);
+				// Ok
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, result));
             }
             catch (Exception ex)
             {
@@ -169,55 +121,35 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-				ResponseData responseData = new ResponseData();
-				if(!ModelState.IsValid) 
-                {
-                    return BadRequest();
-                }
+				if(!ModelState.IsValid) return BadRequest();
 
                 if(request.Quantity <= 0)
                 {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_INVALID_QUANTITY;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Invalid quantity!";
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_INVALID_QUANTITY, "Invalid quantity!", false, new()));
 				}
 
 				var cartDetail = cartRepository.GetCartDetail(request.CartDetailId);
                 if (cartDetail == null)
                 {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Cart detail not found!";
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Cart detail not found!", false, new()));
 				}
 
                 if (cartDetail.ProductVariantId != request.ProductVariantId) 
                 {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Invalid cart detail with product variant!";
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid cart detail with product variant!", false, new()));
 				}
 
 				int numberQuantityProductVariantAvailable = assetInformationRepository
                     .GetQuantityAssetInformationProductVariantAvailable(request.ProductVariantId);
                 if(numberQuantityProductVariantAvailable < request.Quantity)
                 {
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Not enough quantity to update!";
-					responseData.Result = numberQuantityProductVariantAvailable;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_PRODUCT_INVALID_QUANTITY, "Not enough quantity to update!", false, numberQuantityProductVariantAvailable));
 				}
 
                 // update quantity in cart
                 cartRepository.UpdateQuantityCartDetail(request.CartDetailId, request.Quantity);
 
-				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
-				responseData.Status.Ok = true;
-				responseData.Status.Message = "Success!";
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", true, new()));
 			}
             catch (Exception ex)
             {
@@ -231,25 +163,16 @@ namespace DigitalFUHubApi.Controllers
         {
             try
             {
-				ResponseData responseData = new ResponseData();
-				if (!ModelState.IsValid) 
-				{
-					return BadRequest();
-				}
+				if (!ModelState.IsValid) return BadRequest();
 
 				var cartDetail = cartRepository.GetCartDetail(cartDetailId);
 				if(cartDetail == null) 
 				{
-					responseData.Status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					responseData.Status.Ok = false;
-					responseData.Status.Message = "Cart detail not found!";
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Cart detail not found!", false, new()));
 				}
 				cartRepository.RemoveCartDetail(cartDetailId);
-				
-				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
-				responseData.Status.Ok = true;
-				responseData.Status.Message = "Success!";
-				return Ok(responseData);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", true, new()));
 			}
             catch (Exception ex)
             {
@@ -263,18 +186,11 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				ResponseData responseData = new ResponseData();
-				if (!ModelState.IsValid)
-				{
-					return BadRequest();
-				}
+				if (!ModelState.IsValid) return BadRequest();
 
 				cartRepository.RemoveCart(requestDTO);
 
-				responseData.Status.ResponseCode = Constants.RESPONSE_CODE_CART_SUCCESS;
-				responseData.Status.Ok = true;
-				responseData.Status.Message = "Success!";
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", true, new()));
 			}
 			catch (Exception ex)
 			{
