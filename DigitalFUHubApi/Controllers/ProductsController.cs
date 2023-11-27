@@ -379,9 +379,11 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
 				}
-				if (request.AssetInformationFilesAddNew.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+				if (
+					request.AssetInformationFilesAddNew.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
 					|| request.AssetInformationFilesUpdate.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
-					|| request.ProductThumbnailFileUpdate.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+					|| (request.ProductThumbnailFileUpdate != null 
+					&& request.ProductThumbnailFileUpdate.Length > Constants.UPLOAD_FILE_SIZE_LIMIT))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
 				}
