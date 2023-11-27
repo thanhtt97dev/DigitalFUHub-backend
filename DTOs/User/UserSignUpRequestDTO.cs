@@ -16,7 +16,6 @@ namespace DTOs.User
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; } = string.Empty;
         [Required]
-        [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,16}$")]
         public string Password { get; set; } = string.Empty;
         [Required]
         [Compare(nameof(Password))]
