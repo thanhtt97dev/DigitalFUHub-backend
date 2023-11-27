@@ -249,6 +249,11 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
 				}
+				if(request.ProductDetailImageFiles.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+					|| request.ThumbnailFile.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
+				}
 				if (!(request.ProductVariantNames.Count() == request.ProductVariantPrices.Count()
 					&& request.ProductVariantPrices.Count() == request.ProductVariantDiscounts.Count()
 					&& request.ProductVariantDiscounts.Count() == request.AssetInformationFiles.Count()
@@ -373,6 +378,12 @@ namespace DigitalFUHubApi.Controllers
 				if (request.Tags == null || request.Tags.Count == 0)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
+				}
+				if (request.AssetInformationFilesAddNew.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+					|| request.AssetInformationFilesUpdate.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+					|| request.ProductThumbnailFileUpdate.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
 				}
 				if (!(request.ProductVariantIdsUpdate.Count() == request.ProductVariantNamesUpdate.Count()
 					&& request.ProductVariantNamesUpdate.Count() == request.ProductVariantDiscountsUpdate.Count()

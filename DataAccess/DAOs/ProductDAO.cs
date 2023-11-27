@@ -856,7 +856,8 @@ namespace DataAccess.DAOs
 				return context.Product.Include(x => x.Tags)
 					.Where(x => x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE 
 					&& (x.ProductName.ToLower().Contains(keywordSearch)
-					|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch))))
+					//|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch))
+					))
 					.OrderByDescending(x => x.SoldCount)
 					.Take(Constants.LIMIT_SEARCH_HINT)
 					.ToList();

@@ -64,13 +64,13 @@
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
 
-        public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_USERNAME_01";
+		public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_USERNAME_01";
 
 
 
 
-        //SignalR
-        public const string SIGNAL_R_CHAT_HUB = "chatHub";
+		//SignalR
+		public const string SIGNAL_R_CHAT_HUB = "chatHub";
 		public const string SIGNAL_R_CHAT_HUB_RECEIVE_MESSAGE = "ReceiveMessage";
 
 		public const string SIGNAL_R_NOTIFICATION_HUB = "notificationHub";
@@ -182,8 +182,8 @@
 		public const int PAGE_SIZE_SEARCH_SHOP = 10;
 		public const int LIMIT_SEARCH_HINT = 10;
 
-        //withdraw, deposit transaction
-        public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
+		//withdraw, deposit transaction
+		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
@@ -214,6 +214,8 @@
 
 		public const int STATISTIC_BY_MONTH = 0;
 		public const int STATISTIC_BY_YEAR = 1;
+
+		public const long UPLOAD_FILE_SIZE_LIMIT = 2 * 1024 * 1024;
 	}
 }
 

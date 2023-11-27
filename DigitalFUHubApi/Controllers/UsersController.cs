@@ -17,37 +17,39 @@
 	using global::Comons;
 	using static QRCoder.PayloadGenerator;
 	using Google.Apis.Auth;
-    using DTOs.Seller;
+	using DTOs.Seller;
 	using DataAccess.Repositories;
 	using DTOs.Admin;
-    using Azure.Core;
-    using Quartz.Util;
-    using System.Text.RegularExpressions;
+	using Azure.Core;
+	using Quartz.Util;
+	using System.Text.RegularExpressions;
 
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class UsersController : ControllerBase
 	{
 		private readonly IUserRepository _userRepository;
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 		private readonly IAccessTokenRepository _accessTokenRepository;
+		private readonly IConfiguration _configuration;
 		private readonly IMapper _mapper;
 		private readonly ITwoFactorAuthenticationRepository _twoFactorAuthenticationRepository;
 
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly TwoFactorAuthenticationService _twoFactorAuthenticationService;
 		private readonly MailService _mailService;
-        private readonly StorageService _storageService;
+		private readonly StorageService _storageService;
 
-        public UsersController(IUserRepository userRepository, IMapper mapper,
+		public UsersController(IUserRepository userRepository, IMapper mapper,
+			IConfiguration configuration,
 			IRefreshTokenRepository refreshTokenRepository,
 			IAccessTokenRepository accessTokenRepository,
 			ITwoFactorAuthenticationRepository twoFactorAuthenticationRepository,
 			JwtTokenService jwtTokenService,
 			TwoFactorAuthenticationService twoFactorAuthenticationService,
 			MailService mailService,
-            StorageService storageService
-            )
+			StorageService storageService
+			)
 		{
 			_userRepository = userRepository;
 			_mapper = mapper;
@@ -58,8 +60,9 @@
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
 			_storageService = storageService;
+			_configuration = configuration;
 
-        }
+		}
 
 		#region SignIn
 		[HttpPost("SignIn")]
@@ -174,7 +177,7 @@
 				_userRepository.AddUser(userSignUp);
 
 				string token = _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
-				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
+				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>Nhấn vào đây để xác nhận.</a>");
 			}
 			catch (Exception)
 			{
@@ -245,7 +248,7 @@
 		}
 		#endregion
 
-		#region Generate token confirm email
+		#region Send email confirm
 		[HttpGet("GenerateTokenConfirmEmail/{email}")]
 		public async Task<IActionResult> GenerateTokenConfirmEmail(string email)
 		{
@@ -263,7 +266,7 @@
 				else
 				{
 					string token = _jwtTokenService.GenerateTokenConfirmEmail(user);
-					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='http://localhost:3000/confirmEmail?token={token}'>Nhấn vào đây để xác nhận.</a>");
+					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>Nhấn vào đây để xác nhận.</a>");
 				}
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
@@ -588,50 +591,62 @@
 		[HttpPut("EditUserInfo")]
 		public async Task<IActionResult> EditUserInfo([FromForm] UserUpdateRequestDTO request)
 		{
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
 
-            try
+			try
 			{
                 if (request == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
+                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+                    status.Message = "request invalid!";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
                 }
 
-                User? user = _userRepository.GetUserById(request.UserId);
+				User? user = _userRepository.GetUserById(request.UserId);
 
 				if (user == null)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "not found", false, new()));
+                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+                    status.Message = "user not found";
+                    status.Ok = false;
+                    responseData.Status = status;
+                    return Ok(responseData);
                 }
 
-                var userUpdate = _mapper.Map<User>(request);
+				var userUpdate = _mapper.Map<User>(request);
 
-                // Declares
-                string urlNewAvatar = "";
-                string filename = "";
-                DateTime now;
+				// Declares
+				string urlNewAvatar = "";
+				string filename = "";
+				DateTime now;
 				//
 
-                // Check update avatar user or not
-                if (request.Avatar != null)
-                {
-                    now = DateTime.Now;
-                    filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
-                        now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
-                        request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
+				// Check update avatar user or not
+				if (request.Avatar != null)
+				{
+					now = DateTime.Now;
+					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
+						now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
+						request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
 
-                    urlNewAvatar = await _storageService.UploadFileToAzureAsync(request.Avatar, filename);
+					urlNewAvatar = await _storageService.UploadFileToAzureAsync(request.Avatar, filename);
 					userUpdate.Avatar = urlNewAvatar;
 
-                    // delete avatar old
-                    await _storageService.RemoveFileFromAzureAsync(user.Avatar.Substring(user.Avatar.LastIndexOf("/") + 1));
-                }
+					// delete avatar old
+					await _storageService.RemoveFileFromAzureAsync(user.Avatar.Substring(user.Avatar.LastIndexOf("/") + 1));
+				}
 
 				// Ok
 				_userRepository.EditUserInfo(userUpdate);
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
-			}
+                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+                status.Message = "Success";
+                status.Ok = true;
+                responseData.Status = status;
+                return Ok(responseData);
+            }
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
@@ -699,24 +714,24 @@
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 		}
-        #endregion
+		#endregion
 
-        #region Active UserName and Password
-        [HttpPost("ActiveUserNameAndPassword")]
-        [Authorize]
-        public IActionResult ActiveUserNameAndPassword(ActiveUserNameAndPasswordRequestDTO request)
-        {
-            try
-            {
-                if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-                {
-                    return Unauthorized();
-                }
+		#region Active UserName and Password
+		[HttpPost("ActiveUserNameAndPassword")]
+		[Authorize]
+		public IActionResult ActiveUserNameAndPassword(ActiveUserNameAndPasswordRequestDTO request)
+		{
+			try
+			{
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 
-                if (!Regex.IsMatch(request.Username, Constants.REGEX_USERNAME_SIGN_UP))
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "UserName Invalid", false, new()));
-                }
+				if (!Regex.IsMatch(request.Username, Constants.REGEX_USERNAME_SIGN_UP))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "UserName Invalid", false, new()));
+				}
 
 				//if (!Regex.IsMatch(request.Password, Constants.REGEX_PASSWORD_SIGN_UP))
 				//{
@@ -728,37 +743,37 @@
 
 				if (user == null)
 				{
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "User not found", false, new()));
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "User not found", false, new()));
+				}
 
 				if (user.IsChangeUsername)
 				{
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "This user has an activated username and password", false, new()));
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "This user has an activated username and password", false, new()));
+				}
 
-                var userFind = _userRepository.GetUserByUserNameOtherUserId(request.UserId, request.Username);
+				var userFind = _userRepository.GetUserByUserNameOtherUserId(request.UserId, request.Username);
 
-                // check username exist
-                if (userFind != null)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS, "UserName already exists", false, new()));
-                }
+				// check username exist
+				if (userFind != null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS, "UserName already exists", false, new()));
+				}
 
 				_userRepository.ActiveUserNameAndPassword(request.UserId, request.Username, request.Password);
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        #endregion
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
 
 
 
-        #region Get all users for admin
-        [Authorize(Roles = "Admin")]
+		#region Get all users for admin
+		[Authorize(Roles = "Admin")]
 		[HttpPost("GetUsers")]
 		public IActionResult GetUsers(UsersRequestDTO requestDTO)
 		{
