@@ -177,7 +177,7 @@ namespace DigitalFUHubApi
 					.ForJob(jobKeyHistoryDepositTransactionMbBankJob)
 					.StartNow()
 					.WithSimpleSchedule(x =>
-						x.WithIntervalInMinutes(1)
+						x.WithIntervalInMinutes(5)
 						.RepeatForever()
 						)
 					);
@@ -188,7 +188,7 @@ namespace DigitalFUHubApi
 					.ForJob(jobKeyHistoryWithdrawTransactionMbBankJob)
 					.StartNow()
 					.WithSimpleSchedule(x =>
-						x.WithIntervalInMinutes(1)
+						x.WithIntervalInMinutes(60)
 						.RepeatForever()
 						)
 					);
