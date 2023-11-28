@@ -11,7 +11,7 @@ namespace BusinessObject
 	{
 
 		public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
-		//public readonly string connectionString = "Server=tcp:fptu-database.database.windows.net,1433;Database=fptu;User ID=fptu;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
+		//public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Database=digitalfuhub;User ID=digitalfuhub;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
 
 		public DatabaseContext() { }
 
