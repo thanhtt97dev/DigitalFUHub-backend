@@ -551,7 +551,7 @@ namespace DataAccess.DAOs
 						{
 							if (totalPayment <= customerCoin)
 							{
-								totalCoinDiscount = customerCoin;
+								totalCoinDiscount = totalPayment;
 								totalPayment = 0;
 								customerCoin -= totalCoinDiscount;
 							}

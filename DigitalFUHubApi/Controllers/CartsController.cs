@@ -79,7 +79,7 @@ namespace DigitalFUHubApi.Controllers
 
                 cartRepository.AddProductToCart(request.UserId, request.ShopId, request.ProductVariantId, request.Quantity);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", false, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", true, new()));
             }
             catch (Exception)
             {
