@@ -1403,9 +1403,9 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Order.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION
+				return context.Order.Where(x => x.ShopId == userId && (x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION
 							|| x.OrderStatusId == Constants.ORDER_STATUS_DISPUTE
-							|| x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT)
+							|| x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT))
 					.GroupBy(x => x.OrderStatusId)
 					.Select(x => new StatisticNumberOrdersOfStatusResponseDTO
 					{

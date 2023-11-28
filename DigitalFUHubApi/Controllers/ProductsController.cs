@@ -234,10 +234,6 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				//{
-				//	return Unauthorized();
-				//}
 				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.ProductName)
 					|| string.IsNullOrWhiteSpace(request.Description)
@@ -250,7 +246,8 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
 				}
 				if(request.ProductDetailImageFiles.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
-					|| request.ThumbnailFile.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+					|| request.ThumbnailFile.Length > Constants.UPLOAD_FILE_SIZE_LIMIT
+					|| request.AssetInformationFiles.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
 				}
@@ -364,10 +361,6 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				//{
-				//	return Unauthorized();
-				//}
 				if (request == null
 					|| string.IsNullOrWhiteSpace(request.ProductName)
 					|| string.IsNullOrWhiteSpace(request.ProductDescription)
@@ -383,7 +376,8 @@ namespace DigitalFUHubApi.Controllers
 					request.AssetInformationFilesAddNew.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
 					|| request.AssetInformationFilesUpdate.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
 					|| (request.ProductThumbnailFileUpdate != null 
-					&& request.ProductThumbnailFileUpdate.Length > Constants.UPLOAD_FILE_SIZE_LIMIT))
+						&& request.ProductThumbnailFileUpdate.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+					|| request.ProductDetailImagesAddNew.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
 				}
