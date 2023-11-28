@@ -121,7 +121,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get list product of seller
+		#region Get list product for add coupon
 		[Authorize("Seller")]
 		[HttpGet("Seller/List")]
 		public IActionResult GetListProductBySeller(string productId, string productName, int page)
