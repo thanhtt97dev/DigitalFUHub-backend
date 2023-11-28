@@ -784,10 +784,10 @@ namespace DataAccess.DAOs
 				var query = (from product in context.Product
 							 where (categoryId == 0 ? true : product.CategoryId == categoryId)
 								&&
-                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-                                ||
-                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
-                             select new Product
+								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+								||
+								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
+							 select new Product
 							 {
 								 ProductId = product.ProductId,
 								 ProductName = product.ProductName,
@@ -854,7 +854,7 @@ namespace DataAccess.DAOs
 #pragma warning disable CS8604 // Possible null reference argument.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 				return context.Product.Include(x => x.Tags)
-					.Where(x => x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE 
+					.Where(x => x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 					&& (x.ProductName.ToLower().Contains(keywordSearch)
 					//|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch))
 					))
@@ -874,15 +874,41 @@ namespace DataAccess.DAOs
 			{
 				string keywordSearch = keyword.Trim().ToLower();
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-				var query = context.Product.Include(x => x.Tags).Include(x => x.ProductVariants)
-					.Where(x => (x.ProductName.ToLower().Contains(keywordSearch) 
+				var query = context.Product.Include(x => x.Tags)
+					.Include(x => x.ProductVariants)
+					.ThenInclude(x => x.AssetInformations)
+					.Where(x => (x.ProductName.ToLower().Contains(keywordSearch)
 							|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
 						&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 						&& (categoryId == Constants.ALL_CATEGORY ? true : x.CategoryId == categoryId)
 						&& (rating == Constants.FEEDBACK_TYPE_ALL ? true : (x.NumberFeedback != 0 && x.TotalRatingStar / x.NumberFeedback >= rating))
 						&& (minPrice == null ? true : x.ProductVariants.All(pv => (pv.Price - (pv.Price * pv.Discount / 100)) >= minPrice))
 						&& (maxPrice == null ? true : x.ProductVariants.All(pv => (pv.Price - (pv.Price * pv.Discount / 100)) <= maxPrice))
-					);
+					)
+					.Select(product => new Product
+					{
+						ProductId = product.ProductId,
+						ProductName = product.ProductName,
+						Thumbnail = product.Thumbnail,
+						TotalRatingStar = product.TotalRatingStar,
+						NumberFeedback = product.NumberFeedback,
+						SoldCount = product.SoldCount,
+						DateCreate = product.DateCreate,
+						ProductStatusId = product.ProductStatusId,
+						ProductVariants = (from productVariant in context.ProductVariant
+										   where productVariant.ProductId == product.ProductId
+										   select new ProductVariant
+										   {
+											   ProductVariantId = productVariant.ProductId,
+											   Discount = productVariant.Discount,
+											   Price = productVariant.Price,
+											   AssetInformations = (from assetInformation in context.AssetInformation
+																	where assetInformation.ProductVariantId == productVariant.ProductVariantId
+																	&&
+																	assetInformation.IsActive
+																	select new AssetInformation { }).ToList()
+										   }).ToList()
+					});
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 				if (sort == Constants.SORTED_BY_DATETIME)
 				{
