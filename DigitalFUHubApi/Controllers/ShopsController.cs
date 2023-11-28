@@ -25,9 +25,9 @@ namespace DigitalFUHubApi.Controllers
 		private readonly StorageService _storageService;
 		private readonly IMapper _mapper;
 
-		public ShopsController(IShopRepository shopRepository, 
-			IUserRepository userRepository, 
-			JwtTokenService jwtTokenService, 
+		public ShopsController(IShopRepository shopRepository,
+			IUserRepository userRepository,
+			JwtTokenService jwtTokenService,
 			StorageService storageService,
 			IMapper mapper)
 		{
@@ -72,20 +72,21 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Register")]
 		public async Task<IActionResult> Register([FromForm] RegisterShopRequestDTO request)
 		{
-			string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
-			if (!ModelState.IsValid
-				|| string.IsNullOrWhiteSpace(request.ShopName)
-				|| string.IsNullOrWhiteSpace(request.ShopDescription)
-				|| !fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf("."))))
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
-			}
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+				if (!ModelState.IsValid
+					|| string.IsNullOrWhiteSpace(request.ShopName)
+					|| string.IsNullOrWhiteSpace(request.ShopDescription)
+					|| !fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf("."))))
 				{
-					return Unauthorized();
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
+				if (request.AvatarFile.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
+				}
+
 				DateTime now = DateTime.Now;
 				string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 					now.Millisecond, now.Second, now.Minute, now.Hour,
@@ -101,20 +102,24 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region register seller
+		#region edit shop
 		[Authorize("Seller")]
 		[HttpPost("Seller/Edit")]
-		public async Task<IActionResult> EditShop([FromForm]SellerEditShopRequestDTO request)
+		public async Task<IActionResult> EditShop([FromForm] SellerEditShopRequestDTO request)
 		{
-			string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
-			if (string.IsNullOrWhiteSpace(request.ShopDescription)
-				|| (request.AvatarFile != null &&
-				!fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")))))
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
-			}
 			try
 			{
+				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+				if (string.IsNullOrWhiteSpace(request.ShopDescription)
+					|| (request.AvatarFile != null &&
+					!fileExtension.Contains(request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")))))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
+				}
+				if (request.AvatarFile != null && request.AvatarFile.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
+				}
 				string avatarUrl = "";
 				if (request.AvatarFile != null)
 				{
@@ -122,7 +127,7 @@ namespace DigitalFUHubApi.Controllers
 					string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 						now.Millisecond, now.Second, now.Minute, now.Hour,
 						request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
-					 avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
+					avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				}
 				Shop shop = new Shop
 				{
@@ -180,51 +185,51 @@ namespace DigitalFUHubApi.Controllers
 
 		#region Get shop detail (customer)
 		[HttpGet("GetDetail/{userId}")]
-        public IActionResult GetShopDetail(long userId)
-        {
-            ResponseData responseData = new ResponseData();
-            Status status = new Status();
-            try
-            {
+		public IActionResult GetShopDetail(long userId)
+		{
+			ResponseData responseData = new ResponseData();
+			Status status = new Status();
+			try
+			{
 
 				Shop? shop = _shopRepository.GetShopDetail(userId);
 
 				if (shop == null)
 				{
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Ok = false;
-                    status.Message = "shop not found!";
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					status.Ok = false;
+					status.Message = "shop not found!";
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
 				var shopResponse = _mapper.Map<ShopDetailCustomerResponseDTO>(shop);
 
 				// Ok
 				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Ok = false;
-                status.Message = "Success";
-                responseData.Status = status;
+				status.Ok = false;
+				status.Message = "Success";
+				responseData.Status = status;
 				responseData.Result = shopResponse;
-                return Ok(responseData);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+				return Ok(responseData);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 		#endregion
 
 		#region Get most popular shop 
 		[HttpGet("MostPopular")]
 		public IActionResult GetMostPopularShop(string keyword)
 		{
-			if(string.IsNullOrWhiteSpace(keyword))
+			if (string.IsNullOrWhiteSpace(keyword))
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid keyword search", false, new()));
 			}
 			Shop? shop = _shopRepository.GetMostPopularShop(keyword);
-			if(shop == null)
+			if (shop == null)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 			}
@@ -233,7 +238,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get 
+		#region Get shop by search
 		[HttpGet("Search")]
 		public IActionResult GetShopsSearched(string keyword, int page)
 		{
@@ -241,7 +246,7 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid keyword search", false, new()));
 			}
-			if(page <= 0)
+			if (page <= 0)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 			}
