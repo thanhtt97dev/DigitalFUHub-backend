@@ -58,7 +58,7 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!", false, new()));
                 }
 
-					// check product status
+				// check product status
 				if (product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_BAN, "This product has been banned", false, new()));
@@ -80,7 +80,9 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_HIDE, "Wish list already exists", false, new()));
 				}
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+                wishListRepository.AddWishList(request.ProductId, request.UserId);
+				//Ok
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception ex)
 			{
@@ -166,7 +168,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get all with list of a user
+		#region Get all wish list of a user
 		[HttpPost("GetAll")]
 		[Authorize]
 		public IActionResult GetWishListByUserId(WishListCustomerParamRequestDTO request)
