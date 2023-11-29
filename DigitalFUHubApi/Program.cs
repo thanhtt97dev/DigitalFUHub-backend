@@ -125,6 +125,7 @@ namespace DigitalFUHubApi
             builder.Services.AddSingleton<IWishListRepository, WishListRepository>();
 			builder.Services.AddSingleton<IReportProductRepository, ReportProductRepository>();
             builder.Services.AddSingleton<IReasonReportProductRepository, ReasonReportProductRepository>();
+            builder.Services.AddSingleton<ISliderRepository, SliderRepository>();
 
             builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 

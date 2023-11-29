@@ -62,10 +62,11 @@ namespace BusinessObject
 		public virtual DbSet<ReportProduct> ReportProduct { get; set; } = null!;
 		public virtual DbSet<ReasonReportProduct> ReasonReportProduct { get; set; } = null!;
 		public virtual DbSet<ReportProductStatus> ReportProductStatus { get; set; } = null!;
+        public virtual DbSet<Slider> Sliders { get; set; } = null!;
 
-		#endregion
+        #endregion
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			optionsBuilder.UseSqlServer(connectionString);
 		}
