@@ -105,7 +105,7 @@ namespace DigitalFUHubApi.Controllers
                 reportProduct.ReportProductStatusId = Constants.REPORT_PRODUCT_STATUS_VERIFYING;
                 reportProductRepository.AddReportProduct(reportProduct);
 
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_CART_SUCCESS, "Success!", true, new()));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new()));
 
 			}
             catch (Exception ex)
