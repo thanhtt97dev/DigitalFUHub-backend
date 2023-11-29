@@ -463,6 +463,7 @@ namespace DataAccess.DAOs
 			{
 				if (userId == 0) throw new Exception("INVALID DATA");
 				var query = context.Product.Where(x => x.ShopId == userId
+							&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 							&& (string.IsNullOrWhiteSpace(productId) ? true : productId.Trim() == x.ProductId.ToString())
 							&& (string.IsNullOrWhiteSpace(productName) ? true : x.ProductName.ToLower().Contains(productName.ToLower().Trim())));
 				var lsProduct = query
