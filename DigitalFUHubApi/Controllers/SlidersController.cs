@@ -22,8 +22,9 @@ namespace DigitalFUHubApi.Controllers
             this.sliderRepository = sliderRepository;
         }
 
-        [HttpPost("GetAll")]
-        //[Authorize("Admin")]
+
+        [Authorize("Admin")]
+        [HttpPost("admin/getSliders")]
         public IActionResult GetAllSliders (SliderAdminRequestParamDTO request)
         {
             try
