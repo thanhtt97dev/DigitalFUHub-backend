@@ -18,7 +18,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
-using static Azure.Core.HttpHeader;
 
 namespace DigitalFUHubApi.Controllers
 {
