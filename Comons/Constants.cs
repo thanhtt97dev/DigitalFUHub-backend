@@ -180,7 +180,8 @@
 		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
 		public const int PAGE_SIZE_SEARCH_PRODUCT = 20;
 		public const int PAGE_SIZE_SEARCH_SHOP = 10;
-		public const int LIMIT_SEARCH_HINT = 10;
+        public const int PAGE_SIZE_SLIDER = 20;		//ADMIN
+        public const int LIMIT_SEARCH_HINT = 10;
 
 		//withdraw, deposit transaction
 		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
@@ -216,6 +217,10 @@
 		public const int STATISTIC_BY_YEAR = 1;
 
 		public const long UPLOAD_FILE_SIZE_LIMIT = 2 * 1024 * 1024;
-	}
+
+        public const int STATUS_ALL_SLIDER_FOR_FILTER = 0;
+        public const int STATUS_ACTIVE_SLIDER_FOR_FILTER = 1;
+        public const int STATUS_UN_ACTIVE_SLIDER_FOR_FILTER = 2;
+    }
 }
 
