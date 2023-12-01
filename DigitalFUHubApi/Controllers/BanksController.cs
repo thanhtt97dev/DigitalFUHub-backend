@@ -384,7 +384,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_REQUESTS_CREATED, "Exceeded number of requests created!", false, new()));
 				}
 
-				if(totalAnountWithdrawRequestMakedToday > Constants.MAX_PRICE_CAN_WITHDRAW)
+				if(totalAnountWithdrawRequestMakedToday + request.Amount > Constants.MAX_PRICE_CAN_WITHDRAW)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_AMOUNT_A_DAY, "Exceeded total amount can make a day", false, totalAnountWithdrawRequestMakedToday));
 				}
