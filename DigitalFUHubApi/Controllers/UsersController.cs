@@ -477,10 +477,15 @@
 				if (secretKey == null) return BadRequest();
 
 				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
-				string title = "FU-Market: QR Code for Two Factor Authentication";
-				string body = $"<html><body><p>Here's an image:</p> <img src='{qrCode}'/></body></html>";
-
-
+				string title = "DigitalFUHub: Mã QR cho xác thực hai yếu tố.";
+				string body = $"<html>" +
+					$"<body>" +
+					$"<div>Xin chào {user.Fullname},</div>" +
+					$"<div>Mã QR của bạn:</div>" +
+					$"<img src='{qrCode}'/>" +
+					$"<div><b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b></div>" +
+					$"</body>" +
+					$"</html>";
 				await _mailService.SendEmailAsync(user.Email, title, body);
 
 				return Ok();
