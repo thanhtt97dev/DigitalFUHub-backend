@@ -85,7 +85,20 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void Update2FA(int id)
+        internal void UpdateSettingPersonalInfo(User userUpdate)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var user = context.User.First(x => x.UserId == userUpdate.UserId);
+				
+                user.Avatar = user.Avatar != userUpdate.Avatar ? userUpdate.Avatar : user.Avatar;
+                user.Fullname = user.Fullname != userUpdate.Fullname ? userUpdate.Fullname : user.Fullname;
+
+                context.SaveChanges();
+            }
+        }
+
+        internal void Update2FA(int id)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
