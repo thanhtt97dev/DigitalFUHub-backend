@@ -515,7 +515,7 @@ namespace DigitalFUHubApi.Controllers
 				string reportname = string.Format("{0}{1}{2}{3}{4}{5}{6}.xlsx", now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour);
 				var exportBytes = await _reportRepository
 					.ExportToExcel<SellerReportOrderResponseDTO>(_mapper.Map<List<SellerReportOrderResponseDTO>>(orders),
-					reportname, fromDate, toDate, shop.ShopName);
+					reportname, fromDate, toDate, shop.ShopName, request.Status);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true,
 					File(exportBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", reportname)));
 			}

@@ -109,22 +109,20 @@ namespace DigitalFUHubApi.Controllers
 				}
 				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SESSION_INVALID)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Third-party's session invalid", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Third-party's session invalid!", false, new()));
 				}
 				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Search data err", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Search data err!", false, new()));
 				}
 				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found!", false, new()));
 				}
-				/*
-				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+				else if (mbBankResponse.Code == Constants.MB_BANK_RESPONE_CODE_NO_SUITABLE_ACCOUNTS)
 				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, mbBankResponse.Result));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "No suitable accounts", false, mbBankResponse.Result));
 				}
-				*/
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, mbBankResponse.Result));
 			}
 			catch (Exception ex)
@@ -150,8 +148,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("AddBankAccount")]
 		public async Task<IActionResult> AddBankAccount(BankLinkAccountRequestDTO bankLinkAccountRequestDTO)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (bankLinkAccountRequestDTO == null) return BadRequest();
@@ -170,11 +166,7 @@ namespace DigitalFUHubApi.Controllers
 				var totalUserLinkedBank = bankRepository.TotalUserLinkedBank(bankLinkAccountRequestDTO.UserId);
 				if (totalUserLinkedBank > 1)
 				{
-					status.Message = "You was linked with bank account!";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "You was linked with bank account!", false, new()));
 				}
 
 				BankInquiryAccountNameRequestDTO bankInquiryAccount = new BankInquiryAccountNameRequestDTO()
@@ -187,11 +179,7 @@ namespace DigitalFUHubApi.Controllers
 
 				if (mbBank == null || mbBank.Result == null) //RULE 2
 				{
-					status.Message = "Third-party's server err";
-					status.Ok = false;
-					status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-					responseData.Status = status;
-					return Ok(responseData);
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Third-party's session invalid!", false, new()));
 				}
 				else
 				{
@@ -199,19 +187,12 @@ namespace DigitalFUHubApi.Controllers
 					{
 						if (mbBank.Code == Constants.MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND) //RULE 3
 						{
-							status.Message = "Not found";
-							status.Ok = false;
-							status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-							responseData.Status = status;
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found!", false, new()));
 						}
 						else //RULE 2
 						{
-							status.Message = "Third-party's server err";
-							status.Ok = false;
-							status.ResponseCode = Constants.RESPONSE_CODE_FAILD;
-							responseData.Status = status;
+							return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Third-party's session invalid!", false, new()));
 						}
-						return Ok(responseData);
 					}
 				}
 				var benName = mbBank.Result;
@@ -227,11 +208,7 @@ namespace DigitalFUHubApi.Controllers
 
 				bankRepository.AddUserBank(userBank);
 
-				status.Message = "Add bank account success!";
-				status.Ok = false;
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				responseData.Status = status;
-				return Ok(responseData);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Add bank account success!", true, new {}));
 			}
 			catch (Exception ex)
 			{
@@ -407,7 +384,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_REQUESTS_CREATED, "Exceeded number of requests created!", false, new()));
 				}
 
-				if(totalAnountWithdrawRequestMakedToday > Constants.MAX_PRICE_CAN_WITHDRAW)
+				if(totalAnountWithdrawRequestMakedToday + request.Amount > Constants.MAX_PRICE_CAN_WITHDRAW)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_EXCEEDED_AMOUNT_A_DAY, "Exceeded total amount can make a day", false, totalAnountWithdrawRequestMakedToday));
 				}

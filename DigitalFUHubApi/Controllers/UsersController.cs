@@ -177,7 +177,13 @@
 				_userRepository.AddUser(userSignUp);
 
 				string token = _jwtTokenService.GenerateTokenConfirmEmail(userSignUp);
-				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>Nhấn vào đây để xác nhận.</a>");
+				string html = $"<div>" +
+					$"<h3>Xin chào {userSignUp.Fullname},</h3>" +
+					$"<div>Chào mừng bạn đến với DigitalFUHub.</div>" +
+					$"<div><span>Để có thể truy cập vào ứng dụng vui lòng nhấn vào:</span> <a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>tại đây</a></div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>\r\n    " +
+					$"</div>";
+				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác thực đăng ký tài khoản.", html);
 			}
 			catch (Exception)
 			{
@@ -206,7 +212,7 @@
 		}
 		#endregion
 
-		#region reset password
+		#region Reset password
 		[HttpGet("ResetPassword/{email}")]
 		public async Task<IActionResult> ResetPassword(string email)
 		{
@@ -235,7 +241,14 @@
 					string passwordHash = Util.Instance.Sha256Hash(newPassword);
 					user.Password = passwordHash;
 					_userRepository.UpdateUser(user);
-					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Đặt lại mật khẩu.", $"<div>Mật khẩu mới: {newPassword}</div>");
+					string html = $"<div>" +
+						$"<h3>Xin chào ${user.Fullname},</h3>" +
+						$"<div>Yêu cầu đặt lại mật khẩu.</div>" +
+						$"<div>Mật khẩu mới của bạn là: <b>{newPassword}</b></div>" +
+						$"<div>Sau khi đăng nhập vào ứng dụng vui lòng đổi lại mật khẩu mới để đảm bảo tài khoản của bạn được an toàn.</div>" +
+						$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+						$"</div>";
+					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Đặt lại mật khẩu.", html);
 				}
 				catch (Exception)
 				{
@@ -266,7 +279,13 @@
 				else
 				{
 					string token = _jwtTokenService.GenerateTokenConfirmEmail(user);
-					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác nhận đăng ký tài khoản.", $"<a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>Nhấn vào đây để xác nhận.</a>");
+					string html = $"<div>" +
+					$"<h3>Xin chào {user.Fullname},</h3>" +
+					$"<div>Chào mừng bạn đến với DigitalFUHub.</div>" +
+					$"<div><span>Để có thể truy cập vào ứng dụng vui lòng nhấn vào:</span> <a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>tại đây</a></div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>\r\n    " +
+					$"</div>";
+					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác thực đăng ký tài khoản.", html);
 				}
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
@@ -458,10 +477,15 @@
 				if (secretKey == null) return BadRequest();
 
 				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
-				string title = "FU-Market: QR Code for Two Factor Authentication";
-				string body = $"<html><body><p>Here's an image:</p> <img src='{qrCode}'/></body></html>";
-
-
+				string title = "DigitalFUHub: Mã QR cho xác thực hai yếu tố.";
+				string body = $"<html>" +
+					$"<body>" +
+					$"<div>Xin chào {user.Fullname},</div>" +
+					$"<div>Mã QR của bạn:</div>" +
+					$"<img src='{qrCode}'/>" +
+					$"<div><b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b></div>" +
+					$"</body>" +
+					$"</html>";
 				await _mailService.SendEmailAsync(user.Email, title, body);
 
 				return Ok();
@@ -596,25 +620,25 @@
 
 			try
 			{
-                if (request == null)
+				if (request == null)
 				{
-                    status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-                    status.Message = "request invalid!";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+					status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
+					status.Message = "request invalid!";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
 				User? user = _userRepository.GetUserById(request.UserId);
 
 				if (user == null)
 				{
-                    status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-                    status.Message = "user not found";
-                    status.Ok = false;
-                    responseData.Status = status;
-                    return Ok(responseData);
-                }
+					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
+					status.Message = "user not found";
+					status.Ok = false;
+					responseData.Status = status;
+					return Ok(responseData);
+				}
 
 				var userUpdate = _mapper.Map<User>(request);
 
@@ -641,12 +665,12 @@
 
 				// Ok
 				_userRepository.EditUserInfo(userUpdate);
-                status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-                status.Message = "Success";
-                status.Ok = true;
-                responseData.Status = status;
-                return Ok(responseData);
-            }
+				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
+				status.Message = "Success";
+				status.Ok = true;
+				responseData.Status = status;
+				return Ok(responseData);
+			}
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);

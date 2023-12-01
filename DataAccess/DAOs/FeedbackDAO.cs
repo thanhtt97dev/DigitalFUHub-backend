@@ -188,7 +188,7 @@ namespace DataAccess.DAOs
 		}
 
 		internal (long, List<Order>) GetListFeedbackSeller(long userId, string orderId, string userName, string productName,
-			string productVariantName, DateTime? fromDate, int rate, int page)
+			string productVariantName, DateTime? fromDate, DateTime? toDate, int rate, int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -215,6 +215,7 @@ namespace DataAccess.DAOs
 						OrderDetails = x.OrderDetails.Where(od => od.IsFeedback == true
 							&& (rate == 0 ? true : od.Feedback.Rate == rate)
 							&& (fromDate == null ? true : fromDate.Value.Date <= od.Feedback.DateUpdate.Date)
+							&& (toDate == null? true: toDate.Value.Date >= od.Feedback.DateUpdate.Date)
 							&& (od.ProductVariant.Product.ProductName ?? "").ToLower().Contains(productName.ToLower())
 							&& (od.ProductVariant.Name ?? "").ToLower().Contains(productVariantName.ToLower()))
 							.Select(od => new OrderDetail
@@ -233,7 +234,7 @@ namespace DataAccess.DAOs
 					.ToList())
 					.Where(x => x.OrderDetails.Count > 0);
 
-				return (query.Count(), query.Skip((page - 1) * Constants.PAGE_SIZE_FEEDBACK).Take(Constants.PAGE_SIZE_FEEDBACK).ToList());
+				return (query.Count(), query.OrderByDescending(x => x.OrderDate).Skip((page - 1) * Constants.PAGE_SIZE_FEEDBACK).Take(Constants.PAGE_SIZE_FEEDBACK).ToList());
 
 			}
 		}

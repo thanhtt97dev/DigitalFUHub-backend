@@ -8,15 +8,9 @@ using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.Coupon;
 using DTOs.Seller;
-using Google.Apis.Util;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata;
-using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace DigitalFUHubApi.Controllers
@@ -202,10 +196,6 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				//{
-				//	return Unauthorized();
-				//}
 				Regex rxCouponCode = new Regex(Constants.REGEX_COUPON_CODE);
 				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.CouponCode)
@@ -276,10 +266,6 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				//if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-				//{
-				//	return Unauthorized();
-				//}
 				Regex rxCouponCode = new Regex(Constants.REGEX_COUPON_CODE);
 				if (!ModelState.IsValid
 					|| string.IsNullOrWhiteSpace(request.CouponCode)

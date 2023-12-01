@@ -14,7 +14,10 @@
 		public const string MB_BANK_RESPONE_CODE_SESSION_INVALID = "GW200";
 		public const string MB_BANK_RESPONE_CODE_SAME_URI_IN_SAME_TIME = "GW485";
 		public const string MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND = "MC201";
+		public const string MB_BANK_RESPONE_CODE_NO_SUITABLE_ACCOUNTS = "MC4217";
 		public const string MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR = "MC231";
+
+		
 
 		//Respone code
 		public const string RESPONSE_CODE_SUCCESS = "00";
@@ -184,7 +187,7 @@
         public const int LIMIT_SEARCH_HINT = 10;
 
 		//withdraw, deposit transaction
-		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 50;
+		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 20;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
