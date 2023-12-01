@@ -23,20 +23,26 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IUserRepository _userRepository;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly StorageService _storageService;
+		private readonly MailService _mailService;
+
 		private readonly IMapper _mapper;
 
-		public ShopsController(IShopRepository shopRepository,
-			IUserRepository userRepository,
-			JwtTokenService jwtTokenService,
-			StorageService storageService,
+		public ShopsController(IShopRepository shopRepository, 
+			IUserRepository userRepository, 
+			JwtTokenService jwtTokenService, 
+			StorageService storageService, 
+			MailService mailService, 
 			IMapper mapper)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
 			_jwtTokenService = jwtTokenService;
 			_storageService = storageService;
+			_mailService = mailService;
 			_mapper = mapper;
 		}
+
+
 
 		#region check exist shop name
 		[Authorize]
@@ -82,6 +88,12 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
+				User? user = _userRepository.GetUserById(request.UserId);
+				if(user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found user", false, new()));
+				}
+
 				if (request.AvatarFile.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
@@ -93,6 +105,23 @@ namespace DigitalFUHubApi.Controllers
 					request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
 				string avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				_shopRepository.AddShop(avatarUrl, request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
+				string html = $"<div>" +
+					$"<h3>Xin chào {user.Fullname},</h3>" +
+					$"<div>Xin chúc mừng bạn đã đăng ký bán hàng thành công.</div>" +
+					$"<div>Tên cửa hàng của bạn là: <b>{request.ShopName.Trim()}</b></div>" +
+					$" <div>" +
+					$"<b>Vui lòng tuân thủ các quy định sau:</b>" +
+					$"<div>" +
+					$"<ul>" +
+					$"<li>Tuân thủ các quy định về bảo mật thông tin cá nhân người mua</li>" +
+					$"<li>Yêu cầu người bán xác nhận và xử lý các giao dịch một cách an toàn và đáng tin cậy</li>" +
+					$"<li>Đảm bảo rằng mọi thông tin sản phẩm là chính xác và không gây lừa dối khách hàng</li>" +
+					$"</ul>" +
+					$"</div>" +
+					$"</div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+					$"</div>";
+				await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Đăng ký bán hàng thành công.", html);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
