@@ -13,6 +13,7 @@ namespace DTOs.Seller
 		public string ProductName { get; set; } = string.Empty;
 		public string ProductVariantName { get; set; } = string.Empty;
 		public string? FromDate { get; set; } = null!;
+		public string? ToDate { get; set; } = null!;
 		public string UserName { get; set; } = string.Empty;
 		public int Rate { get; set; }
 		public int Page { get; set; }
