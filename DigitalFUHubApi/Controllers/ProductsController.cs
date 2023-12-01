@@ -155,10 +155,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("getProducts")]
 		public IActionResult GetProductsSeller(GetProductsOfSellerRequestDTO request)
 		{
-			if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-			{
-				return Unauthorized();
-			}
 			if (!ModelState.IsValid)
 			{
 				return BadRequest();
