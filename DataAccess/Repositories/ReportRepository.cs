@@ -13,8 +13,9 @@ namespace DataAccess.Repositories
 {
     public class ReportRepository : IReportRepository
     {
-        public async Task<byte[]> ExportToExcel<T>(List<T> table, string filename, DateTime? fromDate, DateTime? toDate, string shopName)
-        => await ReportDAO.Instance.ExportToExcel<T>(table, filename, fromDate, toDate, shopName);
+        public async Task<byte[]> ExportToExcel<T>(List<T> table, string filename, DateTime? fromDate, 
+            DateTime? toDate, string shopName, int status)
+        => await ReportDAO.Instance.ExportToExcel<T>(table, filename, fromDate, toDate, shopName,  status);
 
 		public async Task<byte[]> ReportUser(int id)
         {
