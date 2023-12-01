@@ -14,7 +14,10 @@
 		public const string MB_BANK_RESPONE_CODE_SESSION_INVALID = "GW200";
 		public const string MB_BANK_RESPONE_CODE_SAME_URI_IN_SAME_TIME = "GW485";
 		public const string MB_BANK_RESPONE_CODE_ACCOUNT_NOT_FOUND = "MC201";
+		public const string MB_BANK_RESPONE_CODE_NO_SUITABLE_ACCOUNTS = "MC4217";
 		public const string MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR = "MC231";
+
+		
 
 		//Respone code
 		public const string RESPONSE_CODE_SUCCESS = "00";
