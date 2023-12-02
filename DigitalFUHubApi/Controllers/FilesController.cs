@@ -29,5 +29,21 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("order")]
+		public IActionResult GetOrder()
+		{
+			try
+			{
+				var file = Util.GetFile(Constants.ORDER_REPORT_EXCEL_FILE_PATH);
+				if (file == null) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Faild", true, new { }));
+				return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Constants.ORDER_REPORT_EXCEL_FILE_NAME);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 	}
 }

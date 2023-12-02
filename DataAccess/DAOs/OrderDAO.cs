@@ -223,7 +223,7 @@ namespace DataAccess.DAOs
 							.Include(x => x.Shop)
 							.Where
 							(x =>
-								(fromDate != null && toDate != null) ? fromDate <= x.OrderDate && toDate >= x.OrderDate : true &&
+								((fromDate != null && toDate != null) ? fromDate <= x.OrderDate && toDate >= x.OrderDate : true) &&
 								x.User.Email.Contains(customerEmail) &&
 								((shopId == 0) ? true : x.Shop.UserId == shopId) &&
 								x.Shop.ShopName.Contains(shopName) &&
@@ -271,7 +271,7 @@ namespace DataAccess.DAOs
 								OrderStatusId = o.OrderStatusId
 							})
 							.Where(x =>
-								(fromDate != null && toDate != null) ? fromDate <= x.OrderDate && toDate >= x.OrderDate : true &&
+								((fromDate != null && toDate != null) ? fromDate <= x.OrderDate && toDate >= x.OrderDate : true) &&
 								x.User.Email.Contains(customerEmail) &&
 								((shopId == 0) ? true : x.Shop.UserId == shopId) &&
 								x.Shop.ShopName.Contains(shopName) &&
@@ -1413,6 +1413,53 @@ namespace DataAccess.DAOs
 						Count = x.Count()
 					}).ToList();
 
+			}
+		}
+
+		internal List<Order> GetOrdersForReport(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var orders = context.Order
+							.Include(x => x.User)
+							.Include(x => x.Shop)
+							.Include(x => x.BusinessFee)
+							.Select(o => new Order
+							{
+								OrderId = o.OrderId,
+								OrderDate = o.OrderDate,
+								TotalPayment = o.TotalPayment,
+								TotalAmount = o.TotalAmount,
+								TotalCouponDiscount = o.TotalCouponDiscount,
+								TotalCoinDiscount = o.TotalCoinDiscount,
+								BusinessFee = new BusinessFee
+								{
+									Fee = o.BusinessFee.Fee
+								},
+								User = new User
+								{
+									UserId = o.User.UserId,
+									Email = o.User.Email,
+								},
+								Shop = new Shop
+								{
+									UserId = o.ShopId,
+									ShopName = o.Shop.ShopName
+								},
+								Note = o.Note,
+								OrderStatusId = o.OrderStatusId
+							})
+							.Where(x =>
+								((fromDate != null && toDate != null) ? fromDate <= x.OrderDate && toDate >= x.OrderDate : true) &&
+								x.User.Email.Contains(customerEmail) &&
+								((shopId == 0) ? true : x.Shop.UserId == shopId) &&
+								x.Shop.ShopName.Contains(shopName) &&
+								(orderId == 0 ? true : x.OrderId == orderId) &&
+								(status == 0 ? true : x.OrderStatusId == status)
+							)
+							.OrderByDescending(x => x.OrderDate)
+							.ToList();
+				return orders;
 			}
 		}
 	}

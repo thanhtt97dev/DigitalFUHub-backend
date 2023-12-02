@@ -14,6 +14,7 @@ using DTOs.Seller;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml.Style;
 using System.Globalization;
 
 namespace DigitalFUHubApi.Controllers
@@ -647,6 +648,46 @@ namespace DigitalFUHubApi.Controllers
 
 				// check seller have VIOLATE 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new { }));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get orders for export report
+		[Authorize("Admin")]
+		[HttpPost("Admin/Report")]
+		public IActionResult GetOrdersForReport(GetOrderForReportDTO request)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
+			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new { }));
+			}
+
+			try
+			{
+
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				long orderId;
+				long.TryParse(request.OrderId, out orderId);
+
+				long shopId;
+				long.TryParse(request.ShopId, out shopId);
+
+				var orders = _orderRepository.GetOrdersForReport(orderId, request.CustomerEmail, shopId, request.ShopName, fromDate, toDate, request.Status);
+
+				var result = _mapper.Map<List<OrdersResponseDTO>>(orders);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)
 			{

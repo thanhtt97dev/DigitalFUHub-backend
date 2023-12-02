@@ -224,6 +224,10 @@
         public const int STATUS_ALL_SLIDER_FOR_FILTER = 0;
         public const int STATUS_ACTIVE_SLIDER_FOR_FILTER = 1;
         public const int STATUS_UN_ACTIVE_SLIDER_FOR_FILTER = 2;
-    }
+
+		//files
+		public const string ORDER_REPORT_EXCEL_FILE_NAME = "OrdersReport.xlsx";
+		public const string ORDER_REPORT_EXCEL_FILE_PATH = $"Files/Excels/{ORDER_REPORT_EXCEL_FILE_NAME}";
+	}
 }
 
