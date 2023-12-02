@@ -213,7 +213,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var userBank = context.UserBank.FirstOrDefault(x => x.UserId == userBankUpdate.UserId);
+				var userBank = context.UserBank.FirstOrDefault(x => x.UserBankId == userBankUpdate.UserBankId);
 				if (userBank == null) throw new Exception("User's bank account not existed!");
 				userBank.UpdateAt = DateTime.Now;
 				userBank.isActivate = false;
