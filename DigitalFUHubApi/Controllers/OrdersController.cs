@@ -356,6 +356,7 @@ namespace DigitalFUHubApi.Controllers
 				OrderDate = order.OrderDate,
 				ShopId = order.ShopId,
 				CustomerId = order.User.UserId,
+				ConversationId = order.ConversationId,
 				CustomerUsername = order.User.Username,
 				CustomerAvatar = order.User.Avatar,
 				StatusId = order.OrderStatusId,
@@ -364,7 +365,8 @@ namespace DigitalFUHubApi.Controllers
 				//TotalPayment = order.TotalPayment,
 				CouponCode = order.OrderCoupons.FirstOrDefault()?.Coupon?.CouponCode ?? "",
 				TotalCouponDiscount = order.TotalCouponDiscount,
-				BussinessFee = (order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100,
+				PercentBusinessFee = order.BusinessFee.Fee,
+				BusinessFeePrice = (order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100,
 				AmountSellerReceive = (order.TotalAmount - order.TotalCouponDiscount) -
 									((order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100),
 				HistoryOrderStatus = order.HistoryOrderStatus.Select(x => new SellerHistoryOrderResponseDTO
