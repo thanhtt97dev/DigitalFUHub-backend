@@ -228,6 +228,10 @@
 		//files
 		public const string ORDER_REPORT_EXCEL_FILE_NAME = "OrdersReport.xlsx";
 		public const string ORDER_REPORT_EXCEL_FILE_PATH = $"Files/Excels/{ORDER_REPORT_EXCEL_FILE_NAME}";
+
+		public const string WITHDRAW_TRANSACTION_REPORT_EXCEL_FILE_NAME = "WithdrawTransactionReport.xlsx";
+		public const string WITHDRAW_TRANSACTION_EXCEL_FILE_PATH = $"Files/Excels/{WITHDRAW_TRANSACTION_REPORT_EXCEL_FILE_NAME}";
+		
 	}
 }
 
