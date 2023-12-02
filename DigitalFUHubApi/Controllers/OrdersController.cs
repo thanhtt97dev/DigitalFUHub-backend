@@ -29,13 +29,15 @@ namespace DigitalFUHubApi.Controllers
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 		private readonly HubService _hubService;
+		private readonly MailService _mailService;
 
 		public OrdersController(IOrderRepository orderRepository,
 			IReportRepository reportRepository,
 			IShopRepository shopRepository,
 			JwtTokenService jwtTokenService,
 			IMapper mapper,
-			HubService hubService)
+			HubService hubService,
+			MailService mailService)
 		{
 			_orderRepository = orderRepository;
 			_reportRepository = reportRepository;
@@ -43,6 +45,7 @@ namespace DigitalFUHubApi.Controllers
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 			_hubService = hubService;
+			_mailService = mailService;	
 		}
 
 
@@ -605,7 +608,7 @@ namespace DigitalFUHubApi.Controllers
 		#region Update order status (admin)
 		[Authorize("Admin")]
 		[HttpPost("Admin/UpdateOrderStatus")]
-		public IActionResult UpdateOrderStatus(UpdateOrderStatusRequestDTO request)
+		public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusRequestDTO request)
 		{
 			if (request.OrderId == 0 || request.Status == 0) return BadRequest();
 
@@ -636,17 +639,36 @@ namespace DigitalFUHubApi.Controllers
 				if (request.Status == Constants.ORDER_STATUS_REJECT_COMPLAINT)
 				{
 					_orderRepository.UpdateOrderStatusRejectComplaint(request.OrderId, request.Note);
+					await _mailService.SendMailRejectComplantForCustomer(order);
+					// send notification to customer
+					await _hubService.SendNotification(order.UserId, $"Từ chối hoàn tiền", $"Mã đơn hàng #{order.OrderId}", Constants.FRONT_END_HISTORY_ORDER_URL + order.OrderId);
 				}
 				else if (request.Status == Constants.ORDER_STATUS_SELLER_VIOLATES)
 				{
 					_orderRepository.UpdateOrderStatusSellerViolates(request.OrderId, request.Note);
+					var totalNumbnerOrderSellerViolates = _orderRepository.GetTotalNumberOrderSellerViolates(order.ShopId);
+					//warning
+					if (totalNumbnerOrderSellerViolates <= Constants.MAX_NUMBER_ORDER_CAN_VIOLATES_OF_A_SHOP)
+					{
+						await _mailService.SendMailWarningSellerViolate(order, totalNumbnerOrderSellerViolates);
+					}
+					//BAN
+					else
+					{
+						_shopRepository.UpdateBanShop(order.ShopId);
+						await _mailService.SendMailBanShop(order, totalNumbnerOrderSellerViolates);
+					}
+					await _mailService.SendMailOrderRefundMoneyForCustomer(order);
+					// send notification to seller
+					await _hubService.SendNotification(order.ShopId, $"Đơn hàng VI PHẠM", $"Mã đơn hàng #{order.OrderId}", Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + order.OrderId);
+					// send notification to customer
+					await _hubService.SendNotification(order.UserId, $"Hoàn tiền", $"Mã đơn hàng #{order.OrderId}", Constants.FRONT_END_HISTORY_ORDER_URL + order.OrderId);
 				}
 				else
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new { }));
 				}
 
-				// check seller have VIOLATE 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, new { }));
 			}
 			catch (Exception ex)

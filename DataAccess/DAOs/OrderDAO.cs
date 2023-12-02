@@ -1324,7 +1324,11 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Order.FirstOrDefault(x => x.OrderId == orderId);
+				return context.Order
+							.Include(x => x.User)
+							.Include(x => x.Shop)
+							.ThenInclude(x => x.User)
+							.FirstOrDefault(x => x.OrderId == orderId);
 			}
 		}
 
@@ -1460,6 +1464,18 @@ namespace DataAccess.DAOs
 							.OrderByDescending(x => x.OrderDate)
 							.ToList();
 				return orders;
+			}
+		}
+
+		internal int GetTotalNumberOrderSellerViolates(long shopId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+						.Where(x =>
+							x.OrderStatusId == Constants.ORDER_STATUS_SELLER_VIOLATES &&
+							x.ShopId == shopId
+						).Count();
 			}
 		}
 	}

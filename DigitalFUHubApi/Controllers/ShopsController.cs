@@ -176,7 +176,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get shops for admin
-		//[Authorize("Admin")]
+		[Authorize("Admin")]
 		[HttpPost("admin/all")]
 		public IActionResult GetProductsSeller(GetShopsRequestDTO request)
 		{

@@ -76,5 +76,6 @@ namespace DataAccess.Repositories
 
 		public List<Order> GetOrdersForReport(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status) => OrderDAO.Instance.GetOrdersForReport(orderId, customerEmail, shopId, shopName, fromDate, toDate, status);
 
+		public int GetTotalNumberOrderSellerViolates(long shopId) => OrderDAO.Instance.GetTotalNumberOrderSellerViolates(shopId);
 	}
 }
