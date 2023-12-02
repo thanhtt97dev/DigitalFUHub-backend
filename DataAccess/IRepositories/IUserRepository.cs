@@ -22,7 +22,9 @@ namespace DataAccess.IRepositories
 		bool IsExistUsernameOrEmail(string username, string email);
 		User? GetUser(string email, string username, string fullname);
 		void UpdateUser(User user);
-		List<User> GetUsers(long userId, string email, string fullName, int roleId, int status);
+		void UpdateSettingPersonalInfo(User userUpdate);
+
+        List<User> GetUsers(long userId, string email, string fullName, int roleId, int status);
 		User? GetUserInfo (int id);
 		bool CheckUsersExisted(List<long> userIds);
 		void UpdateUserOnlineStatus(long userId, bool isOnline);

@@ -49,5 +49,6 @@ namespace DataAccess.Repositories
         public User? GetUserByUserNameOtherUserId(long userId, string userName) => UserDAO.Instance.GetUserByUserNameOtherUserId(userId, userName);
 
         public void ActiveUserNameAndPassword(long userId, string userName, string password) => UserDAO.Instance.ActiveUserNameAndPassword(userId, userName, password);
-    }
+
+		public void UpdateSettingPersonalInfo(User userUpdate) => UserDAO.Instance.UpdateSettingPersonalInfo(userUpdate);    }
 }

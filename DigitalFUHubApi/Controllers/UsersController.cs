@@ -676,10 +676,92 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Get Coin
-		[Authorize]
+        #region Edit fullName user
+        [Authorize]
+        [HttpPut("EditFullNameUser")]
+        public IActionResult EditFullNameUser(SettingPersonalUpdateFullNameUserRequestDTO request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Fullname))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "request invalid!", false, new()));
+                }
+
+                User? user = _userRepository.GetUserById(request.UserId);
+
+                if (user == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found", false, new()));
+                }
+
+				// update fullname
+				user.Fullname = request.Fullname;
+
+                // Ok
+                _userRepository.UpdateSettingPersonalInfo(user);
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+        #region Edit avatar user
+        [Authorize]
+        [HttpPut("EditAvatarUser")]
+        public async Task<IActionResult> EditAvatarUser([FromForm] SettingPersonalUpdateAvatarUserRequestDTO request)
+        {
+            try
+            {
+                if (request.Avatar == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "request invalid!", false, new()));
+                }
+
+                User? user = _userRepository.GetUserById(request.UserId);
+
+                if (user == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found", false, new()));
+                }
+
+                // Declares
+                string urlNewAvatar = "";
+                string filename = "";
+                DateTime now;
+                //
+
+                // update avatar user
+                now = DateTime.Now;
+                filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
+                    now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
+                    request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
+
+                urlNewAvatar = await _storageService.UploadFileToAzureAsync(request.Avatar, filename);
+				string urlOld = user.Avatar;
+                user.Avatar = urlNewAvatar;
+
+                // delete avatar old
+                await _storageService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
+
+                // Ok
+                _userRepository.UpdateSettingPersonalInfo(user);
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+        #region Get Coin
+        [Authorize]
 		[HttpGet("GetCoin/{userId}")]
 		public IActionResult GetCoin(long userId)
 		{

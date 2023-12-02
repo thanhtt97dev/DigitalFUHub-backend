@@ -242,10 +242,9 @@ namespace DataAccess.DAOs
 
 		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
 		{
-			List<DepositTransaction> deposits = new List<DepositTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				deposits = context.DepositTransaction
+				var deposits = context.DepositTransaction
 							.Where
 							(x =>
 								userId == x.UserId &&
@@ -257,8 +256,8 @@ namespace DataAccess.DAOs
 							.Skip((page - 1) * Constants.PAGE_SIZE)
 							.Take(Constants.PAGE_SIZE)
 							.ToList();
+				return deposits;
 			}
-			return deposits;
 		}
 
 		internal List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int page)
@@ -615,6 +614,71 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		
+		internal List<WithdrawTransaction> GetWithdrawTransactionReport(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status)
+		{
+			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				withdraws = (from withdraw in context.WithdrawTransaction
+							 join user in context.User
+								 on withdraw.UserId equals user.UserId
+							 join userBank in context.UserBank
+								 on withdraw.UserBankId equals userBank.UserBankId
+							 join bank in context.Bank
+								 on userBank.BankId equals bank.BankId
+							 where
+							 (1 == 1) &&
+							 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
+							 user.Email.Contains(email) &&
+							 userBank.CreditAccount.Contains(creditAccount) &&
+							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
+							 (bankId == 0 ? true : bank.BankId == bankId)
+							 select new WithdrawTransaction
+							 {
+								 WithdrawTransactionId = withdraw.WithdrawTransactionId,
+								 UserId = withdraw.UserId,
+								 User = new User { Email = user.Email },
+								 Amount = withdraw.Amount,
+								 Code = withdraw.Code,
+								 RequestDate = withdraw.RequestDate,
+								 PaidDate = withdraw.PaidDate,
+								 UserBank = new UserBank
+								 {
+									 CreditAccount = userBank.CreditAccount,
+									 CreditAccountName = userBank.CreditAccountName,
+									 Bank = new Bank
+									 {
+										 BankCode = bank.BankCode,
+										 BankName = bank.BankName,
+									 }
+								 },
+								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+							 }
+							)
+							.OrderByDescending(x => x.RequestDate)
+							.ToList();
+			}
+			return withdraws;
+		}
+
+		internal List<DepositTransaction> GetDataReportDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var deposits = context.DepositTransaction
+							.Include(x => x.User)
+							.Where
+							(x =>
+								(userId == 0 ? true : userId == x.UserId) &&
+								((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
+								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+								(status == 0 ? true : x.IsPay == (status == 1))
+							)
+							.OrderByDescending(x => x.RequestDate)
+							.ToList();
+				return deposits;
+			}
+		}
 	}
 }

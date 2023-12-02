@@ -22,5 +22,6 @@ namespace DTOs.Admin
 		public long SellerId { get; set; }
 		public string ShopName { get; set; } = string.Empty;
 		public long OrderStatusId { get; set; }
+		public string? Note { get; set; }
 	}
 }

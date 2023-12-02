@@ -7,8 +7,6 @@
 		public const string BANK_ID_MB_BANK = "970422";
 		public const int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 3;
 		public const string BANK_TRANSACTION_CODE_KEY = "FU";
-		public const string MB_BANK_TRANFER_BY_LIST_EXCEL_FILE_NAME = "Chuyenkhoantheobangke.xlsx";
-		public const string MB_BANK_TRANFER_BY_LIST_EXCEL_FILE_PATH = $"Files/Excels/{MB_BANK_TRANFER_BY_LIST_EXCEL_FILE_NAME}";
 
 		public const string MB_BANK_RESPONE_CODE_SUCCESS = "00";
 		public const string MB_BANK_RESPONE_CODE_SESSION_INVALID = "GW200";
@@ -108,6 +106,7 @@
 		public static int[] WITHDRAW_TRANSACTION_STATUS = new int[] { WITHDRAW_TRANSACTION_IN_PROCESSING, WITHDRAW_TRANSACTION_PAID, WITHDRAW_TRANSACTION_REJECT, WITHDRAW_TRANSACTION_CANCEL };
 
 		//Order Status
+		public const int MAX_NUMBER_ORDER_CAN_VIOLATES_OF_A_SHOP = 3;
 		public const int NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER = 3;
 		public const int NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER = NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER + 3;
 		public const int ORDER_ALL = 0;
@@ -224,6 +223,29 @@
         public const int STATUS_ALL_SLIDER_FOR_FILTER = 0;
         public const int STATUS_ACTIVE_SLIDER_FOR_FILTER = 1;
         public const int STATUS_UN_ACTIVE_SLIDER_FOR_FILTER = 2;
-    }
+
+		//files
+		public const string EXECL_FOLDER_PATH = "Files/Excels/";
+
+		public const string MB_BANK_TRANFER_BY_LIST_EXCEL_FILE_NAME = "Chuyenkhoantheobangke.xlsx";
+		public const string MB_BANK_TRANFER_BY_LIST_EXCEL_FILE_PATH = $"{EXECL_FOLDER_PATH}{MB_BANK_TRANFER_BY_LIST_EXCEL_FILE_NAME}";
+
+		public const string ORDER_REPORT_EXCEL_FILE_NAME = "OrdersReport.xlsx";
+		public const string ORDER_REPORT_EXCEL_FILE_PATH = $"{EXECL_FOLDER_PATH}{ORDER_REPORT_EXCEL_FILE_NAME}";
+
+		public const string WITHDRAW_TRANSACTION_REPORT_EXCEL_FILE_NAME = "WithdrawTransactionReport.xlsx";
+		public const string WITHDRAW_TRANSACTION_EXCEL_FILE_PATH = $"{EXECL_FOLDER_PATH}{WITHDRAW_TRANSACTION_REPORT_EXCEL_FILE_NAME}";
+
+		public const string TRANSACTION_INTERNAL_REPORT_EXCEL_FILE_NAME = "TransactionInternalReport.xlsx";
+		public const string TRANSACTION_INTERNAL_FILE_PATH = $"{EXECL_FOLDER_PATH}{TRANSACTION_INTERNAL_REPORT_EXCEL_FILE_NAME}";
+
+		public const string TRANSACTION_COIN_REPORT_EXCEL_FILE_NAME = "TransactionCoinReport.xlsx";
+		public const string TRANSACTION_COIN_FILE_PATH = $"{EXECL_FOLDER_PATH}{TRANSACTION_COIN_REPORT_EXCEL_FILE_NAME}";
+
+		public const string DEPOSIT_TRANSACTION_REPORT_EXCEL_FILE_NAME = "DepositTransactionReport.xlsx";
+		public const string DEPOSIT_TRANSACTION_FILE_PATH = $"Files/Excels/{DEPOSIT_TRANSACTION_REPORT_EXCEL_FILE_NAME}";
+
+	}
+
 }
 

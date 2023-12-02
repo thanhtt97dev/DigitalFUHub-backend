@@ -15,6 +15,8 @@ namespace BusinessObject.Entities
 		public string ShopName { get; set; } = null!;
 		public string Avatar { get; set; } = string.Empty;
 		public DateTime DateCreate { get; set; }
+		public DateTime DateBan { get; set; }
+		public string Note { get; set; } = string.Empty;
 		public string? Description { get; set; }
 		public bool IsActive { get; set; }
 

@@ -20,5 +20,6 @@ namespace DataAccess.IRepositories
 		Shop? GetShopDetail(long userId);
 		Shop? GetMostPopularShop(string keyword);
 		(long, List<Shop>) GetListShop(string keyword, int page);
+		void UpdateBanShop(long shopId);
 	}
 }

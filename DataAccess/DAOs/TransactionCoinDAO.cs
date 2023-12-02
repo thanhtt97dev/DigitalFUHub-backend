@@ -38,7 +38,7 @@ namespace DataAccess.DAOs
 								.Include(x => x.User)
 								.Where
 								(x =>
-									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
 									x.User.Email.Contains(email) &&
 									(orderId == 0 ? true : x.OrderId == orderId) &&
 									(transactionCoinTypeId == 0 ? true : x.TransactionCoinTypeId == transactionCoinTypeId)
@@ -56,7 +56,7 @@ namespace DataAccess.DAOs
 								.Include(x => x.User)
 								.Where
 								(x =>
-									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
 									x.User.Email.Contains(email) &&
 									(orderId == 0 ? true : x.OrderId == orderId) &&
 									(transactionCoinTypeId == 0 ? true : x.TransactionCoinTypeId == transactionCoinTypeId)
@@ -64,6 +64,25 @@ namespace DataAccess.DAOs
 								.OrderByDescending(x => x.DateCreate)
 								.Skip((page - 1) * Constants.PAGE_SIZE)
 								.Take(Constants.PAGE_SIZE)
+								.ToList();
+				return transactions;
+			}
+		}
+
+		internal List<TransactionCoin> GetDataReportTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transactions = context.TransactionCoin
+								.Include(x => x.User)
+								.Where
+								(x =>
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
+									x.User.Email.Contains(email) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionCoinTypeId == 0 ? true : x.TransactionCoinTypeId == transactionCoinTypeId)
+								)
+								.OrderByDescending(x => x.DateCreate)
 								.ToList();
 				return transactions;
 			}

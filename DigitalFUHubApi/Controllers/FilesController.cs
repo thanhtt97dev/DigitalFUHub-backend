@@ -29,5 +29,86 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("OrderReportFile")]
+		public IActionResult GetOrder()
+		{
+			try
+			{
+				var file = Util.GetFile(Constants.ORDER_REPORT_EXCEL_FILE_PATH);
+				if (file == null) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Faild", true, new { }));
+				return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Constants.ORDER_REPORT_EXCEL_FILE_NAME);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("WithdrawTransactionReportFile")]
+		public IActionResult GetWithdrawTransactionReportFile()
+		{
+			try
+			{
+				var file = Util.GetFile(Constants.WITHDRAW_TRANSACTION_EXCEL_FILE_PATH);
+				if (file == null) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Faild", true, new { }));
+				return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Constants.WITHDRAW_TRANSACTION_REPORT_EXCEL_FILE_NAME);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("TransactionInternalReportFile")]
+		public IActionResult GeTransactionInternalReportFile()
+		{
+			try
+			{
+				var file = Util.GetFile(Constants.TRANSACTION_INTERNAL_FILE_PATH);
+				if (file == null) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Faild", true, new { }));
+				return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Constants.TRANSACTION_INTERNAL_REPORT_EXCEL_FILE_NAME);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("TransactionCoinReportFile")]
+		public IActionResult TransactionCoinReportFile()
+		{
+			try
+			{
+				var file = Util.GetFile(Constants.TRANSACTION_COIN_FILE_PATH);
+				if (file == null) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Faild", true, new { }));
+				return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Constants.TRANSACTION_COIN_REPORT_EXCEL_FILE_NAME);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("DepositTransactionReportFile")]
+		public IActionResult DepositTransactionReportFile()
+		{
+			try
+			{
+				var file = Util.GetFile(Constants.DEPOSIT_TRANSACTION_FILE_PATH);
+				if (file == null) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Faild", true, new { }));
+				return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Constants.DEPOSIT_TRANSACTION_REPORT_EXCEL_FILE_NAME);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 	}
 }

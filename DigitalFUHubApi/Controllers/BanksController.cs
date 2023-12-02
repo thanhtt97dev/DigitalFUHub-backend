@@ -492,6 +492,35 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Get data report deposit transaction success for admin
+		//[Authorize(Roles = "Admin")]
+		[HttpPost("ReportHistoryDeposit")]
+		public IActionResult GetDataReportDepositTransaction(HistoryDepositForAdminRequestDTO request)
+		{
+			try
+			{
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				long depositTransactionId;
+				long.TryParse(request.DepositTransactionId, out depositTransactionId);
+
+				var deposits = bankRepository.GetDataReportDepositTransaction(0, depositTransactionId, request.Email, fromDate, toDate, 1);
+
+				var result = mapper.Map<List<HistoryDepositResponeDTO>>(deposits);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 		#region Get history withdraw transaction of a user
 		[Authorize]
 		[HttpPost("HistoryWithdraw/{id}")]
@@ -575,6 +604,41 @@ namespace DigitalFUHubApi.Controllers
 					Total = totalRecord,
 					WithdrawTransactions = mapper.Map<List<HistoryWithdrawDetail>>(withdraws)
 				};
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Get data report withdraw transaction for admin
+		[Authorize(Roles = "Admin")]
+		[HttpPost("GetDataReportWithdrawTransaction")]
+		public IActionResult GetDataReportWithdrawTransaction(GetReportDataWithdrawTransactionDTO request)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+			try
+			{
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				if (!Constants.WITHDRAW_TRANSACTION_STATUS.Contains(request.Status) && request.Status != Constants.WITHDRAW_TRANSACTION_ALL)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
+				}
+
+				long withdrawTransactionId;
+				long.TryParse(request.WithdrawTransactionId, out withdrawTransactionId);
+
+				var withdraws = bankRepository.GetWithdrawTransactionReport(withdrawTransactionId, request.Email, fromDate, toDate, request.BankId, request.CreditAccount, request.Status);
+
+				var result = mapper.Map<List<HistoryWithdrawDetail>>(withdraws);
+
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
 			}
 			catch (Exception ex)

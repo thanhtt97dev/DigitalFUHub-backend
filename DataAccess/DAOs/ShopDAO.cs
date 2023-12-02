@@ -298,6 +298,28 @@ namespace DataAccess.DAOs
 
 			}
 		}
+
+		internal void UpdateBanShop(long shopId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				try
+				{
+					User? user = context.User.FirstOrDefault(x => x.UserId == shopId);
+					if (user == null) throw new Exception("Not Found");
+					Shop? shop = context.Shop.FirstOrDefault(x => x.UserId == shopId);
+					if (shop == null) throw new Exception("Not Found");
+					user.Status = false;
+					shop.DateBan = DateTime.Now;
+					shop.IsActive = false;
+					context.SaveChanges();
+				}
+				catch (Exception e)
+				{
+					throw new Exception(e.Message);
+				}
+			}
+		}
 	}
 }
 
