@@ -12,6 +12,7 @@ namespace DTOs.Seller
 		public long OrderId { get; set; }
 		public long ShopId { get; set; }
 		public long CustomerId { get; set; }
+		public long? ConversationId { get; set; } = null!;
 		public string CustomerUsername { get; set; } = string.Empty;
 		public string CustomerAvatar { get; set; } = string.Empty;
 		public DateTime OrderDate { get; set; }
@@ -21,7 +22,8 @@ namespace DTOs.Seller
 		//public long TotalCoinDiscount { get; set; }
 		//public long TotalPayment { get; set; }
 		public string CouponCode { get; set; } = string.Empty;
-		public long BussinessFee { get; set; }
+		public long PercentBusinessFee { get; set; }
+		public long BusinessFeePrice { get; set; }
 		public long AmountSellerReceive { get; set; }
 		public long StatusId { get; set; }
 		public List<SellerHistoryOrderResponseDTO> HistoryOrderStatus { get; set; } = null!;
