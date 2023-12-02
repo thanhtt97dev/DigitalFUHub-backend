@@ -231,7 +231,9 @@
 
 		public const string WITHDRAW_TRANSACTION_REPORT_EXCEL_FILE_NAME = "WithdrawTransactionReport.xlsx";
 		public const string WITHDRAW_TRANSACTION_EXCEL_FILE_PATH = $"Files/Excels/{WITHDRAW_TRANSACTION_REPORT_EXCEL_FILE_NAME}";
-		
+
+		public const string TRANSACTION_INTERNAL_REPORT_EXCEL_FILE_NAME = "TransactionInternalReport.xlsx";
+		public const string TRANSACTION_INTERNAL_FILE_PATH = $"Files/Excels/{TRANSACTION_INTERNAL_REPORT_EXCEL_FILE_NAME}";
 	}
 }
 

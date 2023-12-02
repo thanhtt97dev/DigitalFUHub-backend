@@ -74,5 +74,43 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Get data report History transaction of internal 
+		[Authorize(Roles = "Admin")]
+		[HttpPost("GetDataReportTransactionInternal")]
+		public IActionResult GetDataReportTransactionInternal(HistoryTransactionInternalRequestDTO request)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+
+			const int TRANSACTION_TYPE_ALL = 0;
+			int[] transactionTypes = Constants.TRANSACTION_INTERNAL_STATUS_TYPE;
+			if (!transactionTypes.Contains(request.TransactionInternalTypeId) && request.TransactionInternalTypeId != TRANSACTION_TYPE_ALL)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction type!", false, new()));
+			}
+
+			try
+			{
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				long orderId;
+				long.TryParse(request.OrderId, out orderId);
+
+				var transactionInternals = transactionRepository.GetDataReportTransactionInternal(orderId, request.Email, fromDate, toDate, request.TransactionInternalTypeId);
+
+				var result = mapper.Map<List<HistoryTransactionInternalResponseDTO>>(transactionInternals);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 	}
 }

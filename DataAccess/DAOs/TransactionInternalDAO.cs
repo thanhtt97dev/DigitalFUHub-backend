@@ -43,7 +43,7 @@ namespace DataAccess.DAOs
 								.Include(x => x.User)
 								.Where
 								(x =>
-									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
 									x.User.Email.Contains(email) &&
 									(orderId == 0 ? true : x.OrderId == orderId) &&
 									(transactionTypeId == 0 ? true : x.TransactionInternalTypeId == transactionTypeId)
@@ -65,13 +65,33 @@ namespace DataAccess.DAOs
 								.Include(x => x.User)
 								.Where
 								(x =>
-									(fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true &&
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
 									x.User.Email.Contains(email) &&
 									(orderId == 0 ? true : x.OrderId == orderId) &&
 									(transactionTypeId == 0 ? true : x.TransactionInternalTypeId == transactionTypeId)
 								)
 								.Count();
 				return transactions;
+			}
+		}
+
+		internal List<TransactionInternal> GetDataReportTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionTypeId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transactions = context.TransactionInternal
+								.Include(x => x.User)
+								.Where
+								(x =>
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
+									x.User.Email.Contains(email) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionTypeId == 0 ? true : x.TransactionInternalTypeId == transactionTypeId)
+								)
+								.OrderByDescending(x => x.DateCreate)
+								.ToList();
+				return transactions;
+
 			}
 		}
 	}
