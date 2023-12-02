@@ -242,10 +242,9 @@ namespace DataAccess.DAOs
 
 		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
 		{
-			List<DepositTransaction> deposits = new List<DepositTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				deposits = context.DepositTransaction
+				var deposits = context.DepositTransaction
 							.Where
 							(x =>
 								userId == x.UserId &&
@@ -257,8 +256,8 @@ namespace DataAccess.DAOs
 							.Skip((page - 1) * Constants.PAGE_SIZE)
 							.Take(Constants.PAGE_SIZE)
 							.ToList();
+				return deposits;
 			}
-			return deposits;
 		}
 
 		internal List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int page)
@@ -661,6 +660,25 @@ namespace DataAccess.DAOs
 							.ToList();
 			}
 			return withdraws;
+		}
+
+		internal List<DepositTransaction> GetDataReportDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var deposits = context.DepositTransaction
+							.Include(x => x.User)
+							.Where
+							(x =>
+								(userId == 0 ? true : userId == x.UserId) &&
+								((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
+								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+								(status == 0 ? true : x.IsPay == (status == 1))
+							)
+							.OrderByDescending(x => x.RequestDate)
+							.ToList();
+				return deposits;
+			}
 		}
 	}
 }

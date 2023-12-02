@@ -492,6 +492,35 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region Get data report deposit transaction success for admin
+		//[Authorize(Roles = "Admin")]
+		[HttpPost("ReportHistoryDeposit")]
+		public IActionResult GetDataReportDepositTransaction(HistoryDepositForAdminRequestDTO request)
+		{
+			try
+			{
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				long depositTransactionId;
+				long.TryParse(request.DepositTransactionId, out depositTransactionId);
+
+				var deposits = bankRepository.GetDataReportDepositTransaction(0, depositTransactionId, request.Email, fromDate, toDate, 1);
+
+				var result = mapper.Map<List<HistoryDepositResponeDTO>>(deposits);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 		#region Get history withdraw transaction of a user
 		[Authorize]
 		[HttpPost("HistoryWithdraw/{id}")]
