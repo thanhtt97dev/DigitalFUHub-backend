@@ -234,6 +234,10 @@
 
 		public const string TRANSACTION_INTERNAL_REPORT_EXCEL_FILE_NAME = "TransactionInternalReport.xlsx";
 		public const string TRANSACTION_INTERNAL_FILE_PATH = $"Files/Excels/{TRANSACTION_INTERNAL_REPORT_EXCEL_FILE_NAME}";
+
+		public const string TRANSACTION_COIN_REPORT_EXCEL_FILE_NAME = "TransactionCoinReport.xlsx";
+		public const string TRANSACTION_COIN_FILE_PATH = $"Files/Excels/{TRANSACTION_COIN_REPORT_EXCEL_FILE_NAME}";
 	}
+
 }
 

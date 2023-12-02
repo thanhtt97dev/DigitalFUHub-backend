@@ -71,5 +71,44 @@ namespace DigitalFUHubApi.Controllers
 			}
 		}
 		#endregion
+
+
+		#region Get data report History transaction coin 
+		[Authorize(Roles = "Admin")]
+		[HttpPost("GetDataReportTransactionCoin")]
+		public IActionResult GetDataReportTransactionCoin(HistoryTransactionCoinRequestDTO request)
+		{
+			if (!ModelState.IsValid) return BadRequest();
+
+			const int TRANSACTION_TYPE_ALL = 0;
+			int[] transactionTypes = Constants.TRANSACTION_COIN_STATUS_TYPE;
+			if (!transactionTypes.Contains(request.TransactionCoinTypeId) && request.TransactionCoinTypeId != TRANSACTION_TYPE_ALL)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction type", false, new()));
+			}
+
+			try
+			{
+				(bool isValid, DateTime? fromDate, DateTime? toDate) = Util.GetFromDateToDate(request.FromDate, request.ToDate);
+				if (!isValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
+				}
+
+				long orderId;
+				long.TryParse(request.OrderId, out orderId);
+
+				var transactions = transactionCoinRepository.GetDataReportTransactionCoin(orderId, request.Email, fromDate, toDate, request.TransactionCoinTypeId);
+
+				var result = mapper.Map<List<HistoryTransactionCoinResponseDTO>>(transactions);
+
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, result));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 	}
 }

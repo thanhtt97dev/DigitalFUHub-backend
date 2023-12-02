@@ -78,5 +78,21 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet("TransactionCoinReportFile")]
+		public IActionResult TransactionCoinReportFile()
+		{
+			try
+			{
+				var file = Util.GetFile(Constants.TRANSACTION_COIN_FILE_PATH);
+				if (file == null) return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Faild", true, new { }));
+				return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Constants.TRANSACTION_COIN_REPORT_EXCEL_FILE_NAME);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 	}
 }
