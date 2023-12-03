@@ -1261,9 +1261,9 @@ namespace DataAccess.DAOs
 						User customer = context.User.First(x => x.UserId == order.UserId);
 						if (order.TotalPayment > 0)
 						{
-							// update customer's account balance
+							// update customer's account balance and coin
 							customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
-
+							customer.Coin += order.TotalCoinDiscount;
 							// add transaction for refund money to customer
 							TransactionInternal transactionInternal = new TransactionInternal()
 							{

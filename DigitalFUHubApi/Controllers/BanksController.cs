@@ -372,6 +372,14 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "User has been baned!", false, new()));
 				}
 
+				var accountBalanceAfterWithdraw = customer.AccountBalance - request.Amount;
+				if(accountBalanceAfterWithdraw < Constants.ACCOUNT_BALANCE_REQUIRED_FOR_SELLER &&
+					customer.RoleId == Constants.SELLER_ROLE
+				)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_SELLER_REQUEST_WITHDRAW_ACCOUNT_BALLANCE_REQUIRED, "Exceeded amount can request !", false, new()));
+				}
+
 				if (customer.AccountBalance < request.Amount)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_BANK_CUSTOMER_REQUEST_WITHDRAW_INSUFFICIENT_BALANCE, "Insufficient balance!", false, new()));

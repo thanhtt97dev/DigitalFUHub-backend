@@ -20,6 +20,13 @@ namespace DigitalFUHubApi.Services
 			return Guid.NewGuid().ToString();
 		}
 
+		internal (string, string) GetAccountManualEntryKey(string secretKey, string userName)
+		{
+			var totp = new TwoFactorAuthenticator();
+			var info = totp.GenerateSetupCode(configuration["JWT:Issuer"], userName, secretKey, false, 3);
+			return (info.Account, info.ManualEntryKey);
+		}
+
 		internal string GenerateQrCode(string secretKey, string userName)
 		{
 			var totp = new TwoFactorAuthenticator();
