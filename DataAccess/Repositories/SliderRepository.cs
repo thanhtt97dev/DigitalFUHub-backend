@@ -19,6 +19,8 @@ namespace DataAccess.Repositories
         public int GetNumberSliderByConditions(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive) 
             => SliderDAO.Instance.GetNumberSliderByConditions(name, link, startDate,endDate, statusActive);
 
+        public Slider? GetSliderById(long sliderId) => SliderDAO.Instance.GetSliderById(sliderId);
+
         public List<Slider> GetSliders(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive, int page) 
             => SliderDAO.Instance.GetSliders(name, link, startDate, endDate, statusActive, page);
 

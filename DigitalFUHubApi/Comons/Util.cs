@@ -265,7 +265,18 @@ namespace DigitalFUHubApi.Comons
 			}
 			return (true, fromDate, toDate);
 		}
-		#endregion
+        #endregion
 
-	}
+        #region Check Url Valid
+        public static bool IsUrlValid(string url)
+        {
+            Uri? uriResult;
+            bool isValidUrl = Uri.TryCreate(url, UriKind.Absolute, out uriResult)
+                              && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+            return isValidUrl;
+        }
+        #endregion
+
+    }
 }

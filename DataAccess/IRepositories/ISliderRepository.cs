@@ -12,6 +12,7 @@ namespace DataAccess.IRepositories
         List<Slider> GetSliders(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive, int page);
         int GetNumberSliderByConditions(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive);
         void AddSlider(Slider slider);
+        Slider? GetSliderById(long sliderId);
         void UpdateSlider(Slider newSlider);
         void UpdateStatusActiveSlider(long sliderId, bool newStatusActive);
         void DeleteSlider(long sliderId);

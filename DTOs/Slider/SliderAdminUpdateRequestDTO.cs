@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace DTOs.Slider
 {
-    public class SliderAdminAddRequestDTO
+    public class SliderAdminUpdateRequestDTO
     {
+        public long SliderId { get; set; }
         public string Name { get; set; } = string.Empty;
         public IFormFile? Image { get; set; }
         public string Link { get; set; } = string.Empty;

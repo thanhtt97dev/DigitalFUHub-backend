@@ -23,6 +23,7 @@ using DTOs.Shop;
 using System.Globalization;
 using DTOs.ReasonReportProduct;
 using DTOs.ReportProduct;
+using DTOs.Slider;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -338,9 +339,12 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.OrderStatus, act => act.MapFrom(src => MapOrderStatusToString(src.OrderStatusId)))
 				.ReverseMap();
+            // admin/slider
+            CreateMap<Slider, SliderAdminGetByIdResponseDTO>().ReverseMap();
+            //
 
-			//feedback/search
-			CreateMap<Feedback, SearchFeedbackDetailResponseDTO>()
+            //feedback/search
+            CreateMap<Feedback, SearchFeedbackDetailResponseDTO>()
 				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.FullName, act => act.MapFrom(src => src.User.Fullname))
 				.ForMember(des => des.UserAvatar, act => act.MapFrom(src => src.User.Avatar))

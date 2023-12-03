@@ -1,4 +1,5 @@
-﻿using BusinessObject.Entities;
+﻿using AutoMapper;
+using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
@@ -19,12 +20,14 @@ namespace DigitalFUHubApi.Controllers
         private readonly ISliderRepository sliderRepository;
         private readonly IProductRepository productRepository;
         private readonly StorageService storageService;
+        private readonly IMapper mapper;
 
-        public SlidersController(ISliderRepository sliderRepository, IProductRepository productRepository, StorageService storageService)
+        public SlidersController(ISliderRepository sliderRepository, IProductRepository productRepository, StorageService storageService, IMapper mapper)
         {
             this.sliderRepository = sliderRepository;
             this.productRepository = productRepository;
             this.storageService = storageService;
+            this.mapper = mapper;
         }
 
 
@@ -83,6 +86,16 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param!", false, new()));
                 }
 
+                if (string.IsNullOrEmpty(request.Link))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param!", false, new()));
+                }
+
+                if (!Util.IsUrlValid(request.Link))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Url invalid!", false, new()));
+                }
+
                 if (request.Image == null)
                 {
                     return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param!", false, new()));
@@ -91,13 +104,6 @@ namespace DigitalFUHubApi.Controllers
                 if (request.Image.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)                
                 {
                     return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
-                }
-
-                var product = productRepository.GetProductEntityById(request.ProductId);
-
-                if (product == null)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found", false, new()));
                 }
 
                 // Declares variable
@@ -125,13 +131,117 @@ namespace DigitalFUHubApi.Controllers
                 {
                     Name = request.Name,
                     Url = urlImage,
-                    Link = "/product/" + request.ProductId,
+                    Link = request.Link,
                     DateCreate = DateTime.Now,
                     IsActive = request.IsActive
                 };
 
                 // Add Slider
                 sliderRepository.AddSlider(slider);
+
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [Authorize("Admin")]
+        [HttpGet("admin/getById/{id}")]
+        public IActionResult AddSliderById(long id)
+        {
+            try
+            {
+               var slider = sliderRepository.GetSliderById(id);
+
+                if (slider == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "slider not found", false, new()));
+                }
+
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, mapper.Map<SliderAdminGetByIdResponseDTO>(slider)));
+
+
+            } catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+        [Authorize("Admin")]
+        [HttpPut("admin/updateSlider")]
+        public async Task<IActionResult> UpdateSlider([FromForm] SliderAdminUpdateRequestDTO request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Name))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param!", false, new()));
+                }
+
+                if (string.IsNullOrEmpty(request.Link))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param!", false, new()));
+                }
+
+                if (!Util.IsUrlValid(request.Link))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Url invalid!", false, new()));
+                }
+
+                var slider = sliderRepository.GetSliderById(request.SliderId);
+
+                if (slider == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Slider Not found", false, new()));
+                }
+
+                if (request.Image != null)
+                {
+                    if (request.Image.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+                    {
+                        return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Size file upload exceed 2MB", false, new()));
+                    }
+
+                    // Declares variable
+                    string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
+                    string urlImage = "";
+
+                    // Check file extension
+                    IFormFile fileRequest = request.Image;
+                    if (!fileExtension.Contains(fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf("."))))
+                    {
+                        return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid file!", false, new()));
+                    }
+
+                    // Declares variable
+                    DateTime now;
+                    string filename = "";
+
+                    // Upload file to azure
+                    now = DateTime.Now;
+                    filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", Constants.ADMIN_USER_ID, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf(".")));
+                    urlImage = await storageService.UploadFileToAzureAsync(fileRequest, filename);
+
+                    string urlOld = slider.Url;
+
+                    // update new url
+                    slider.Url = urlImage;
+
+                    // delete url old
+                    await storageService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
+                }
+
+                // Update slider
+                slider.Name = request.Name;
+                slider.Link = request.Link;
+                slider.IsActive = request.IsActive;
+
+                // Add Slider
+                sliderRepository.UpdateSlider(slider);
 
                 return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new()));
 

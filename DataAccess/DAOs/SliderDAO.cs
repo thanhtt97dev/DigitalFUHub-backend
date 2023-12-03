@@ -59,6 +59,16 @@ namespace DataAccess.DAOs
             }
         }
 
+        internal Slider? GetSliderById (long sliderId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var slider = context.Sliders.FirstOrDefault(x => x.SliderId == sliderId);
+
+                return slider;
+            }
+        }
+
         internal int GetNumberSliderByConditions(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive)
         {
             using (DatabaseContext context = new DatabaseContext())
@@ -93,15 +103,7 @@ namespace DataAccess.DAOs
         {
             using (DatabaseContext context = new DatabaseContext())
             {
-                var sliderFind = context.Sliders.FirstOrDefault(x => x.SliderId == newSlider.SliderId);
-                if (sliderFind == null) throw new ArgumentNullException("Slider not found");
-
-                // update slider
-                sliderFind.Name = newSlider.Name;
-                sliderFind.Link = newSlider.Link;
-                sliderFind.Url = newSlider.Url;
-                sliderFind.IsActive = newSlider.IsActive;
-
+                context.Sliders.Update(newSlider);
                 context.SaveChanges();
             }
         }
