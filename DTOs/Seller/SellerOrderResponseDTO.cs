@@ -13,6 +13,10 @@ namespace DTOs.Seller
 		public DateTime OrderDate { get; set; }
 		public long TotalAmount { get; set; }
 		public long TotalCouponDiscount { get; set; }
+		public long BusinessFee { get; set; }
+		public long Profit { get; set; }
+		public bool IsFeedback { get; set; }
+		public string CouponCode { get; set; } = string.Empty;
 		public string Username { get; set; } = string.Empty;
 		public long OrderStatusId { get; set; }
 	}

@@ -102,6 +102,10 @@ namespace DigitalFUHubApi.Comons
 				.ReverseMap();
 			CreateMap<Order, SellerOrderResponseDTO>()
 				.ForMember(des => des.Username, act => act.MapFrom(src => src.User.Username))
+				.ForMember(des => des.BusinessFee, act => act.MapFrom(src => src.BusinessFee.Fee))
+				.ForMember(des => des.CouponCode, act => act.MapFrom(src => (src.OrderCoupons == null || src.OrderCoupons.Count <= 0) ? "" : src.OrderCoupons.ToArray()[0].Coupon.CouponCode))
+				.ForMember(des => des.IsFeedback, act => act.MapFrom(src => src.OrderDetails.Any(x => x.IsFeedback == true)))
+				.ForMember(des => des.Profit, act => act.MapFrom(src => (src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)))
 				.ReverseMap();
 			CreateMap<OrderCoupon, OrderDetailInfoResponseDTO>()
 				.ReverseMap();

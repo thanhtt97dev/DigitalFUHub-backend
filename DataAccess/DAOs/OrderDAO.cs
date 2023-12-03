@@ -1153,6 +1153,9 @@ namespace DataAccess.DAOs
 			{
 				var query = context.Order
 					.Include(x => x.User)
+					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderCoupons)
+					.ThenInclude(x => x.Coupon)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
