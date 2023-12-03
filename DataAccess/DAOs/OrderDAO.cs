@@ -299,7 +299,7 @@ namespace DataAccess.DAOs
 					int numberQuantityAvailable = 0;
 					Order orderResult = new Order();
 
-					#region Check customer by with quantity < 0
+					#region Check customer buy with quantity < 0
 					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0)))
 					{
 						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", numberQuantityAvailable, orderResult);
@@ -311,6 +311,15 @@ namespace DataAccess.DAOs
 					if (!isCustomerExisted)
 					{
 						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!", numberQuantityAvailable, orderResult);
+					}
+
+					#endregion
+
+					#region Check buyer is seller of orther shop was banned
+					var shopOfBuyer = context.Shop.FirstOrDefault(x => x.UserId == userId);
+					if(shopOfBuyer != null && shopOfBuyer.IsActive == false)
+					{
+						return (Constants.RESPONSE_CODE_ORDER_SELLER_BAN_LOCK_TRANSACTION, "Seller ban and lock transaction!", numberQuantityAvailable, orderResult);
 					}
 					#endregion
 
