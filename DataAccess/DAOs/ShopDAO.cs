@@ -240,7 +240,7 @@ namespace DataAccess.DAOs
 			{
 				string keywordSearch = keyword.Trim().ToLower();
 				Shop? mostPopularShop = context.Shop.Include(x => x.User).Include(x => x.Products)
-					.Where(x => x.Products.Any(x => x.ProductName.ToLower().Contains(keywordSearch)) && x.IsActive == true)
+					.Where(x => x.Products.Any(x => x.ProductName.ToLower().Contains(keywordSearch)) && x.IsActive == true && x.User.Status == true)
 					.OrderByDescending(x => x.Products.Where(pr => pr.ProductName.ToLower().Contains(keywordSearch)).Max(pr => pr.SoldCount))
 					.FirstOrDefault();
 				if (mostPopularShop == null)
@@ -264,6 +264,7 @@ namespace DataAccess.DAOs
 							  || shop.Products.Any(x => x.ProductName.Contains(keyword))
 							  &&
 							  shop.IsActive == true
+							  && user.Status == true
 							  select new Shop
 							  {
 								  UserId = shop.UserId,
