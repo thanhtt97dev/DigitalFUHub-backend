@@ -42,7 +42,7 @@ namespace DTOs.Order
 		public long Discount { get; set; }
 		public long TotalAmount { get; set; }
 		public List<string> AssetInformations { get; set; } = null!;
-		public int FeebackRate { get; set; }
+		public int FeedbackRate { get; set; }
 		public bool IsFeedback { get; set; }
 	}
 	public class HistoryOrderStatusResponseDTO

@@ -41,6 +41,8 @@ namespace DTOs.Seller
 		public long Price { get; set; }
 		public long Discount { get; set; }
 		public long TotalAmount { get; set; }
+		public int FeedbackRate { get; set; }
+		public bool IsFeedback { get; set; }
 	}
 	public class SellerHistoryOrderResponseDTO
 	{

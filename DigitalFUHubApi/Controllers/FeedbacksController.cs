@@ -90,7 +90,7 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Customer/Add")]
 		public async Task<IActionResult> AddFeedbackOrder([FromForm] CustomerFeedbackOrderRequestDTO request)
 		{
-			
+
 			try
 			{
 				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
@@ -133,13 +133,17 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 
-				_feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				int bonusCoin = _feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, bonusCoin));
+			}
+			catch(ArgumentOutOfRangeException)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_FEEDBACK_AGAIN, "Not feedback again", false, new()));
 			}
 			catch (Exception e)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 		}
 		#endregion
 
@@ -158,6 +162,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					Username = order.User.Username,
 					Avatar = order.User.Avatar,
+					ProductId = x.ProductVariant.Product.ProductId,
 					ProductName = x.ProductVariant.Product.ProductName ?? "",
 					ProductVariantName = x.ProductVariant.Name ?? "",
 					Content = x?.Feedback?.Content ?? "",
@@ -178,7 +183,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region get list feedback of seller
-		[Authorize("Seller")]		
+		[Authorize("Seller")]
 		[HttpPost("Seller/List")]
 		public IActionResult GetListFeedbackSeller(SellerFeedbackRequestDTO request)
 		{
@@ -189,22 +194,22 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
-				if(request.Page <= 0)
+				if (request.Page <= 0)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 				}
 
-				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : 
+				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null :
 					DateTime.ParseExact(request.FromDate, "M/d/yyyy", CultureInfo.InvariantCulture);
-				DateTime? toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : 
+				DateTime? toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null :
 					DateTime.ParseExact(request.ToDate, "M/d/yyyy", CultureInfo.InvariantCulture);
-				if(fromDate >= toDate)
+				if (fromDate >= toDate)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
-				(long totalItems, List<Order> orders) = _feedbackRepository.GetListFeedbackSeller(request.UserId, 
-					request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(), 
-					fromDate,toDate, request.Rate, request.Page);
+				(long totalItems, List<Order> orders) = _feedbackRepository.GetListFeedbackSeller(request.UserId,
+					request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(),
+					fromDate, toDate, request.Rate, request.Page);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new ListFeedbackResponseDTO
 				{
 					TotalItems = totalItems,
@@ -215,6 +220,42 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
+		}
+		#endregion
+
+		#region get feedback detail order of seller
+		[Authorize("Seller")]		
+		[HttpGet("Seller/{userId}/{orderId}")]
+		public IActionResult GetFeedbackDetailOrderOfSeller(long userId, long orderId)
+		{
+			try
+			{
+				Order? order = _feedbackRepository.GetFeedbackDetailOrderOfSeller(orderId, userId);
+				if (order == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				List<CustomerFeedbackDetailOrderResponseDTO> response = order.OrderDetails.Where(x => x.IsFeedback == true).Select(x => new CustomerFeedbackDetailOrderResponseDTO
+				{
+					Username = order.User.Username,
+					Avatar = order.User.Avatar,
+					ProductId = x.ProductVariant.Product.ProductId,
+					ProductName = x.ProductVariant.Product.ProductName ?? "",
+					ProductVariantName = x.ProductVariant.Name ?? "",
+					Content = x?.Feedback?.Content ?? "",
+					Rate = x.Feedback?.Rate ?? 0,
+					Quantity = x.Quantity,
+					Date = x.Feedback?.DateUpdate ?? new DateTime(),
+					Thumbnail = x.ProductVariant.Product.Thumbnail ?? "",
+					UrlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
+				}).ToList();
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, response));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+
 		}
 		#endregion
 	}

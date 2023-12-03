@@ -299,7 +299,7 @@ namespace DataAccess.DAOs
 					int numberQuantityAvailable = 0;
 					Order orderResult = new Order();
 
-					#region Check customer by with quantity < 0
+					#region Check customer buy with quantity < 0
 					if (shopProducts.Any(x => x.Products.Any(p => p.Quantity <= 0)))
 					{
 						return (Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid quantity order!", numberQuantityAvailable, orderResult);
@@ -311,6 +311,15 @@ namespace DataAccess.DAOs
 					if (!isCustomerExisted)
 					{
 						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!", numberQuantityAvailable, orderResult);
+					}
+
+					#endregion
+
+					#region Check buyer is seller of orther shop was banned
+					var shopOfBuyer = context.Shop.FirstOrDefault(x => x.UserId == userId);
+					if(shopOfBuyer != null && shopOfBuyer.IsActive == false)
+					{
+						return (Constants.RESPONSE_CODE_ORDER_SELLER_BAN_LOCK_TRANSACTION, "Seller ban and lock transaction!", numberQuantityAvailable, orderResult);
 					}
 					#endregion
 
@@ -787,10 +796,11 @@ namespace DataAccess.DAOs
 					.Include(x => x.Shop)
 					.Include(x => x.User)
 					.Include(x => x.OrderDetails)
-					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
 					.FirstOrDefault(x => x.OrderId == orderId && x.ShopId == userId);
 			}
 		}
@@ -1115,8 +1125,10 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Order
+					.Include(x => x.User)
 					.Include(x => x.OrderCoupons)
 					.Include(x => x.Shop)
+					.ThenInclude(x => x.User)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.Feedback)
 					.Include(x => x.OrderDetails)
@@ -1153,6 +1165,9 @@ namespace DataAccess.DAOs
 			{
 				var query = context.Order
 					.Include(x => x.User)
+					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderCoupons)
+					.ThenInclude(x => x.Coupon)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)

@@ -26,12 +26,14 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IOrderRepository _orderRepository;
 		private readonly IReportRepository _reportRepository;
 		private readonly IShopRepository _shopRepository;
+		private readonly IUserRepository _userRepository;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 		private readonly HubService _hubService;
 		private readonly MailService _mailService;
 
 		public OrdersController(IOrderRepository orderRepository,
+			IUserRepository userRepository,
 			IReportRepository reportRepository,
 			IShopRepository shopRepository,
 			JwtTokenService jwtTokenService,
@@ -42,10 +44,11 @@ namespace DigitalFUHubApi.Controllers
 			_orderRepository = orderRepository;
 			_reportRepository = reportRepository;
 			_shopRepository = shopRepository;
+			_userRepository = userRepository;
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 			_hubService = hubService;
-			_mailService = mailService;	
+			_mailService = mailService;
 		}
 
 
@@ -56,7 +59,6 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
 				if (!ModelState.IsValid) return BadRequest();
 
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
@@ -64,14 +66,14 @@ namespace DigitalFUHubApi.Controllers
 
 				if (responseCode == Constants.RESPONSE_CODE_SUCCESS)
 				{
-					// send notification to seller
-					var title = $"Đơn hàng mới";
-					var content = $"Mã đơn hàng #{orderInfo.OrderId}";
-					var link = Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + orderInfo.OrderId;
-					await _hubService.SendNotification(orderInfo.ShopId, title, content, link);
+					await _hubService.SendNotification(
+						orderInfo.ShopId, 
+						$"Đơn hàng mới", 
+						$"Mã đơn hàng #{orderInfo.OrderId}", 
+						Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + orderInfo.OrderId);
 				}
 
-				return Ok(new ResponseData(responseCode, message, true, numberQuantityAvailable));
+				return Ok(new ResponseData(responseCode, message, responseCode == Constants.RESPONSE_CODE_SUCCESS, numberQuantityAvailable));
 			}
 			catch (Exception ex)
 			{
@@ -140,7 +142,7 @@ namespace DigitalFUHubApi.Controllers
 		#region Update status order (customer)
 		[Authorize("Customer,Seller")]
 		[HttpPost("Customer/Edit/Status")]
-		public IActionResult UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
+		public async Task<IActionResult> UpdateStatusOrder([FromBody] EditStatusOrderRequestDTO request)
 		{
 			try
 			{
@@ -183,6 +185,57 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateOrderStatusCustomer(request.OrderId, request.ShopId, request.StatusId, request.Note);
+				if (request.StatusId == Constants.ORDER_STATUS_CONFIRMED || request.StatusId == Constants.ORDER_STATUS_COMPLAINT
+					)
+				{
+
+					string subjectCustomer = "";
+					string subjectSeller = "";
+					string htmlCustomer = "";
+					string htmlSeller = "";
+					if (request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
+					{
+						subjectCustomer = $"DigitalFUHub: Xác nhận đơn hàng mã số {order.OrderId} thành công.";
+						htmlCustomer = $"<div>" +
+							$"<h3>Xin chào {order.User.Fullname},</h3>" +
+							$"<div>Đơn hàng mã số {order.OrderId} đã được xác nhận thành công.</div>" +
+							$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+							$"</div>";
+						subjectSeller = $"DigitalFUHub: Đơn hàng mã số {order.OrderId} đã được người mua xác nhận thành công.";
+						htmlSeller = $"<div>" +
+							$"<h3>Xin chào {order.Shop.ShopName},</h3>" +
+							$"<div>Đơn hàng mã số {order.OrderId} đã được xác nhận thành công.</div>" +
+							$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+							$"</div>";
+						// send notification to seller
+						var title = $"Xác nhận đơn hàng";
+						var content = $"Mã đơn hàng #{order.OrderId} đã được xác nhận.";
+						var link = Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + order.OrderId;
+						await _hubService.SendNotification(order.ShopId, title, content, link);
+					}
+					else if (request.StatusId == Constants.ORDER_STATUS_COMPLAINT)
+					{
+						subjectCustomer = $"DigitalFUHub: Khiếu nại đơn hàng mã số {order.OrderId}.";
+						htmlCustomer = $"<div>" +
+							$"<h3>Xin chào {order.User.Fullname},</h3>" +
+							$"<div>Đơn hàng mã số {order.OrderId} đang được khiếu nại.</div>" +
+							$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+							$"</div>";
+						subjectSeller = $"DigitalFUHub: Khiếu nại đơn hàng mã số {order.OrderId}.";
+						htmlSeller = $"<div>" +
+							$"<h3>Xin chào {order.Shop.ShopName},</h3>" +
+							$"<div>Đơn hàng mã số {order.OrderId} đang bị khiếu nại.</div>" +
+							$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+							$"</div>";
+						// send notification to seller
+						var title = $"Khiếu nại đơn hàng";
+						var content = $"Mã đơn hàng #{order.OrderId} đang được khiếu nại.";
+						var link = Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + order.OrderId;
+						await _hubService.SendNotification(order.ShopId, title, content, link);
+					}
+					await _mailService.SendEmailAsync(order.User.Email, subjectCustomer, htmlCustomer);
+					await _mailService.SendEmailAsync(order.Shop.User.Email, subjectSeller, htmlSeller);
+				}
 			}
 			catch (Exception e)
 			{
@@ -245,7 +298,7 @@ namespace DigitalFUHubApi.Controllers
 						Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
 						TotalAmount = od.TotalAmount,
 						AssetInformations = od.AssetInformations.Select(x => x.Asset ?? "").ToList(),
-						FeebackRate = od?.Feedback?.Rate ?? 0
+						FeedbackRate = od?.Feedback?.Rate ?? 0
 					}).ToList(),
 				};
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -392,6 +445,8 @@ namespace DigitalFUHubApi.Controllers
 					Quantity = od.Quantity,
 					Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
 					TotalAmount = od.TotalAmount,
+					IsFeedback = od.IsFeedback,
+					FeedbackRate = od?.Feedback?.Rate ?? 0
 				}).ToList(),
 			};
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -402,7 +457,7 @@ namespace DigitalFUHubApi.Controllers
 		#region Update status dispute (seller)
 		[Authorize("Seller")]
 		[HttpPost("Seller/Dispute")]
-		public IActionResult UpdateDisputeOrder(SellerDisputeOrderRequestDTO request)
+		public async Task<IActionResult> UpdateDisputeOrder(SellerDisputeOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -426,6 +481,32 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId, request.Note);
+				string subjectCustomer = "";
+				string subjectSeller = "";
+				string htmlCustomer = "";
+				string htmlSeller = "";
+
+				subjectCustomer = $"DigitalFUHub: Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.";
+				htmlCustomer = $"<div>" +
+					$"<h3>Xin chào {order.User.Fullname},</h3>" +
+					$"<div>Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.</div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+					$"</div>";
+				subjectSeller = $"DigitalFUHub: Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.";
+				htmlSeller = $"<div>" +
+					$"<h3>Xin chào {order.Shop.ShopName},</h3>" +
+					$"<div>Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.</div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+					$"</div>";
+				// send notification to seller
+				var title = $"Tranh chấp đơn hàng";
+				var content = $"Mã đơn hàng #{order.OrderId} đang được tranh chấp.";
+				var link = Constants.FRONT_END_HISTORY_ORDER_URL + order.OrderId;
+				await _hubService.SendNotification(order.User.UserId, title, content, link);
+				link = Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + order.OrderId;
+				await _hubService.SendNotification(Constants.ADMIN_USER_ID, title, content, link);
+				await _mailService.SendEmailAsync(order.User.Email, subjectCustomer, htmlCustomer);
+				await _mailService.SendEmailAsync(order.Shop.User.Email, subjectSeller, htmlSeller);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
@@ -439,7 +520,7 @@ namespace DigitalFUHubApi.Controllers
 		#region  Update status refund (seller)
 		[Authorize("Seller")]
 		[HttpPost("Seller/Refund")]
-		public IActionResult UpdateRefundOrder(SellerRefundOrderRequestDTO request)
+		public async Task<IActionResult> UpdateRefundOrder(SellerRefundOrderRequestDTO request)
 		{
 			if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.Note))
 			{
@@ -464,6 +545,30 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateStatusOrderRefund(request.SellerId, request.OrderId, request.Note.Trim());
+				string subjectCustomer = "";
+				string subjectSeller = "";
+				string htmlCustomer = "";
+				string htmlSeller = "";
+
+				subjectCustomer = $"DigitalFUHub: Đơn hàng mã số {order.OrderId} đã được hoàn trả lại tiền.";
+				htmlCustomer = $"<div>" +
+					$"<h3>Xin chào {order.User.Fullname},</h3>" +
+					$"<div>Đơn hàng mã số {order.OrderId} đã được hoàn trả lại tiền.</div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+					$"</div>";
+				subjectSeller = $"DigitalFUHub: Hoàn trả lại tiền đơn hàng mã số {order.OrderId}.";
+				htmlSeller = $"<div>" +
+					$"<h3>Xin chào {order.Shop.ShopName},</h3>" +
+					$"<div>Hoàn trả tiền đơn hàng mã số {order.OrderId} thành công.</div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+					$"</div>";
+				// send notification to seller
+				var title = $"Tranh chấp đơn hàng";
+				var content = $"Mã đơn hàng #{order.OrderId} đã được hoàn lại tiền.";
+				var link = Constants.FRONT_END_HISTORY_ORDER_URL + order.OrderId;
+				await _hubService.SendNotification(order.User.UserId, title, content, link);
+				await _mailService.SendEmailAsync(order.User.Email, subjectCustomer, htmlCustomer);
+				await _mailService.SendEmailAsync(order.Shop.User.Email, subjectSeller, htmlSeller);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
@@ -541,7 +646,7 @@ namespace DigitalFUHubApi.Controllers
 			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
 			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new {}));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new { }));
 			}
 
 			try
@@ -567,7 +672,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				var orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, shopId, request.ShopName, fromDate, toDate, request.Status, request.Page);
-				
+
 				var result = new
 				{
 					Total = totalRecord,

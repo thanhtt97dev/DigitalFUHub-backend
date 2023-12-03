@@ -51,6 +51,7 @@
 		public const string RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED = "ORDER_06";
 		public const string RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT = "ORDER_07";
 		public const string RESPONSE_CODE_ORDER_COUPON_INVALID_PRODUCT_APPLY = "ORDER_08";
+		public const string RESPONSE_CODE_ORDER_SELLER_BAN_LOCK_TRANSACTION = "ORDER_09";
 
 		public const string RESPONSE_CODE_CART_SUCCESS = "CART_00";
 		public const string RESPONSE_CODE_CART_INVALID_QUANTITY = "CART_01";
@@ -67,6 +68,8 @@
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
 
 		public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_USERNAME_01";
+
+		public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
 
 
 
@@ -173,6 +176,7 @@
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 		public const string FRONT_END_SELLER_PRODUCT_URL = "/seller/product/";
 		public const string FRONT_END_SELLER_ORDER_DETAIL_URL = "/seller/order/";
+		public const string FRONT_END_ADMIN_ORDER_DETAIL_URL = "/admin/order/";
 
 		// Pagination
 		public const int PAGE_SIZE = 10;

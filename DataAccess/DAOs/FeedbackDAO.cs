@@ -87,7 +87,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal void AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
+		internal int AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -97,13 +97,13 @@ namespace DataAccess.DAOs
 					Order? order = context.Order.Include(x => x.OrderDetails).ThenInclude(x => x.ProductVariant)
 						.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId
 						&& x.OrderDetails.Any(od => od.OrderDetailId == orderDetailId));
-					if (order == null) throw new Exception("NOT FOUND.");
+					if (order == null) throw new Exception("Not found.");
 					if (DateTime.Now.Subtract(order.OrderDate) > TimeSpan.FromDays(Constants.NUMBER_DAYS_CAN_MAKE_FEEDBACK)) throw new Exception("EXCEED TIME TO FEEDBACK.");
 
 					User user = context.User.First(x => x.UserId == userId);
 
 					OrderDetail orderDetail = order.OrderDetails.First(x => x.OrderDetailId == orderDetailId);
-					if (orderDetail.IsFeedback) throw new Exception("NOT FEEDBACK AGAIN.");
+					if (orderDetail.IsFeedback) throw new ArgumentOutOfRangeException("Not feedback again.");
 					Product product = context.Product.First(x => x.ProductId == orderDetail.ProductVariant.ProductId);
 
 					//update product
@@ -160,6 +160,12 @@ namespace DataAccess.DAOs
 					}
 					context.SaveChanges();
 					transaction.Commit();
+					return feedbackBenefit.Coin;
+				}
+				catch(ArgumentOutOfRangeException e)
+				{
+					transaction.Rollback();
+					throw new ArgumentOutOfRangeException(e.Message);
 				}
 				catch (Exception e)
 				{
@@ -331,6 +337,24 @@ namespace DataAccess.DAOs
 								.OrderBy(x => x.DateUpdate)
 								.ToList();
 				return feedbacks;
+			}
+		}
+
+		internal Order? GetFeedbackDetailOrderOfSeller(long orderId, long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Order? order = context.Order
+					.Include(x => x.User)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
+					.ThenInclude(x => x.FeedbackMedias)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.ShopId == userId && x.OrderId == orderId);
+				return order;
+
 			}
 		}
 	}
