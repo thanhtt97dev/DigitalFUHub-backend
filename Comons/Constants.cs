@@ -67,6 +67,8 @@
 
 		public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_USERNAME_01";
 
+		public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
+
 
 
 

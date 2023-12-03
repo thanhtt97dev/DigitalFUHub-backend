@@ -90,7 +90,7 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Customer/Add")]
 		public async Task<IActionResult> AddFeedbackOrder([FromForm] CustomerFeedbackOrderRequestDTO request)
 		{
-			
+
 			try
 			{
 				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
@@ -133,13 +133,17 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 
-				_feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				int bonusCoin = _feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, bonusCoin));
+			}
+			catch(ArgumentOutOfRangeException)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_FEEDBACK_AGAIN, "Not feedback again", false, new()));
 			}
 			catch (Exception e)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
-			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 		}
 		#endregion
 
@@ -178,7 +182,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region get list feedback of seller
-		[Authorize("Seller")]		
+		[Authorize("Seller")]
 		[HttpPost("Seller/List")]
 		public IActionResult GetListFeedbackSeller(SellerFeedbackRequestDTO request)
 		{
@@ -189,22 +193,22 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
-				if(request.Page <= 0)
+				if (request.Page <= 0)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 				}
 
-				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null : 
+				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null :
 					DateTime.ParseExact(request.FromDate, "M/d/yyyy", CultureInfo.InvariantCulture);
-				DateTime? toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null : 
+				DateTime? toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null :
 					DateTime.ParseExact(request.ToDate, "M/d/yyyy", CultureInfo.InvariantCulture);
-				if(fromDate >= toDate)
+				if (fromDate >= toDate)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid date", false, new()));
 				}
-				(long totalItems, List<Order> orders) = _feedbackRepository.GetListFeedbackSeller(request.UserId, 
-					request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(), 
-					fromDate,toDate, request.Rate, request.Page);
+				(long totalItems, List<Order> orders) = _feedbackRepository.GetListFeedbackSeller(request.UserId,
+					request.OrderId, request.UserName.Trim(), request.ProductName.Trim(), request.ProductVariantName.Trim(),
+					fromDate, toDate, request.Rate, request.Page);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new ListFeedbackResponseDTO
 				{
 					TotalItems = totalItems,

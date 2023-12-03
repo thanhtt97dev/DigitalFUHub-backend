@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
 		public Order? GetFeedbackDetail(long orderId, long userId)
 		=> FeedbackDAO.Instance.GetFeedbackDetail(orderId, userId);
 
-		public void AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
+		public int AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
 		=> FeedbackDAO.Instance.AddFeedbackOrder(userId, orderId, orderDetailId, content, rate, urlImages);
 
 		public List<FeedbackResponseDTO> GetFeedbacks(long productId)
