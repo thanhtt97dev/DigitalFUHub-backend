@@ -9,6 +9,7 @@ namespace DataAccess.IRepositories
 {
     public interface ISliderRepository
     {
+        List<Slider> GetSliders();
         List<Slider> GetSliders(int statusActive, int page);
         int GetNumberSliderByConditions(int statusActive);
         void AddSlider(Slider slider);

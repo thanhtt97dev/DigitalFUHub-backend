@@ -343,8 +343,9 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.OrderStatus, act => act.MapFrom(src => MapOrderStatusToString(src.OrderStatusId)))
 				.ReverseMap();
-            // admin/slider
+            // slider
             CreateMap<Slider, SliderAdminGetByIdResponseDTO>().ReverseMap();
+            CreateMap<Slider, HomeCustomerSliderResponseDTO>().ReverseMap();
             //
 
             //feedback/search

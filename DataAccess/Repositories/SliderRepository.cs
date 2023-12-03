@@ -24,6 +24,8 @@ namespace DataAccess.Repositories
         public List<Slider> GetSliders(int statusActive, int page) 
             => SliderDAO.Instance.GetSliders(statusActive, page);
 
+        public List<Slider> GetSliders() => SliderDAO.Instance.GetSliders();
+
         public void UpdateSlider(Slider newSlider) => SliderDAO.Instance.UpdateSlider(newSlider);
 
         public void UpdateStatusActiveSlider(long sliderId, bool newStatusActive) => SliderDAO.Instance.UpdateStatusActiveSlider(sliderId, newStatusActive);

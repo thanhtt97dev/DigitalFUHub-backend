@@ -52,6 +52,26 @@ namespace DataAccess.DAOs
             }
         }
 
+        internal List<Slider> GetSliders()
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var result = (from slider in context.Sliders
+                              where slider.IsActive == true
+                              select new Slider
+                              {
+                                  SliderId = slider.SliderId,
+                                  Name = slider.Name,
+                                  Link = slider.Link,
+                                  DateCreate = slider.DateCreate,
+                                  Url = slider.Url,
+                                  IsActive = slider.IsActive,
+                              }).ToList();
+
+                return result;
+            }
+        }
+
         internal Slider? GetSliderById (long sliderId)
         {
             using (DatabaseContext context = new DatabaseContext())

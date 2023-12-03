@@ -30,6 +30,24 @@ namespace DigitalFUHubApi.Controllers
             this.mapper = mapper;
         }
 
+        #region Get Sliders (Home Page)
+        [HttpGet("getAll")]
+        public IActionResult GetAllSliders()
+        {
+            try
+            {
+                var sliders = sliderRepository.GetSliders();
+                
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, mapper.Map<List<HomeCustomerSliderResponseDTO>>(sliders)));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
         #region Get Sliders (Admin)
         [Authorize("Admin")]
         [HttpPost("admin/getSliders")]
