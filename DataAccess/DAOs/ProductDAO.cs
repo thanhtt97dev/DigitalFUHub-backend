@@ -875,10 +875,14 @@ namespace DataAccess.DAOs
 			{
 				string keywordSearch = keyword.Trim().ToLower();
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 				var query = context.Product.Include(x => x.Tags)
+					.Include(x => x.Shop)
+					.ThenInclude(x => x.User)
 					.Include(x => x.ProductVariants)
 					.ThenInclude(x => x.AssetInformations)
-					.Where(x => (x.ProductName.ToLower().Contains(keywordSearch)
+					.Where(x => x.Shop.User.Status == true
+						&& (x.ProductName.ToLower().Contains(keywordSearch)
 							|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
 						&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 						&& (categoryId == Constants.ALL_CATEGORY ? true : x.CategoryId == categoryId)
@@ -910,6 +914,7 @@ namespace DataAccess.DAOs
 																	select new AssetInformation { }).ToList()
 										   }).ToList()
 					});
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 				if (sort == Constants.SORTED_BY_DATETIME)
 				{
