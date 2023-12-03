@@ -1116,8 +1116,10 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Order
+					.Include(x => x.User)
 					.Include(x => x.OrderCoupons)
 					.Include(x => x.Shop)
+					.ThenInclude(x => x.User)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.Feedback)
 					.Include(x => x.OrderDetails)
