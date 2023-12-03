@@ -305,11 +305,8 @@ namespace DataAccess.DAOs
 			{
 				try
 				{
-					User? user = context.User.FirstOrDefault(x => x.UserId == shopId);
-					if (user == null) throw new Exception("Not Found");
 					Shop? shop = context.Shop.FirstOrDefault(x => x.UserId == shopId);
 					if (shop == null) throw new Exception("Not Found");
-					user.Status = false;
 					shop.DateBan = DateTime.Now;
 					shop.IsActive = false;
 					context.SaveChanges();
