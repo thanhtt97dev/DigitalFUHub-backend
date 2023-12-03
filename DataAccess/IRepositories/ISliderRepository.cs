@@ -9,12 +9,12 @@ namespace DataAccess.IRepositories
 {
     public interface ISliderRepository
     {
-        List<Slider> GetSliders(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive, int page);
-        int GetNumberSliderByConditions(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive);
+        List<Slider> GetSliders(int statusActive, int page);
+        int GetNumberSliderByConditions(int statusActive);
         void AddSlider(Slider slider);
         Slider? GetSliderById(long sliderId);
         void UpdateSlider(Slider newSlider);
         void UpdateStatusActiveSlider(long sliderId, bool newStatusActive);
-        void DeleteSlider(long sliderId);
+        void DeleteSlider(Slider slider);
     }
 }

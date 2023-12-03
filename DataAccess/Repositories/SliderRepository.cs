@@ -14,15 +14,15 @@ namespace DataAccess.Repositories
     {
         public void AddSlider(Slider slider) => SliderDAO.Instance.AddSlider(slider);
 
-        public void DeleteSlider(long sliderId) => SliderDAO.Instance.DeleteSlider(sliderId);
+        public void DeleteSlider(Slider slider) => SliderDAO.Instance.DeleteSlider(slider);
 
-        public int GetNumberSliderByConditions(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive) 
-            => SliderDAO.Instance.GetNumberSliderByConditions(name, link, startDate,endDate, statusActive);
+        public int GetNumberSliderByConditions(int statusActive) 
+            => SliderDAO.Instance.GetNumberSliderByConditions(statusActive);
 
         public Slider? GetSliderById(long sliderId) => SliderDAO.Instance.GetSliderById(sliderId);
 
-        public List<Slider> GetSliders(string name, string link, DateTime? startDate, DateTime? endDate, int statusActive, int page) 
-            => SliderDAO.Instance.GetSliders(name, link, startDate, endDate, statusActive, page);
+        public List<Slider> GetSliders(int statusActive, int page) 
+            => SliderDAO.Instance.GetSliders(statusActive, page);
 
         public void UpdateSlider(Slider newSlider) => SliderDAO.Instance.UpdateSlider(newSlider);
 
