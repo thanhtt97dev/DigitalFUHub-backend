@@ -17,5 +17,6 @@ namespace DataAccess.IRepositories
 			string productVariantName, DateTime? fromDate, DateTime? toDate, int rate, int page);
 		int GetNumberFeedbackWithCondition(long productId, int type, int page);
 		List<Feedback> GetFeedbacksWithCondition(long productId, int type, int page);
+		Order? GetFeedbackDetailOrderOfSeller(long orderId, long userId);
 	}
 }

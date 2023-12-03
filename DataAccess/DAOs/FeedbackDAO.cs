@@ -339,5 +339,23 @@ namespace DataAccess.DAOs
 				return feedbacks;
 			}
 		}
+
+		internal Order? GetFeedbackDetailOrderOfSeller(long orderId, long userId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				Order? order = context.Order
+					.Include(x => x.User)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
+					.ThenInclude(x => x.FeedbackMedias)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.FirstOrDefault(x => x.ShopId == userId && x.OrderId == orderId);
+				return order;
+
+			}
+		}
 	}
 }

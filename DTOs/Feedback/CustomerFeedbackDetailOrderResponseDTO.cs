@@ -10,6 +10,7 @@ namespace DTOs.Feedback
 	{
 		public string Username { get; set; } = string.Empty!;
 		public string Avatar { get; set; } = string.Empty!;
+		public long ProductId { get; set; }
 		public string ProductName { get; set; } = string.Empty!;
 		public string Thumbnail { get; set; } = string.Empty!;
 		public string ProductVariantName { get; set; } = string.Empty!;

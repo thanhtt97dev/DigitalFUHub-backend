@@ -162,6 +162,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					Username = order.User.Username,
 					Avatar = order.User.Avatar,
+					ProductId = x.ProductVariant.Product.ProductId,
 					ProductName = x.ProductVariant.Product.ProductName ?? "",
 					ProductVariantName = x.ProductVariant.Name ?? "",
 					Content = x?.Feedback?.Content ?? "",
@@ -219,6 +220,42 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
 			}
+		}
+		#endregion
+
+		#region get feedback detail order of seller
+		[Authorize("Seller")]		
+		[HttpGet("Seller/{userId}/{orderId}")]
+		public IActionResult GetFeedbackDetailOrderOfSeller(long userId, long orderId)
+		{
+			try
+			{
+				Order? order = _feedbackRepository.GetFeedbackDetailOrderOfSeller(orderId, userId);
+				if (order == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				List<CustomerFeedbackDetailOrderResponseDTO> response = order.OrderDetails.Where(x => x.IsFeedback == true).Select(x => new CustomerFeedbackDetailOrderResponseDTO
+				{
+					Username = order.User.Username,
+					Avatar = order.User.Avatar,
+					ProductId = x.ProductVariant.Product.ProductId,
+					ProductName = x.ProductVariant.Product.ProductName ?? "",
+					ProductVariantName = x.ProductVariant.Name ?? "",
+					Content = x?.Feedback?.Content ?? "",
+					Rate = x.Feedback?.Rate ?? 0,
+					Quantity = x.Quantity,
+					Date = x.Feedback?.DateUpdate ?? new DateTime(),
+					Thumbnail = x.ProductVariant.Product.Thumbnail ?? "",
+					UrlImages = x.Feedback == null || x.Feedback?.FeedbackMedias == null ? new List<string>() : x.Feedback.FeedbackMedias.Select(x => x.Url).ToList(),
+				}).ToList();
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, response));
+			}
+			catch (Exception e)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+			}
+
 		}
 		#endregion
 	}

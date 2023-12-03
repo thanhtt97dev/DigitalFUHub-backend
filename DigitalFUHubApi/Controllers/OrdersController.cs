@@ -45,7 +45,7 @@ namespace DigitalFUHubApi.Controllers
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 			_hubService = hubService;
-			_mailService = mailService;	
+			_mailService = mailService;
 		}
 
 
@@ -245,7 +245,7 @@ namespace DigitalFUHubApi.Controllers
 						Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
 						TotalAmount = od.TotalAmount,
 						AssetInformations = od.AssetInformations.Select(x => x.Asset ?? "").ToList(),
-						FeebackRate = od?.Feedback?.Rate ?? 0
+						FeedbackRate = od?.Feedback?.Rate ?? 0
 					}).ToList(),
 				};
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -392,6 +392,8 @@ namespace DigitalFUHubApi.Controllers
 					Quantity = od.Quantity,
 					Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
 					TotalAmount = od.TotalAmount,
+					IsFeedback = od.IsFeedback,
+					FeedbackRate = od?.Feedback?.Rate ?? 0
 				}).ToList(),
 			};
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -541,7 +543,7 @@ namespace DigitalFUHubApi.Controllers
 			int[] acceptedOrderStatus = Constants.ORDER_STATUS;
 			if (!acceptedOrderStatus.Contains(request.Status) && request.Status != Constants.ORDER_ALL)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new {}));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid order status!", false, new { }));
 			}
 
 			try
@@ -567,7 +569,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				var orders = _orderRepository.GetOrders(orderId, request.CustomerEmail, shopId, request.ShopName, fromDate, toDate, request.Status, request.Page);
-				
+
 				var result = new
 				{
 					Total = totalRecord,

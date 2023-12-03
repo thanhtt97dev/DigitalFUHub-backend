@@ -787,10 +787,11 @@ namespace DataAccess.DAOs
 					.Include(x => x.Shop)
 					.Include(x => x.User)
 					.Include(x => x.OrderDetails)
-					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.Feedback)
 					.FirstOrDefault(x => x.OrderId == orderId && x.ShopId == userId);
 			}
 		}
