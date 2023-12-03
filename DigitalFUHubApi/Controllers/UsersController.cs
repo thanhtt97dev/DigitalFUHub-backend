@@ -476,13 +476,20 @@
 				var secretKey = _twoFactorAuthenticationRepository.Get2FAKey(id);
 				if (secretKey == null) return BadRequest();
 
-				var qrCode = _twoFactorAuthenticationService.GenerateQrCode(secretKey, user.Email);
+				(string account, string manualEntryKey) = _twoFactorAuthenticationService.GetAccountManualEntryKey(secretKey, user.Email);
+
 				string title = "DigitalFUHub: Mã QR cho xác thực hai yếu tố.";
 				string body = $"<html>" +
 					$"<body>" +
 					$"<div>Xin chào {user.Fullname},</div>" +
-					$"<div>Mã QR của bạn:</div>" +
-					$"<img src='{qrCode}'/>" +
+					$"<b>Hướng dẫn:<b/>" +
+					$"<p>Bước 1: Mở ứng dụng Google Authenticator<p/>" +
+					$"<p>Bước 2: Chọn mục nhập khóa thiết lập<p/>" +
+					$"<p>Bước 3: Tài khoản: <b>{_configuration["JWT:Issuer"]}:{user.Email}<b/><p/>" +
+					$"<p>Bước 4: Khóa: <b>{manualEntryKey}<b/><p/>" +
+					$"<p>Bước 5: Bấm Thêm<p/>" +
+					$"<p>Hoàn tất<p/>" +
+					$"<i>Vui lòng không gửi thông tin này cho bất cứ ai!</>" +
 					$"<div><b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b></div>" +
 					$"</body>" +
 					$"</html>";
