@@ -56,7 +56,6 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
 				if (!ModelState.IsValid) return BadRequest();
 
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
@@ -64,14 +63,14 @@ namespace DigitalFUHubApi.Controllers
 
 				if (responseCode == Constants.RESPONSE_CODE_SUCCESS)
 				{
-					// send notification to seller
-					var title = $"Đơn hàng mới";
-					var content = $"Mã đơn hàng #{orderInfo.OrderId}";
-					var link = Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + orderInfo.OrderId;
-					await _hubService.SendNotification(orderInfo.ShopId, title, content, link);
+					await _hubService.SendNotification(
+						orderInfo.ShopId, 
+						$"Đơn hàng mới", 
+						$"Mã đơn hàng #{orderInfo.OrderId}", 
+						Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + orderInfo.OrderId);
 				}
 
-				return Ok(new ResponseData(responseCode, message, true, numberQuantityAvailable));
+				return Ok(new ResponseData(responseCode, message, responseCode == Constants.RESPONSE_CODE_SUCCESS, numberQuantityAvailable));
 			}
 			catch (Exception ex)
 			{
