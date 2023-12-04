@@ -746,5 +746,9 @@ namespace DigitalFUHubApi.Controllers
 			}));
 		}
 		#endregion
+
+		#region Get products ban of seller
+
+		#endregion
 	}
 }

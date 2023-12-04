@@ -695,6 +695,7 @@ namespace DataAccess.DAOs
 									ViewCount = product.ViewCount,
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
+									Note = product.Note,
 									ProductStatusId = product.ProductStatusId,
 									Shop = new Shop
 									{

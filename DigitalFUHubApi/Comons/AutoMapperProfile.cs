@@ -301,6 +301,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductId))
 				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductName))
 				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.Thumbnail))
+				.ForMember(des => des.Note, act => act.MapFrom(src => src.Note))
 				.ReverseMap();
 			// /admin/product/{id}
 			CreateMap<ProductVariant, ProductDetailProductVariantAdminResponseDTO>()
