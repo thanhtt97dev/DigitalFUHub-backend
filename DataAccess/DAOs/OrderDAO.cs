@@ -307,7 +307,7 @@ namespace DataAccess.DAOs
 					#endregion
 
 					#region Check customer existed
-					var isCustomerExisted = context.User.Any(x => x.UserId == userId);
+					var isCustomerExisted = context.User.Any(x => x.UserId == userId && x.Status == true);
 					if (!isCustomerExisted)
 					{
 						return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Customer not existed!", numberQuantityAvailable, orderResult);
@@ -365,7 +365,7 @@ namespace DataAccess.DAOs
 
 						#region Check customer existed
 						var customer = context.User
-							.FirstOrDefault(x => x.UserId == userId);
+							.FirstOrDefault(x => x.UserId == userId && x.Status == true);
 						if (customer == null)
 						{
 							transaction.Rollback();
