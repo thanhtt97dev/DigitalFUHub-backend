@@ -786,7 +786,6 @@ namespace DataAccess.DAOs
 							 where (categoryId == 0 ? true : product.CategoryId == categoryId)
 								&& product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 								&& context.Shop.Any(x => x.UserId == product.ShopId && x.IsActive)
-								&& context.User.Any(x => x.UserId == product.ShopId && x.Status)
                                 && context.AssetInformation
 							   .Count(ai => ai.ProductVariant.ProductId == product.ProductId && ai.IsActive) > 0
                              select new Product
