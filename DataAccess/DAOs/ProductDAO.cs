@@ -778,17 +778,18 @@ namespace DataAccess.DAOs
 		}
 
 
-		internal List<Product> GetProductForHomePageCustomer(int page, long categoryId, bool isOrderFeedback, bool isOrderSoldCount)
+		internal List<Product> GetProductForHomePageCustomer(int page, long categoryId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var query = (from product in context.Product
+				var products = (from product in context.Product
 							 where (categoryId == 0 ? true : product.CategoryId == categoryId)
-								&&
-								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-								||
-								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
-							 select new Product
+								&& product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+								&& context.Shop.Any(x => x.UserId == product.ShopId && x.IsActive)
+								&& context.User.Any(x => x.UserId == product.ShopId && x.Status)
+                                && context.AssetInformation
+							   .Count(ai => ai.ProductVariant.ProductId == product.ProductId && ai.IsActive) > 0
+                             select new Product
 							 {
 								 ProductId = product.ProductId,
 								 ProductName = product.ProductName,
@@ -796,40 +797,24 @@ namespace DataAccess.DAOs
 								 TotalRatingStar = product.TotalRatingStar,
 								 NumberFeedback = product.NumberFeedback,
 								 SoldCount = product.SoldCount,
-								 ProductStatusId = product.ProductStatusId,
 								 ProductVariants = (from productVariant in context.ProductVariant
-													where productVariant.ProductId == product.ProductId
+                                                    where productVariant.ProductId == product.ProductId
 													select new ProductVariant
 													{
-														ProductVariantId = productVariant.ProductId,
-														Discount = productVariant.Discount,
-														Price = productVariant.Price,
-														AssetInformations = (from assetInformation in context.AssetInformation
-																			 where assetInformation.ProductVariantId == productVariant.ProductVariantId
-																			 &&
-																			 assetInformation.IsActive
-																			 select new AssetInformation { }).ToList()
-													}).ToList()
+                                                        Discount = productVariant.Discount,
+                                                        Price = productVariant.Price,
+                                                    }).ToList()
 							 }
-					);
-
-				// Sort descending by total star / number feedback
-				if (isOrderFeedback)
-				{
-					query = query.OrderByDescending(x => x.NumberFeedback != 0 ? x.TotalRatingStar / x.NumberFeedback : 0);
-				}
-
-				// Sort descending by sold count
-				if (isOrderSoldCount)
-				{
-					query = query.OrderByDescending(x => x.SoldCount);
-
-				}
-
-				return query.Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
+					)
+					.OrderByDescending(x => x.SoldCount)
+					.ThenByDescending(x => x.NumberFeedback != 0 ? x.TotalRatingStar / x.NumberFeedback : 0)
+					.Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
 					 .Take(Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
 					 .ToList();
-			}
+
+				return products;
+
+            }
 		}
 
 		internal int GetNumberProductByConditions(long categoryId)
@@ -838,11 +823,12 @@ namespace DataAccess.DAOs
 			{
 				return (from product in context.Product
 						where (categoryId == 0 ? true : product.CategoryId == categoryId)
-								&&
-								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-								||
-								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
-						select new { })
+                                && product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                && context.Shop.Any(x => x.UserId == product.ShopId && x.IsActive)
+                                && context.User.Any(x => x.UserId == product.ShopId && x.Status)
+                                && context.AssetInformation
+                               .Count(ai => ai.ProductVariant.ProductId == product.ProductId && ai.IsActive) > 0
+                        select new { })
 						.Count();
 			}
 		}

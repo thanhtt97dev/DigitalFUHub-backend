@@ -257,7 +257,6 @@ namespace DigitalFUHubApi.Comons
 
 			// Home Page <Customer>
 			CreateMap<Product, HomePageCustomerProductDetailResponseDTO>()
-				.ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() : 0))
 				.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
 				.ReverseMap();
 

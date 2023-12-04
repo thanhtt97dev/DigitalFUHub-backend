@@ -15,8 +15,6 @@ namespace DTOs.Product
         public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
         public int SoldCount { get; set; }
-        public long ProductStatusId { get; set; }
-        public int QuantityProductRemaining { get; set; }
         public HomePageCustomerProductVariantDetailResponseDTO? ProductVariant { get; set; }
     }
 }
