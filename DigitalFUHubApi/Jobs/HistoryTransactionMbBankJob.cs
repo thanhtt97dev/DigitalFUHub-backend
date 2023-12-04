@@ -21,7 +21,7 @@ namespace DigitalFUHubApi.Jobs
 
 		public async Task Execute(IJobExecutionContext context)
 		{
-			//return;
+			return;
 			var data = await mbBankService.GetHistoryTransaction();
 
 			if (data == null) return;
