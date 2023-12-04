@@ -667,6 +667,10 @@ namespace DataAccess.DAOs
 				if (product == null) throw new Exception("Data not found");
 				product.ProductStatusId = status;
 				product.Note = note;
+				if(status == Constants.PRODUCT_STATUS_BAN)
+				{
+					product.BanDate = DateTime.Now;
+				}
 				context.Product.Update(product);
 				context.SaveChanges();
 			}
@@ -696,6 +700,7 @@ namespace DataAccess.DAOs
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
 									Note = product.Note,
+									BanDate = product.BanDate,
 									ProductStatusId = product.ProductStatusId,
 									Shop = new Shop
 									{
