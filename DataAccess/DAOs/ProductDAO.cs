@@ -164,7 +164,11 @@ namespace DataAccess.DAOs
 
 				// medias
 				List<string> medias = new List<string>();
-				foreach (var media in productMedias)
+                // add product thumbnai
+
+                if (product.Thumbnail != null) medias.Add(product.Thumbnail );
+
+                foreach (var media in productMedias)
 				{
 					medias.Add(media.Url);
 				}
