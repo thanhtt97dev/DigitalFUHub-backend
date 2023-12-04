@@ -121,7 +121,9 @@
 						Status = true,
 						IsConfirm = true,
 						Fullname = payload.Name,
-						IsChangeUsername = false
+						IsChangeUsername = false,
+						LastTimeOnline = DateTime.Now,
+						IsOnline = false
 					};
 					_userRepository.AddUser(newUser);
 					user = _userRepository.GetUserByEmail(payload.Email);
@@ -172,7 +174,9 @@
 					AccountBalance = 0,
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
-					IsChangeUsername = true
+					IsChangeUsername = true,
+					LastTimeOnline = DateTime.Now,
+					IsOnline = false
 				};
 				_userRepository.AddUser(userSignUp);
 

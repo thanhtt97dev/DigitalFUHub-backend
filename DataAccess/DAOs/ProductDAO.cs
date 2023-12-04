@@ -127,6 +127,11 @@ namespace DataAccess.DAOs
 				var product = context.Product.Include(_ => _.Shop).FirstOrDefault(x => x.ProductId == productId);
 				if (product == null) return null;
 
+				//update view count
+				product.ViewCount = product.ViewCount + 1;
+				context.Product.Update(product);
+				context.SaveChanges();
+
 				long productQuantity = 0;
 				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
 				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
@@ -667,6 +672,10 @@ namespace DataAccess.DAOs
 				if (product == null) throw new Exception("Data not found");
 				product.ProductStatusId = status;
 				product.Note = note;
+				if(status == Constants.PRODUCT_STATUS_BAN)
+				{
+					product.BanDate = DateTime.Now;
+				}
 				context.Product.Update(product);
 				context.SaveChanges();
 			}
@@ -695,6 +704,8 @@ namespace DataAccess.DAOs
 									ViewCount = product.ViewCount,
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
+									Note = product.Note,
+									BanDate = product.BanDate,
 									ProductStatusId = product.ProductStatusId,
 									Shop = new Shop
 									{

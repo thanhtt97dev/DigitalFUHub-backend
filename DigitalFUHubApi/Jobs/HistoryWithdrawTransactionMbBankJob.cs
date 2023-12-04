@@ -18,29 +18,39 @@ namespace DigitalFUHubApi.Jobs
 			this.mbBankService = mbBankService;
 		}
 
-		public async Task Execute(IJobExecutionContext context)
+		public Task Execute(IJobExecutionContext context)
 		{
-			return;
-			var data = await mbBankService.GetHistoryTransaction();
-			if (data == null) return;
-			if (data.result.responseCode != "00") return;
+			//get folder name history transaction data
+			string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreData"];
+			if (directoryPathStoreData == null)
+				return Task.CompletedTask;
 
+			//get data history transaction
+			string dataHistoryTransactionJson =  Util.ReadFile(directoryPathStoreData);
+			if (string.IsNullOrEmpty(dataHistoryTransactionJson))
+				return Task.CompletedTask;
+
+			List<TransactionHistory>? data = new List<TransactionHistory>();
+			data = JsonSerializer.Deserialize<List<TransactionHistory>>(dataHistoryTransactionJson);
+
+			// get debit data
 			List<TransactionHistory> transactionHistoryDebitList = new List<TransactionHistory>();
-			if (data.transactionHistoryList != null)
+			if (data != null && data.Count != 0)
 			{
-				transactionHistoryDebitList = data.transactionHistoryList
+				transactionHistoryDebitList = data
 					.Where(x => x.debitAmount != 0 && x.description.Contains(Constants.BANK_TRANSACTION_CODE_KEY)).ToList();
 			}
 
-			string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreWithdrawData"];
-			if (directoryPathStoreData == null) return;
+			// get previous data debit transaction
+			string? directoryPathStoreWithdrawData = configuration["MbBank:DirectoryPathStoreDepositData"];
+			if (directoryPathStoreWithdrawData == null)
+				return Task.CompletedTask;
 
-			string dataPreviousText = Util.ReadFile(directoryPathStoreData);
-
+			string dataPreviousDebitTransactionJson = Util.ReadFile(directoryPathStoreWithdrawData);
 			List<TransactionHistory>? dataPrevious = new List<TransactionHistory>();
-			if (!string.IsNullOrEmpty(dataPreviousText))
+			if (!string.IsNullOrEmpty(dataPreviousDebitTransactionJson))
 			{
-				dataPrevious = JsonSerializer.Deserialize<List<TransactionHistory>>(dataPreviousText);
+				dataPrevious = JsonSerializer.Deserialize<List<TransactionHistory>>(dataPreviousDebitTransactionJson);
 			}
 
 			// Compare previous data with current data
@@ -50,14 +60,17 @@ namespace DigitalFUHubApi.Jobs
 				isSame = dataPrevious.SequenceEqual(transactionHistoryDebitList,
 					new MbBankResponeHistoryTransactionDataEqualityComparer());
 			}
-			if (isSame) return;
+			if (isSame)
+				return Task.CompletedTask;
 
 			//Have new debit info
 			// Save new data into file
-			Util.WriteFile(directoryPathStoreData, transactionHistoryDebitList);
+			Util.WriteFile(directoryPathStoreWithdrawData, transactionHistoryDebitList);
 
 			//Update DB
 			BankDAO.Instance.CheckingDebitTransactions(transactionHistoryDebitList);
+
+			return Task.CompletedTask;
 		}
 	}
 }
