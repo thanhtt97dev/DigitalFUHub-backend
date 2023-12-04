@@ -16,5 +16,6 @@ namespace DTOs.Product
         public DateTime DateCreate { get; set; }
 		public bool IsOnline { get; set; }
 		public DateTime LastTimeOnline { get; set; }
-	}
+        public bool IsActive { get; set; }
+    }
 }
