@@ -453,32 +453,24 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateStatusOrderDispute(request.SellerId, request.CustomerId, request.OrderId, request.Note);
-				string subjectCustomer = "";
-				string subjectSeller = "";
-				string htmlCustomer = "";
-				string htmlSeller = "";
 
-				subjectCustomer = $"DigitalFUHub: Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.";
-				htmlCustomer = $"<div>" +
-					$"<h3>Xin chào {order.User.Fullname},</h3>" +
-					$"<div>Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.</div>" +
-					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
-					$"</div>";
-				subjectSeller = $"DigitalFUHub: Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.";
-				htmlSeller = $"<div>" +
-					$"<h3>Xin chào {order.Shop.ShopName},</h3>" +
-					$"<div>Đơn hàng mã số {order.OrderId} đã chuyển sang tranh chấp.</div>" +
-					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
-					$"</div>";
-				// send notification to seller
+
+				await _mailService.SendMailOrderDispute(order);
+
+				// send notification to customer
 				var title = $"Tranh chấp đơn hàng";
-				var content = $"Mã đơn hàng #{order.OrderId} đang được tranh chấp.";
+				var content = $"Mã đơn hàng #{order.OrderId} tranh chấp.";
 				var link = Constants.FRONT_END_HISTORY_ORDER_URL + order.OrderId;
 				await _hubService.SendNotification(order.User.UserId, title, content, link);
+
+				// send notification to seller
 				link = Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + order.OrderId;
+				await _hubService.SendNotification(order.ShopId, title, content, link);
+
+				// send notification to admin
+				link = Constants.FRONT_END_ADMIN_ORDER_DETAIL_URL + order.OrderId;
 				await _hubService.SendNotification(Constants.ADMIN_USER_ID, title, content, link);
-				await _mailService.SendEmailAsync(order.User.Email, subjectCustomer, htmlCustomer);
-				await _mailService.SendEmailAsync(order.Shop.User.Email, subjectSeller, htmlSeller);
+
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
@@ -517,30 +509,15 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				_orderRepository.UpdateStatusOrderRefund(request.SellerId, request.OrderId, request.Note.Trim());
-				string subjectCustomer = "";
-				string subjectSeller = "";
-				string htmlCustomer = "";
-				string htmlSeller = "";
 
-				subjectCustomer = $"DigitalFUHub: Đơn hàng mã số {order.OrderId} đã được hoàn trả lại tiền.";
-				htmlCustomer = $"<div>" +
-					$"<h3>Xin chào {order.User.Fullname},</h3>" +
-					$"<div>Đơn hàng mã số {order.OrderId} đã được hoàn trả lại tiền.</div>" +
-					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
-					$"</div>";
-				subjectSeller = $"DigitalFUHub: Hoàn trả lại tiền đơn hàng mã số {order.OrderId}.";
-				htmlSeller = $"<div>" +
-					$"<h3>Xin chào {order.Shop.ShopName},</h3>" +
-					$"<div>Hoàn trả tiền đơn hàng mã số {order.OrderId} thành công.</div>" +
-					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
-					$"</div>";
-				// send notification to seller
-				var title = $"Tranh chấp đơn hàng";
+				await _mailService.SendMailOrderRefund(order);
+
+				// send notification to customer
+				var title = $"Hoàn tiền";
 				var content = $"Mã đơn hàng #{order.OrderId} đã được hoàn lại tiền.";
 				var link = Constants.FRONT_END_HISTORY_ORDER_URL + order.OrderId;
 				await _hubService.SendNotification(order.User.UserId, title, content, link);
-				await _mailService.SendEmailAsync(order.User.Email, subjectCustomer, htmlCustomer);
-				await _mailService.SendEmailAsync(order.Shop.User.Email, subjectSeller, htmlSeller);
+
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)
