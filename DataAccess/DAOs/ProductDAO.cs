@@ -127,6 +127,11 @@ namespace DataAccess.DAOs
 				var product = context.Product.Include(_ => _.Shop).FirstOrDefault(x => x.ProductId == productId);
 				if (product == null) return null;
 
+				//update view count
+				product.ViewCount = product.ViewCount + 1;
+				context.Product.Update(product);
+				context.SaveChanges();
+
 				long productQuantity = 0;
 				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
 				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();

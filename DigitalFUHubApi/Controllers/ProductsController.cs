@@ -43,8 +43,6 @@ namespace DigitalFUHubApi.Controllers
 		[HttpGet("GetById/{productId}")]
 		public IActionResult GetById(long productId)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
 				if (productId == 0)
