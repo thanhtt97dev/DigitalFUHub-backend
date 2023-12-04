@@ -315,14 +315,6 @@ namespace DataAccess.DAOs
 
 					#endregion
 
-					#region Check buyer is seller of orther shop was banned
-					var shopOfBuyer = context.Shop.FirstOrDefault(x => x.UserId == userId);
-					if(shopOfBuyer != null && shopOfBuyer.IsActive == false)
-					{
-						return (Constants.RESPONSE_CODE_ORDER_SELLER_BAN_LOCK_TRANSACTION, "Seller ban and lock transaction!", numberQuantityAvailable, orderResult);
-					}
-					#endregion
-
 					#region Get bussinsis fee
 					var businessFeeDate = context.BusinessFee.Max(x => x.StartDate);
 					var businessFee = context.BusinessFee.First(x => x.StartDate == businessFeeDate);
@@ -577,6 +569,17 @@ namespace DataAccess.DAOs
 						//update customer and admin account balance
 						if (totalPayment >= 0)
 						{
+							//Check customer is a seller of another shop and total payment > seller's account balance require
+							var shopOfBuyer = context.Shop.FirstOrDefault(x => x.UserId == userId);
+							if (shopOfBuyer != null)
+							{
+								if(customer.AccountBalance - totalPayment < Constants.ACCOUNT_BALANCE_REQUIRED_FOR_SELLER)
+								{
+									transaction.Rollback();
+									return (Constants.RESPONSE_CODE_ORDER_SELLER_LOCK_TRANSACTION, "Seller lock transaction!", numberQuantityAvailable, orderResult);
+								}
+							}
+
 							if (customer.AccountBalance < totalPayment)
 							{
 								transaction.Rollback();
@@ -595,6 +598,8 @@ namespace DataAccess.DAOs
 							context.User.UpdateRange(admin, customer);
 							context.SaveChanges();
 						}
+
+						
 
 						// update order
 						order.TotalAmount = totalAmount;
