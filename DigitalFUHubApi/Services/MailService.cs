@@ -38,7 +38,7 @@ namespace DigitalFUHubApi.Services
 
 		public async Task SendMailWarningSellerViolate(Order order ,int totalOrderViolate)
 		{
-			var subject = "CẢNH BÁO: ĐƠN HÀNG VI PHẠM";
+			var subject = "DigitalFUHub: CẢNH BÁO: ĐƠN HÀNG VI PHẠM";
 			var body = 
 				$"<p>" +
 				$"Chào {order.Shop.User.Fullname},<br/>Tôi là Nguyễn Văn Hiếu, đại diện cho Sàn Thương Mại Điện Tử DigitalFuHub. <br/>" +
@@ -56,7 +56,7 @@ namespace DigitalFUHubApi.Services
 
 		public async Task SendMailBanShop(Order order, int totalOrderViolate)
 		{
-			var subject = $"THÔNG BÁO KHÓA CỦA HÀNG {order.Shop.ShopName}";
+			var subject = $"DigitalFUHub: THÔNG BÁO KHÓA CỦA HÀNG {order.Shop.ShopName}";
 			var body =
 					$"<h2>Thông Báo: Khóa Shop</h2>" +
 					$"<p>Chào ${order.Shop.User.Fullname}," +
@@ -75,7 +75,7 @@ namespace DigitalFUHubApi.Services
 
 		public async Task SendMailOrderRefundMoneyForCustomer(Order order)
 		{
-			var subject = $"ĐƠN HÀNG #{order.OrderId} - HOÀN TIỀN";
+			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - HOÀN TIỀN";
 			var body = 
 				$" <h2>Thông Báo: Trạng Thái Đơn Hàng Đã Hoàn Tiền</h2>" +
 				$"<p> " +
@@ -99,7 +99,7 @@ namespace DigitalFUHubApi.Services
 
 		public async Task SendMailRejectComplantForCustomer(Order order)
 		{
-			var subject = $"ĐƠN HÀNG #{order.OrderId} - HOÀN TIỀN";
+			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - HOÀN TIỀN";
 			var body =
 				$" <h2>Thông Báo: Trạng Thái Đơn Hàng Đã Hoàn Tiền</h2>" +
 				$"<p> " +
@@ -113,6 +113,74 @@ namespace DigitalFUHubApi.Services
 				$"Sàn Thương Mại Điện Tử DigitalFuHub " +
 				$"<p/>";
 			await SendEmailAsync(order.User.Email, subject, body);
+		}
+
+		public async Task SendMailOrderComfirm(Order order)
+		{
+			//send mail for customer
+			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - XÁC NHẬN";
+			var body =
+				$" <h2>Thông Báo: Trạng Thái Đơn Hàng Đã Xác Nhận</h2>" +
+				$"<p> " +
+				$"Chào ${order.User.Fullname}, <br/>" +
+				$"Đơn hàng mã số #{order.OrderId} đã được bạn xác nhận thành công.<br/>" +
+				$"Nếu có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, đừng ngần ngại liên hệ với chúng tôi<br/>" +
+				$"Chân thành cảm ơn sự tin tưởng và sự hợp tác của bạn. Chúng tôi hy vọng sẽ tiếp tục phục vụ bạn trong tương lai.<br/>" +
+				$"Trân trọng,<br/>" +
+				$"Nguyễn Văn Hiếu <br/>" +
+				$"Sàn Thương Mại Điện Tử DigitalFuHub " +
+				$"<p/>";
+			await SendEmailAsync(order.User.Email, subject, body);
+
+			//send mail for seller
+			var subjectForSeller = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - XÁC NHẬN";
+			var bodyForSeller =
+				$" <h2>Thông Báo: Trạng Thái Đơn Hàng Đã Xác Nhận</h2>" +
+				$"<p> " +
+				$"Chào ${order.Shop.ShopName}, <br/>" +
+				$"Đơn hàng mã số #{order.OrderId} đã được khách hàng xác nhận thành công.<br/>" +
+				$"Nếu có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, đừng ngần ngại liên hệ với chúng tôi<br/>" +
+				$"Chân thành cảm ơn sự tin tưởng và sự hợp tác của bạn. Chúng tôi hy vọng sẽ tiếp tục phục vụ bạn trong tương lai.<br/>" +
+				$"Trân trọng,<br/>" +
+				$"Nguyễn Văn Hiếu <br/>" +
+				$"Sàn Thương Mại Điện Tử DigitalFuHub " +
+				$"<p/>";
+			await SendEmailAsync(order.Shop.User.Email, subjectForSeller, bodyForSeller);
+		}
+
+		public async Task SendMailOrderComplain(Order order)
+		{
+			//send mail for customer
+			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHẾU NẠI";
+			var body =
+				$" <h2>Thông Báo: Trạng Thái Đơn Hàng Đang Khiếu nại</h2>" +
+				$"<p> " +
+				$"Chào ${order.User.Fullname}, <br/>" +
+				$"Đơn hàng mã số #{order.OrderId} đã được chuyển sang trạng thái khiếu nại.<br/>" +
+				$"Người bán sẽ liên hệ với bạn trong thời gian sớm nhất để giải quyết đơn hàng này cho bạn.<br/>" +
+				$"Nếu có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, đừng ngần ngại liên hệ với chúng tôi<br/>" +
+				$"Chân thành cảm ơn sự tin tưởng và sự hợp tác của bạn. Chúng tôi hy vọng sẽ tiếp tục phục vụ bạn trong tương lai.<br/>" +
+				$"Trân trọng,<br/>" +
+				$"Nguyễn Văn Hiếu <br/>" +
+				$"Sàn Thương Mại Điện Tử DigitalFuHub " +
+				$"<p/>";
+			await SendEmailAsync(order.User.Email, subject, body);
+
+			//send mail for seller
+			var subjectForSeller = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHẾU NẠI";
+			var bodyForSeller =
+				$" <h2>Thông Báo: Trạng Thái Đơn Hàng Đang Khiếu nại</h2>" +
+				$"<p> " +
+				$"Chào ${order.Shop.ShopName}, <br/>" +
+				$"Đơn hàng mã số #{order.OrderId} đã được khách hàng chuyển sang trạng thái khiếu nại.<br/>" +
+				$"Bạn vui lòng liên hệ với khác hàng trong khoảng thời gian sớm nhất.<br/>" +
+				$"Nếu có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, đừng ngần ngại liên hệ với chúng tôi<br/>" +
+				$"Chân thành cảm ơn sự tin tưởng và sự hợp tác của bạn. Chúng tôi hy vọng sẽ tiếp tục phục vụ bạn trong tương lai.<br/>" +
+				$"Trân trọng,<br/>" +
+				$"Nguyễn Văn Hiếu <br/>" +
+				$"Sàn Thương Mại Điện Tử DigitalFuHub " +
+				$"<p/>";
+			await SendEmailAsync(order.Shop.User.Email, subjectForSeller, bodyForSeller);
 		}
 	}
 }
