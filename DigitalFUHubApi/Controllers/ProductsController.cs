@@ -683,7 +683,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get Products (Home Page Customer)
-		[HttpPost("GetProductHomePageCustomer")]
+		[HttpPost("homepage")]
 		public IActionResult GetProductForHomePageCustomer(HomePageCustomerSearchParamProductRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
@@ -701,7 +701,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
 				}
 
-				List<Product> products = _productRepository.GetProductForHomePageCustomer(request.Page, request.CategoryId, request.IsOrderFeedback, request.IsOrderSoldCount);
+				List<Product> products = _productRepository.GetProductForHomePageCustomer(request.Page, request.CategoryId);
 
 				List<HomePageCustomerProductDetailResponseDTO> productResponses = _mapper.Map<List<HomePageCustomerProductDetailResponseDTO>>(products);
 

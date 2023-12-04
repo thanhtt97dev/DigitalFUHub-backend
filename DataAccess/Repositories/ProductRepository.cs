@@ -61,7 +61,7 @@ namespace DataAccess.Repositories
 
 		public int GetNumberProductByConditions(long categoryId) => ProductDAO.Instance.GetNumberProductByConditions(categoryId);
 
-		public List<Product> GetProductForHomePageCustomer(int page, long categoryId, bool isOrderFeedback, bool isOrderSoldCount) => ProductDAO.Instance.GetProductForHomePageCustomer(page, categoryId, isOrderFeedback, isOrderSoldCount);
+		public List<Product> GetProductForHomePageCustomer(int page, long categoryId) => ProductDAO.Instance.GetProductForHomePageCustomer(page, categoryId);
 
 		public List<Product> GetListProductForSearchHint(string keyword)
 		=> ProductDAO.Instance.GetListProductForSearchHint(keyword);
