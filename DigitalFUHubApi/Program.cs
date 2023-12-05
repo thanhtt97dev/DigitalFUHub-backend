@@ -205,17 +205,6 @@ namespace DigitalFUHubApi
 						)
 					);
 
-				var jobKeyInquiryAccountNameBankJob = new JobKey("InquiryAccountNameBankJob ");
-				q.AddJob<InquiryAccountNameBankJob>(opts => opts.WithIdentity(jobKeyInquiryAccountNameBankJob));
-				q.AddTrigger(opts => opts
-					.ForJob(jobKeyInquiryAccountNameBankJob)
-					.StartNow()
-					.WithSimpleSchedule(x =>
-						x.WithIntervalInMinutes(2)
-						.RepeatForever()
-						)
-					);
-
 				var jobKeyOrderStatusJob = new JobKey("OrderStatusJob");
 				q.AddJob<OrderStatusJob>(opts => opts.WithIdentity(jobKeyOrderStatusJob));
 				q.AddTrigger(opts => opts

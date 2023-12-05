@@ -24,7 +24,7 @@ namespace DigitalFUHubApi.Services
 			client.DefaultRequestHeaders.Add("Authorization", "Basic " + configuration["MbBank:BasicAuthBase64"]);
 		}
 
-
+		#region Get History Transaction
 		public async Task<MbBankResponeHistoryTransactionDataDTO?> GetHistoryTransaction()
 		{
 			MbBankRequestBodyHistoryTransactionDTO mbBank = new MbBankRequestBodyHistoryTransactionDTO()
@@ -51,7 +51,9 @@ namespace DigitalFUHubApi.Services
 
 			return data;
 		}
+		#endregion
 
+		#region Inquiry Account Name
 		public async Task<MbBankResponse?> InquiryAccountName(BankInquiryAccountNameRequestDTO bankInquiryAccountNameRequestDTO)
 		{
 			MbBankRequestBodyInquiryAccountNameDTO mbBank = new MbBankRequestBodyInquiryAccountNameDTO()
@@ -78,7 +80,7 @@ namespace DigitalFUHubApi.Services
 			options.Converters.Add(new JsonSerializerIntConverter());
 
 			var data = JsonSerializer.Deserialize<MbBankResponeInquiryAccountNameDTO>(respone, options);
-		
+
 			if (data == null) return null;
 
 			MbBankResponse mbBankResponse = new MbBankResponse()
@@ -89,5 +91,77 @@ namespace DigitalFUHubApi.Services
 
 			return mbBankResponse;
 		}
+		#endregion
+
+		#region Get Captcha Image
+		public async Task<MbBankResponse?> GetCaptchaImage()
+		{
+			MbBankRequestBodyGetCaptchaImageDTO body = new MbBankRequestBodyGetCaptchaImageDTO()
+			{
+				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
+				refNo = configuration["MbBank:RefNo"],
+				sessionId = string.Empty
+			};
+
+			var jsonData = JsonSerializer.Serialize(body);
+			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+			var request = await client.PostAsync(configuration["MbBank:ApiGetCaptchaImage"], content);
+
+			var respone = await request.Content.ReadAsStringAsync();
+
+			var options = new JsonSerializerOptions();
+			options.Converters.Add(new JsonSerializerDateTimeConverter());
+			options.Converters.Add(new JsonSerializerIntConverter());
+
+			var data = JsonSerializer.Deserialize<MbBankResponseGetCaptchaImageDTO>(respone, options);
+
+			if (data == null) return null;
+
+			MbBankResponse mbBankResponse = new MbBankResponse()
+			{
+				Code = data.result.responseCode,
+				Result = data.imageString
+			};
+
+			return mbBankResponse;
+		}
+		#endregion
+
+		#region Login
+		public async Task<MbBankResponse?> Login(string captcha)
+		{
+			MbBankRequestBodyDoLoginDTO body = new MbBankRequestBodyDoLoginDTO()
+			{
+				captcha = captcha,
+				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
+				password = configuration["MbBank:Password"],
+				refNo = configuration["MbBank:RefNo"],
+				sessionId = null,
+				userId = configuration["MbBank:AccountNo"],
+			};
+
+			var jsonData = JsonSerializer.Serialize(body);
+			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+			var request = await client.PostAsync(configuration["MbBank:ApiLogin"], content);
+
+			var respone = await request.Content.ReadAsStringAsync();
+
+			var options = new JsonSerializerOptions();
+			options.Converters.Add(new JsonSerializerDateTimeConverter());
+			options.Converters.Add(new JsonSerializerIntConverter());
+
+			var data = JsonSerializer.Deserialize<MbBankResponseLoginDTO>(respone, options);
+
+			if (data == null) return null;
+
+			MbBankResponse mbBankResponse = new MbBankResponse()
+			{
+				Code = data.result.responseCode,
+				Result = data.sessionId
+			};
+
+			return mbBankResponse;
+		}
+		#endregion
 	}
 }
