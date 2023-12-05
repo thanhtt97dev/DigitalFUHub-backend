@@ -141,7 +141,7 @@ namespace DataAccess.DAOs
 				context.SaveChanges();
 
 				long productQuantity = 0;
-				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductVariant>();
+				List<ProductVariant> productVariants = context.ProductVariant.Where(x => x.ProductId == product.ProductId && x.isActivate).ToList() ?? new List<ProductVariant>();
 				List<ProductMedia> productMedias = context.ProductMedia.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<ProductMedia>();
 				List<Tag> productTags = context.Tag.Where(x => x.ProductId == product.ProductId).ToList() ?? new List<Tag>();
 
