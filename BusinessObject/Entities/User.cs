@@ -31,8 +31,10 @@ namespace BusinessObject.Entities
         public bool IsChangeUsername { get; set; }
 		public DateTime LastTimeOnline { get; set; }
 		public bool IsOnline { get; set; }
+        public DateTime? BanDate { get; set; } = null!;
+        public string? Note { get; set; } = null!;
 
-		[ForeignKey(nameof(RoleId))]
+        [ForeignKey(nameof(RoleId))]
         public virtual Role Role { get; set; } = null!;
         public virtual Shop Shop { get; set; } = null!;
         public virtual ICollection<AccessToken>? AccessTokens { get; set; }

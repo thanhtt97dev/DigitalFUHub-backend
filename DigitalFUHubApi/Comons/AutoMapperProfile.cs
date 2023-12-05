@@ -355,6 +355,8 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Notification, NotificationDetailResponeDTO>()
 				.ReverseMap();
 
+			CreateMap<User, UserInfoResponseDTO>().ReverseMap();
+
 		}
 	}
 }

@@ -882,9 +882,6 @@
 		}
 		#endregion
 
-
-
-
 		#region Get all users for admin
 		[Authorize(Roles = "Admin")]
 		[HttpPost("GetUsers")]
@@ -915,22 +912,27 @@
 		#endregion
 
 		#region Get user info by Id for admin
-		[Authorize(Roles = "Admin")]
-		[HttpPost("GetUser/{id}")]
+		[Authorize("Admin")]
+		[HttpGet("Admin/UserInfo/{id}")]
 		public IActionResult GetUser(int id)
 		{
-			if (id == 0) return BadRequest();
 			try
 			{
-
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, new()));
+				if (id == Constants.ADMIN_USER_ID) throw new Exception("Not allowed");
+				User? user = _userRepository.GetUserInfo(id);
+				if(user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, _mapper.Map<UserInfoResponseDTO>(user)));
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+				return BadRequest(ex.Message);
 			}
 		}
 		#endregion
+
 
 	}
 }
