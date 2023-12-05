@@ -185,6 +185,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Cart, UserCartResponseDTO>()
 				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.ShopActivate, act => act.MapFrom(src => src.Shop.IsActive))
 				.ForMember(des => des.Products, act => act.MapFrom(src => src.CartDetails))
 				.ReverseMap();
 			CreateMap<TransactionInternal, HistoryTransactionInternalResponseDTO>()

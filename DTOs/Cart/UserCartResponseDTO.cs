@@ -11,6 +11,7 @@ namespace DTOs.Cart
 		public long CartId { get; set; }
 		public long ShopId { get; set; }	
 		public string ShopName { get; set; } = string.Empty;
+		public bool ShopActivate { get; set; }
 		public ICollection<UserCartProductResponseDTO> Products { get; set; } = null!;
 	}
 

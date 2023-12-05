@@ -116,6 +116,7 @@ namespace DataAccess.DAOs
                                  {
                                      UserId = shop.UserId,
                                      ShopName = shop.ShopName,
+                                     IsActive = shop.IsActive
                                  },
                                  CartDetails = (from cartDetail in context.CartDetail
                                                 where cartDetail.CartId == cart.CartId
