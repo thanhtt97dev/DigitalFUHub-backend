@@ -11,11 +11,9 @@ namespace DigitalFUHubApi.Jobs
 	public class HistoryWithdrawTransactionMbBankJob : IJob
 	{
 		private readonly IConfiguration configuration;
-		private readonly MbBankService mbBankService;
-		public HistoryWithdrawTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
+		public HistoryWithdrawTransactionMbBankJob(IConfiguration configuration)
 		{
 			this.configuration = configuration;
-			this.mbBankService = mbBankService;
 		}
 
 		public Task Execute(IJobExecutionContext context)
