@@ -831,7 +831,6 @@ namespace DataAccess.DAOs
 					)
 					.OrderByDescending(x => x.SoldCount)
 					.ThenByDescending(x => x.NumberFeedback != 0 ? x.TotalRatingStar / x.NumberFeedback : 0)
-					.ThenByDescending(x => x.ViewCount)
 					.Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
 					.Take(Constants.PAGE_SIZE_PRODUCT_HOME_PAGE)
 					.ToList();
