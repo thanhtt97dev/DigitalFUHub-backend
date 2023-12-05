@@ -45,31 +45,10 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-				if (productId == 0)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid!!", false, new()));
-				}
-
 				var product = _productRepository.GetProductById(productId);
 				if (product == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!", false, new()));
-				}
-
-				// check product status
-				if (product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_BAN, "This product has been banned!", false, product));
-				}
-
-				if (product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_REMOVE, "This product has been remove!", false, new {}));
-				}
-
-				if (product.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_HIDE, "This product has been hide!", false, new { }));
 				}
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_ACTIVE, "Success!", false, product));

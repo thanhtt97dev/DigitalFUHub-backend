@@ -124,7 +124,15 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var product = context.Product.Include(_ => _.Shop).FirstOrDefault(x => x.ProductId == productId);
+                var product = context
+					.Product.Include(_ => _.Shop)
+					.FirstOrDefault(x => x.ProductId == productId
+									&& (x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+										||
+                                        x.ProductStatusId == Constants.PRODUCT_STATUS_BAN
+										||
+                                        x.ProductStatusId == Constants.PRODUCT_STATUS_HIDE));
+
 				if (product == null) return null;
 
 				//update view count
@@ -156,7 +164,11 @@ namespace DataAccess.DAOs
 
 				// medias
 				List<string> medias = new List<string>();
-				foreach (var media in productMedias)
+                // add product thumbnai
+
+                if (product.Thumbnail != null) medias.Add(product.Thumbnail );
+
+                foreach (var media in productMedias)
 				{
 					medias.Add(media.Url);
 				}
@@ -193,8 +205,9 @@ namespace DataAccess.DAOs
 					FeedbackNumber = feedbachNumber,
 					ProductNumber = productNumber,
 					IsOnline = sellerInfo.IsOnline,
-					LastTimeOnline = sellerInfo.LastTimeOnline
-				};
+					LastTimeOnline = sellerInfo.LastTimeOnline,
+					IsActive = product.Shop.IsActive
+                };
 
 				var feedbacks = (from feedback in context.Feedback
 								 where
