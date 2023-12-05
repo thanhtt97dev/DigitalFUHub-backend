@@ -30,18 +30,18 @@ namespace DigitalFUHubApi.Controllers
         private readonly IConnectionManager connectionManager;
         private readonly IConversationRepository conversationRepository;
         private readonly IMapper mapper;
-        private readonly StorageService storageService;
+        private readonly AzureFilesService azureFilesService;
         private readonly IUserRepository userRepository;
         private readonly IUserConversationRepository userConversationRepository;
         private readonly JwtTokenService jwtTokenService;
 
-        public ConversationsController(IHubContext<ChatHub> hubContext, JwtTokenService jwtTokenService, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, StorageService storageService, IUserRepository userRepository, IUserConversationRepository userConversationRepository)
+        public ConversationsController(IHubContext<ChatHub> hubContext, JwtTokenService jwtTokenService, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, AzureFilesService azureFilesService, IUserRepository userRepository, IUserConversationRepository userConversationRepository)
         {
             this.hubContext = hubContext;
             this.connectionManager = connectionManager;
             this.conversationRepository = conversationRepository;
             this.mapper = mapper;
-            this.storageService = storageService;
+            this.azureFilesService = azureFilesService;
             this.userRepository = userRepository;
             this.userConversationRepository = userConversationRepository;
             this.jwtTokenService = jwtTokenService;
@@ -123,7 +123,7 @@ namespace DigitalFUHubApi.Controllers
                     // Upload file to azure
                     now = DateTime.Now;
                     filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf(".")));
-                    urlImage = await storageService.UploadFileToAzureAsync(fileRequest, filename);
+                    urlImage = await azureFilesService.UploadFileToAzureAsync(fileRequest, filename);
                 }
 
                 // Declares variable

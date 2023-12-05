@@ -22,7 +22,7 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IShopRepository _shopRepository;
 		private readonly IUserRepository _userRepository;
 		private readonly JwtTokenService _jwtTokenService;
-		private readonly StorageService _storageService;
+		private readonly AzureFilesService _azureFilesService;
 		private readonly MailService _mailService;
 
 		private readonly IMapper _mapper;
@@ -30,14 +30,14 @@ namespace DigitalFUHubApi.Controllers
 		public ShopsController(IShopRepository shopRepository, 
 			IUserRepository userRepository, 
 			JwtTokenService jwtTokenService, 
-			StorageService storageService, 
+			AzureFilesService azureFilesService, 
 			MailService mailService, 
 			IMapper mapper)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
 			_jwtTokenService = jwtTokenService;
-			_storageService = storageService;
+			_azureFilesService = azureFilesService;
 			_mailService = mailService;
 			_mapper = mapper;
 		}
@@ -103,7 +103,7 @@ namespace DigitalFUHubApi.Controllers
 				string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 					now.Millisecond, now.Second, now.Minute, now.Hour,
 					request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
-				string avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
+				string avatarUrl = await _azureFilesService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				_shopRepository.AddShop(avatarUrl, request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
 				string html = $"<div>" +
 					$"<h3>Xin chào {user.Fullname},</h3>" +
@@ -156,7 +156,7 @@ namespace DigitalFUHubApi.Controllers
 					string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 						now.Millisecond, now.Second, now.Minute, now.Hour,
 						request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
-					avatarUrl = await _storageService.UploadFileToAzureAsync(request.AvatarFile, filename);
+					avatarUrl = await _azureFilesService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				}
 				Shop shop = new Shop
 				{

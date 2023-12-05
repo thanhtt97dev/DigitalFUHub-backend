@@ -19,14 +19,14 @@ namespace DigitalFUHubApi.Controllers
     {
         private readonly ISliderRepository sliderRepository;
         private readonly IProductRepository productRepository;
-        private readonly StorageService storageService;
+        private readonly AzureFilesService azureFilesService;
         private readonly IMapper mapper;
 
-        public SlidersController(ISliderRepository sliderRepository, IProductRepository productRepository, StorageService storageService, IMapper mapper)
+        public SlidersController(ISliderRepository sliderRepository, IProductRepository productRepository, AzureFilesService azureFilesService, IMapper mapper)
         {
             this.sliderRepository = sliderRepository;
             this.productRepository = productRepository;
-            this.storageService = storageService;
+            this.azureFilesService = azureFilesService;
             this.mapper = mapper;
         }
 
@@ -143,7 +143,7 @@ namespace DigitalFUHubApi.Controllers
                 // Upload file to azure
                 now = DateTime.Now;
                 filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", Constants.ADMIN_USER_ID, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf(".")));
-                urlImage = await storageService.UploadFileToAzureAsync(fileRequest, filename);
+                urlImage = await azureFilesService.UploadFileToAzureAsync(fileRequest, filename);
 
                 // Initial New Slider
                 Slider slider = new Slider
@@ -246,7 +246,7 @@ namespace DigitalFUHubApi.Controllers
                     // Upload file to azure
                     now = DateTime.Now;
                     filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", Constants.ADMIN_USER_ID, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, fileRequest.FileName.Substring(fileRequest.FileName.LastIndexOf(".")));
-                    urlImage = await storageService.UploadFileToAzureAsync(fileRequest, filename);
+                    urlImage = await azureFilesService.UploadFileToAzureAsync(fileRequest, filename);
 
                     string urlOld = slider.Url;
 
@@ -254,7 +254,7 @@ namespace DigitalFUHubApi.Controllers
                     slider.Url = urlImage;
 
                     // delete url old
-                    await storageService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
+                    await azureFilesService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
                 }
 
                 // Update slider

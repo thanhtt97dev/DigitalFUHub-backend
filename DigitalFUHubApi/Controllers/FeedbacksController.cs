@@ -20,15 +20,15 @@ namespace DigitalFUHubApi.Controllers
 	{
 		private readonly IOrderRepository _orderRepository;
 		private readonly IFeedbackRepository _feedbackRepository;
-		private readonly StorageService _storageService;
+		private readonly AzureFilesService _azureFilesService;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 
-		public FeedbacksController(IOrderRepository orderRepository, IFeedbackRepository feedbackRepository, StorageService storageService, JwtTokenService jwtTokenService, IMapper mapper)
+		public FeedbacksController(IOrderRepository orderRepository, IFeedbackRepository feedbackRepository, AzureFilesService azureFilesService, JwtTokenService jwtTokenService, IMapper mapper)
 		{
 			_orderRepository = orderRepository;
 			_feedbackRepository = feedbackRepository;
-			_storageService = storageService;
+			_azureFilesService = azureFilesService;
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 		}
@@ -127,7 +127,7 @@ namespace DigitalFUHubApi.Controllers
 					{
 						now = DateTime.Now;
 						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-						string path = await _storageService.UploadFileToAzureAsync(file, filename);
+						string path = await _azureFilesService.UploadFileToAzureAsync(file, filename);
 						urlImages.Add(path);
 					}
 				}

@@ -9,17 +9,17 @@ using Comons;
 
 namespace DigitalFUHubApi.Services
 {
-	public class StorageService
+	public class AzureFilesService
 	{
 		private readonly IConfiguration _configuration;
 
-		private readonly string connectionString = "";
-		private readonly string containerName = "";
-		public StorageService(IConfiguration configuration)
+		private readonly string connectionString = string.Empty;
+		private readonly string containerName = string.Empty;
+		public AzureFilesService(IConfiguration configuration)
 		{
 			_configuration = configuration;
-			connectionString = _configuration["Azure:StorageConnectionString"] ?? "";
-			containerName = _configuration["Azure:StorageContainerName"] ?? "";
+			connectionString = _configuration["Azure:StorageConnectionString"] ?? string.Empty;
+			containerName = _configuration["Azure:StorageContainerName"] ?? string.Empty;
 		}
 
 		public async Task<string> UploadFileToAzureAsync(IFormFile fileUpload, string filename)

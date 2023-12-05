@@ -11,7 +11,7 @@ namespace DigitalFUHubApi.Services
 
 		public void ClarifyCaptchaImage(string base64)
 		{
-//#pragma warning disable CA1416 //bitmap just support for windown
+#pragma warning disable CA1416 //bitmap just support for windown
 			byte[] bytes = System.Convert.FromBase64String(base64);
 
 			Bitmap image;
@@ -41,7 +41,7 @@ namespace DigitalFUHubApi.Services
 			}
 			string path = Constants.CAPTCHA_IMAGE_FILE_NAME;
 			image.Save(path);
-//#pragma warning restore CA1416 // 
+#pragma warning restore CA1416 // 
 		}
 
 		public string GetCaptchaInImage()
