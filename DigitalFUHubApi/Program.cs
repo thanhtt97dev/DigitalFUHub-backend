@@ -211,7 +211,7 @@ namespace DigitalFUHubApi
 					.ForJob(jobKeyInquiryAccountNameBankJob)
 					.StartNow()
 					.WithSimpleSchedule(x =>
-						x.WithIntervalInMinutes(1)
+						x.WithIntervalInMinutes(2)
 						.RepeatForever()
 						)
 					);

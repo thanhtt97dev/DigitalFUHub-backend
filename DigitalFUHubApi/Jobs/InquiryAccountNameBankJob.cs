@@ -18,6 +18,7 @@ namespace DigitalFUHubApi.Jobs
 
 		public async Task Execute(IJobExecutionContext context)
 		{
+			return;
 			BankInquiryAccountNameRequestDTO requestBody = new BankInquiryAccountNameRequestDTO
 			{
 				BankId = Constants.BANK_ID_MB_BANK,
