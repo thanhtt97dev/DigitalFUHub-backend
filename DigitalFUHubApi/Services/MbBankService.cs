@@ -29,11 +29,11 @@ namespace DigitalFUHubApi.Services
 		{
 			MbBankRequestBodyHistoryTransactionDTO mbBank = new MbBankRequestBodyHistoryTransactionDTO()
 			{
-				accountNo = configuration["MbBank:FirstBankAccount:AccountNo"],
-				deviceIdCommon = configuration["MbBank:FirstBankAccount:DeviceIdCommon"],
-				refNo = configuration["MbBank:FirstBankAccount:RefNo"],
+				accountNo = configuration["MbBank:AccountNo"],
+				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
+				refNo = configuration["MbBank:RefNo"],
 				fromDate = DateTime.Now.AddDays(-5).ToString("dd/MM/yyyy"),
-				sessionId = configuration["MbBank:FirstBankAccount:SessionId"],
+				sessionId = configuration["MbBank:SessionId"],
 				toDate = DateTime.Now.ToString("dd/MM/yyyy")
 			};
 
@@ -59,11 +59,11 @@ namespace DigitalFUHubApi.Services
 				bankCode = bankInquiryAccountNameRequestDTO.BankId,
 				creditAccount = bankInquiryAccountNameRequestDTO.CreditAccount,
 				creditAccountType = "ACCOUNT",
-				debitAccount = configuration["MbBank:SecondBankAccount:AccountNo"],
-				deviceIdCommon = configuration["MbBank:SecondBankAccount:DeviceIdCommon"],
-				refNo = configuration["MbBank:SecondBankAccount:RefNo"],
+				debitAccount = configuration["MbBank:AccountNo"],
+				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
+				refNo = configuration["MbBank:RefNo"],
 				remark = string.Empty,
-				sessionId = configuration["MbBank:SecondBankAccount:SessionId"],
+				sessionId = configuration["MbBank:SessionId"],
 				type = bankInquiryAccountNameRequestDTO.BankId == Constants.BANK_ID_MB_BANK ? "INHOUSE" : "FAST"
 			};
 
@@ -78,7 +78,7 @@ namespace DigitalFUHubApi.Services
 			options.Converters.Add(new JsonSerializerIntConverter());
 
 			var data = JsonSerializer.Deserialize<MbBankResponeInquiryAccountNameDTO>(respone, options);
-
+		
 			if (data == null) return null;
 
 			MbBankResponse mbBankResponse = new MbBankResponse()
