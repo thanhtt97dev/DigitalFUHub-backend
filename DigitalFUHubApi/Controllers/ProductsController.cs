@@ -634,7 +634,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				var numberProducts = _productRepository.GetNumberProductByConditions(request.UserId, request.ProductName);
-				var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT + 1;
+				var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT_SHOP_DETAIL_CUSTOMER + 1;
 				if (request.Page > numberPages)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));

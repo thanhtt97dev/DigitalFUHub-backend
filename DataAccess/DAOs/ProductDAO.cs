@@ -441,7 +441,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal bool IsExistProductByShop(long userId, long productId)
+        internal bool IsExistProductByShop(long userId, long productId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -517,16 +517,16 @@ namespace DataAccess.DAOs
 			{
 				return (from product in context.Product
 						where product.ShopId == userId
-								&&
-								(product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
-								&&
-								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-								||
-								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN))
-						select new { })
+                                &&
+						 (string.IsNullOrEmpty(productName) ? true : product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
+						 && product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+						 && context.Shop.Any(x => x.UserId == product.ShopId && x.IsActive)
+						 && context.AssetInformation
+						 .Count(ai => ai.ProductVariant.ProductId == product.ProductId && ai.IsActive) > 0)
+                        select new { })
 						.Count();
 			}
-		}
+        }
 
 
 		internal List<Product> GetProductsForAdmin(long shopId, string shopName, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page)
@@ -763,14 +763,18 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				var products = (from product in context.Product
-								where product.ShopId == userId
+								where 
+								product.ShopId == userId
+                                && 
+								product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+							    && 
+								context.Shop.Any(x => x.UserId == product.ShopId && x.IsActive)
+							    && 
+								context.AssetInformation
+                                .Count(ai => ai.ProductVariant.ProductId == product.ProductId && ai.IsActive) > 0
 								&&
-								(product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
-								&&
-								(product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-								||
-								product.ProductStatusId == Constants.PRODUCT_STATUS_BAN))
-								select new Product
+                                product.ProductName.ToUpper().Trim().Contains(productName.ToUpper().Trim())
+                                select new Product
 								{
 									ProductId = product.ProductId,
 									ProductName = product.ProductName,
@@ -778,31 +782,26 @@ namespace DataAccess.DAOs
 									TotalRatingStar = product.TotalRatingStar,
 									NumberFeedback = product.NumberFeedback,
 									SoldCount = product.SoldCount,
-									ProductStatusId = product.ProductStatusId,
 									ProductVariants = (from productVariant in context.ProductVariant
 													   where productVariant.ProductId == product.ProductId
 													   select new ProductVariant
 													   {
-														   ProductVariantId = productVariant.ProductId,
 														   Discount = productVariant.Discount,
 														   Price = productVariant.Price,
-														   AssetInformations = (from assetInformation in context.AssetInformation
-																				where assetInformation.ProductVariantId == productVariant.ProductVariantId
-																				&&
-																				assetInformation.IsActive
-																				select new AssetInformation { }).ToList()
 													   }).ToList()
 								}
-					).Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT)
-					 .Take(Constants.PAGE_SIZE_PRODUCT)
-					 .ToList();
+					)
+                    .OrderByDescending(x => x.SoldCount)
+                    .ThenByDescending(x => x.NumberFeedback != 0 ? x.TotalRatingStar / x.NumberFeedback : 0)
+                    .Skip((page - 1) * Constants.PAGE_SIZE_PRODUCT_SHOP_DETAIL_CUSTOMER)
+					.Take(Constants.PAGE_SIZE_PRODUCT_SHOP_DETAIL_CUSTOMER)
+					.ToList();
 
 				return products;
 			}
 		}
 
-
-		internal List<Product> GetProductForHomePageCustomer(int page, long categoryId)
+        internal List<Product> GetProductForHomePageCustomer(int page, long categoryId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
