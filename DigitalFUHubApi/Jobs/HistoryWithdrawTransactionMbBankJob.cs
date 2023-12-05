@@ -10,16 +10,10 @@ namespace DigitalFUHubApi.Jobs
 {
 	public class HistoryWithdrawTransactionMbBankJob : IJob
 	{
-		private readonly IConfiguration configuration;
-		public HistoryWithdrawTransactionMbBankJob(IConfiguration configuration)
-		{
-			this.configuration = configuration;
-		}
-
 		public Task Execute(IJobExecutionContext context)
 		{
 			//get folder name history transaction data
-			string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreData"];
+			string? directoryPathStoreData = MbBankAccountData.DirectoryPathStoreData;
 			if (directoryPathStoreData == null)
 				return Task.CompletedTask;
 
@@ -40,7 +34,7 @@ namespace DigitalFUHubApi.Jobs
 			}
 
 			// get previous data debit transaction
-			string? directoryPathStoreWithdrawData = configuration["MbBank:DirectoryPathStoreDepositData"];
+			string? directoryPathStoreWithdrawData = MbBankAccountData.DirectoryPathStoreDepositData;
 			if (directoryPathStoreWithdrawData == null)
 				return Task.CompletedTask;
 

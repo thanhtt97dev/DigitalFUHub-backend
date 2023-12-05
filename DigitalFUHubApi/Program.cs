@@ -213,7 +213,7 @@ namespace DigitalFUHubApi
 					.ForJob(jobKeyHistoryWithdrawTransactionMbBankJob)
 					.StartNow()
 					.WithSimpleSchedule(x =>
-						x.WithIntervalInMinutes(3)
+						x.WithIntervalInSeconds(174)
 						.RepeatForever()
 						)
 					);

@@ -56,8 +56,8 @@ namespace DigitalFUHubApi.Jobs
 			}
 			while (string.IsNullOrEmpty(sessionId));
 
-			// update sessionId in appsettings
-			configuration["MbBank:SessionId"] = sessionId;
+			// update sessionId 
+			MbBankAccountData.SessionId = sessionId;
 		}
 	}
 }

@@ -13,15 +13,12 @@ namespace DigitalFUHubApi.Services
     public class MbBankService
 	{
 		private  HttpClient client;
-		private readonly IConfiguration configuration;
 
-		public MbBankService(IConfiguration configuration)
+		public MbBankService()
 		{
-			this.configuration = configuration;
-
 			client = new HttpClient();
 			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			client.DefaultRequestHeaders.Add("Authorization", "Basic " + configuration["MbBank:BasicAuthBase64"]);
+			client.DefaultRequestHeaders.Add("Authorization", "Basic " + MbBankAccountData.BasicAuthBase64);
 		}
 
 		#region Get History Transaction
@@ -29,17 +26,17 @@ namespace DigitalFUHubApi.Services
 		{
 			MbBankRequestBodyHistoryTransactionDTO mbBank = new MbBankRequestBodyHistoryTransactionDTO()
 			{
-				accountNo = configuration["MbBank:AccountNo"],
-				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
-				refNo = configuration["MbBank:RefNo"],
+				accountNo = MbBankAccountData.AccountNo,
+				deviceIdCommon = MbBankAccountData.DeviceIdCommon,
+				refNo = MbBankAccountData.RefNo,
 				fromDate = DateTime.Now.AddDays(-5).ToString("dd/MM/yyyy"),
-				sessionId = configuration["MbBank:SessionId"],
+				sessionId = MbBankAccountData.SessionId,
 				toDate = DateTime.Now.ToString("dd/MM/yyyy")
 			};
 
 			var jsonData = JsonSerializer.Serialize(mbBank);
 			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-			var request = await client.PostAsync(configuration["MbBank:ApiHistoryTransaction"], content);
+			var request = await client.PostAsync(MbBankAccountData.ApiHistoryTransaction, content);
 
 			var respone = await request.Content.ReadAsStringAsync();
 
@@ -61,17 +58,17 @@ namespace DigitalFUHubApi.Services
 				bankCode = bankInquiryAccountNameRequestDTO.BankId,
 				creditAccount = bankInquiryAccountNameRequestDTO.CreditAccount,
 				creditAccountType = "ACCOUNT",
-				debitAccount = configuration["MbBank:AccountNo"],
-				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
-				refNo = configuration["MbBank:RefNo"],
+				debitAccount = MbBankAccountData.AccountNo,
+				deviceIdCommon = MbBankAccountData.DeviceIdCommon,
+				refNo = MbBankAccountData.RefNo,
 				remark = string.Empty,
-				sessionId = configuration["MbBank:SessionId"],
+				sessionId = MbBankAccountData.SessionId,
 				type = bankInquiryAccountNameRequestDTO.BankId == Constants.BANK_ID_MB_BANK ? "INHOUSE" : "FAST"
 			};
 
 			var jsonData = JsonSerializer.Serialize(mbBank);
 			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-			var request = await client.PostAsync(configuration["MbBank:ApiInquiryAccountName"], content);
+			var request = await client.PostAsync(MbBankAccountData.ApiInquiryAccountName, content);
 
 			var respone = await request.Content.ReadAsStringAsync();
 
@@ -98,14 +95,14 @@ namespace DigitalFUHubApi.Services
 		{
 			MbBankRequestBodyGetCaptchaImageDTO body = new MbBankRequestBodyGetCaptchaImageDTO()
 			{
-				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
-				refNo = configuration["MbBank:RefNo"],
+				deviceIdCommon = MbBankAccountData.DeviceIdCommon,
+				refNo = MbBankAccountData.RefNo,
 				sessionId = string.Empty
 			};
 
 			var jsonData = JsonSerializer.Serialize(body);
 			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-			var request = await client.PostAsync(configuration["MbBank:ApiGetCaptchaImage"], content);
+			var request = await client.PostAsync(MbBankAccountData.ApiGetCaptchaImage, content);
 
 			var respone = await request.Content.ReadAsStringAsync();
 
@@ -133,16 +130,16 @@ namespace DigitalFUHubApi.Services
 			MbBankRequestBodyDoLoginDTO body = new MbBankRequestBodyDoLoginDTO()
 			{
 				captcha = captcha,
-				deviceIdCommon = configuration["MbBank:DeviceIdCommon"],
-				password = configuration["MbBank:Password"],
-				refNo = configuration["MbBank:RefNo"],
+				deviceIdCommon = MbBankAccountData.DeviceIdCommon,
+				password = MbBankAccountData.Password,
+				refNo = MbBankAccountData.RefNo,
 				sessionId = null,
-				userId = configuration["MbBank:AccountNo"],
+				userId = MbBankAccountData.AccountNo,
 			};
 
 			var jsonData = JsonSerializer.Serialize(body);
 			var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-			var request = await client.PostAsync(configuration["MbBank:ApiLogin"], content);
+			var request = await client.PostAsync(MbBankAccountData.ApiLogin, content);
 
 			var respone = await request.Content.ReadAsStringAsync();
 

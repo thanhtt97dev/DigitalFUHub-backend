@@ -10,12 +10,10 @@ namespace DigitalFUHubApi.Jobs
 {
 	public class HistoryTransactionMbBankJob : IJob
 	{
-		private readonly IConfiguration configuration;
 		private readonly MbBankService mbBankService;
 
-		public HistoryTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
+		public HistoryTransactionMbBankJob(MbBankService mbBankService)
 		{
-			this.configuration = configuration;
 			this.mbBankService = mbBankService;
 		}
 
@@ -34,7 +32,7 @@ namespace DigitalFUHubApi.Jobs
 					.Where(x => x.creditAmount != 0 && x.description.Contains(Constants.BANK_TRANSACTION_CODE_KEY)).ToList();
 			}
 
-			string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreData"];
+			string? directoryPathStoreData = MbBankAccountData.DirectoryPathStoreData;
 			if (directoryPathStoreData == null) return;
 
 			string dataPreviousText = Util.ReadFile(directoryPathStoreData);
