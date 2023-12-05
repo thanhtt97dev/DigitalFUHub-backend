@@ -253,6 +253,8 @@
 		public const string DEPOSIT_TRANSACTION_REPORT_EXCEL_FILE_NAME = "DepositTransactionReport.xlsx";
 		public const string DEPOSIT_TRANSACTION_FILE_PATH = $"Files/Excels/{DEPOSIT_TRANSACTION_REPORT_EXCEL_FILE_NAME}";
 
+		public const string CAPTCHA_IMAGE_FILE_NAME = "captcha.png";
+
 	}
 
 }
