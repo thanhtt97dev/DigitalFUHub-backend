@@ -182,7 +182,7 @@
 		public const int PAGE_SIZE = 10;
 		public const int PAGE_SIZE_FEEDBACK = 5;
 		public const int PAGE_SIZE_NOTIFICATION = 5;
-		public const int PAGE_SIZE_PRODUCT = 30;
+		public const int PAGE_SIZE_PRODUCT_SHOP_DETAIL_CUSTOMER = 30;
 		public const int PAGE_SIZE_PRODUCT_WISH_LIST = 30;
 		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
 		public const int PAGE_SIZE_SEARCH_PRODUCT = 20;

@@ -200,8 +200,6 @@ namespace DataAccess.DAOs
 							  join user in context.User
 							  on shop.UserId equals user.UserId
 							  where shop.UserId == userId
-							  &&
-							  shop.IsActive == true
 							  select new Shop
 							  {
 								  UserId = shop.UserId,
@@ -209,6 +207,7 @@ namespace DataAccess.DAOs
 								  ShopName = shop.ShopName,
 								  DateCreate = shop.DateCreate,
 								  Description = shop.Description,
+								  IsActive = shop.IsActive,
 								  User = new User
 								  {
 									  IsOnline = user.IsOnline,

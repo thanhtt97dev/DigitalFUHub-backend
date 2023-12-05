@@ -213,34 +213,22 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get shop detail (customer)
-		[HttpGet("GetDetail/{userId}")]
+		[HttpGet("getDetail/{userId}")]
 		public IActionResult GetShopDetail(long userId)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
-
 				Shop? shop = _shopRepository.GetShopDetail(userId);
 
 				if (shop == null)
 				{
-					status.ResponseCode = Constants.RESPONSE_CODE_DATA_NOT_FOUND;
-					status.Ok = false;
-					status.Message = "shop not found!";
-					responseData.Status = status;
-					return Ok(responseData);
-				}
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found!", false, new()));
+                }
 
 				var shopResponse = _mapper.Map<ShopDetailCustomerResponseDTO>(shop);
 
-				// Ok
-				status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				status.Ok = false;
-				status.Message = "Success";
-				responseData.Status = status;
-				responseData.Result = shopResponse;
-				return Ok(responseData);
+                // Ok
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, shopResponse));
 			}
 			catch (Exception ex)
 			{
