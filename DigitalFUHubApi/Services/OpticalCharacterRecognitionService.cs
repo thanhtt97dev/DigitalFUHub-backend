@@ -49,7 +49,7 @@ namespace DigitalFUHubApi.Services
 			string path = Constants.CAPTCHA_IMAGE_FILE_NAME;
 			Pix pix = Pix.LoadFromFile(path);
 
-			var orc = new Tesseract.TesseractEngine("./tessdata", "eng", EngineMode.TesseractAndLstm);
+			var orc = new Tesseract.TesseractEngine("./tesseractData", "eng", EngineMode.TesseractAndLstm);
 			var page = orc.Process(pix);
 
 			return page.GetText();
