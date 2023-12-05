@@ -886,9 +886,6 @@
 		}
 		#endregion
 
-
-
-
 		#region Get all users for admin
 		[Authorize(Roles = "Admin")]
 		[HttpPost("GetUsers")]
@@ -934,7 +931,55 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-	}
+        #region Change Password
+        [HttpPost("changePassword")]
+        [Authorize]
+        public IActionResult ChangePassword(ChangePasswordRequestDTO request)
+        {
+            try
+            {
+                if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
+
+                //if (!Regex.IsMatch(request.Password, Constants.REGEX_PASSWORD_SIGN_UP))
+                //{
+                //	return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Password Invalid", false, new()));
+                //}
+
+                // check user exists
+                var user = _userRepository.GetUserById(request.UserId);
+
+                if (user == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "User not found", false, new()));
+                }
+
+                if (!user.IsChangeUsername)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_USERNAME_PASSWORD_NOT_ACTIVE, "This user has not yet activated their account and password", false, new()));
+                }
+
+                if (!user.Password.Equals(request.OldPassword))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_PASSWORD_OLD_INCORRECT, "The old password is incorrect", false, new()));
+                }
+
+				// set new password
+				user.Password = request.NewPassword;
+
+                _userRepository.UpdateUser(user);
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+    }
 }
