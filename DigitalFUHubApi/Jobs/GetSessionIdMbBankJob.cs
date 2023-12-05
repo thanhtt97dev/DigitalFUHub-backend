@@ -58,10 +58,6 @@ namespace DigitalFUHubApi.Jobs
 
 			// update sessionId in appsettings
 			configuration["MbBank:SessionId"] = sessionId;
-
-			var x = 10;
-
-			//d53f9a50-99e6-429a-8a22-d04e697aeb3a
 		}
 	}
 }
