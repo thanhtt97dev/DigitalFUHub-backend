@@ -8,10 +8,6 @@ namespace DTOs.Slider
 {
     public class SliderAdminRequestParamDTO
     {
-        public string Name { get; set; } = string.Empty;
-        public string Link { get; set; } = string.Empty;
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
         public int StatusActive { get; set; }
         public int Page { get; set; }
     }

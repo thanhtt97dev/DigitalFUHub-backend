@@ -38,7 +38,7 @@
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly TwoFactorAuthenticationService _twoFactorAuthenticationService;
 		private readonly MailService _mailService;
-		private readonly StorageService _storageService;
+		private readonly AzureFilesService _azureFilesService;
 
 		public UsersController(IUserRepository userRepository, IMapper mapper,
 			IConfiguration configuration,
@@ -48,7 +48,7 @@
 			JwtTokenService jwtTokenService,
 			TwoFactorAuthenticationService twoFactorAuthenticationService,
 			MailService mailService,
-			StorageService storageService
+			AzureFilesService azureFilesService
 			)
 		{
 			_userRepository = userRepository;
@@ -59,7 +59,7 @@
 			_twoFactorAuthenticationService = twoFactorAuthenticationService;
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
-			_storageService = storageService;
+			_azureFilesService = azureFilesService;
 			_configuration = configuration;
 
 		}
@@ -121,7 +121,9 @@
 						Status = true,
 						IsConfirm = true,
 						Fullname = payload.Name,
-						IsChangeUsername = false
+						IsChangeUsername = false,
+						LastTimeOnline = DateTime.Now,
+						IsOnline = false
 					};
 					_userRepository.AddUser(newUser);
 					user = _userRepository.GetUserByEmail(payload.Email);
@@ -172,7 +174,9 @@
 					AccountBalance = 0,
 					TwoFactorAuthentication = false,
 					IsConfirm = false,
-					IsChangeUsername = true
+					IsChangeUsername = true,
+					LastTimeOnline = DateTime.Now,
+					IsOnline = false
 				};
 				_userRepository.AddUser(userSignUp);
 
@@ -663,11 +667,11 @@
 						now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
 						request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
 
-					urlNewAvatar = await _storageService.UploadFileToAzureAsync(request.Avatar, filename);
+					urlNewAvatar = await _azureFilesService.UploadFileToAzureAsync(request.Avatar, filename);
 					userUpdate.Avatar = urlNewAvatar;
 
 					// delete avatar old
-					await _storageService.RemoveFileFromAzureAsync(user.Avatar.Substring(user.Avatar.LastIndexOf("/") + 1));
+					await _azureFilesService.RemoveFileFromAzureAsync(user.Avatar.Substring(user.Avatar.LastIndexOf("/") + 1));
 				}
 
 				// Ok
@@ -749,12 +753,12 @@
                     now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
                     request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
 
-                urlNewAvatar = await _storageService.UploadFileToAzureAsync(request.Avatar, filename);
+                urlNewAvatar = await _azureFilesService.UploadFileToAzureAsync(request.Avatar, filename);
 				string urlOld = user.Avatar;
                 user.Avatar = urlNewAvatar;
 
                 // delete avatar old
-                await _storageService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
+                await _azureFilesService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
 
                 // Ok
                 _userRepository.UpdateSettingPersonalInfo(user);
@@ -931,8 +935,55 @@
 				return BadRequest(ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
+        #region Change Password
+        [HttpPost("changePassword")]
+        [Authorize]
+        public IActionResult ChangePassword(ChangePasswordRequestDTO request)
+        {
+            try
+            {
+                if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+                {
+                    return Unauthorized();
+                }
 
-	}
+                //if (!Regex.IsMatch(request.Password, Constants.REGEX_PASSWORD_SIGN_UP))
+                //{
+                //	return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Password Invalid", false, new()));
+                //}
+
+                // check user exists
+                var user = _userRepository.GetUserById(request.UserId);
+
+                if (user == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "User not found", false, new()));
+                }
+
+                if (!user.IsChangeUsername)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_USERNAME_PASSWORD_NOT_ACTIVE, "This user has not yet activated their account and password", false, new()));
+                }
+
+                if (!user.Password.Equals(request.OldPassword))
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_PASSWORD_OLD_INCORRECT, "The old password is incorrect", false, new()));
+                }
+
+				// set new password
+				user.Password = request.NewPassword;
+
+                _userRepository.UpdateUser(user);
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+    }
 }

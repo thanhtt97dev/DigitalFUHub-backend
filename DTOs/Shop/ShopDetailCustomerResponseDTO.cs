@@ -16,6 +16,7 @@ namespace DTOs.Shop
         public long NumberFeedback { get; set; }
         public long ProductNumber { get; set; }
         public DateTime DateCreate { get; set; }
+        public bool IsActive { get; set; }
         public ShopDetailCustomerUserResponseDTO? User { get; set; }
 
     }

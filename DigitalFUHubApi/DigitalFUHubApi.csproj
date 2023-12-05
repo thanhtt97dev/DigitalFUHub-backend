@@ -21,6 +21,8 @@
     <PackageReference Include="Quartz" Version="3.7.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.7.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+    <PackageReference Include="Tesseract.Net.SDK" Version="4.5.411" />
     <PackageReference Include="ZXing.Net" Version="0.16.9" />
   </ItemGroup>
 
@@ -33,6 +35,36 @@
 
   <ItemGroup>
     <Folder Include="Files\Excels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\dell\.nuget\packages\tesseract.net.sdk\4.5.411\build\..\content\tessdata\configs\config.cfg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\dell\.nuget\packages\tesseract.net.sdk\4.5.411\build\..\content\tessdata\eng.traineddata" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\dell\.nuget\packages\tesseract.net.sdk\4.5.411\build\..\content\tessdata\equ.traineddata" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\dell\.nuget\packages\tesseract.net.sdk\4.5.411\build\..\content\tessdata\osd.traineddata" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\dell\.nuget\packages\tesseract.net.sdk\4.5.411\build\..\content\tessdata\pdf.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\dell\.nuget\packages\tesseract.net.sdk\4.5.411\build\..\content\tessdata\pdf.ttx" />
   </ItemGroup>
 
 </Project>

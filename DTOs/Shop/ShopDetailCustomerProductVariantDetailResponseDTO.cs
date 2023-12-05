@@ -8,7 +8,6 @@ namespace DTOs.Shop
 {
     public class ShopDetailCustomerProductVariantDetailResponseDTO
     {
-        public long ProductVariantId { get; set; }
         public int Discount { get; set; }
         public long Price { get; set; }
     }

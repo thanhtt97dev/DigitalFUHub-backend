@@ -11,7 +11,7 @@ namespace DTOs.Slider
     {
         public string Name { get; set; } = string.Empty;
         public IFormFile? Image { get; set; }
-        public long ProductId { get; set; }
+        public string Link { get; set; } = string.Empty;
         public bool IsActive { get; set; }
     }
 }

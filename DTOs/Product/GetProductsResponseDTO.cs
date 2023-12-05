@@ -23,6 +23,8 @@ namespace DTOs.Product
 		public int ViewCount { get; set; }
 		public int LikeCount { get; set; }
 		public int SoldCount { get; set; }
+		public string Note { get; set; } = string.Empty;
+		public DateTime BanDate { get; set; }
 		public List<GetProductsProductVariantDetailResponseDTO> ProductVariants { get; set; } = new List<GetProductsProductVariantDetailResponseDTO>();
 	}
 	public class GetProductsProductVariantDetailResponseDTO

@@ -51,7 +51,7 @@
 		public const string RESPONSE_CODE_ORDER_PRODUCT_HAS_BEEN_BANED = "ORDER_06";
 		public const string RESPONSE_CODE_ORDER_CUSTOMER_BUY_THEIR_OWN_PRODUCT = "ORDER_07";
 		public const string RESPONSE_CODE_ORDER_COUPON_INVALID_PRODUCT_APPLY = "ORDER_08";
-		public const string RESPONSE_CODE_ORDER_SELLER_BAN_LOCK_TRANSACTION = "ORDER_09";
+		public const string RESPONSE_CODE_ORDER_SELLER_LOCK_TRANSACTION = "ORDER_09";
 
 		public const string RESPONSE_CODE_CART_SUCCESS = "CART_00";
 		public const string RESPONSE_CODE_CART_INVALID_QUANTITY = "CART_01";
@@ -67,9 +67,11 @@
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
 
-		public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_USERNAME_01";
+        public const string RESPONSE_CODE_USER_USERNAME_PASSWORD_NOT_ACTIVE = "USER_ACCOUNT_01";
+        public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_ACCOUNT_02";
+        public const string RESPONSE_CODE_USER_PASSWORD_OLD_INCORRECT = "USER_ACCOUNT_03";
 
-		public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
+        public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
 
 
 
@@ -182,7 +184,7 @@
 		public const int PAGE_SIZE = 10;
 		public const int PAGE_SIZE_FEEDBACK = 5;
 		public const int PAGE_SIZE_NOTIFICATION = 5;
-		public const int PAGE_SIZE_PRODUCT = 30;
+		public const int PAGE_SIZE_PRODUCT_SHOP_DETAIL_CUSTOMER = 30;
 		public const int PAGE_SIZE_PRODUCT_WISH_LIST = 30;
 		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
 		public const int PAGE_SIZE_SEARCH_PRODUCT = 20;
@@ -192,7 +194,7 @@
 
 		//withdraw, deposit transaction
 		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 20;
-		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 500000;
+		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 100000;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
@@ -250,6 +252,8 @@
 
 		public const string DEPOSIT_TRANSACTION_REPORT_EXCEL_FILE_NAME = "DepositTransactionReport.xlsx";
 		public const string DEPOSIT_TRANSACTION_FILE_PATH = $"Files/Excels/{DEPOSIT_TRANSACTION_REPORT_EXCEL_FILE_NAME}";
+
+		public const string CAPTCHA_IMAGE_FILE_NAME = "captcha.png";
 
 	}
 

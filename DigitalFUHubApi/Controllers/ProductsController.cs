@@ -23,16 +23,16 @@ namespace DigitalFUHubApi.Controllers
 	public class ProductsController : ControllerBase
 	{
 		private readonly IProductRepository _productRepository;
-		private readonly StorageService _storageService;
+		private readonly AzureFilesService _azureFilesService;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly HubService _hubService;
 		private readonly MailService _mailService;
 		private readonly IMapper _mapper;
 
-		public ProductsController(IProductRepository productRepository, StorageService storageService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper)
+		public ProductsController(IProductRepository productRepository, AzureFilesService azureFilesService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper)
 		{
 			_productRepository = productRepository;
-			_storageService = storageService;
+			_azureFilesService = azureFilesService;
 			_jwtTokenService = jwtTokenService;
 			_hubService = hubService;
 			_mailService = mailService;
@@ -43,35 +43,12 @@ namespace DigitalFUHubApi.Controllers
 		[HttpGet("GetById/{productId}")]
 		public IActionResult GetById(long productId)
 		{
-			ResponseData responseData = new ResponseData();
-			Status status = new Status();
 			try
 			{
-				if (productId == 0)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid!!", false, new()));
-				}
-
 				var product = _productRepository.GetProductById(productId);
 				if (product == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Product not found!", false, new()));
-				}
-
-				// check product status
-				if (product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_BAN, "This product has been banned!", false, product));
-				}
-
-				if (product.ProductStatusId == Constants.PRODUCT_STATUS_REMOVE)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_REMOVE, "This product has been remove!", false, new {}));
-				}
-
-				if (product.ProductStatusId == Constants.PRODUCT_STATUS_HIDE)
-				{
-					return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_HIDE, "This product has been hide!", false, new { }));
 				}
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_PRODUCT_ACTIVE, "Success!", false, product));
@@ -307,7 +284,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					now = DateTime.Now;
 					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-					string url = await _storageService.UploadFileToAzureAsync(file, filename);
+					string url = await _azureFilesService.UploadFileToAzureAsync(file, filename);
 					productMedias.Add(new ProductMedia
 					{
 						Url = url
@@ -318,7 +295,7 @@ namespace DigitalFUHubApi.Controllers
 				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 					now.Millisecond, now.Second, now.Minute, now.Hour,
 					request.ThumbnailFile.FileName.Substring(request.ThumbnailFile.FileName.LastIndexOf(".")));
-				string urlThumbnail = await _storageService.UploadFileToAzureAsync(request.ThumbnailFile, filename);
+				string urlThumbnail = await _azureFilesService.UploadFileToAzureAsync(request.ThumbnailFile, filename);
 
 				Product product = new Product()
 				{
@@ -430,7 +407,7 @@ namespace DigitalFUHubApi.Controllers
 						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 							now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
 						// upload to azure
-						string url = await _storageService.UploadFileToAzureAsync(file, filename);
+						string url = await _azureFilesService.UploadFileToAzureAsync(file, filename);
 						listProductDetailImagesAddNew.Add(new ProductMedia
 						{
 							ProductId = request.ProductId,
@@ -487,7 +464,7 @@ namespace DigitalFUHubApi.Controllers
 						.Where(x => !request.ProductDetailImagesCurrent.Any(m => m == x.Url)).ToList();
 					foreach (ProductMedia image in productDetailImagesDelete)
 					{
-						await _storageService.RemoveFileFromAzureAsync(image.Url.Substring(image.Url.LastIndexOf("/") + 1));
+						await _azureFilesService.RemoveFileFromAzureAsync(image.Url.Substring(image.Url.LastIndexOf("/") + 1));
 					}
 				}
 
@@ -500,11 +477,11 @@ namespace DigitalFUHubApi.Controllers
 					filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
 						now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
 						request.ProductThumbnailFileUpdate.FileName.Substring(request.ProductThumbnailFileUpdate.FileName.LastIndexOf(".")));
-					urlThumbnailNew = await _storageService.UploadFileToAzureAsync(request.ProductThumbnailFileUpdate, filename);
+					urlThumbnailNew = await _azureFilesService.UploadFileToAzureAsync(request.ProductThumbnailFileUpdate, filename);
 
 					// delete product thumbnail old
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-					await _storageService.RemoveFileFromAzureAsync(prod.Thumbnail.Substring(prod.Thumbnail.LastIndexOf("/") + 1));
+					await _azureFilesService.RemoveFileFromAzureAsync(prod.Thumbnail.Substring(prod.Thumbnail.LastIndexOf("/") + 1));
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 				}
 
@@ -657,7 +634,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				var numberProducts = _productRepository.GetNumberProductByConditions(request.UserId, request.ProductName);
-				var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT + 1;
+				var numberPages = numberProducts / Constants.PAGE_SIZE_PRODUCT_SHOP_DETAIL_CUSTOMER + 1;
 				if (request.Page > numberPages)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
@@ -683,7 +660,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get Products (Home Page Customer)
-		[HttpPost("GetProductHomePageCustomer")]
+		[HttpPost("homepage")]
 		public IActionResult GetProductForHomePageCustomer(HomePageCustomerSearchParamProductRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
@@ -701,7 +678,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
 				}
 
-				List<Product> products = _productRepository.GetProductForHomePageCustomer(request.Page, request.CategoryId, request.IsOrderFeedback, request.IsOrderSoldCount);
+				List<Product> products = _productRepository.GetProductForHomePageCustomer(request.Page, request.CategoryId);
 
 				List<HomePageCustomerProductDetailResponseDTO> productResponses = _mapper.Map<List<HomePageCustomerProductDetailResponseDTO>>(products);
 
@@ -746,5 +723,6 @@ namespace DigitalFUHubApi.Controllers
 			}));
 		}
 		#endregion
+
 	}
 }

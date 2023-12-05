@@ -23,7 +23,8 @@ namespace BusinessObject.Entities
         public string? Thumbnail { get; set; }
 		public DateTime DateCreate { get; set; }
 		public DateTime DateUpdate { get; set; }
-        public long TotalRatingStar { get; set; }
+		public DateTime BanDate { get; set; }
+		public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
 		public int ViewCount { get; set; }
 		public int LikeCount { get; set; }

@@ -134,7 +134,8 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 			builder.Services.AddSingleton<MailService>();
 			builder.Services.AddSingleton<MbBankService>();
-			builder.Services.AddSingleton<StorageService>();
+			builder.Services.AddSingleton<AzureFilesService>();
+			builder.Services.AddSingleton<OpticalCharacterRecognitionService>();
 
 			//Add SignalR
 			builder.Services.AddSignalR(c =>
@@ -172,13 +173,36 @@ namespace DigitalFUHubApi
 			// add job scheduler get history transaction bank
 			builder.Services.AddQuartz(q =>
 			{
+
+				var jobKeyGetSessionIdMbBankJob = new JobKey("GetSessionIdMbBankJob");
+				q.AddJob<GetSessionIdMbBankJob>(opts => opts.WithIdentity(jobKeyGetSessionIdMbBankJob));
+				q.AddTrigger(opts => opts
+					.ForJob(jobKeyGetSessionIdMbBankJob)
+					.StartNow()
+					.WithSimpleSchedule(x =>
+						x.WithIntervalInMinutes(25)
+						.RepeatForever()
+						)
+					);
+
+				var jobKeyHistoryTransactionMbBankJob = new JobKey("HistoryTransactionMbBankJob");
+				q.AddJob<HistoryTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyHistoryTransactionMbBankJob));
+				q.AddTrigger(opts => opts
+					.ForJob(jobKeyHistoryTransactionMbBankJob)
+					.StartNow()
+					.WithSimpleSchedule(x =>
+						x.WithIntervalInSeconds(63)
+						.RepeatForever()
+						)
+					);
+
 				var jobKeyHistoryDepositTransactionMbBankJob = new JobKey("HistoryDepositTransactionMbBankJob");
 				q.AddJob<HistoryDepositTransactionMbBankJob>(opts => opts.WithIdentity(jobKeyHistoryDepositTransactionMbBankJob));
 				q.AddTrigger(opts => opts
 					.ForJob(jobKeyHistoryDepositTransactionMbBankJob)
 					.StartNow()
 					.WithSimpleSchedule(x =>
-						x.WithIntervalInMinutes(5)
+						x.WithIntervalInSeconds(71)
 						.RepeatForever()
 						)
 					);
@@ -189,7 +213,7 @@ namespace DigitalFUHubApi
 					.ForJob(jobKeyHistoryWithdrawTransactionMbBankJob)
 					.StartNow()
 					.WithSimpleSchedule(x =>
-						x.WithIntervalInMinutes(60)
+						x.WithIntervalInSeconds(174)
 						.RepeatForever()
 						)
 					);

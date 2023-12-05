@@ -12,56 +12,56 @@ namespace DigitalFUHubApi.Jobs
 {
     public class HistoryDepositTransactionMbBankJob : IJob
 	{
-		private readonly IConfiguration configuration;
-		private readonly MbBankService mbBankService;
-
-		public HistoryDepositTransactionMbBankJob(IConfiguration configuration, MbBankService mbBankService)
+		public Task Execute(IJobExecutionContext context)
 		{
-			this.configuration = configuration;
-			this.mbBankService = mbBankService;
-		}
+			//get folder name history transaction data
+			string? directoryPathStoreData = MbBankAccountData.DirectoryPathStoreData;
+			if (directoryPathStoreData == null)
+				return Task.CompletedTask;
 
-		public async Task Execute(IJobExecutionContext context)
-		{
-			return;
-			var data = await mbBankService.GetHistoryTransaction();
+			//get data history transaction
+			string dataHistoryTransactionJson = Util.ReadFile(directoryPathStoreData);
+			if (string.IsNullOrEmpty(dataHistoryTransactionJson))
+				return Task.CompletedTask;
 
-			if (data == null) return;
-			if (data.result.responseCode != "00") return;
+			List<TransactionHistory>? data = new List<TransactionHistory>();
+			data = JsonSerializer.Deserialize<List<TransactionHistory>>(dataHistoryTransactionJson);
 
+			// get credit data
 			List<TransactionHistory> transactionHistoryCreditList = new List<TransactionHistory>();
-
-			if (data.transactionHistoryList != null)
+			if (data != null && data.Count != 0)
 			{
-				transactionHistoryCreditList = data.transactionHistoryList
+				transactionHistoryCreditList = data
 					.Where(x => x.creditAmount != 0 && x.description.Contains(Constants.BANK_TRANSACTION_CODE_KEY)).ToList();
 			}
 
-			string? directoryPathStoreData = configuration["MbBank:DirectoryPathStoreDepositData"];
-			if (directoryPathStoreData == null) return;
+			// get previous data debit transaction
+			string? directoryPathStoreDepositData = MbBankAccountData.DirectoryPathStoreDepositData;
+			if (directoryPathStoreDepositData == null)
+				return Task.CompletedTask;
 
-			string dataPreviousText = Util.ReadFile(directoryPathStoreData);
+			string dataPreviousCreditTransactionJson = Util.ReadFile(directoryPathStoreDepositData);
 			List<TransactionHistory>? dataPrevious = new List<TransactionHistory>();
-			if (!string.IsNullOrEmpty(dataPreviousText))
+			if (!string.IsNullOrEmpty(dataPreviousCreditTransactionJson))
 			{
-				dataPrevious = JsonSerializer.Deserialize<List<TransactionHistory>>(dataPreviousText);
+				dataPrevious = JsonSerializer.Deserialize<List<TransactionHistory>>(dataPreviousCreditTransactionJson);
 			}
 
 			// Compare previous data with current data
-
 			bool isSame = true;
 			if (dataPrevious != null)
 			{
 				isSame = dataPrevious.SequenceEqual(transactionHistoryCreditList,
 					new MbBankResponeHistoryTransactionDataEqualityComparer());
 			}
-			if (isSame) return;
+			if (isSame) return Task.CompletedTask;
 			//Have new recharge info
 			// Save new data into file
-			Util.WriteFile(directoryPathStoreData, transactionHistoryCreditList);
+			Util.WriteFile(directoryPathStoreDepositData, transactionHistoryCreditList);
 			//Update DB
 			BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
 
+			return Task.CompletedTask;
 		}
 	}
 }

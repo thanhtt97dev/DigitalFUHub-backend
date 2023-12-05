@@ -23,6 +23,7 @@ using DTOs.Shop;
 using System.Globalization;
 using DTOs.ReasonReportProduct;
 using DTOs.ReportProduct;
+using DTOs.Slider;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -184,6 +185,7 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Cart, UserCartResponseDTO>()
 				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Shop.UserId))
 				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.ShopActivate, act => act.MapFrom(src => src.Shop.IsActive))
 				.ForMember(des => des.Products, act => act.MapFrom(src => src.CartDetails))
 				.ReverseMap();
 			CreateMap<TransactionInternal, HistoryTransactionInternalResponseDTO>()
@@ -213,7 +215,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductNumber, act => act.MapFrom(src => src.Products.Count))
 				.ForMember(des => des.NumberFeedback, act => act.MapFrom(src => src.Products.Sum(x => x.NumberFeedback)))
 				.ForMember(des => des.TotalRatingStar, act => act.MapFrom(src => src.Products.Sum(x => x.TotalRatingStar)))
-				.ReverseMap();
+                .ReverseMap();
 			CreateMap<User, ShopDetailCustomerUserResponseDTO>().ReverseMap();
 			CreateMap<Coupon, CouponResponseDTO>()
 				.ForMember(des => des.productIds, act => act.MapFrom(src => src.CouponProducts != null ? src.CouponProducts.Select(x => x.ProductId).ToList() : new List<long>()))
@@ -246,7 +248,6 @@ namespace DigitalFUHubApi.Comons
 
 			// Shop Detail <Customer>
 			CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
-				.ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() : 0))
 				.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
 				.ReverseMap();
 
@@ -256,7 +257,6 @@ namespace DigitalFUHubApi.Comons
 
 			// Home Page <Customer>
 			CreateMap<Product, HomePageCustomerProductDetailResponseDTO>()
-				.ForMember(des => des.QuantityProductRemaining, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() : 0))
 				.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
 				.ReverseMap();
 
@@ -301,6 +301,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.ProductId))
 				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.ProductName))
 				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.Thumbnail))
+				.ForMember(des => des.Note, act => act.MapFrom(src => src.Note))
 				.ReverseMap();
 			// /admin/product/{id}
 			CreateMap<ProductVariant, ProductDetailProductVariantAdminResponseDTO>()
@@ -342,9 +343,13 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.OrderStatus, act => act.MapFrom(src => MapOrderStatusToString(src.OrderStatusId)))
 				.ReverseMap();
+            // slider
+            CreateMap<Slider, SliderAdminGetByIdResponseDTO>().ReverseMap();
+            CreateMap<Slider, HomeCustomerSliderResponseDTO>().ReverseMap();
+            //
 
-			//feedback/search
-			CreateMap<Feedback, SearchFeedbackDetailResponseDTO>()
+            //feedback/search
+            CreateMap<Feedback, SearchFeedbackDetailResponseDTO>()
 				.ForMember(des => des.UserId, act => act.MapFrom(src => src.User.UserId))
 				.ForMember(des => des.FullName, act => act.MapFrom(src => src.User.Fullname))
 				.ForMember(des => des.UserAvatar, act => act.MapFrom(src => src.User.Avatar))

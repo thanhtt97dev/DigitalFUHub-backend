@@ -9,8 +9,6 @@ namespace DTOs.Product
     public class HomePageCustomerSearchParamProductRequestDTO
     {
         public long CategoryId { get; set; }
-        public bool IsOrderFeedback { get; set; } = false;
-        public bool IsOrderSoldCount { get; set; } = false;
         public int Page { get; set; }
     }
 }

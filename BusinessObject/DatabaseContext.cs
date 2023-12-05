@@ -10,8 +10,8 @@ namespace BusinessObject
 	public class DatabaseContext : DbContext
 	{
 
-		public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
-		//public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Database=digitalfuhub;User ID=digitalfuhub;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
+		//public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+		public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Database=digitalfuhub;User ID=digitalfuhub;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
 
 		public DatabaseContext() { }
 
@@ -261,7 +261,7 @@ namespace BusinessObject
 
 			modelBuilder.Entity<FeedbackBenefit>().HasData(new FeedbackBenefit[]
 			{
-				new FeedbackBenefit() {FeedbackBenefitId = 1, Coin = 200, StartDate = DateTime.Now},
+				new FeedbackBenefit() {FeedbackBenefitId = 1, Coin = 50, StartDate = DateTime.Now},
 			});
 
 			modelBuilder.Entity<ReportProductStatus>().HasData(new ReportProductStatus[]
