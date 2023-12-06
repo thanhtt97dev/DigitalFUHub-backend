@@ -128,7 +128,7 @@ namespace DigitalFUHubApi
             builder.Services.AddSingleton<ISliderRepository, SliderRepository>();
 
             builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
-
+			
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubService>();
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();

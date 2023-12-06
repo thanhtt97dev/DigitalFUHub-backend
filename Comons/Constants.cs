@@ -15,7 +15,21 @@
 		public const string MB_BANK_RESPONE_CODE_NO_SUITABLE_ACCOUNTS = "MC4217";
 		public const string MB_BANK_RESPONE_CODE_SEARCH_WITH_TYPE_ERR = "MC231";
 
-		
+		public const string MB_BANK_BASIC_AUTH_USERNAME = "EMBRETAILWEB"; //BasicAuthUserName
+		public const string MB_BANK_BASIC_AUTH_PASSWORD = "SD234dfg34%#@FG@34sfsdf45843f"; //BasicAuthPassword
+		public const string MB_BANK_BASIC_AUTH_BASE64 = "RU1CUkVUQUlMV0VCOlNEMjM0ZGZnMzQlI0BGR0AzNHNmc2RmNDU4NDNm"; //BasicAuthBase64
+
+		public const string MB_BANK_API_GET_CAPTCHA_IMAGE = "https://online.mbbank.com.vn/api/retail-web-internetbankingms/getCaptchaImage";
+		public const string MB_BANK_API_LOGIN = "https://online.mbbank.com.vn/api/retail_web/internetbanking/doLogin";
+		public const string MB_BANK_API_HISTORY_TRANSACTION = "https://online.mbbank.com.vn/api/retail-web-transactionservice/transaction/getTransactionAccountHistory";
+		public const string MB_BANK_API_INQUIRY_ACCOUNT_NAME = "https://online.mbbank.com.vn/api/retail_web/transfer/inquiryAccountName";
+
+		public const string MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA = "Data/mbBankAccountData.json";
+		public const string MB_BANK_DIRECTORY_PATH_STORE_DEPOSIT_DATA = "Data/historyDepositTransactionMbBank.json"; 
+		public const string MB_BANK_DIRECTORY_PATH_STORE_WITHDRAW_DATA = "Data/historyWithdrawTransactionMbBank.json";
+		public const string MB_BANK_DIRECTORY_PATH_STORE_TRANSACTION_DATA = "Data/historyTransactionMbBank.json";
+
+
 
 		//Respone code
 		public const string RESPONSE_CODE_SUCCESS = "00";
