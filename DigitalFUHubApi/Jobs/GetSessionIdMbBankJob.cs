@@ -9,13 +9,11 @@ namespace DigitalFUHubApi.Jobs
 {
 	public class GetSessionIdMbBankJob : IJob
 	{
-		private readonly IConfiguration configuration;
 		private readonly MbBankService mbBankService;
 		private readonly OpticalCharacterRecognitionService imageService;
 
-		public GetSessionIdMbBankJob(IConfiguration configuration, MbBankService mbBankService, OpticalCharacterRecognitionService imageService)
+		public GetSessionIdMbBankJob(MbBankService mbBankService, OpticalCharacterRecognitionService imageService)
 		{
-			this.configuration = configuration;
 			this.mbBankService = mbBankService;
 			this.imageService = imageService;
 		}
@@ -56,8 +54,12 @@ namespace DigitalFUHubApi.Jobs
 			}
 			while (string.IsNullOrEmpty(sessionId));
 
-			// update sessionId 
-			MbBankAccountData.SessionId = sessionId;
+			// update sessionId in to json file
+			MbBankAccount? mbBankAccount = mbBankService.GetMbBankAccount();
+			if (mbBankAccount == null) return;
+			mbBankAccount.SessionId = sessionId;
+
+			Util.WriteFile(Constants.MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA, mbBankAccount);
 		}
 	}
 }

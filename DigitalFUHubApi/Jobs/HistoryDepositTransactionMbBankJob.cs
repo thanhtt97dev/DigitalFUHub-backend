@@ -15,7 +15,7 @@ namespace DigitalFUHubApi.Jobs
 		public Task Execute(IJobExecutionContext context)
 		{
 			//get folder name history transaction data
-			string? directoryPathStoreData = MbBankAccountData.DirectoryPathStoreData;
+			string? directoryPathStoreData = Constants.MB_BANK_DIRECTORY_PATH_STORE_TRANSACTION_DATA;
 			if (directoryPathStoreData == null)
 				return Task.CompletedTask;
 
@@ -36,7 +36,7 @@ namespace DigitalFUHubApi.Jobs
 			}
 
 			// get previous data debit transaction
-			string? directoryPathStoreDepositData = MbBankAccountData.DirectoryPathStoreDepositData;
+			string? directoryPathStoreDepositData = Constants.MB_BANK_DIRECTORY_PATH_STORE_DEPOSIT_DATA;
 			if (directoryPathStoreDepositData == null)
 				return Task.CompletedTask;
 

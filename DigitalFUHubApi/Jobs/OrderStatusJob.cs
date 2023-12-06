@@ -7,7 +7,6 @@ namespace DigitalFUHubApi.Jobs
 {
 	public class OrderStatusJob : IJob
 	{
-		//private readonly IConfiguration configuration;
 		private readonly IOrderRepository orderRepository;
 
 		public OrderStatusJob(IOrderRepository orderRepository)
