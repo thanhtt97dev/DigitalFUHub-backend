@@ -101,7 +101,10 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
-
+				if (request.ImageFiles != null && request.ImageFiles.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "File exceed 2mb", false, new()));
+				}
 				var orderDetail = _orderRepository.GetOrderDetail(request.OrderDetailId);
 				if (orderDetail == null)
 				{
@@ -136,7 +139,7 @@ namespace DigitalFUHubApi.Controllers
 				int bonusCoin = _feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, bonusCoin));
 			}
-			catch(ArgumentOutOfRangeException)
+			catch (ArgumentOutOfRangeException)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_FEEDBACK_AGAIN, "Not feedback again", false, new()));
 			}
@@ -224,7 +227,7 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region get feedback detail order of seller
-		[Authorize("Seller")]		
+		[Authorize("Seller")]
 		[HttpGet("Seller/{userId}/{orderId}")]
 		public IActionResult GetFeedbackDetailOrderOfSeller(long userId, long orderId)
 		{
