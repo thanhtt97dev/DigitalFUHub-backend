@@ -985,7 +985,31 @@
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        #endregion
+		#endregion
 
-    }
+		#region Get info wallet
+		[Authorize("Customer,Seller")]
+		[HttpGet("Wallet")]
+		public IActionResult GetInfoWallet()
+		{
+			try
+			{
+				User? user = _userRepository.GetUserById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if(user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new
+				{
+					AccountBalance = user.AccountBalance,
+					Coin = user.Coin
+				}));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+	}
 }

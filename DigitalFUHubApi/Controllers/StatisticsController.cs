@@ -367,8 +367,9 @@ namespace DigitalFUHubApi.Controllers
 
 		}
 		#endregion
+
 		#region  statistc sales current month all shop (admin)
-		[Authorize("Seller")]
+		[Authorize("Admin")]
 		[HttpGet("Admin/CurrentMonth")]
 		public IActionResult StatisticSalesCurrentMonthAllShop()
 		{
