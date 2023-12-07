@@ -71,11 +71,20 @@ namespace DataAccess.Repositories
 		public List<Order> GetListOrderOfCurrentMonth(long userId)
 		=> OrderDAO.Instance.GetListOrderOfCurrentMonth(userId);
 
-		public List<StatisticNumberOrdersOfStatusResponseDTO> GetNumberOrderByStatus(long userId)
-		=> OrderDAO.Instance.GetNumberOrderByStatus(userId);
+		public List<Order> GetListOrderByStatus(long userId)
+		=> OrderDAO.Instance.GetListOrderByStatus(userId);
 
 		public List<Order> GetOrdersForReport(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status) => OrderDAO.Instance.GetOrdersForReport(orderId, customerEmail, shopId, shopName, fromDate, toDate, status);
 
 		public int GetTotalNumberOrderSellerViolates(long shopId) => OrderDAO.Instance.GetTotalNumberOrderSellerViolates(shopId);
+
+		public List<Order> GetListOrderAllShop(int month, int year, int typeOrders)
+		=> OrderDAO.Instance.GetListOrderAllShop(month,  year,  typeOrders);
+
+		public long GetNumberOrdersDispute()
+		=> OrderDAO.Instance.GetNumberOrdersDispute();
+
+		public List<Order> GetListOrderOfCurrentMonthAllShop()
+		=> OrderDAO.Instance.GetListOrderOfCurrentMonthAllShop();
 	}
 }

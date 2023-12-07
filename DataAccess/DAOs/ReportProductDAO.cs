@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Comons;
 
 namespace DataAccess.DAOs
 {
@@ -52,5 +53,12 @@ namespace DataAccess.DAOs
             }
         }
 
-    }
+		internal long GetNumberUnprocessedReportProducts()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.ReportProduct.LongCount(x => x.ReportProductStatusId == Constants.REPORT_PRODUCT_STATUS_VERIFYING);
+			}
+		}
+	}
 }

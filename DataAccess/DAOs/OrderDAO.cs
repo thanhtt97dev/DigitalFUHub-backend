@@ -573,7 +573,7 @@ namespace DataAccess.DAOs
 							var shopOfBuyer = context.Shop.FirstOrDefault(x => x.UserId == userId);
 							if (shopOfBuyer != null)
 							{
-								if(customer.AccountBalance - totalPayment < Constants.ACCOUNT_BALANCE_REQUIRED_FOR_SELLER)
+								if (customer.AccountBalance - totalPayment < Constants.ACCOUNT_BALANCE_REQUIRED_FOR_SELLER)
 								{
 									transaction.Rollback();
 									return (Constants.RESPONSE_CODE_ORDER_SELLER_LOCK_TRANSACTION, "Seller lock transaction!", numberQuantityAvailable, orderResult);
@@ -599,7 +599,7 @@ namespace DataAccess.DAOs
 							context.SaveChanges();
 						}
 
-						
+
 
 						// update order
 						order.TotalAmount = totalAmount;
@@ -1391,7 +1391,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOders)
+		internal List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOrders)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -1400,7 +1400,7 @@ namespace DataAccess.DAOs
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.Where(x => x.ShopId == userId && x.OrderStatusId == typeOders
+					.Where(x => x.ShopId == userId && (typeOrders == Constants.ORDER_ALL ? true : x.OrderStatusId == typeOrders)
 						&& (month == 0 ? true : x.OrderDate.Month == month)
 						&& year == x.OrderDate.Year)
 					.OrderBy(x => x.OrderDate)
@@ -1423,20 +1423,14 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<StatisticNumberOrdersOfStatusResponseDTO> GetNumberOrderByStatus(long userId)
+		internal List<Order> GetListOrderByStatus(long userId)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.Order.Where(x => x.ShopId == userId && (x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION
 							|| x.OrderStatusId == Constants.ORDER_STATUS_DISPUTE
 							|| x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT))
-					.GroupBy(x => x.OrderStatusId)
-					.Select(x => new StatisticNumberOrdersOfStatusResponseDTO
-					{
-						OrderStatusId = x.Key,
-						Count = x.Count()
-					}).ToList();
-
+						.ToList();
 			}
 		}
 
@@ -1496,6 +1490,46 @@ namespace DataAccess.DAOs
 							x.OrderStatusId == Constants.ORDER_STATUS_SELLER_VIOLATES &&
 							x.ShopId == shopId
 						).Count();
+			}
+		}
+
+		internal List<Order> GetListOrderAllShop(int month, int year, int typeOrders)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order
+					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.Where(x => (typeOrders == Constants.ORDER_ALL ? true : x.OrderStatusId == typeOrders)
+						&& (month == 0 ? true : x.OrderDate.Month == month)
+						&& year == x.OrderDate.Year)
+					.OrderBy(x => x.OrderDate)
+					.ToList();
+			}
+		}
+
+		internal long GetNumberOrdersDispute()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.Order.LongCount(x => x.OrderStatusId == Constants.ORDER_STATUS_DISPUTE);
+			}
+		}
+
+		internal List<Order> GetListOrderOfCurrentMonthAllShop()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				DateTime now = DateTime.Now;
+				return context.Order
+					.Include(x => x.BusinessFee)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.ProductVariant)
+					.ThenInclude(x => x.Product)
+					.Where(x => x.OrderDate.Month == now.Month && x.OrderDate.Year == now.Year)
+					.ToList();
 			}
 		}
 	}

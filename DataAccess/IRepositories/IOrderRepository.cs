@@ -36,8 +36,11 @@ namespace DataAccess.IRepositories
 		int GetNumberOrders(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status);
 		List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOders);
 		List<Order> GetListOrderOfCurrentMonth(long userId);
-		List<StatisticNumberOrdersOfStatusResponseDTO> GetNumberOrderByStatus(long userId);
+		List<Order> GetListOrderByStatus(long userId);
 		List<Order> GetOrdersForReport(long orderId, string customerEmail, long shopId, string shopName, DateTime? fromDate, DateTime? toDate, int status);
 		int GetTotalNumberOrderSellerViolates(long shopId);
+		List<Order> GetListOrderAllShop(int month, int year, int typeOrders);
+		long GetNumberOrdersDispute();
+		List<Order> GetListOrderOfCurrentMonthAllShop();
 	}
 }

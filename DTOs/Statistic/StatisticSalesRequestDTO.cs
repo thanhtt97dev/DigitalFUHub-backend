@@ -12,4 +12,9 @@ namespace DTOs.Statistic
 		public int Year { get; set; }
 		public int TypeOrders { get; set; }
 	}
+	public class StatisticDepositAndWithdrawnRequestDTO
+	{
+		public int Month { get; set; }
+		public int Year { get; set; }
+	}
 }

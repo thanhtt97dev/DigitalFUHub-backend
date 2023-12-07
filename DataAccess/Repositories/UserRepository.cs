@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-    public class UserRepository : IUserRepository
+	public class UserRepository : IUserRepository
 	{
 		public User? GetUserByUsernameAndPassword(string? username, string? password) => UserDAO.Instance.GetUserByUsernameAndPassword(username, password);
 	
@@ -50,5 +50,9 @@ namespace DataAccess.Repositories
 
         public void ActiveUserNameAndPassword(long userId, string userName, string password) => UserDAO.Instance.ActiveUserNameAndPassword(userId, userName, password);
 
-		public void UpdateSettingPersonalInfo(User userUpdate) => UserDAO.Instance.UpdateSettingPersonalInfo(userUpdate);    }
+		public void UpdateSettingPersonalInfo(User userUpdate) => UserDAO.Instance.UpdateSettingPersonalInfo(userUpdate);
+
+		public long GetNumberNewUserInCurrentMonth()
+		=> UserDAO.Instance.GetNumberNewUserInCurrentMonth();
+	}
 }

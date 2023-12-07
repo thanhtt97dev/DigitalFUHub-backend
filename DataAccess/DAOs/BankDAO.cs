@@ -680,5 +680,38 @@ namespace DataAccess.DAOs
 				return deposits;
 			}
 		}
+
+		internal List<WithdrawTransaction> GetListWithdrawnMoney(int month, int year)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.WithdrawTransaction
+							.Include(x => x.User)
+							.Where(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID && x.PaidDate != null)
+							.OrderByDescending(x => x.PaidDate)
+							.ToList();
+			}
+		}
+
+		internal List<DepositTransaction> GetListDepositMoney(int month, int year)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.DepositTransaction
+							.Include(x => x.User)
+							.Where(x => x.IsPay == true && x.PaidDate != null)
+							.OrderByDescending(x => x.PaidDate)
+							.ToList();
+			}
+		}
+
+		internal long GetNumberRequestWithdrawnMoney()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.WithdrawTransaction.LongCount(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING);
+							
+			}
+		}
 	}
 }

@@ -956,7 +956,7 @@ namespace DataAccess.DAOs
 				return context.Product
 					.Include(x => x.ProductVariants)
 					.ThenInclude(x => x.AssetInformations)
-					.Count(x => x.ShopId == userId
+					.LongCount(x => x.ShopId == userId
 						&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 						&& x.ProductVariants.All(pv => pv.AssetInformations.Count(ai => ai.IsActive == true) == 0));
 #pragma warning restore CS8604 // Possible null reference argument.

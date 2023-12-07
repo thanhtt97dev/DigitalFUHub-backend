@@ -31,5 +31,6 @@ namespace DataAccess.IRepositories
 		string GenerateRandomUsername(string email);
         User? GetUserByUserNameOtherUserId(long userId, string userName);
 		void ActiveUserNameAndPassword(long userId, string userName, string password);
-    }
+		long GetNumberNewUserInCurrentMonth();
+	}
 }
