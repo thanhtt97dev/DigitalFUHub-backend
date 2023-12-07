@@ -60,7 +60,7 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Clarify image  and convert into byte[]
-		public static byte[]? GetImageByBase64(string base64)
+		public byte[]? GetClarifyCaptchaImageByBase64(string base64)
 		{
 #pragma warning disable CA1416, SC8600 //bitmap just support for windown
 			byte[] bytes = System.Convert.FromBase64String(base64);
@@ -97,7 +97,7 @@ namespace DigitalFUHubApi.Services
 		}
 		#endregion
 
-		#region Extract text from image - TesseractEngine
+		#region Extract text from image - Tesseract, Tesseract.Net.SDK
 		public string ExtractTextFromImage()
 		{
 			using (var engine = new TesseractEngine("tessdata", "eng", EngineMode.Default))
@@ -112,7 +112,7 @@ namespace DigitalFUHubApi.Services
 		}
 		#endregion
 
-		#region Extract text from image - TesseractEngine
+		#region Extract text from image - Tesseract, Tesseract.Net.SDK
 		public string ExtractTextFromImage(string base64)
 		{
 			var currentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
@@ -120,7 +120,7 @@ namespace DigitalFUHubApi.Services
 
 			using (var engine = new TesseractEngine(tessDataPath, "eng", EngineMode.Default))
 			{
-				Pix pix = Pix.LoadFromMemory(GetImageByBase64(base64));
+				Pix pix = Pix.LoadFromMemory(GetClarifyCaptchaImageByBase64(base64));
 
 				var page = engine.Process(pix);
 
@@ -130,9 +130,8 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Extract text from image - Azure Computer Vision
-		public async Task<string> ExtractTextFromImageAzureComputerVision(string base64Image)
+		public async Task<string> ExtractTextFromImageAzureComputerVision(byte[] bytes)
 		{
-			var bytes = Convert.FromBase64String(base64Image);
 			var imageStream = new MemoryStream(bytes);
 
 			ApiKeyServiceClientCredentials visionCredentials = new(Constants.AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY);

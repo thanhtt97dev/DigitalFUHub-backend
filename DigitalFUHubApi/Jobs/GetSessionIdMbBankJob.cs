@@ -9,13 +9,13 @@ namespace DigitalFUHubApi.Jobs
 {
 	public class GetSessionIdMbBankJob : IJob
 	{
+		private readonly OpticalCharacterRecognitionService opticalCharacterRecognitionService;
 		private readonly MbBankService mbBankService;
-		private readonly OpticalCharacterRecognitionService imageService;
 
-		public GetSessionIdMbBankJob(MbBankService mbBankService, OpticalCharacterRecognitionService imageService)
+		public GetSessionIdMbBankJob(MbBankService mbBankService, OpticalCharacterRecognitionService opticalCharacterRecognitionService)
 		{
 			this.mbBankService = mbBankService;
-			this.imageService = imageService;
+			this.opticalCharacterRecognitionService = opticalCharacterRecognitionService;
 		}
 
 		public async Task Execute(IJobExecutionContext context)
@@ -42,7 +42,7 @@ namespace DigitalFUHubApi.Jobs
 				while (string.IsNullOrEmpty(base64CaptchaImage));
 
 				//login
-				var captchaRaw = imageService.ExtractTextFromImage(base64CaptchaImage).Trim();
+				var captchaRaw = opticalCharacterRecognitionService.ExtractTextFromImage(base64CaptchaImage).Trim();
 				if (captchaRaw == null) return;
 
 				var captcha = String.Concat(captchaRaw.Where(c => !Char.IsWhiteSpace(c)));
@@ -76,18 +76,33 @@ namespace DigitalFUHubApi.Jobs
 				while (string.IsNullOrEmpty(base64CaptchaImage));
 
 				//login
-				var captchaRaw = await imageService.ExtractTextFromImageAzureComputerVision(base64CaptchaImage) ;
-				if (captchaRaw == null) return;
-
-				var captcha = String.Concat(captchaRaw.Where(c => !Char.IsWhiteSpace(c)));
-
-				var response = await mbBankService.Login(captcha);
-				if (response == null) continue;
-
-				if (response.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+				try
 				{
-					sessionId = (string)response.Result;
+					byte[]? captchaImageStream = opticalCharacterRecognitionService.GetClarifyCaptchaImageByBase64(base64CaptchaImage);
+					if(captchaImageStream == null) continue;	
+
+					var captchaRaw = await opticalCharacterRecognitionService.ExtractTextFromImageAzureComputerVision(captchaImageStream);
+					if (captchaRaw == null) return;
+
+					var captcha = String.Concat(captchaRaw.Where(c => !Char.IsWhiteSpace(c)));
+
+					var response = await mbBankService.Login(captcha);
+					if (response == null) continue;
+
+					if (response.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+					{
+						sessionId = (string)response.Result;
+					}
 				}
+				catch (Exception ex)
+				{
+					var message = new
+					{
+						Error = ex.Message,
+					};
+					Util.WriteFile("Data/err.json", message);
+				}
+				
 			}
 			while (string.IsNullOrEmpty(sessionId));
 			#endregion
