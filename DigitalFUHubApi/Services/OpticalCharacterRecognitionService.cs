@@ -8,7 +8,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
-using Tesseract;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
@@ -98,6 +97,7 @@ namespace DigitalFUHubApi.Services
 		#endregion
 
 		#region Extract text from image - Tesseract, Tesseract.Net.SDK
+		/*
 		public string ExtractTextFromImage()
 		{
 			using (var engine = new TesseractEngine("tessdata", "eng", EngineMode.Default))
@@ -110,9 +110,11 @@ namespace DigitalFUHubApi.Services
 				return page.GetText();
 			}
 		}
+		*/
 		#endregion
 
 		#region Extract text from image - Tesseract, Tesseract.Net.SDK
+		/*
 		public string ExtractTextFromImage(string base64)
 		{
 			var currentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
@@ -127,6 +129,7 @@ namespace DigitalFUHubApi.Services
 				return page.GetText();
 			}
 		}
+		*/
 		#endregion
 
 		#region Extract text from image - Azure Computer Vision
