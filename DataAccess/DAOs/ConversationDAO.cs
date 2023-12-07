@@ -51,7 +51,7 @@ namespace DataAccess.DAOs
 												.Where(x => x.UserId != userId && conversationIds.Contains(x.ConversationId))
 												.ToList();
 
-				var groupedConversations = conversations
+                var groupedConversations = conversations
 					.GroupBy(x => new { x.Conversation.ConversationId, x.Conversation.ConversationName, x.Conversation.DateCreate, x.Conversation.IsActivate, x.Conversation.IsGroup })
 					.Select(group => new ConversationResponseDTO
 					{
@@ -73,7 +73,9 @@ namespace DataAccess.DAOs
 						{
 							UserId = uc.User.UserId,
 							RoleId = uc.User.RoleId,
-							Fullname = uc.User.Fullname,
+							Fullname = uc.User.RoleId == Constants.SELLER_ROLE ? 
+										(context.Shop.FirstOrDefault(x => x.UserId == uc.User.UserId)?.ShopName ?? uc.User.Fullname) 
+										: uc.User.Fullname,
 							Avatar = uc.User.Avatar,
                         }).Distinct().ToList()
 					}).ToList();
@@ -119,7 +121,7 @@ namespace DataAccess.DAOs
 
 		}
 
-		internal long AddConversation(AddConversationRequestDTO addConversation)
+        internal long AddConversation(AddConversationRequestDTO addConversation)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{

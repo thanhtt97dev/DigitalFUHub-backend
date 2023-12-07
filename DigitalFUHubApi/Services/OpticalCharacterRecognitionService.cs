@@ -1,10 +1,13 @@
 ﻿using Comons;
+using DigitalFUHubApi.Comons;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.Azure;
 using System;
 using System.Drawing;
+using System.Reflection;
 using System.Reflection.Metadata;
 using Tesseract;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DigitalFUHubApi.Services
 {
@@ -49,7 +52,7 @@ namespace DigitalFUHubApi.Services
 
 		public string GetCaptchaInImage()
 		{
-			using (var engine = new TesseractEngine("./tessdata", "eng", EngineMode.Default))
+			using (var engine = new TesseractEngine("tessdata", "eng", EngineMode.Default))
 			{
 				string path = Constants.CAPTCHA_IMAGE_FILE_NAME;
 				Pix pix = Pix.LoadFromFile(path);
@@ -99,7 +102,10 @@ namespace DigitalFUHubApi.Services
 
 		public string GetCaptchaInBase64Image(string base64)
 		{
-			using (var engine = new TesseractEngine("./tessdata", "eng", EngineMode.Default))
+			var currentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+			var tessDataPath = Path.Combine(currentFolder, "tessdata");
+
+			using (var engine = new TesseractEngine(tessDataPath, "eng", EngineMode.Default))
 			{
 				Pix pix = Pix.LoadFromMemory(GetClarifyCaptchaImage(base64));
 
