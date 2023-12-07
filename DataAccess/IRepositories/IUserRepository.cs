@@ -32,5 +32,6 @@ namespace DataAccess.IRepositories
         User? GetUserByUserNameOtherUserId(long userId, string userName);
 		void ActiveUserNameAndPassword(long userId, string userName, string password);
 		long GetNumberNewUserInCurrentMonth();
+		User? GetUserInfoById(long id);
 	}
 }

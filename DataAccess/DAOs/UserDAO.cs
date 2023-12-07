@@ -305,5 +305,18 @@ namespace DataAccess.DAOs
 				return context.User.LongCount(x => x.UserId != Constants.ADMIN_USER_ID && x.CreateDate.Month == now.Month && x.CreateDate.Year == now.Year);
 			}
 		}
+
+		internal User? GetUserInfoById(long id)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.User
+					.Include(x => x.Shop)
+					.ThenInclude(x => x.Orders)
+					.ThenInclude(x => x.BusinessFee)
+					.Include(x => x.Orders)
+					.FirstOrDefault(x => x.UserId == id);
+			}
+		}
 	}
 }

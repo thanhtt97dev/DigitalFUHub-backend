@@ -54,5 +54,8 @@ namespace DataAccess.Repositories
 
 		public long GetNumberNewUserInCurrentMonth()
 		=> UserDAO.Instance.GetNumberNewUserInCurrentMonth();
+
+		public User? GetUserInfoById(long id)
+		=> UserDAO.Instance.GetUserInfoById(id);
 	}
 }

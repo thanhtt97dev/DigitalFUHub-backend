@@ -920,12 +920,12 @@
 		#region Get user info by Id for admin
 		[Authorize("Admin")]
 		[HttpGet("Admin/UserInfo/{id}")]
-		public IActionResult GetUser(int id)
+		public IActionResult GetUser(long id)
 		{
 			try
 			{
 				if (id == Constants.ADMIN_USER_ID) throw new Exception("Not allowed");
-				User? user = _userRepository.GetUserInfo(id);
+				User? user = _userRepository.GetUserInfoById(id);
 				if(user == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
