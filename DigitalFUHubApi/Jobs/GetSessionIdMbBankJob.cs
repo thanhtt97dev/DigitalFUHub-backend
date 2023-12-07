@@ -23,43 +23,67 @@ namespace DigitalFUHubApi.Jobs
 			return;
 			string base64CaptchaImage = string.Empty;
 			string sessionId = string.Empty;
-
-			do
+			try
 			{
-				//get captcha
 				do
 				{
-					var responseGetCaptcha = await mbBankService.GetCaptchaImage();
-					if (responseGetCaptcha == null) continue;
-
-					if (responseGetCaptcha.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+					//get captcha
+					do
 					{
-						base64CaptchaImage = (string)responseGetCaptcha.Result;
+						var responseGetCaptcha = await mbBankService.GetCaptchaImage();
+						if (responseGetCaptcha == null) continue;
+
+						if (responseGetCaptcha.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+						{
+							base64CaptchaImage = (string)responseGetCaptcha.Result;
+						}
 					}
+					while (string.IsNullOrEmpty(base64CaptchaImage));
+
+					//login
+					try
+					{
+						var captchaRaw = imageService.GetCaptchaInBase64Image(base64CaptchaImage).Trim();
+						if (captchaRaw == null) return;
+
+						var captcha = String.Concat(captchaRaw.Where(c => !Char.IsWhiteSpace(c)));
+						
+						var response = await mbBankService.Login(captcha);
+						if (response == null) continue;
+
+						if (response.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
+						{
+							sessionId = (string)response.Result;
+						}
+					}
+					catch (Exception ex)
+					{
+						var message = new
+						{
+							Error = ex.Message,
+							D = ex.InnerException.Message,
+						};
+						Util.WriteFile("Data/getcaptcha.json", message);
+					}
+					
 				}
-				while (string.IsNullOrEmpty(base64CaptchaImage));
+				while (string.IsNullOrEmpty(sessionId));
 
-				//login
-				imageService.ClarifyCaptchaImage(base64CaptchaImage);
-				var captchaRaw = imageService.GetCaptchaInImage().Trim();
-				var captcha = String.Concat(captchaRaw.Where(c => !Char.IsWhiteSpace(c)));
+				// update sessionId in to json file
+				MbBankAccount? mbBankAccount = mbBankService.GetMbBankAccount();
+				if (mbBankAccount == null) return;
+				mbBankAccount.SessionId = sessionId;
 
-				var response = await mbBankService.Login(captcha);
-				if (response == null) continue;
-
-				if (response.Code == Constants.MB_BANK_RESPONE_CODE_SUCCESS)
-				{
-					sessionId = (string)response.Result;
-				}
+				Util.WriteFile(Constants.MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA, mbBankAccount);
 			}
-			while (string.IsNullOrEmpty(sessionId));
-
-			// update sessionId in to json file
-			MbBankAccount? mbBankAccount = mbBankService.GetMbBankAccount();
-			if (mbBankAccount == null) return;
-			mbBankAccount.SessionId = sessionId;
-
-			Util.WriteFile(Constants.MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA, mbBankAccount);
+			catch (Exception ex) 
+			{
+				var message = new
+				{
+					Error = ex.Message,
+				};
+				Util.WriteFile("Data/test.json", message);
+			}
 		}
 	}
 }

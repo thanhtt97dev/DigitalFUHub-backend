@@ -6,11 +6,13 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.MbBank;
 using DTOs.Product;
 using DTOs.WishList;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -259,6 +261,29 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 				wishListRepository.RemoveWishListSelecteds(request.ProductIds, request.UserId);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", false, new()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region Test
+		[HttpGet("test")]
+		public IActionResult Test()
+		{
+			try
+			{
+				MbBankAccount? mbBankAccount = new MbBankAccount();
+				string mbBankAccountDataJson = Util.ReadFile(Constants.MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA);
+				if (!string.IsNullOrEmpty(mbBankAccountDataJson))
+				{
+					mbBankAccount = JsonSerializer.Deserialize<MbBankAccount>(mbBankAccountDataJson);
+				}
+				mbBankAccount.SessionId = "heieudl";
+				Util.WriteFile(Constants.MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA, mbBankAccount);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", false, new()));
 			}
 			catch (Exception ex)
