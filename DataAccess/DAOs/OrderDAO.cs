@@ -1391,7 +1391,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOrders)
+		internal List<Order> GetListOrderOfShop(long userId, int month, int year, int statusOrder)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -1400,7 +1400,7 @@ namespace DataAccess.DAOs
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.Where(x => x.ShopId == userId && (typeOrders == Constants.ORDER_ALL ? true : x.OrderStatusId == typeOrders)
+					.Where(x => x.ShopId == userId && (statusOrder == Constants.ORDER_ALL ? true : x.OrderStatusId == statusOrder)
 						&& (month == 0 ? true : x.OrderDate.Month == month)
 						&& year == x.OrderDate.Year)
 					.OrderBy(x => x.OrderDate)
@@ -1493,7 +1493,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<Order> GetListOrderAllShop(int month, int year, int typeOrders)
+		internal List<Order> GetListOrderAllShop(int month, int year, int statusOrder)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -1502,7 +1502,7 @@ namespace DataAccess.DAOs
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.Where(x => (typeOrders == Constants.ORDER_ALL ? true : x.OrderStatusId == typeOrders)
+					.Where(x => (statusOrder == Constants.ORDER_ALL ? true : x.OrderStatusId == statusOrder)
 						&& (month == 0 ? true : x.OrderDate.Month == month)
 						&& year == x.OrderDate.Year)
 					.OrderBy(x => x.OrderDate)

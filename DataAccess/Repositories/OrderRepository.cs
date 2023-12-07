@@ -65,8 +65,8 @@ namespace DataAccess.Repositories
 		=> OrderDAO.Instance.GetListOrderSeller(userId, orderId, username, fromDate, toDate, status);
 
 		
-		public List<Order> GetListOrderOfShop(long userId, int month, int year, int typeOrders)
-		=> OrderDAO.Instance.GetListOrderOfShop(userId, month, year, typeOrders);
+		public List<Order> GetListOrderOfShop(long userId, int month, int year, int statusOrder)
+		=> OrderDAO.Instance.GetListOrderOfShop(userId, month, year, statusOrder);
 
 		public List<Order> GetListOrderOfCurrentMonth(long userId)
 		=> OrderDAO.Instance.GetListOrderOfCurrentMonth(userId);
@@ -78,8 +78,8 @@ namespace DataAccess.Repositories
 
 		public int GetTotalNumberOrderSellerViolates(long shopId) => OrderDAO.Instance.GetTotalNumberOrderSellerViolates(shopId);
 
-		public List<Order> GetListOrderAllShop(int month, int year, int typeOrders)
-		=> OrderDAO.Instance.GetListOrderAllShop(month,  year,  typeOrders);
+		public List<Order> GetListOrderAllShop(int month, int year, int statusOrder)
+		=> OrderDAO.Instance.GetListOrderAllShop(month,  year, statusOrder);
 
 		public long GetNumberOrdersDispute()
 		=> OrderDAO.Instance.GetNumberOrdersDispute();

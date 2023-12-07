@@ -56,12 +56,12 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid month", false, new()));
 				}
-				if(!Constants.ORDER_STATUS.Contains(request.TypeOrders) && Constants.ORDER_ALL != request.TypeOrders)
+				if(!Constants.ORDER_STATUS.Contains(request.StatusOrder) && Constants.ORDER_ALL != request.StatusOrder)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid type order", false, new()));
 				}
 				List<Order> orders = _orderRepository.GetListOrderOfShop(_jwtTokenService.GetUserIdByAccessToken(User),
-					request.Month, request.Year, request.TypeOrders);
+					request.Month, request.Year, request.StatusOrder);
 				// get statisic sales by each day of month
 				if (request.Month != 0)
 				{
@@ -195,11 +195,11 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid month", false, new()));
 				}
-				if (!Constants.ORDER_STATUS.Contains(request.TypeOrders) && Constants.ORDER_ALL != request.TypeOrders)
+				if (!Constants.ORDER_STATUS.Contains(request.StatusOrder) && Constants.ORDER_ALL != request.StatusOrder)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid type order", false, new()));
 				}
-				List<Order> orders = _orderRepository.GetListOrderAllShop(request.Month, request.Year, request.TypeOrders);
+				List<Order> orders = _orderRepository.GetListOrderAllShop(request.Month, request.Year, request.StatusOrder);
 				// get statisic sales by each day of month
 				if (request.Month != 0)
 				{
