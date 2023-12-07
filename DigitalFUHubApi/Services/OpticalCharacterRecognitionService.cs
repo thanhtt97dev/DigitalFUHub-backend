@@ -4,18 +4,26 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.Azure;
 using System;
 using System.Drawing;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Text;
 using Tesseract;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Azure;
+using System.IO;
+
 
 namespace DigitalFUHubApi.Services
 {
 	public class OpticalCharacterRecognitionService
 	{
-		public OpticalCharacterRecognitionService() { }	
+		public OpticalCharacterRecognitionService() { }
 
-		public void ClarifyCaptchaImage(string base64)
+		#region Clarify image
+		public void ClarifyImage(string base64)
 		{
 #pragma warning disable CA1416 //bitmap just support for windown
 			byte[] bytes = System.Convert.FromBase64String(base64);
@@ -49,21 +57,10 @@ namespace DigitalFUHubApi.Services
 			}
 #pragma warning restore CA1416 // 
 		}
+		#endregion
 
-		public string GetCaptchaInImage()
-		{
-			using (var engine = new TesseractEngine("tessdata", "eng", EngineMode.Default))
-			{
-				string path = Constants.CAPTCHA_IMAGE_FILE_NAME;
-				Pix pix = Pix.LoadFromFile(path);
-
-				var page = engine.Process(pix);
-
-				return page.GetText();
-			}
-		}
-
-		public byte[]? GetClarifyCaptchaImage(string base64)
+		#region Clarify image  and convert into byte[]
+		public static byte[]? GetImageByBase64(string base64)
 		{
 #pragma warning disable CA1416, SC8600 //bitmap just support for windown
 			byte[] bytes = System.Convert.FromBase64String(base64);
@@ -98,21 +95,72 @@ namespace DigitalFUHubApi.Services
 			}
 #pragma warning restore CA1416, SC8600 // 
 		}
+		#endregion
 
-
-		public string GetCaptchaInBase64Image(string base64)
+		#region Extract text from image - TesseractEngine
+		public string ExtractTextFromImage()
 		{
-			var currentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
-			var tessDataPath = Path.Combine(currentFolder, "tessdata");
-
-			using (var engine = new TesseractEngine(tessDataPath, "eng", EngineMode.Default))
+			using (var engine = new TesseractEngine("tessdata", "eng", EngineMode.Default))
 			{
-				Pix pix = Pix.LoadFromMemory(GetClarifyCaptchaImage(base64));
+				string path = Constants.CAPTCHA_IMAGE_FILE_NAME;
+				Pix pix = Pix.LoadFromFile(path);
 
 				var page = engine.Process(pix);
 
 				return page.GetText();
 			}
 		}
+		#endregion
+
+		#region Extract text from image - TesseractEngine
+		public string ExtractTextFromImage(string base64)
+		{
+			var currentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+			var tessDataPath = Path.Combine(currentFolder, "tessdata");
+
+			using (var engine = new TesseractEngine(tessDataPath, "eng", EngineMode.Default))
+			{
+				Pix pix = Pix.LoadFromMemory(GetImageByBase64(base64));
+
+				var page = engine.Process(pix);
+
+				return page.GetText();
+			}
+		}
+		#endregion
+
+		#region Extract text from image - Azure Computer Vision
+		public async Task<string> ExtractTextFromImageAzureComputerVision(string base64Image)
+		{
+			var bytes = Convert.FromBase64String(base64Image);
+			var imageStream = new MemoryStream(bytes);
+
+			ApiKeyServiceClientCredentials visionCredentials = new(Constants.AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY);
+			ComputerVisionClient client = new ComputerVisionClient(visionCredentials);
+			client.Endpoint = Constants.AZURE_COMPUTER_VISION_ENDPOINT;
+
+			ReadOperationResult results;
+
+			ReadInStreamHeaders textHeaders = await client.ReadInStreamAsync(imageStream);
+			string operationLocation = textHeaders.OperationLocation;
+			string operationId = operationLocation[^36..];
+			do
+			{
+				results = await client.GetReadResultAsync(Guid.Parse(operationId));
+			}
+			while ((results.Status == OperationStatusCodes.Running || results.Status == OperationStatusCodes.NotStarted));
+			IList<ReadResult> textUrlFileResults = results.AnalyzeResult.ReadResults;
+
+			StringBuilder sb = new();
+			foreach (ReadResult page in textUrlFileResults)
+			{
+				foreach (Line line in page.Lines)
+				{
+					sb.AppendLine(line.Text);
+				}
+			}
+			return string.Join(Environment.NewLine, sb).Trim();
+		}
+		#endregion
 	}
 }
