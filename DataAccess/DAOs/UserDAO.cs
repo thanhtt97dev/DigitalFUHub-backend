@@ -302,7 +302,7 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				DateTime now = DateTime.Now;
-				return context.User.LongCount(x => x.CreateDate.Month == now.Month && x.CreateDate.Year == now.Year);
+				return context.User.LongCount(x => x.UserId != Constants.ADMIN_USER_ID && x.CreateDate.Month == now.Month && x.CreateDate.Year == now.Year);
 			}
 		}
 	}
