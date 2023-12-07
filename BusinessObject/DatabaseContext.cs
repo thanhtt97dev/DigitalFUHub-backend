@@ -68,7 +68,7 @@ namespace BusinessObject
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseSqlServer(connectionString);
+			optionsBuilder.UseSqlServer(connectionString).EnableSensitiveDataLogging(true).LogTo(Console.WriteLine);
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

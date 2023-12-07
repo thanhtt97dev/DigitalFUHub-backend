@@ -33,6 +33,7 @@ namespace BusinessObject.Entities
 		public bool IsOnline { get; set; }
         public DateTime? BanDate { get; set; } = null!;
         public string? Note { get; set; } = null!;
+        public DateTime CreateDate { get; set; } 
 
         [ForeignKey(nameof(RoleId))]
         public virtual Role Role { get; set; } = null!;
