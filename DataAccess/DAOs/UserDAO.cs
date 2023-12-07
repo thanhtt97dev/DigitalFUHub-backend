@@ -85,20 +85,20 @@ namespace DataAccess.DAOs
 			}
 		}
 
-        internal void UpdateSettingPersonalInfo(User userUpdate)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
-                var user = context.User.First(x => x.UserId == userUpdate.UserId);
-				
-                user.Avatar = user.Avatar != userUpdate.Avatar ? userUpdate.Avatar : user.Avatar;
-                user.Fullname = user.Fullname != userUpdate.Fullname ? userUpdate.Fullname : user.Fullname;
+		internal void UpdateSettingPersonalInfo(User userUpdate)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var user = context.User.First(x => x.UserId == userUpdate.UserId);
 
-                context.SaveChanges();
-            }
-        }
+				user.Avatar = user.Avatar != userUpdate.Avatar ? userUpdate.Avatar : user.Avatar;
+				user.Fullname = user.Fullname != userUpdate.Fullname ? userUpdate.Fullname : user.Fullname;
 
-        internal void Update2FA(int id)
+				context.SaveChanges();
+			}
+		}
+
+		internal void Update2FA(int id)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -267,10 +267,10 @@ namespace DataAccess.DAOs
 			}
 		}
 
-        internal User? GetUserByUserNameOtherUserId(long userId, string userName)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal User? GetUserByUserNameOtherUserId(long userId, string userName)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				var result = (from user in context.User
 							  where user.UserId != userId
 							  &&
@@ -278,13 +278,13 @@ namespace DataAccess.DAOs
 							  select new User { }).FirstOrDefault();
 
 				return result;
-            }
-        }
+			}
+		}
 
-        internal void ActiveUserNameAndPassword(long userId, string userName, string password)
-        {
-            using (DatabaseContext context = new DatabaseContext())
-            {
+		internal void ActiveUserNameAndPassword(long userId, string userName, string password)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
 				var userFind = context.User.FirstOrDefault(x => x.UserId == userId);
 
 				if (userFind == null) throw new ArgumentNullException(nameof(userFind));
@@ -294,9 +294,16 @@ namespace DataAccess.DAOs
 				userFind.IsChangeUsername = true;
 
 				context.SaveChanges();
-            }
-        }
+			}
+		}
 
-
-    }
+		internal long GetNumberNewUserInCurrentMonth()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				DateTime now = DateTime.Now;
+				return context.User.LongCount(x => x.CreateDate.Month == now.Month && x.CreateDate.Year == now.Year);
+			}
+		}
+	}
 }

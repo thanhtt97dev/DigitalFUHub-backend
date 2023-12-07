@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20231205143601_init")]
-    partial class init
+    [Migration("20231207023923_updatedb")]
+    partial class updatedb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -239,7 +239,7 @@ namespace BusinessObject.Migrations
                         {
                             BusinessFeeId = 1L,
                             Fee = 5L,
-                            StartDate = new DateTime(2023, 12, 5, 21, 36, 0, 836, DateTimeKind.Local).AddTicks(5649)
+                            StartDate = new DateTime(2023, 12, 7, 9, 39, 23, 257, DateTimeKind.Local).AddTicks(2765)
                         });
                 });
 
@@ -572,7 +572,7 @@ namespace BusinessObject.Migrations
                         {
                             FeedbackBenefitId = 1,
                             Coin = 50,
-                            StartDate = new DateTime(2023, 12, 5, 21, 36, 0, 836, DateTimeKind.Local).AddTicks(5675)
+                            StartDate = new DateTime(2023, 12, 7, 9, 39, 23, 257, DateTimeKind.Local).AddTicks(2797)
                         });
                 });
 
@@ -1527,6 +1527,9 @@ namespace BusinessObject.Migrations
                     b.Property<long>("Coin")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1583,6 +1586,7 @@ namespace BusinessObject.Migrations
                             AccountBalance = 0L,
                             Avatar = "",
                             Coin = 0L,
+                            CreateDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "",
                             Fullname = "Admin",
                             IsChangeUsername = false,

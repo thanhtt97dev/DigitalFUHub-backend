@@ -10,8 +10,8 @@ namespace BusinessObject
 	public class DatabaseContext : DbContext
 	{
 
-		//public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
-		public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Database=digitalfuhub;User ID=digitalfuhub;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
+		public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+		//public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Database=digitalfuhub;User ID=digitalfuhub;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
 
 		public DatabaseContext() { }
 
@@ -68,7 +68,7 @@ namespace BusinessObject
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseSqlServer(connectionString);
+			optionsBuilder.UseSqlServer(connectionString).EnableSensitiveDataLogging(true).LogTo(Console.WriteLine);
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

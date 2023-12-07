@@ -35,5 +35,8 @@ namespace DataAccess.IRepositories
 		List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount);
 		List<WithdrawTransaction> GetWithdrawTransactionReport(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status);
 		List<DepositTransaction> GetDataReportDepositTransaction(int userid, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status);
+		List<DepositTransaction> GetListDepositMoney(int month, int year);
+		List<WithdrawTransaction> GetListWithdrawnMoney(int month, int year);
+		long GetNumberRequestWithdrawnMoney();
 	}
 }

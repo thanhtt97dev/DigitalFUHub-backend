@@ -11,6 +11,6 @@ namespace DataAccess.IRepositories
 	{
 		void UpdateReportProduct(long reportProductId, int status, string note);
 		void AddReportProduct(ReportProduct reportProduct);
-
-    }
+		long GetNumberUnprocessedReportProducts();
+	}
 }

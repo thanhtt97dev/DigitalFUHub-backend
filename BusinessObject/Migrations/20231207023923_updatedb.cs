@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BusinessObject.Migrations
 {
-    public partial class init : Migration
+    public partial class updatedb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -242,7 +242,8 @@ namespace BusinessObject.Migrations
                     LastTimeOnline = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsOnline = table.Column<bool>(type: "bit", nullable: false),
                     BanDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1155,7 +1156,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "BusinessFee",
                 columns: new[] { "BusinessFeeId", "EndDate", "Fee", "StartDate" },
-                values: new object[] { 1L, null, 5L, new DateTime(2023, 12, 5, 21, 36, 0, 836, DateTimeKind.Local).AddTicks(5649) });
+                values: new object[] { 1L, null, 5L, new DateTime(2023, 12, 7, 9, 39, 23, 257, DateTimeKind.Local).AddTicks(2765) });
 
             migrationBuilder.InsertData(
                 table: "Category",
@@ -1182,7 +1183,7 @@ namespace BusinessObject.Migrations
             migrationBuilder.InsertData(
                 table: "FeedbackBenefit",
                 columns: new[] { "FeedbackBenefitId", "Coin", "EndDate", "StartDate" },
-                values: new object[] { 1, 50, null, new DateTime(2023, 12, 5, 21, 36, 0, 836, DateTimeKind.Local).AddTicks(5675) });
+                values: new object[] { 1, 50, null, new DateTime(2023, 12, 7, 9, 39, 23, 257, DateTimeKind.Local).AddTicks(2797) });
 
             migrationBuilder.InsertData(
                 table: "OrderStatus",
@@ -1277,8 +1278,8 @@ namespace BusinessObject.Migrations
 
             migrationBuilder.InsertData(
                 table: "User",
-                columns: new[] { "UserId", "AccountBalance", "Avatar", "BanDate", "Coin", "Email", "Fullname", "IsChangeUsername", "IsConfirm", "IsOnline", "LastTimeOnline", "Note", "Password", "RoleId", "SignInGoogle", "Status", "TwoFactorAuthentication", "Username" },
-                values: new object[] { 1L, 0L, "", null, 0L, "", "Admin", false, true, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "123", 1L, false, true, false, "admin" });
+                columns: new[] { "UserId", "AccountBalance", "Avatar", "BanDate", "Coin", "CreateDate", "Email", "Fullname", "IsChangeUsername", "IsConfirm", "IsOnline", "LastTimeOnline", "Note", "Password", "RoleId", "SignInGoogle", "Status", "TwoFactorAuthentication", "Username" },
+                values: new object[] { 1L, 0L, "", null, 0L, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", "Admin", false, true, false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "123", 1L, false, true, false, "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccessToken_UserId",

@@ -37,5 +37,14 @@ namespace DataAccess.Repositories
 		public List<WithdrawTransaction> GetWithdrawTransactionReport(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status) => BankDAO.Instance.GetWithdrawTransactionReport(withdrawTransactionId, email, fromDate, toDate, bankId, creditAccount, status);
 		public List<DepositTransaction> GetDataReportDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status) => BankDAO.Instance.GetDataReportDepositTransaction(userId, depositTransactionId, email, fromDate, toDate, status);
 
+
+		public List<DepositTransaction> GetListDepositMoney(int month, int year)
+		=> BankDAO.Instance.GetListDepositMoney(month, year);
+
+		public List<WithdrawTransaction> GetListWithdrawnMoney(int month, int year)
+		=> BankDAO.Instance.GetListWithdrawnMoney(month, year);
+
+		public long GetNumberRequestWithdrawnMoney()
+		=> BankDAO.Instance.GetNumberRequestWithdrawnMoney();
 	}
 }

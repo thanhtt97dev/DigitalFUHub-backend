@@ -123,7 +123,8 @@
 						Fullname = payload.Name,
 						IsChangeUsername = false,
 						LastTimeOnline = DateTime.Now,
-						IsOnline = false
+						IsOnline = false,
+						CreateDate = DateTime.Now,
 					};
 					_userRepository.AddUser(newUser);
 					user = _userRepository.GetUserByEmail(payload.Email);
@@ -176,7 +177,8 @@
 					IsConfirm = false,
 					IsChangeUsername = true,
 					LastTimeOnline = DateTime.Now,
-					IsOnline = false
+					IsOnline = false,
+					CreateDate = DateTime.Now,
 				};
 				_userRepository.AddUser(userSignUp);
 
