@@ -11,7 +11,7 @@ namespace DataAccess.IRepositories
     public interface IFeedbackRepository
     {
 		Order? GetFeedbackDetail(long orderId, long userId);
-		int AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages);
+		long AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages);
 		List<FeedbackResponseDTO> GetFeedbacks(long productId);
 		(long, List<Order>) GetListFeedbackSeller(long userId, string orderId, string userName, string productName, 
 			string productVariantName, DateTime? fromDate, DateTime? toDate, int rate, int page);

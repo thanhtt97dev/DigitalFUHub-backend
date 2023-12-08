@@ -16,7 +16,7 @@ namespace BusinessObject.Entities
         public long ProductId { get; set; }
         public long UserId { get; set; }
 		public long OrderDetailId { get; set; }
-		public int FeedbackBenefitId { get; set; }
+		public long FeedbackBenefitId { get; set; }
 		public string? Content { get; set; }
         public int Rate { get; set; }
 		public DateTime DateCreate { get; set; }

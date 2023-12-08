@@ -87,7 +87,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal int AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
+		internal long AddFeedbackOrder(long userId, long orderId, long orderDetailId, string content, int rate, List<string> urlImages)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -160,6 +160,7 @@ namespace DataAccess.DAOs
 					}
 					context.SaveChanges();
 					transaction.Commit();
+
 					return feedbackBenefit.Coin;
 				}
 				catch(ArgumentOutOfRangeException e)

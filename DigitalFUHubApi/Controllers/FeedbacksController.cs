@@ -136,7 +136,7 @@ namespace DigitalFUHubApi.Controllers
 				}
 
 
-				int bonusCoin = _feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				long bonusCoin = _feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, bonusCoin));
 			}
 			catch (ArgumentOutOfRangeException)

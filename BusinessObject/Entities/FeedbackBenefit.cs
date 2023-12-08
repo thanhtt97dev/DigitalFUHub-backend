@@ -12,8 +12,8 @@ namespace BusinessObject.Entities
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public int FeedbackBenefitId { get; set; }
-		public int Coin { get; set; }	
+		public long FeedbackBenefitId { get; set; }
+		public long Coin { get; set; }	
 		public DateTime StartDate { get; set; }	
 		public DateTime? EndDate { get; set; }
 	}
