@@ -35,7 +35,8 @@ namespace DataAccess.Repositories
 
 		public void UpdateUser(User user) => UserDAO.Instance.UpdateUser(user);
 
-		public List<User> GetUsers(long userId, string email, string fullName, int roleId, int status) => UserDAO.Instance.GetUsers(userId, email, fullName, roleId, status);
+		public int GetNumberUserWithCondition(long userId, string email, string fullName, int roleId, int status) => UserDAO.Instance.GetNumberUserWithCondition(userId, email, fullName, roleId, status);
+		public List<User> GetUsers(long userId, string email, string fullName, int roleId, int status, int page) => UserDAO.Instance.GetUsers(userId, email, fullName, roleId, status, page);
 
 		public User? GetUserInfo(int id) => UserDAO.Instance.GetUserInfo(id);
 

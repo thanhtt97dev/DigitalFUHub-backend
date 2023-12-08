@@ -174,7 +174,7 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal List<User> GetUsers(long userId, string email, string fullName, int roleId, int status)
+		internal int GetNumberUserWithCondition(long userId, string email, string fullName, int roleId, int status)
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
@@ -186,7 +186,27 @@ namespace DataAccess.DAOs
 								(userId == 0 ? true : x.UserId == userId) &&
 								(roleId == 0 ? true : x.RoleId == roleId) &&
 								(status == 0 ? true : x.Status == (status == 1))
-								).ToList();
+								).Count();
+				return users;
+			}
+		}
+
+		internal List<User> GetUsers(long userId, string email, string fullName, int roleId, int status, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var users = context.User
+							.Include(x => x.Role)
+							.Where(x =>
+								x.Email.Contains(email) && x.Fullname.Contains(fullName) &&
+								x.RoleId != Constants.ADMIN_ROLE &&
+								(userId == 0 ? true : x.UserId == userId) &&
+								(roleId == 0 ? true : x.RoleId == roleId) &&
+								(status == 0 ? true : x.Status == (status == 1))
+								)
+								.Skip((page - 1) * Constants.PAGE_SIZE)
+							   .Take(Constants.PAGE_SIZE)
+							   .ToList();
 				return users;
 			}
 		}

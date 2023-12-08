@@ -891,22 +891,30 @@
 		#region Get all users for admin
 		[Authorize(Roles = "Admin")]
 		[HttpPost("GetUsers")]
-		public IActionResult GetUsers(UsersRequestDTO requestDTO)
+		public IActionResult GetUsers(UsersRequestDTO request)
 		{
-
-			if (requestDTO == null || requestDTO.Email == null ||
-				requestDTO.FullName == null || requestDTO.UserId == null)
-			{
-				return BadRequest();
-			}
+			if (!ModelState.IsValid) return BadRequest();
 
 			try
 			{
 				long userId = 0;
-				long.TryParse(requestDTO.UserId, out userId);
+				long.TryParse(request.UserId, out userId);
 
-				var users = _userRepository.GetUsers(userId, requestDTO.Email, requestDTO.FullName, requestDTO.RoleId, requestDTO.Status);
-				var result = _mapper.Map<List<UsersResponseDTO>>(users);
+				var numberUsers = _userRepository.GetNumberUserWithCondition(userId, request.Email, request.FullName, request.RoleId, request.Status);
+				var numberPages = numberUsers / Constants.PAGE_SIZE + 1;
+
+				if (request.Page > numberPages)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid number page", false, new()));
+				}
+
+				var users = _userRepository.GetUsers(userId, request.Email, request.FullName, request.RoleId, request.Status, request.Page);
+
+				var result = new
+				{
+					Total = numberUsers,
+					Users = _mapper.Map<List<UsersResponseDTO>>(users)
+			};
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, result));
 			}
