@@ -24,7 +24,7 @@ namespace DataAccess.IRepositories
 		void UpdateUser(User user);
 		void UpdateSettingPersonalInfo(User userUpdate);
 
-        List<User> GetUsers(long userId, string email, string fullName, int roleId, int status);
+        List<User> GetUsers(long userId, string email, string fullName, int roleId, int status, int page);
 		User? GetUserInfo (int id);
 		bool CheckUsersExisted(List<long> userIds);
 		void UpdateUserOnlineStatus(long userId, bool isOnline);
@@ -33,5 +33,6 @@ namespace DataAccess.IRepositories
 		void ActiveUserNameAndPassword(long userId, string userName, string password);
 		long GetNumberNewUserInCurrentMonth();
 		User? GetUserInfoById(long id);
+		int GetNumberUserWithCondition(long userId, string email, string fullName, int roleId, int status);
 	}
 }
