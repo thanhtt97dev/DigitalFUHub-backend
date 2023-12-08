@@ -134,7 +134,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 			builder.Services.AddSingleton<MailService>();
 			builder.Services.AddSingleton<MbBankService>();
-			builder.Services.AddSingleton<AzureFilesService>();
+			builder.Services.AddSingleton<AzureStorageAccountService>();
 			builder.Services.AddSingleton<OpticalCharacterRecognitionService>();
 
 			//Add SignalR

@@ -38,7 +38,7 @@
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly TwoFactorAuthenticationService _twoFactorAuthenticationService;
 		private readonly MailService _mailService;
-		private readonly AzureFilesService _azureFilesService;
+		private readonly AzureStorageAccountService _azureStorageAccountService;
 
 		public UsersController(IUserRepository userRepository, IMapper mapper,
 			IConfiguration configuration,
@@ -48,7 +48,7 @@
 			JwtTokenService jwtTokenService,
 			TwoFactorAuthenticationService twoFactorAuthenticationService,
 			MailService mailService,
-			AzureFilesService azureFilesService
+			AzureStorageAccountService azureStorageAccountService
 			)
 		{
 			_userRepository = userRepository;
@@ -59,7 +59,7 @@
 			_twoFactorAuthenticationService = twoFactorAuthenticationService;
 			_twoFactorAuthenticationRepository = twoFactorAuthenticationRepository;
 			_mailService = mailService;
-			_azureFilesService = azureFilesService;
+			_azureStorageAccountService = azureStorageAccountService;
 			_configuration = configuration;
 
 		}
@@ -669,11 +669,11 @@
 						now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
 						request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
 
-					urlNewAvatar = await _azureFilesService.UploadFileToAzureAsync(request.Avatar, filename);
+					urlNewAvatar = await _azureStorageAccountService.UploadFileToAzureAsync(request.Avatar, filename);
 					userUpdate.Avatar = urlNewAvatar;
 
 					// delete avatar old
-					await _azureFilesService.RemoveFileFromAzureAsync(user.Avatar.Substring(user.Avatar.LastIndexOf("/") + 1));
+					await _azureStorageAccountService.RemoveFileFromAzureAsync(user.Avatar.Substring(user.Avatar.LastIndexOf("/") + 1));
 				}
 
 				// Ok
@@ -755,12 +755,12 @@
                     now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
                     request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
 
-                urlNewAvatar = await _azureFilesService.UploadFileToAzureAsync(request.Avatar, filename);
+                urlNewAvatar = await _azureStorageAccountService.UploadFileToAzureAsync(request.Avatar, filename);
 				string urlOld = user.Avatar;
                 user.Avatar = urlNewAvatar;
 
                 // delete avatar old
-                await _azureFilesService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
+                await _azureStorageAccountService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
 
                 // Ok
                 _userRepository.UpdateSettingPersonalInfo(user);

@@ -21,7 +21,7 @@ namespace DigitalFUHubApi.Controllers
 	{
 		private readonly IConfiguration _configuration;
 		private readonly IProductRepository _productRepository;
-		private readonly AzureFilesService _azureFilesService;
+		private readonly AzureStorageAccountService _azureStorageAccountService;
 		private readonly IShopRepository _shopRepository;
 		private readonly IUserRepository _userRepository;
 		private readonly IRoleRepository _roleRepository;
@@ -32,7 +32,7 @@ namespace DigitalFUHubApi.Controllers
 
 		public CouponsController(IConfiguration configuration,
 			IProductRepository productRepository,
-			AzureFilesService azureFilesService,
+			AzureStorageAccountService azureStorageAccountService,
 			IShopRepository shopRepository,
 			IUserRepository userRepository,
 			IRoleRepository roleRepository,
@@ -43,7 +43,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			_configuration = configuration;
 			_productRepository = productRepository;
-			_azureFilesService = azureFilesService;
+			_azureStorageAccountService = azureStorageAccountService;
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
 			_roleRepository = roleRepository;

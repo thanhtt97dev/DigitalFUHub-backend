@@ -9,13 +9,13 @@ using Comons;
 
 namespace DigitalFUHubApi.Services
 {
-	public class AzureFilesService
+	public class AzureStorageAccountService
 	{
 		private readonly IConfiguration _configuration;
 
 		private readonly string connectionString = string.Empty;
 		private readonly string containerName = string.Empty;
-		public AzureFilesService(IConfiguration configuration)
+		public AzureStorageAccountService(IConfiguration configuration)
 		{
 			_configuration = configuration;
 			connectionString = _configuration["Azure:StorageConnectionString"] ?? string.Empty;
