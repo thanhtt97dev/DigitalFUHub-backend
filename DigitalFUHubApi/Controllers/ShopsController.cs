@@ -240,8 +240,8 @@ namespace DigitalFUHubApi.Controllers
 
         #region Get shop detail (admin)
         [HttpGet("admin/getById/{userId}")]
-        [Authorize("Admin")]
-        public IActionResult GetShopDetailAdmin(long userId)
+		[Authorize("Admin")]
+		public IActionResult GetShopDetailAdmin(long userId)
         {
             try
             {

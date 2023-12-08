@@ -15,10 +15,16 @@ namespace DTOs.Shop
         public DateTime DateCreate { get; set; }
         public DateTime DateBan { get; set; }
         public string Note { get; set; } = string.Empty;
-        public string? Description { get; set; }
         public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
         public bool IsActive { get; set; }
+        public int TotalNumberOrder { get; set; }
+        public int TotalNumberProduct { get; set; }
+        public int NumberProductsSold { get; set; }
+        public long Revenue { get; set; }
+        public int NumberOrderWaitConfirmation { get; set; }
+        public int NumberOrderConfirmed { get; set; }
+        public int NumberOrderViolated { get; set; }
         public ShopDetailAdminUserResponseDTO? User { get; set; }
     }
 
