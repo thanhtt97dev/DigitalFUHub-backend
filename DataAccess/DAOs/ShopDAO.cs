@@ -218,8 +218,6 @@ namespace DataAccess.DAOs
 											  where product.ShopId == shop.UserId
 											  &&
 											  product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-											  ||
-											  product.ProductStatusId == Constants.PRODUCT_STATUS_BAN
 											  select new Product
 											  {
 												  TotalRatingStar = product.TotalRatingStar,
@@ -233,7 +231,46 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal Shop? GetMostPopularShop(string keyword)
+        internal Shop? GetShopDetailAdmin(long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                var result = (from shop in context.Shop
+                              join user in context.User
+                              on shop.UserId equals user.UserId
+                              where shop.UserId == userId
+                              select new Shop
+                              {
+                                  UserId = shop.UserId,
+                                  Avatar = shop.Avatar,
+                                  ShopName = shop.ShopName,
+                                  DateCreate = shop.DateCreate,
+                                  DateBan = shop.DateBan,
+								  Note = shop.Note,
+                                  Description = shop.Description,
+                                  IsActive = shop.IsActive,
+                                  User = new User
+                                  {
+									  Email = user.Email,
+                                      IsOnline = user.IsOnline,
+                                      LastTimeOnline = user.LastTimeOnline,
+                                  },
+                                  Products = (from product in context.Product
+                                              where product.ShopId == shop.UserId
+                                              select new Product
+                                              {
+                                                  TotalRatingStar = product.TotalRatingStar,
+                                                  NumberFeedback = product.NumberFeedback,
+
+                                              }).ToList()
+
+                              }).FirstOrDefault();
+
+                return result;
+            }
+        }
+
+        internal Shop? GetMostPopularShop(string keyword)
 		{
 			using (var context = new DatabaseContext())
 			{

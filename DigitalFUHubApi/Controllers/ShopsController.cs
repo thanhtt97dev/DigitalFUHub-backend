@@ -235,10 +235,36 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Get most popular shop 
-		[HttpGet("MostPopular")]
+        #region Get shop detail (admin)
+        [HttpGet("admin/getById/{userId}")]
+		[Authorize("Admin")]
+		public IActionResult GetShopDetailAdmin(long userId)
+        {
+            try
+            {
+                Shop? shop = _shopRepository.GetShopDetailAdmin(userId);
+
+                if (shop == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found!", false, new()));
+                }
+
+                var shopResponse = _mapper.Map<ShopDetailAdminResponseDTO>(shop);
+
+                // Ok
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, shopResponse));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+        #region Get most popular shop 
+        [HttpGet("MostPopular")]
 		public IActionResult GetMostPopularShop(string keyword)
 		{
 			if (string.IsNullOrWhiteSpace(keyword))
