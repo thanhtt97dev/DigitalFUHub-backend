@@ -212,17 +212,14 @@ namespace DataAccess.DAOs
 								  {
 									  IsOnline = user.IsOnline,
 									  LastTimeOnline = user.LastTimeOnline,
-									  Username = user.Username
-								  },
-								  Products = (from product in context.Product
+									  Username = user.Username,
+                                  },
+                                  Products = (from product in context.Product
 											  where product.ShopId == shop.UserId
-											  &&
-											  product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
 											  select new Product
 											  {
-												  TotalRatingStar = product.TotalRatingStar,
+                                                  TotalRatingStar = product.TotalRatingStar,
 												  NumberFeedback = product.NumberFeedback,
-
 											  }).ToList()
 
 							  }).FirstOrDefault();
@@ -254,11 +251,26 @@ namespace DataAccess.DAOs
 									  Email = user.Email,
                                       IsOnline = user.IsOnline,
                                       LastTimeOnline = user.LastTimeOnline,
+                                      TransactionInternals = (from transactionInternal in context.TransactionInternal
+                                                              where transactionInternal.UserId == shop.UserId && transactionInternal.TransactionInternalTypeId == Constants.TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT
+                                                              select new TransactionInternal
+                                                              {
+                                                                  PaymentAmount = transactionInternal.PaymentAmount
+                                                              }
+                                                            ).ToList(),
                                   },
+                                  Orders = (from order in context.Order
+                                            where order.ShopId == shop.UserId
+                                            select new Order
+                                            {
+                                                OrderStatusId = order.OrderStatusId,
+                                            }
+                                          ).ToList(),
                                   Products = (from product in context.Product
                                               where product.ShopId == shop.UserId
                                               select new Product
                                               {
+                                                  SoldCount = product.SoldCount,
                                                   TotalRatingStar = product.TotalRatingStar,
                                                   NumberFeedback = product.NumberFeedback,
 

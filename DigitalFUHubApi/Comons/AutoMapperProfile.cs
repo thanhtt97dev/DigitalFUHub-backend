@@ -258,10 +258,18 @@ namespace DigitalFUHubApi.Comons
 
             // Shop Detail <Admin>
             CreateMap<Shop, ShopDetailAdminResponseDTO>()
+            .ForMember(des => des.TotalNumberProduct, act => act.MapFrom(src => src.Products.Count()))
             .ForMember(des => des.ShopEmail, act => act.MapFrom(src => src.User.Email))
+            .ForMember(des => des.NumberProductsSold, act => act.MapFrom(src => src.Products.Sum(x => x.SoldCount)))
             .ForMember(des => des.NumberFeedback, act => act.MapFrom(src => src.Products.Sum(x => x.NumberFeedback)))
             .ForMember(des => des.TotalRatingStar, act => act.MapFrom(src => src.Products.Sum(x => x.TotalRatingStar)))
+            .ForMember(des => des.NumberOrderConfirmed, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED).Count()))
+            .ForMember(des => des.NumberOrderWaitConfirmation, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION).Count()))
+            .ForMember(des => des.TotalNumberOrder, act => act.MapFrom(src => src.Orders.Count()))
+            .ForMember(des => des.NumberOrderViolated, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_SELLER_VIOLATES).Count()))
+            .ForMember(des => des.Revenue, act => act.MapFrom(src => (src.User.TransactionInternals == null) ? 0 : src.User.TransactionInternals.Sum(x => x.PaymentAmount)))
             .ReverseMap();
+
             CreateMap<User, ShopDetailAdminUserResponseDTO>().ReverseMap();
 
             //CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
