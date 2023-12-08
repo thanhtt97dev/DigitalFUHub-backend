@@ -37,5 +37,7 @@ namespace DataAccess.Repositories
 		public void UpdateBanShop(long shopId) => ShopDAO.Instance.UpdateBanShop(shopId);
 
         public Shop? GetShopDetailAdmin(long userId) => ShopDAO.Instance.GetShopDetailAdmin(userId);
+
+        public void UpdateShop(Shop shop) => ShopDAO.Instance.UpdateShop(shop);
     }
 }

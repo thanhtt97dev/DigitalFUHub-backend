@@ -354,6 +354,15 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
-	}
+
+        internal void UpdateShop(Shop shop)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				context.Shop.Update(shop);
+				context.SaveChanges();
+            }
+        }
+    }
 }
 

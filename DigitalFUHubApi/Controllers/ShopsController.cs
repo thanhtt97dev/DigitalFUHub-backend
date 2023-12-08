@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using System.Text.RegularExpressions;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -239,8 +240,8 @@ namespace DigitalFUHubApi.Controllers
 
         #region Get shop detail (admin)
         [HttpGet("admin/getById/{userId}")]
-		[Authorize("Admin")]
-		public IActionResult GetShopDetailAdmin(long userId)
+        [Authorize("Admin")]
+        public IActionResult GetShopDetailAdmin(long userId)
         {
             try
             {
@@ -305,7 +306,38 @@ namespace DigitalFUHubApi.Controllers
 				TotalItems = totalItems
 			}));
 		}
-		#endregion
+        #endregion
 
-	}
+        #region Update shop (admin)
+        [HttpPost("admin/update")]
+        [Authorize("Admin")]
+        public IActionResult UpdateShop(ShopDetailAdminUpdateStatusRequestDTO request)
+        {
+            try
+            {
+                Shop? shop = _shopRepository.GetShopById(request.ShopId);
+
+                if (shop == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found!", false, new()));
+                }
+
+				// update shop
+				shop.IsActive = request.IsActive;
+				shop.Note = request.Note;
+				shop.DateBan = DateTime.Now;
+
+				_shopRepository.UpdateShop(shop);
+
+                // Ok
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ()));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+    }
 }

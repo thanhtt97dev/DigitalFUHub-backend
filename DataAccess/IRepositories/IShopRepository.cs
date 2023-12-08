@@ -22,5 +22,7 @@ namespace DataAccess.IRepositories
 		Shop? GetShopDetailAdmin(long userId);
         (long, List<Shop>) GetListShop(string keyword, int page);
 		void UpdateBanShop(long shopId);
-	}
+		void UpdateShop(Shop shop);
+
+    }
 }
