@@ -385,6 +385,19 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.Profit, act => act.MapFrom(src => src.Shop == null || src.Shop.Orders == null ? 0 : src.Shop.Orders.Sum(x => (x.TotalAmount - x.TotalCouponDiscount) - ((x.TotalAmount - x.TotalCouponDiscount) * x.BusinessFee.Fee / 100))))
 				.ReverseMap();
 
+			CreateMap<ReportProduct, GetReportProductResponseDTO>()
+				.ForMember(des => des.CustomerId, act => act.MapFrom(src => src.User.UserId))
+				.ForMember(des => des.CustomerEmail, act => act.MapFrom(src => src.User.Email))
+				.ForMember(des => des.ProductId, act => act.MapFrom(src => src.Product.ProductId))
+				.ForMember(des => des.ProductName, act => act.MapFrom(src => src.Product.ProductName))
+				.ForMember(des => des.ProductThumbnail, act => act.MapFrom(src => src.Product.Thumbnail))
+				.ForMember(des => des.ShopId, act => act.MapFrom(src => src.Product.Shop.UserId))
+				.ForMember(des => des.ShoptName, act => act.MapFrom(src => src.Product.Shop.ShopName))
+				.ForMember(des => des.ReasonReportProductId, act => act.MapFrom(src => src.ReasonReportProduct.ReasonReportProductId))
+				.ForMember(des => des.ReasonReportProductViName, act => act.MapFrom(src => src.ReasonReportProduct.ViName))
+				.ForMember(des => des.ReasonReportProductViExplanation, act => act.MapFrom(src => src.ReasonReportProduct.ViExplanation))
+				.ForMember(des => des.ReportProductStatusId, act => act.MapFrom(src => src.ReportProductStatusId))
+				.ReverseMap();
 		}
 	}
 }

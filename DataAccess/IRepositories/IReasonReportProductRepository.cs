@@ -11,5 +11,5 @@ namespace DataAccess.IRepositories
     {
         List<ReasonReportProduct> GetAll();
         ReasonReportProduct? GetEntityById(int reasonReportProductId);
-    }
+	}
 }
