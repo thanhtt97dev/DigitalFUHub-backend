@@ -37,9 +37,9 @@ namespace DataAccess.DAOs
 			{
 				var coupons = context.Coupon.Where(c => c.ShopId == shopId
 															&& c.IsActive == true
-															&& c.EndDate > DateTime.Now
-															&& c.StartDate < DateTime.Now
-															&& c.IsPublic == true).ToList();
+															&&
+                                                            c.StartDate <= DateTime.Now && DateTime.Now <= c.EndDate
+                                                            && c.IsPublic == true).ToList();
 
 				foreach (var item in coupons)
 				{
@@ -63,8 +63,7 @@ namespace DataAccess.DAOs
 											&& c.ShopId == shopId
 											&& c.IsActive == true
 											&& c.IsPublic == false
-											&& c.EndDate > DateTime.Now
-											&& c.StartDate < DateTime.Now);
+                                            &&c.StartDate <= DateTime.Now && DateTime.Now <= c.EndDate);
 
 				return coupon;
 			}
