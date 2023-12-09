@@ -30,7 +30,7 @@ namespace DataAccess.DAOs
             }
         }
 
-        internal List<FeedbackBenefitAdminResponseDTO> GetFeedbackBenefits(long feedbackBenefitId, long maxCoin, DateTime? fromDate, DateTime? toDate)
+        internal List<FeedbackBenefitAdminResponseDTO> GetFeedbackBenefits(long feedbackBenefitId, long coin, DateTime? fromDate, DateTime? toDate)
         {
             using (DatabaseContext context = new DatabaseContext())
             {
@@ -38,8 +38,8 @@ namespace DataAccess.DAOs
                             where (1 == 1) &&
                             (feedbackBenefitId != 0 ? feebackBenefit.FeedbackBenefitId == feedbackBenefitId : true) &&
                             (fromDate != null && toDate != null) ? fromDate <= feebackBenefit.StartDate && toDate >= feebackBenefit.StartDate : true &&
-                            feebackBenefit.Coin <= maxCoin
-                            select new FeedbackBenefitAdminResponseDTO
+                            feebackBenefit.Coin <= coin
+                                        select new FeedbackBenefitAdminResponseDTO
                             {
                                 FeedbackBenefitId = feebackBenefit.FeedbackBenefitId,
                                 Coin = feebackBenefit.Coin,

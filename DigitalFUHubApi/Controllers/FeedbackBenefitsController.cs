@@ -39,7 +39,7 @@ namespace DigitalFUHubApi.Controllers
                 long feedbackBenefitId;
                 long.TryParse(request.FeedbackBenefitId, out feedbackBenefitId);
 
-                var fees = feedbackBenefitRepository.GetFeedbackBenefits(feedbackBenefitId, request.MaxCoin, fromDate, toDate);
+                var fees = feedbackBenefitRepository.GetFeedbackBenefits(feedbackBenefitId, request.Coin, fromDate, toDate);
                 return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, fees));
             }
             catch (Exception ex)
@@ -55,12 +55,9 @@ namespace DigitalFUHubApi.Controllers
         public IActionResult AddNewFeedbackBenefit(FeedbackBenefitAdminCreateRequestDTO request)
         {
             if (!ModelState.IsValid) return BadRequest();
-
-            ResponseData responseData = new ResponseData();
             try
             {
                 feedbackBenefitRepository.AddNewFeedbackBenefit(request.Coin);
-
                 return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new { }));
             }
             catch (Exception ex)

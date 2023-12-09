@@ -11,7 +11,7 @@ namespace DataAccess.IRepositories
 {
     public interface IFeedbackBenefitRepository
     {
-        List<FeedbackBenefitAdminResponseDTO> GetFeedbackBenefits(long feedbackBenefitId, long maxCoin, DateTime? fromDate, DateTime? toDate);
+        List<FeedbackBenefitAdminResponseDTO> GetFeedbackBenefits(long feedbackBenefitId, long coin, DateTime? fromDate, DateTime? toDate);
         void AddNewFeedbackBenefit(long coin);
     }
 }

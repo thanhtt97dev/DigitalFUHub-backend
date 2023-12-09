@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
     {
         public void AddNewFeedbackBenefit(long coin) => FeedbackBenefitDAO.Instance.AddNewFeedbackBenefit(coin);
 
-        public List<FeedbackBenefitAdminResponseDTO> GetFeedbackBenefits(long feedbackBenefitId, long maxCoin, DateTime? fromDate, DateTime? toDate)
-            => FeedbackBenefitDAO.Instance.GetFeedbackBenefits(feedbackBenefitId, maxCoin, fromDate, toDate);
+        public List<FeedbackBenefitAdminResponseDTO> GetFeedbackBenefits(long feedbackBenefitId, long coin, DateTime? fromDate, DateTime? toDate)
+            => FeedbackBenefitDAO.Instance.GetFeedbackBenefits(feedbackBenefitId, coin, fromDate, toDate);
     }
 }

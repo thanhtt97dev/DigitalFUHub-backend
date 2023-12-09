@@ -55,8 +55,6 @@ namespace DigitalFUHubApi.Controllers
 		public IActionResult AddNewBusinessFee(CreateBusinessFeeRequestDTO request)
 		{
 			if (!ModelState.IsValid) return BadRequest();
-
-			ResponseData responseData = new ResponseData();
 			try
 			{
 				businessFeeRepository.AddNewBusinessFee(request.Fee);

@@ -9,7 +9,7 @@ namespace DTOs.BusinessFee
     public class FeedbackBenefitAdminRequestDTO
     {
         public string? FeedbackBenefitId { get; set; }
-        public long MaxCoin { get; set; }
+        public long Coin { get; set; }
         public string? FromDate { get; set; }
         public string? ToDate { get; set; }
     }
