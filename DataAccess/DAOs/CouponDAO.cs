@@ -35,11 +35,12 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var coupons = context.Coupon.Where(c => c.ShopId == shopId
+                DateTime now = DateTime.Now;
+                var coupons = context.Coupon.Where(c => c.ShopId == shopId
 															&& c.IsActive == true
 															&&
-                                                            c.StartDate <= DateTime.Now && DateTime.Now <= c.EndDate
-                                                            && c.IsPublic == true).ToList();
+															c.StartDate <= now && now <= c.EndDate
+															&& c.IsPublic == true).ToList();
 
 				foreach (var item in coupons)
 				{
@@ -57,13 +58,15 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var coupon = context
+                DateTime now = DateTime.Now;
+                var coupon = context
 								.Coupon
 								.FirstOrDefault(c => c.CouponCode.ToLower().Equals(couponCode.ToLower())
 											&& c.ShopId == shopId
 											&& c.IsActive == true
 											&& c.IsPublic == false
-                                            &&c.StartDate <= DateTime.Now && DateTime.Now <= c.EndDate);
+                                            &&
+                                            c.StartDate <= now && now <= c.EndDate);
 
 				return coupon;
 			}
