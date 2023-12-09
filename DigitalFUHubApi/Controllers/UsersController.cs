@@ -689,92 +689,92 @@
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Edit fullName user
-        [Authorize]
-        [HttpPut("EditFullNameUser")]
-        public IActionResult EditFullNameUser(SettingPersonalUpdateFullNameUserRequestDTO request)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(request.Fullname))
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "request invalid!", false, new()));
-                }
+		#region Edit fullName user
+		[Authorize]
+		[HttpPut("EditFullNameUser")]
+		public IActionResult EditFullNameUser(SettingPersonalUpdateFullNameUserRequestDTO request)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(request.Fullname))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "request invalid!", false, new()));
+				}
 
-                User? user = _userRepository.GetUserById(request.UserId);
+				User? user = _userRepository.GetUserById(request.UserId);
 
-                if (user == null)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found", false, new()));
-                }
+				if (user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found", false, new()));
+				}
 
 				// update fullname
 				user.Fullname = request.Fullname;
 
-                // Ok
-                _userRepository.UpdateSettingPersonalInfo(user);
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        #endregion
+				// Ok
+				_userRepository.UpdateSettingPersonalInfo(user);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
-        #region Edit avatar user
-        [Authorize]
-        [HttpPut("EditAvatarUser")]
-        public async Task<IActionResult> EditAvatarUser([FromForm] SettingPersonalUpdateAvatarUserRequestDTO request)
-        {
-            try
-            {
-                if (request.Avatar == null)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "request invalid!", false, new()));
-                }
+		#region Edit avatar user
+		[Authorize]
+		[HttpPut("EditAvatarUser")]
+		public async Task<IActionResult> EditAvatarUser([FromForm] SettingPersonalUpdateAvatarUserRequestDTO request)
+		{
+			try
+			{
+				if (request.Avatar == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "request invalid!", false, new()));
+				}
 
-                User? user = _userRepository.GetUserById(request.UserId);
+				User? user = _userRepository.GetUserById(request.UserId);
 
-                if (user == null)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found", false, new()));
-                }
+				if (user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "user not found", false, new()));
+				}
 
-                // Declares
-                string urlNewAvatar = "";
-                string filename = "";
-                DateTime now;
-                //
+				// Declares
+				string urlNewAvatar = "";
+				string filename = "";
+				DateTime now;
+				//
 
-                // update avatar user
-                now = DateTime.Now;
-                filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
-                    now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
-                    request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
+				// update avatar user
+				now = DateTime.Now;
+				filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month,
+					now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
+					request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
 
-                urlNewAvatar = await _azureFilesService.UploadFileToAzureAsync(request.Avatar, filename);
+				urlNewAvatar = await _azureFilesService.UploadFileToAzureAsync(request.Avatar, filename);
 				string urlOld = user.Avatar;
-                user.Avatar = urlNewAvatar;
+				user.Avatar = urlNewAvatar;
 
-                // delete avatar old
-                await _azureFilesService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
+				// delete avatar old
+				await _azureFilesService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
 
-                // Ok
-                _userRepository.UpdateSettingPersonalInfo(user);
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        #endregion
+				// Ok
+				_userRepository.UpdateSettingPersonalInfo(user);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
-        #region Get Coin
-        [Authorize]
+		#region Get Coin
+		[Authorize]
 		[HttpGet("GetCoin/{userId}")]
 		public IActionResult GetCoin(long userId)
 		{
@@ -917,7 +917,7 @@
 		}
 		#endregion
 
-		#region Get user info by Id for admin
+		#region Get user info by id for admin
 		[Authorize("Admin")]
 		[HttpGet("Admin/UserInfo/{id}")]
 		public IActionResult GetUser(long id)
@@ -926,7 +926,7 @@
 			{
 				if (id == Constants.ADMIN_USER_ID) throw new Exception("Not allowed");
 				User? user = _userRepository.GetUserInfoById(id);
-				if(user == null)
+				if (user == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
@@ -937,54 +937,54 @@
 				return BadRequest(ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Change Password
-        [HttpPost("changePassword")]
-        [Authorize]
-        public IActionResult ChangePassword(ChangePasswordRequestDTO request)
-        {
-            try
-            {
-                if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
-                {
-                    return Unauthorized();
-                }
+		#region Change Password
+		[HttpPost("changePassword")]
+		[Authorize]
+		public IActionResult ChangePassword(ChangePasswordRequestDTO request)
+		{
+			try
+			{
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User))
+				{
+					return Unauthorized();
+				}
 
-                //if (!Regex.IsMatch(request.Password, Constants.REGEX_PASSWORD_SIGN_UP))
-                //{
-                //	return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Password Invalid", false, new()));
-                //}
+				//if (!Regex.IsMatch(request.Password, Constants.REGEX_PASSWORD_SIGN_UP))
+				//{
+				//	return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Password Invalid", false, new()));
+				//}
 
-                // check user exists
-                var user = _userRepository.GetUserById(request.UserId);
+				// check user exists
+				var user = _userRepository.GetUserById(request.UserId);
 
-                if (user == null)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "User not found", false, new()));
-                }
+				if (user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "User not found", false, new()));
+				}
 
-                if (!user.IsChangeUsername)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_USERNAME_PASSWORD_NOT_ACTIVE, "This user has not yet activated their account and password", false, new()));
-                }
+				if (!user.IsChangeUsername)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_USERNAME_PASSWORD_NOT_ACTIVE, "This user has not yet activated their account and password", false, new()));
+				}
 
-                if (!user.Password.Equals(request.OldPassword))
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_PASSWORD_OLD_INCORRECT, "The old password is incorrect", false, new()));
-                }
+				if (!user.Password.Equals(request.OldPassword))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_USER_PASSWORD_OLD_INCORRECT, "The old password is incorrect", false, new()));
+				}
 
 				// set new password
 				user.Password = request.NewPassword;
 
-                _userRepository.UpdateUser(user);
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+				_userRepository.UpdateUser(user);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 		#endregion
 
 		#region Get info wallet
@@ -995,7 +995,7 @@
 			try
 			{
 				User? user = _userRepository.GetUserById(_jwtTokenService.GetUserIdByAccessToken(User));
-				if(user == null)
+				if (user == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
@@ -1008,6 +1008,36 @@
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
+		#region
+		[Authorize("Admin")]
+		[HttpPost("Admin/EditStatus")]
+		public IActionResult EditStatusUser(EditStatusUserRequestDTO request)
+		{
+			try
+			{
+				if (request.UserId == Constants.ADMIN_USER_ID) throw new Exception("Not allowed");
+				if (!request.Status && string.IsNullOrWhiteSpace(request.Note))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
+				}
+				User? user = _userRepository.GetUserById(request.UserId);
+				if (user == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				user.Status = request.Status;
+				user.Note = request.Status ? null : request.Note;
+				user.BanDate = request.Status ? null : DateTime.Now;
+				_userRepository.UpdateUser(user);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
 			}
 		}
 		#endregion
