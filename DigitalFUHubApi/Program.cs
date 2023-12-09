@@ -126,6 +126,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<IReportProductRepository, ReportProductRepository>();
             builder.Services.AddSingleton<IReasonReportProductRepository, ReasonReportProductRepository>();
             builder.Services.AddSingleton<ISliderRepository, SliderRepository>();
+            builder.Services.AddSingleton<IFeedbackBenefitRepository, FeedbackBenefitRepository>();
 
             builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 			
@@ -134,7 +135,7 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
 			builder.Services.AddSingleton<MailService>();
 			builder.Services.AddSingleton<MbBankService>();
-			builder.Services.AddSingleton<AzureFilesService>();
+			builder.Services.AddSingleton<AzureStorageAccountService>();
 			builder.Services.AddSingleton<OpticalCharacterRecognitionService>();
 
 			//Add SignalR

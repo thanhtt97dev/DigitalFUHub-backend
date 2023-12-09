@@ -20,15 +20,15 @@ namespace DigitalFUHubApi.Controllers
 	{
 		private readonly IOrderRepository _orderRepository;
 		private readonly IFeedbackRepository _feedbackRepository;
-		private readonly AzureFilesService _azureFilesService;
+		private readonly AzureStorageAccountService _azureStorageAccountService;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly IMapper _mapper;
 
-		public FeedbacksController(IOrderRepository orderRepository, IFeedbackRepository feedbackRepository, AzureFilesService azureFilesService, JwtTokenService jwtTokenService, IMapper mapper)
+		public FeedbacksController(IOrderRepository orderRepository, IFeedbackRepository feedbackRepository, AzureStorageAccountService azureStorageAccountService, JwtTokenService jwtTokenService, IMapper mapper)
 		{
 			_orderRepository = orderRepository;
 			_feedbackRepository = feedbackRepository;
-			_azureFilesService = azureFilesService;
+			_azureStorageAccountService = azureStorageAccountService;
 			_jwtTokenService = jwtTokenService;
 			_mapper = mapper;
 		}
@@ -130,13 +130,13 @@ namespace DigitalFUHubApi.Controllers
 					{
 						now = DateTime.Now;
 						filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day, now.Millisecond, now.Second, now.Minute, now.Hour, file.FileName.Substring(file.FileName.LastIndexOf(".")));
-						string path = await _azureFilesService.UploadFileToAzureAsync(file, filename);
+						string path = await _azureStorageAccountService.UploadFileToAzureAsync(file, filename);
 						urlImages.Add(path);
 					}
 				}
 
 
-				int bonusCoin = _feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
+				long bonusCoin = _feedbackRepository.AddFeedbackOrder(request.UserId, request.OrderId, request.OrderDetailId, request.Content, request.Rate, urlImages);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, bonusCoin));
 			}
 			catch (ArgumentOutOfRangeException)

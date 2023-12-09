@@ -19,7 +19,10 @@ namespace DataAccess.IRepositories
 		List<Shop> GetShopsWithCondition(long shopId, string shopEmail, string shopName, int shopStatusId, int page);
 		Shop? GetShopDetail(long userId);
 		Shop? GetMostPopularShop(string keyword);
-		(long, List<Shop>) GetListShop(string keyword, int page);
+		Shop? GetShopDetailAdmin(long userId);
+        (long, List<Shop>) GetListShop(string keyword, int page);
 		void UpdateBanShop(long shopId);
-	}
+		void UpdateShop(Shop shop);
+
+    }
 }

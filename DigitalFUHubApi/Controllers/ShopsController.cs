@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using System.Text.RegularExpressions;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -22,7 +23,7 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IShopRepository _shopRepository;
 		private readonly IUserRepository _userRepository;
 		private readonly JwtTokenService _jwtTokenService;
-		private readonly AzureFilesService _azureFilesService;
+		private readonly AzureStorageAccountService _azureStorageAccountService;
 		private readonly MailService _mailService;
 
 		private readonly IMapper _mapper;
@@ -30,14 +31,14 @@ namespace DigitalFUHubApi.Controllers
 		public ShopsController(IShopRepository shopRepository, 
 			IUserRepository userRepository, 
 			JwtTokenService jwtTokenService, 
-			AzureFilesService azureFilesService, 
+			AzureStorageAccountService azureStorageAccountService, 
 			MailService mailService, 
 			IMapper mapper)
 		{
 			_shopRepository = shopRepository;
 			_userRepository = userRepository;
 			_jwtTokenService = jwtTokenService;
-			_azureFilesService = azureFilesService;
+			_azureStorageAccountService = azureStorageAccountService;
 			_mailService = mailService;
 			_mapper = mapper;
 		}
@@ -103,7 +104,7 @@ namespace DigitalFUHubApi.Controllers
 				string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 					now.Millisecond, now.Second, now.Minute, now.Hour,
 					request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
-				string avatarUrl = await _azureFilesService.UploadFileToAzureAsync(request.AvatarFile, filename);
+				string avatarUrl = await _azureStorageAccountService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				_shopRepository.AddShop(avatarUrl, request.ShopName.Trim(), request.UserId, request.ShopDescription.Trim());
 				string html = $"<div>" +
 					$"<h3>Xin chào {user.Fullname},</h3>" +
@@ -156,7 +157,7 @@ namespace DigitalFUHubApi.Controllers
 					string filename = string.Format("{0}_{1}{2}{3}{4}{5}{6}{7}{8}", request.UserId, now.Year, now.Month, now.Day,
 						now.Millisecond, now.Second, now.Minute, now.Hour,
 						request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
-					avatarUrl = await _azureFilesService.UploadFileToAzureAsync(request.AvatarFile, filename);
+					avatarUrl = await _azureStorageAccountService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				}
 				Shop shop = new Shop
 				{
@@ -235,10 +236,36 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Get most popular shop 
-		[HttpGet("MostPopular")]
+        #region Get shop detail (admin)
+        [HttpGet("admin/getById/{userId}")]
+		[Authorize("Admin")]
+		public IActionResult GetShopDetailAdmin(long userId)
+        {
+            try
+            {
+                Shop? shop = _shopRepository.GetShopDetailAdmin(userId);
+
+                if (shop == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found!", false, new()));
+                }
+
+                var shopResponse = _mapper.Map<ShopDetailAdminResponseDTO>(shop);
+
+                // Ok
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, shopResponse));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+        #region Get most popular shop 
+        [HttpGet("MostPopular")]
 		public IActionResult GetMostPopularShop(string keyword)
 		{
 			if (string.IsNullOrWhiteSpace(keyword))
@@ -279,7 +306,38 @@ namespace DigitalFUHubApi.Controllers
 				TotalItems = totalItems
 			}));
 		}
-		#endregion
+        #endregion
 
-	}
+        #region Update shop (admin)
+        [HttpPost("admin/update")]
+        [Authorize("Admin")]
+        public IActionResult UpdateShop(ShopDetailAdminUpdateStatusRequestDTO request)
+        {
+            try
+            {
+                Shop? shop = _shopRepository.GetShopById(request.ShopId);
+
+                if (shop == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found!", false, new()));
+                }
+
+				// update shop
+				shop.IsActive = request.IsActive;
+				shop.Note = request.Note;
+				shop.DateBan = DateTime.Now;
+
+				_shopRepository.UpdateShop(shop);
+
+                // Ok
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ()));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+    }
 }
