@@ -1020,7 +1020,7 @@
 		}
 		#endregion
 
-		#region
+		#region edit status user
 		[Authorize("Admin")]
 		[HttpPost("Admin/EditStatus")]
 		public IActionResult EditStatusUser(EditStatusUserRequestDTO request)
@@ -1036,6 +1036,10 @@
 				if (user == null)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
+				}
+				if(user.Status == request.Status)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Users in that status, cannot edit again", false, new()));
 				}
 				user.Status = request.Status;
 				user.Note = request.Status ? null : request.Note;
