@@ -479,10 +479,12 @@ namespace DataAccess.DAOs
 						#region Check coupon
 						if (!string.IsNullOrEmpty(shopProduct.Coupon))
 						{
+							var now = DateTime.Now;
 							var coupon = (from c in context.Coupon
 										  where
 										  shopProduct.Coupon == c.CouponCode &&
-										  c.StartDate > DateTime.Now && c.EndDate > DateTime.Now &&
+										  now > c.StartDate &&
+										  now < c.EndDate &&
 										  c.IsActive && c.Quantity > 0
 										  select c).FirstOrDefault();
 							if (coupon == null)
