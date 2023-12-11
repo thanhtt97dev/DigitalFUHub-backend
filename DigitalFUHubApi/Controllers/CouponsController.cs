@@ -54,71 +54,56 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 		#region Get coupon public (customer)
+		[Authorize]
 		[HttpGet("GetCouponPublic")]
 		public IActionResult GetCouponPublic(long shopId)
 		{
-			ResponseData response = new ResponseData();
 			try
 			{
-				if (shopId == 0)
+				var shop = _shopRepository.GetShopById(shopId);
+
+                if (shop == null)
 				{
-					response.Status.Ok = false;
-					response.Status.Message = "Invalid";
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					return Ok(response);
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found", false, new()));
 				}
 
 				List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetCouponPublic(shopId));
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				response.Status.Message = "Success";
-				response.Status.Ok = true;
-				response.Result = coupons;
-				return Ok(response);
-
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, coupons));
 			}
 			catch (Exception ex)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Get coupon private
-		[HttpGet("GetCouponPrivate")]
+        #region Get coupon private
+        [Authorize]
+        [HttpGet("GetCouponPrivate")]
 		public IActionResult GetCouponPrivate(string couponCode, long shopId)
 		{
-			ResponseData response = new ResponseData();
 			try
 			{
-				if (string.IsNullOrEmpty(couponCode))
-				{
-					response.Status.Ok = false;
-					response.Status.Message = "Invalid";
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					return Ok(response);
-				}
+                var shop = _shopRepository.GetShopById(shopId);
 
-				if (shopId == 0)
+                if (shop == null)
+                {
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found", false, new()));
+                }
+
+                if (string.IsNullOrEmpty(couponCode))
 				{
-					response.Status.Ok = false;
-					response.Status.Message = "Invalid";
-					response.Status.ResponseCode = Constants.RESPONSE_CODE_NOT_ACCEPT;
-					return Ok(response);
-				}
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param", false, new()));
+                }
 
 				CouponResponseDTO coupon = _mapper.Map<CouponResponseDTO>(_couponRepository.GetCouponPrivate(couponCode, shopId));
-				response.Status.ResponseCode = Constants.RESPONSE_CODE_SUCCESS;
-				response.Status.Message = "Success";
-				response.Status.Ok = true;
-				response.Result = coupon;
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, coupon));
 
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(ex.Message);
-			}
-
-			return Ok(response);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 		}
 		#endregion
 
