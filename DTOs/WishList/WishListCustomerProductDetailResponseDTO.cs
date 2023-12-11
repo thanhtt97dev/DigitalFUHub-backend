@@ -14,8 +14,9 @@ namespace DTOs.WishList
         public long TotalRatingStar { get; set; }
         public long NumberFeedback { get; set; }
         public int SoldCount { get; set; }
-        public long ProductStatusId { get; set; }
-        public int QuantityProductRemaining { get; set; }
+        public bool IsProductStock { get; set; }
+        public bool IsShopActivate { get; set; }
+        public bool IsProductActivate { get; set; }
         public WishListCustomerProductVariantResponseDTO? ProductVariant { get; set; }
     }
 }

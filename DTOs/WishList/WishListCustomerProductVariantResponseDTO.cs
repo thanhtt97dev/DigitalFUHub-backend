@@ -10,7 +10,6 @@ namespace DTOs.WishList
 {
     public class WishListCustomerProductVariantResponseDTO
     {
-        public long ProductVariantId { get; set; }
         public int Discount { get; set; }
         public long Price { get; set; }
     }

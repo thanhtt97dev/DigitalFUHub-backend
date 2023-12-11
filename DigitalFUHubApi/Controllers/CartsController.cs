@@ -41,9 +41,10 @@ namespace DigitalFUHubApi.Controllers
             this.mapper = mapper;
 		}
 
-		[HttpPost("addProductToCart")]
-        //[Authorize]
-        public IActionResult AddProductToCart([FromBody] AddProductToCartRequestDTO request)
+        #region add product to cart
+        [Authorize]
+        [HttpPost("addProductToCart")]
+		public IActionResult AddProductToCart([FromBody] AddProductToCartRequestDTO request)
         {
             try
             {
@@ -86,8 +87,9 @@ namespace DigitalFUHubApi.Controllers
                 return BadRequest(new Status());
             }
         }
+        #endregion
 
-
+        #region get carts by userid
         [HttpGet("GetCartsByUserId/{userId}")]
 		[Authorize]
 		public IActionResult GetCartsByUserId(long userId)
@@ -114,7 +116,9 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
         }
+        #endregion
 
+        #region update cart
         [HttpPut("Update")]
         [Authorize]
         public IActionResult UpdateCart(UpdateCartRequestDTO request)
@@ -156,7 +160,9 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
         }
+        #endregion
 
+        #region delete cart detail
         [HttpPost("DeleteCartDetail")]
         [Authorize]
         public IActionResult DeleteCartDetail([FromBody] int cartDetailId)
@@ -179,8 +185,10 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
         }
+        #endregion
 
-		[HttpPost("DeleteCart")]
+        #region delete cart
+        [HttpPost("DeleteCart")]
 		[Authorize]
 		public IActionResult DeleteCart([FromBody] List<DeleteCartRequestDTO> requestDTO)
 		{
@@ -197,5 +205,6 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-	}
+        #endregion
+    }
 }
