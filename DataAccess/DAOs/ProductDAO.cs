@@ -889,7 +889,7 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.User)
 					.Include(x => x.ProductVariants)
 					.ThenInclude(x => x.AssetInformations)
-					.Where(x => x.Shop.User.Status == true
+					.Where(x => x.Shop.User.Status == true && x.Shop.IsActive == true
 						&& (x.ProductName.ToLower().Contains(keywordSearch)
 							|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
 						&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
