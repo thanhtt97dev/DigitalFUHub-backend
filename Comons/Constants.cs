@@ -214,7 +214,7 @@ namespace Comons
 
 		//withdraw, deposit transaction
 		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 20;
-		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 100000;
+		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 300000;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
