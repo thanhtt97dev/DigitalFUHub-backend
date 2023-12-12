@@ -200,7 +200,7 @@
 		}
 		#endregion
 
-		#region Confirm Email
+		#region Verify confirm Email
 		[HttpGet("ConfirmEmail/{token}")]
 		public IActionResult ConfirmEmail(string token)
 		{
@@ -239,9 +239,9 @@
 					{
 						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM, "Not confirm email", false, new()));
 					}
-					if (string.IsNullOrEmpty(user.Username))
+					if (string.IsNullOrEmpty(user.Password))
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE, "Username not register", false, new()));
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE, "Never set a password for your Google login account", false, new()));
 					}
 					string newPassword = Util.Instance.RandomPassword8Chars();
 					string passwordHash = Util.Instance.Sha256Hash(newPassword);
@@ -261,7 +261,7 @@
 					return Conflict();
 				}
 			}
-			return Ok();
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 
 
 		}
@@ -755,12 +755,12 @@
 					now.Day, now.Millisecond, now.Second, now.Minute, now.Hour,
 					request.Avatar.FileName.Substring(request.Avatar.FileName.LastIndexOf(".")));
 
-                urlNewAvatar = await _azureStorageAccountService.UploadFileToAzureAsync(request.Avatar, filename);
+				urlNewAvatar = await _azureStorageAccountService.UploadFileToAzureAsync(request.Avatar, filename);
 				string urlOld = user.Avatar;
 				user.Avatar = urlNewAvatar;
 
-                // delete avatar old
-                await _azureStorageAccountService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
+				// delete avatar old
+				await _azureStorageAccountService.RemoveFileFromAzureAsync(urlOld.Substring(urlOld.LastIndexOf("/") + 1));
 
 				// Ok
 				_userRepository.UpdateSettingPersonalInfo(user);
@@ -914,7 +914,7 @@
 				{
 					Total = numberUsers,
 					Users = _mapper.Map<List<UsersResponseDTO>>(users)
-			};
+				};
 
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", false, result));
 			}
@@ -1020,10 +1020,10 @@
 		}
 		#endregion
 
-		#region edit status user
+		#region Edit status user
 		[Authorize("Admin")]
 		[HttpPost("Admin/EditStatus")]
-		public IActionResult EditStatusUser(EditStatusUserRequestDTO request)
+		public async Task<IActionResult> EditStatusUser(EditStatusUserRequestDTO request)
 		{
 			try
 			{
@@ -1037,7 +1037,7 @@
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 				}
-				if(user.Status == request.Status)
+				if (user.Status == request.Status)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Users in that status, cannot edit again", false, new()));
 				}
@@ -1045,6 +1045,21 @@
 				user.Note = request.Status ? null : request.Note;
 				user.BanDate = request.Status ? null : DateTime.Now;
 				_userRepository.UpdateUser(user);
+				string html = request.Status
+					?
+					$"<div>" +
+					$"<h3>Xin chào {user.Fullname},</h3>" +
+					$"<div>Tài khoản của bạn đã được hoạt động trở lại.</div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+					$"</div>"
+					:
+					$"<div>" +
+					$"<h3>Xin chào {user.Fullname},</h3>" +
+					$"<div>Tài khoản của bạn đã bị khóa vì vi phạm chính sách của chúng tôi.</div>" +
+					$"<div>Lý do bị khóa: <b>{request.Note}</b></div>" +
+					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+					$"</div>";
+				await _mailService.SendEmailAsync(user.Email, request.Status ? "DigitalFUHub: Gỡ khóa tài khoản" : "DigitalFUHub: Tài khoản đã bị khóa", html);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception ex)
