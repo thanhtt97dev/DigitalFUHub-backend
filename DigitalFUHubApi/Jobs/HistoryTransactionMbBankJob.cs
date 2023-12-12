@@ -29,7 +29,7 @@ namespace DigitalFUHubApi.Jobs
 			if (data.transactionHistoryList != null)
 			{
 				transactionHistoryList = data.transactionHistoryList
-					.Where(x => x.creditAmount != 0 && x.description.Contains(Constants.BANK_TRANSACTION_CODE_KEY)).ToList();
+					.Where(x => x.description.Contains(Constants.BANK_TRANSACTION_CODE_KEY)).ToList();
 			}
 
 			string? directoryPathStoreData = Constants.MB_BANK_DIRECTORY_PATH_STORE_TRANSACTION_DATA;
