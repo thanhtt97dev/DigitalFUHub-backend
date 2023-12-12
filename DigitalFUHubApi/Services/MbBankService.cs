@@ -45,7 +45,7 @@ namespace DigitalFUHubApi.Services
 				accountNo = mbBankAccount.AccountNo,
 				deviceIdCommon = mbBankAccount.DeviceIdCommon,
 				refNo = mbBankAccount.RefNo,
-				fromDate = DateTime.Now.AddDays(-5).ToString("dd/MM/yyyy"),
+				fromDate = DateTime.Now.AddDays(-2).ToString("dd/MM/yyyy"),
 				sessionId = mbBankAccount.SessionId,
 				toDate = DateTime.Now.ToString("dd/MM/yyyy")
 			};
