@@ -217,12 +217,12 @@ namespace DigitalFUHubApi
 							);
 
 				var jobKeyHistoryWithdrawTransactionMbBankJob = new JobKey("HistoryWithdrawTransactionMbBankJob");
-				configure.AddJob<HistoryDepositTransactionMbBankJob>(jobKeyHistoryWithdrawTransactionMbBankJob)
+				configure.AddJob<HistoryWithdrawTransactionMbBankJob>(jobKeyHistoryWithdrawTransactionMbBankJob)
 						 .AddTrigger(trigger =>
 							trigger.ForJob(jobKeyHistoryWithdrawTransactionMbBankJob)
 							.StartNow()
 							.WithSimpleSchedule(schedule => 
-								schedule.WithIntervalInSeconds(301).RepeatForever()
+								schedule.WithIntervalInSeconds(183).RepeatForever()
 								)
 							);
 
