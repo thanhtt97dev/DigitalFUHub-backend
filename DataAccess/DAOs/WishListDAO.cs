@@ -40,11 +40,9 @@ namespace DataAccess.DAOs
                 var productIds = context.WishList.Where(x => x.UserId == userId).Select(x => x.ProductId);
 
                 var products = (from product in context.Product
+                                join shop in context.Shop
+                                on product.ShopId equals shop.UserId
                              where productIds.Contains(product.ProductId)
-                                &&
-                                (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-                                ||
-                                product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
                              select new Product
                              {
                                  ProductId = product.ProductId,
@@ -54,6 +52,7 @@ namespace DataAccess.DAOs
                                  NumberFeedback = product.NumberFeedback,
                                  SoldCount = product.SoldCount,
                                  ProductStatusId = product.ProductStatusId,
+                                 Shop = new Shop { IsActive = shop.IsActive},
                                  ProductVariants = (from productVariant in context.ProductVariant
                                                     where productVariant.ProductId == product.ProductId
                                                     select new ProductVariant
@@ -86,12 +85,10 @@ namespace DataAccess.DAOs
                 var productIds = context.WishList.Where(x => x.UserId == userId).Select(x => x.ProductId);
 
                 return (from product in context.Product
-                                where productIds.Contains(product.ProductId)
-                                   &&
-                                   (product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
-                                   ||
-                                   product.ProductStatusId == Constants.PRODUCT_STATUS_BAN)
-                                select new Product {}).Count();
+                        join shop in context.Shop
+                        on product.ShopId equals shop.UserId
+                        where productIds.Contains(product.ProductId)
+                        select new Product {}).Count();
             }
         }
 

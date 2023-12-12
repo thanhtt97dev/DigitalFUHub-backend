@@ -110,8 +110,8 @@ namespace Comons
 
 		//Azure
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
-		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub.cognitiveservices.azure.com";
-		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "459218fca6244846a1fce8624ea79a95";
+		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub-testing.cognitiveservices.azure.com";
+		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "01e633a3d5e74d648cc030f7e551fe32";
 		public const string AZURE_EXTRACT_TEXT_FROM_IMAGE_API = $"{AZURE_COMPUTER_VISION_ENDPOINT}/computervision/imageanalysis:analyze?api-version=2023-02-01-preview&features=read&language=en";
 
 		// Product Status
@@ -214,7 +214,7 @@ namespace Comons
 
 		//withdraw, deposit transaction
 		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 20;
-		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 100000;
+		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 300000;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
 		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
