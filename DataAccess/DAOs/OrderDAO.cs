@@ -1142,8 +1142,8 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.AssetInformations)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
-					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId && x.ShopId == shopId
-					&& x.OrderStatusId != Constants.ORDER_STATUS_CONFIRMED);
+					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId && x.ShopId == shopId);
+					//&& x.OrderStatusId != Constants.ORDER_STATUS_CONFIRMED);
 			}
 		}
 
