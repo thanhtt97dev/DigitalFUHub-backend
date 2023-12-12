@@ -54,7 +54,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 
 		#region Get coupon public (customer)
-		[Authorize]
+		//[Authorize]
 		[HttpGet("GetCouponPublic")]
 		public IActionResult GetCouponPublic(long shopId)
 		{
@@ -78,7 +78,7 @@ namespace DigitalFUHubApi.Controllers
         #endregion
 
         #region Get coupon private
-        [Authorize]
+        //[Authorize]
         [HttpGet("GetCouponPrivate")]
 		public IActionResult GetCouponPrivate(string couponCode, long shopId)
 		{
