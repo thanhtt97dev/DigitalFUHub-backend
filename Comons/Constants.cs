@@ -110,8 +110,8 @@ namespace Comons
 
 		//Azure
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
-		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub.cognitiveservices.azure.com";
-		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "459218fca6244846a1fce8624ea79a95";
+		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub-testing.cognitiveservices.azure.com";
+		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "01e633a3d5e74d648cc030f7e551fe32";
 		public const string AZURE_EXTRACT_TEXT_FROM_IMAGE_API = $"{AZURE_COMPUTER_VISION_ENDPOINT}/computervision/imageanalysis:analyze?api-version=2023-02-01-preview&features=read&language=en";
 
 		// Product Status
