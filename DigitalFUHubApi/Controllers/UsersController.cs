@@ -200,7 +200,7 @@
 		}
 		#endregion
 
-		#region Confirm Email
+		#region Verify confirm Email
 		[HttpGet("ConfirmEmail/{token}")]
 		public IActionResult ConfirmEmail(string token)
 		{
@@ -239,9 +239,9 @@
 					{
 						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM, "Not confirm email", false, new()));
 					}
-					if (string.IsNullOrEmpty(user.Username))
+					if (string.IsNullOrEmpty(user.Password))
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE, "Username not register", false, new()));
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE, "Never set a password for your Google login account", false, new()));
 					}
 					string newPassword = Util.Instance.RandomPassword8Chars();
 					string passwordHash = Util.Instance.Sha256Hash(newPassword);
@@ -261,7 +261,7 @@
 					return Conflict();
 				}
 			}
-			return Ok();
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 
 
 		}

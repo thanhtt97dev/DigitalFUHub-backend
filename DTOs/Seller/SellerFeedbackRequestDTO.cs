@@ -33,6 +33,7 @@ namespace DTOs.Seller
 	}
 	public class SellerFeedbackDetailResponseDTO
 	{
+		public long ProductId{ get; set; }
 		public string ProductName { get; set; } = string.Empty;
 		public string Thumbnail { get; set; } = string.Empty;
 		public string ProductVariantName { get; set; } = string.Empty;

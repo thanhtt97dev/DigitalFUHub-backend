@@ -163,7 +163,7 @@ namespace DataAccess.DAOs
 
 					return feedbackBenefit.Coin;
 				}
-				catch(ArgumentOutOfRangeException e)
+				catch (ArgumentOutOfRangeException e)
 				{
 					transaction.Rollback();
 					throw new ArgumentOutOfRangeException(e.Message);
@@ -222,7 +222,7 @@ namespace DataAccess.DAOs
 						OrderDetails = x.OrderDetails.Where(od => od.IsFeedback == true
 							&& (rate == 0 ? true : od.Feedback.Rate == rate)
 							&& (fromDate == null ? true : fromDate.Value.Date <= od.Feedback.DateUpdate.Date)
-							&& (toDate == null? true: toDate.Value.Date >= od.Feedback.DateUpdate.Date)
+							&& (toDate == null ? true : toDate.Value.Date >= od.Feedback.DateUpdate.Date)
 							&& (od.ProductVariant.Product.ProductName ?? "").ToLower().Contains(productName.ToLower())
 							&& (od.ProductVariant.Name ?? "").ToLower().Contains(productVariantName.ToLower()))
 							.Select(od => new OrderDetail
@@ -330,7 +330,7 @@ namespace DataAccess.DAOs
 									 Content = feedback.Content,
 									 Rate = feedback.Rate,
 									 DateUpdate = feedback.DateUpdate,
-									 FeedbackMedias = context.FeedbackMedia.Where(x => x.FeedbackId == feedback.FeedbackId).ToList(),	
+									 FeedbackMedias = context.FeedbackMedia.Where(x => x.FeedbackId == feedback.FeedbackId).ToList(),
 								 }
 								)
 								.Skip((page - 1) * Constants.PAGE_SIZE_FEEDBACK)
