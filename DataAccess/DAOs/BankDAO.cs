@@ -123,7 +123,7 @@ namespace DataAccess.DAOs
 					foreach (var item in transactionHistoryCreditList)
 					{
 						var deposit = context.DepositTransaction
-								.FirstOrDefault(x => string.Equals(x.Code.ToLower(), item.description.ToLower()) &&
+								.FirstOrDefault(x => item.description.ToLower().Contains(x.Code.ToLower()) &&
 								x.Amount == item.creditAmount);
 						if (deposit != null)
 						{

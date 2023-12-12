@@ -19,6 +19,7 @@ namespace DigitalFUHubApi.Services
 
 		public async Task SendEmailAsync(string email, string subject, string message)
 		{
+			return;
 			string? mail = configuration["SendMail:Email"];
 			string? password = configuration["SendMail:Password"];
 			if(string.IsNullOrEmpty(mail) || string.IsNullOrEmpty(password)) return;
