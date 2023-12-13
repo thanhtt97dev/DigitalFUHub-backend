@@ -17,6 +17,7 @@ namespace DigitalFUHubApi.Services
 			configuration = _configuration;
 		}
 
+		#region Send mail
 		public async Task SendEmailAsync(string email, string subject, string message)
 		{
 			//return;
@@ -36,6 +37,7 @@ namespace DigitalFUHubApi.Services
 			mailMessage.IsBodyHtml = true;
 			await client.SendMailAsync(mailMessage);
 		}
+		#endregion
 
 		#region Warning Seller Violate
 		public async Task SendMailWarningSellerViolate(Order order, int totalOrderViolate)
@@ -163,7 +165,7 @@ namespace DigitalFUHubApi.Services
 		public async Task SendMailOrderComplain(Order order)
 		{
 			//send mail for customer
-			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHẾU NẠI";
+			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHIẾU NẠI";
 			var body =
 				$" <h4>Thông Báo: Trạng Thái Đơn Hàng Đang Khiếu nại</h4>" +
 				$"<p> " +
@@ -179,7 +181,7 @@ namespace DigitalFUHubApi.Services
 			await SendEmailAsync(order.User.Email, subject, body);
 
 			//send mail for seller
-			var subjectForSeller = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHẾU NẠI";
+			var subjectForSeller = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHIẾU NẠI";
 			var bodyForSeller =
 				$" <h4>Thông Báo: Trạng Thái Đơn Hàng Đang Khiếu nại</h4>" +
 				$"<p> " +
@@ -202,7 +204,7 @@ namespace DigitalFUHubApi.Services
 			//send mail for customer
 			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - HOÀN TIỀN";
 			var body =
-				$" <h4>Thông Báo: Trạng trạng thái đơn hàng đã hoàn tiền</h4>" +
+				$" <h4>Thông Báo: Trạng thái đơn hàng đã hoàn tiền</h4>" +
 				$"<p> " +
 				$"Chào {order.User.Fullname}, <br/>" +
 				$"Đơn hàng mã số #{order.OrderId} đã được hoàn tiền.<br/>" +
@@ -225,7 +227,7 @@ namespace DigitalFUHubApi.Services
 			//send mail for seller
 			var subjectForSeller = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHẾU NẠI";
 			var bodyForSeller =
-				$" <h4>Thông Báo: Trạng trạng thái đơn hàng đã hoàn tiền</h4>" +
+				$" <h4>Thông Báo: Trạng thái đơn hàng đã hoàn tiền</h4>" +
 				$"<p> " +
 				$"Chào {order.Shop.ShopName}, <br/>" +
 				$"Đơn hàng mã số #{order.OrderId} đã được hoàn tiền cho khách hàng.<br/>" +
@@ -245,7 +247,7 @@ namespace DigitalFUHubApi.Services
 			//send mail for customer
 			var subject = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - TRANH CHẤP";
 			var body =
-				$" <h4>Thông Báo: Trạng trạng thái đơn hàng tranh chấp</h4>" +
+				$" <h4>Thông Báo: Trạng thái đơn hàng tranh chấp</h4>" +
 				$"<p> " +
 				$"Chào {order.User.Fullname}, <br/>" +
 				$"Đơn hàng mã số #{order.OrderId} đang tranh chấp.<br/>" +
@@ -259,9 +261,9 @@ namespace DigitalFUHubApi.Services
 			await SendEmailAsync(order.User.Email, subject, body);
 
 			//send mail for seller
-			var subjectForSeller = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHẾU NẠI";
+			var subjectForSeller = $"DigitalFUHub: ĐƠN HÀNG #{order.OrderId} - KHIẾU NẠI";
 			var bodyForSeller =
-				$" <h4>Thông Báo: Trạng trạng thái đơn hàng tranh chấp</h4>" +
+				$" <h4>Thông Báo: Trạng thái đơn hàng tranh chấp</h4>" +
 				$"<p> " +
 				$"Chào {order.Shop.ShopName}, <br/>" +
 				$"Đơn hàng mã số #{order.OrderId} đang tranh chấp.<br/>" +

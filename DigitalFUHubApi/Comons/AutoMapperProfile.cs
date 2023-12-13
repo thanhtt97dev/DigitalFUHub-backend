@@ -391,6 +391,8 @@ namespace DigitalFUHubApi.Comons
 
 			CreateMap<User, UserInfoResponseDTO>()
 				.ForMember(des => des.Role, act => act.MapFrom(src => src.RoleId == Constants.SELLER_ROLE ? "Seller" : "Customer"))
+				.ForMember(des => des.ShopName, act => act.MapFrom(src => src.Shop.ShopName))
+				.ForMember(des => des.IsActive, act => act.MapFrom(src => src.Shop.IsActive))
 				.ForMember(des => des.NumberOrdersBuyed, act => act.MapFrom(src => src.Orders == null ? 0 : src.Orders.LongCount()))
 				.ForMember(des => des.TotalAmountOrdersBuyed, act => act.MapFrom(src => src.Orders == null ? 0 : src.Orders.Sum(x => (x.TotalAmount - x.TotalCouponDiscount))))
 				.ForMember(des => des.NumberOrderSold, act => act.MapFrom(src => src.Shop == null || src.Shop.Orders == null ? 0 : src.Shop.Orders.LongCount()))
