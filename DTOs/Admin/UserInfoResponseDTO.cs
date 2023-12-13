@@ -27,5 +27,7 @@ namespace DTOs.Admin
 		public long TotalAmountOrdersBuyed { get; set; }
 		public long NumberOrderSold { get; set; }
 		public long Profit { get; set; }
+		public string ShopName { get; set; } = string.Empty;
+		public bool IsActive { get; set; }
 	}
 }
