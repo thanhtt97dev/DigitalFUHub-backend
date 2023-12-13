@@ -186,7 +186,7 @@
 				string html = $"<div>" +
 					$"<h3>Xin chào {userSignUp.Fullname},</h3>" +
 					$"<div>Chào mừng bạn đến với DigitalFUHub.</div>" +
-					$"<div><span>Để có thể truy cập vào ứng dụng vui lòng nhấn vào:</span> <a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>tại đây</a></div>" +
+					$"<div><span>Để có thể truy cập vào ứng dụng vui lòng nhấn vào:</span> <a href='{string.Concat(Constants.FRONT_END_ENDPOINT_USER, "/confirmEmail?token=", token)}'>tại đây</a></div>" +
 					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>\r\n    " +
 					$"</div>";
 				await _mailService.SendEmailAsync(userSignUp.Email, "DigitalFUHub: Xác thực đăng ký tài khoản.", html);
@@ -288,7 +288,7 @@
 					string html = $"<div>" +
 					$"<h3>Xin chào {user.Fullname},</h3>" +
 					$"<div>Chào mừng bạn đến với DigitalFUHub.</div>" +
-					$"<div><span>Để có thể truy cập vào ứng dụng vui lòng nhấn vào:</span> <a href='{string.Concat(_configuration["EndpointFE:BaseUrl"], "/confirmEmail?token=", token)}'>tại đây</a></div>" +
+					$"<div><span>Để có thể truy cập vào ứng dụng vui lòng nhấn vào:</span> <a href='{string.Concat(Constants.FRONT_END_ENDPOINT_USER, "/confirmEmail?token=", token)}'>tại đây</a></div>" +
 					$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>\r\n    " +
 					$"</div>";
 					await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Xác thực đăng ký tài khoản.", html);
