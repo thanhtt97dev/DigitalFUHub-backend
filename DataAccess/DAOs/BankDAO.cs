@@ -169,19 +169,28 @@ namespace DataAccess.DAOs
 
 						if (withdraw != null)
 						{
-							if (withdraw.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID) continue;
-							// set status is paid
-							withdraw.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
-							withdraw.PaidDate = item.transactionDate;
+							//get withdraw transaction bill
+							var withdrawTransactionBill = context.WithdrawTransactionBill
+								.FirstOrDefault(x => x.WithdrawTransactionId == withdraw.WithdrawTransactionId);
+
+							if (withdrawTransactionBill != null) continue;
+
+							if (withdraw.WithdrawTransactionStatusId != Constants.WITHDRAW_TRANSACTION_PAID)
+							{
+								// set status is paid
+								withdraw.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
+								withdraw.PaidDate = item.transactionDate;
+							}
+							
 							// add bill info
-							WithdrawTransactionBill withdrawTransactionBill = new WithdrawTransactionBill()
+							WithdrawTransactionBill bill = new WithdrawTransactionBill()
 							{
 								WithdrawTransactionId = withdraw.WithdrawTransactionId,
 								PostingDate = item.postingDate,
 								TransactionDate = item.transactionDate,
 								AccountNo = item.accountNo,
 								CreditAmount = item.creditAmount,
-								DebitAmount = item.creditAmount,
+								DebitAmount = item.debitAmount,
 								Currency = item.currency,
 								Description = item.description,
 								AvailableBalance = item.availableBalance,
@@ -194,7 +203,7 @@ namespace DataAccess.DAOs
 								DocId = item.docId,
 								TransactionType = item.transactionType,
 							};
-							context.WithdrawTransactionBill.Add(withdrawTransactionBill);
+							context.WithdrawTransactionBill.Add(bill);
 						}
 					}
 					context.SaveChanges();
