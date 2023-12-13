@@ -963,7 +963,29 @@ namespace DataAccess.DAOs
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 			}
 		}
-	}
+
+        internal List<Product> GetProductSpecificOfCoupon(long couponId, string productName)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var products = (from couponProduct in context.CouponProduct
+								join product in context.Product
+								on couponProduct.ProductId equals product.ProductId
+								where couponProduct.CouponId == couponId
+								&& (string.IsNullOrEmpty(productName) ? true : product.ProductName.Trim().ToLower().Contains(productName.Trim().ToLower()))
+								&& product.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+                                && context.Shop.Any(x => x.UserId == product.ShopId && x.IsActive)
+                                select new Product
+								{
+									ProductId = product.ProductId,
+									ProductName = product.ProductName,
+									Thumbnail = product.Thumbnail
+								}).ToList();
+
+				return products;
+            }
+        }
+    }
 }
 
 

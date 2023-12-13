@@ -20,6 +20,7 @@ namespace DataAccess.IRepositories
 		void UpdateCoupon(Coupon coupon);
 		void UpdateCouponFinish(long couponId, long v);
 		Coupon? GetCouponDetailCustomer(long couponId);
+		Coupon? GetCouponEntityById(long couponId);
 
     }
 }

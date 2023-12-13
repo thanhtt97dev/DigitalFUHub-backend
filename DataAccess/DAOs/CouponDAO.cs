@@ -104,6 +104,8 @@ namespace DataAccess.DAOs
             {
                 DateTime now = DateTime.Now;
                 var coupon = (from coupons in context.Coupon
+							  join shops in context.Shop
+							  on coupons.ShopId equals shops.UserId
                               where coupons.CouponId == couponId
                               select new Coupon
                               {
@@ -115,6 +117,12 @@ namespace DataAccess.DAOs
                                   StartDate = coupons.StartDate,
                                   EndDate = coupons.EndDate,
                                   MinTotalOrderValue = coupons.MinTotalOrderValue,
+								  Shop = new Shop
+								  {
+									  UserId = shops.UserId,
+                                      Avatar = shops.Avatar,
+									  ShopName = shops.ShopName,
+                                  }
                               }).FirstOrDefault();
 
                 return coupon;
@@ -290,5 +298,22 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+
+		internal Coupon? GetCouponEntityById (long couponId)
+		{
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                try
+                {
+					Coupon? coupon = context.Coupon.FirstOrDefault(x => x.CouponId == couponId);
+
+					return coupon;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+            }
+        }
 	}
 }

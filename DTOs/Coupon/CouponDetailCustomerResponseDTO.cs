@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.Coupon
 {
-    public class CouponCartCustomerDetailResponseDTO
+    public class CouponDetailCustomerResponseDTO
     {
         public long CouponId { get; set; }
         public string? CouponName { get; set; }
@@ -16,5 +16,6 @@ namespace DTOs.Coupon
         public long MinTotalOrderValue { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public CouponDetailCustomerShopResponseDTO Shop { get; set; } = null!;
     }
 }

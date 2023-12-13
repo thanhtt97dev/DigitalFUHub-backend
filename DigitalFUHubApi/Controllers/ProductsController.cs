@@ -6,6 +6,7 @@ using DataAccess.IRepositories;
 using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
+using DTOs.Coupon;
 using DTOs.Feedback;
 using DTOs.Product;
 using DTOs.ReportProduct;
@@ -27,9 +28,10 @@ namespace DigitalFUHubApi.Controllers
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly HubService _hubService;
 		private readonly MailService _mailService;
-		private readonly IMapper _mapper;
+        private readonly ICouponRepository _couponRepository;
+        private readonly IMapper _mapper;
 
-		public ProductsController(IProductRepository productRepository, AzureStorageAccountService azureStorageAccountService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper)
+		public ProductsController(IProductRepository productRepository, AzureStorageAccountService azureStorageAccountService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper, ICouponRepository couponRepository)
 		{
 			_productRepository = productRepository;
 			_azureStorageAccountService = azureStorageAccountService;
@@ -37,7 +39,9 @@ namespace DigitalFUHubApi.Controllers
 			_hubService = hubService;
 			_mailService = mailService;
 			_mapper = mapper;
-		}
+			_couponRepository = couponRepository;
+
+        }
 
 		#region Get Product Detail
 		[HttpGet("GetById/{productId}")]
@@ -724,5 +728,30 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-	}
+		#region GetProductSpecificOfCoupon
+		[Authorize]
+		[HttpPost("GetProductSpecificOfCoupon")]
+        public IActionResult GetProductSpecificOfCoupon(CouponDetailCustomerProductRequestDTO request)
+        {
+            try
+            {
+				var coupon = _couponRepository.GetCouponEntityById(request.CouponId);
+
+				if (coupon == null)
+				{
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Coupon not found", false, new()));
+                }
+
+				var productResponse = _mapper.Map<List<CouponDetailCustomerProductResponseDTO>>(_productRepository.GetProductSpecificOfCoupon(request.CouponId, request.ProductName));
+
+                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, productResponse));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
+    }
 }

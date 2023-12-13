@@ -91,7 +91,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "coupon not found", false, new()));
 				}
 
-                CouponCartCustomerDetailResponseDTO couponResponse = _mapper.Map<CouponCartCustomerDetailResponseDTO>(coupon);
+                CouponDetailCustomerResponseDTO couponResponse = _mapper.Map<CouponDetailCustomerResponseDTO>(coupon);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, couponResponse));
 			}
 			catch (Exception ex)
@@ -99,10 +99,10 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region Get coupon private
-		[Authorize]
+        #region Get coupon private
+        [Authorize]
 		[HttpGet("GetCouponPrivate")]
 		public IActionResult GetCouponPrivate(string couponCode, long shopId)
 		{
