@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOs.Coupon
 {
-    public class CouponResponseDTO
+    public class CouponCartCustomerResponseDTO
     {
         public long CouponId { get; set; }
         public string? CouponName { get; set; }

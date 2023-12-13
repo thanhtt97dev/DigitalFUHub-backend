@@ -31,5 +31,6 @@ namespace DataAccess.Repositories
 
 		public void UpdateCouponFinish(long couponId, long userId) => CouponDAO.Instance.UpdateCouponFinish( couponId, userId);
 
-	}
+        public Coupon? GetCouponDetailCustomer(long couponId) => CouponDAO.Instance.GetCouponDetailCustomer(couponId);
+    }
 }
