@@ -277,11 +277,10 @@ namespace DataAccess.DAOs
 				deposits = context.DepositTransaction
 							.Include(x => x.User)
 							.Where(x =>
-								(
 									(!string.IsNullOrEmpty(email)) ? x.User.Email.Contains(email) : true &&
-									fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true &&
+									((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
 									(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-									x.IsPay
+									x.IsPay == true
 								)
 							.OrderByDescending(x => x.RequestDate)
 							.Skip((page - 1) * Constants.PAGE_SIZE)
