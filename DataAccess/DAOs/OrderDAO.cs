@@ -1285,7 +1285,6 @@ namespace DataAccess.DAOs
 						{
 							// update customer's account balance and coin
 							customer.AccountBalance = customer.AccountBalance + order.TotalPayment;
-							customer.Coin += order.TotalCoinDiscount;
 							// add transaction for refund money to customer
 							TransactionInternal transactionInternal = new TransactionInternal()
 							{
