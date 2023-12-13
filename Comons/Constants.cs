@@ -27,7 +27,7 @@ namespace Comons
 		public const string MB_BANK_API_INQUIRY_ACCOUNT_NAME = "https://online.mbbank.com.vn/api/retail_web/transfer/inquiryAccountName";
 
 		public const string MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA = "Data/mbBankAccountData.json";
-		public const string MB_BANK_DIRECTORY_PATH_STORE_DEPOSIT_DATA = "Data/historyDepositTransactionMbBank.json"; 
+		public const string MB_BANK_DIRECTORY_PATH_STORE_DEPOSIT_DATA = "Data/historyDepositTransactionMbBank.json";
 		public const string MB_BANK_DIRECTORY_PATH_STORE_WITHDRAW_DATA = "Data/historyWithdrawTransactionMbBank.json";
 		public const string MB_BANK_DIRECTORY_PATH_STORE_TRANSACTION_DATA = "Data/historyTransactionMbBank.json";
 
@@ -83,11 +83,11 @@ namespace Comons
 
 		public const string RESPONSE_CODE_FEEDBACK_ORDER_UN_COMFIRM = "FEEDBACK_01";
 
-        public const string RESPONSE_CODE_USER_USERNAME_PASSWORD_NOT_ACTIVE = "USER_ACCOUNT_01";
-        public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_ACCOUNT_02";
-        public const string RESPONSE_CODE_USER_PASSWORD_OLD_INCORRECT = "USER_ACCOUNT_03";
+		public const string RESPONSE_CODE_USER_USERNAME_PASSWORD_NOT_ACTIVE = "USER_ACCOUNT_01";
+		public const string RESPONSE_CODE_USER_USERNAME_ALREADY_EXISTS = "USER_ACCOUNT_02";
+		public const string RESPONSE_CODE_USER_PASSWORD_OLD_INCORRECT = "USER_ACCOUNT_03";
 
-        public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
+		public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
 
 
 
@@ -113,6 +113,8 @@ namespace Comons
 		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub-testing.cognitiveservices.azure.com";
 		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "01e633a3d5e74d648cc030f7e551fe32";
 		public const string AZURE_EXTRACT_TEXT_FROM_IMAGE_API = $"{AZURE_COMPUTER_VISION_ENDPOINT}/computervision/imageanalysis:analyze?api-version=2023-02-01-preview&features=read&language=en";
+		public const string AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=fptu;AccountKey=RQLNtnNQb2tPDiqpZtac1dcMZMpI2AdsS63ZyAzMMar5FVfOsFUulBu27ecGae9LhK7O8unXV3z3+ASt64pCYA==;EndpointSuffix=core.windows.net";
+		public const string AZURE_STORAGE_CONTAINER_NAME = "test";
 
 		// Product Status
 		public const int PRODUCT_STATUS_ALL = 0;
@@ -195,6 +197,7 @@ namespace Comons
 		public static int[] FEEDBACK_TYPES = new int[] { FEEDBACK_TYPE_ALL, FEEDBACK_TYPE_1_STAR, FEEDBACK_TYPE_2_STAR, FEEDBACK_TYPE_3_STAR, FEEDBACK_TYPE_4_STAR, FEEDBACK_TYPE_5_STAR, FEEDBACK_TYPE_HAVE_COMMENT, FEEDBACK_TYPE_HAVE_MEDIA };
 
 		//URL front-end
+		public const string FRONT_END_ENDPOINT_USER = "http://localhost:3000";
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 		public const string FRONT_END_SELLER_PRODUCT_URL = "/seller/product/";
 		public const string FRONT_END_SELLER_ORDER_DETAIL_URL = "/seller/order/";
@@ -209,8 +212,8 @@ namespace Comons
 		public const int PAGE_SIZE_PRODUCT_HOME_PAGE = 48;
 		public const int PAGE_SIZE_SEARCH_PRODUCT = 20;
 		public const int PAGE_SIZE_SEARCH_SHOP = 10;
-        public const int PAGE_SIZE_SLIDER = 20;		//ADMIN
-        public const int LIMIT_SEARCH_HINT = 10;
+		public const int PAGE_SIZE_SLIDER = 20;     //ADMIN
+		public const int LIMIT_SEARCH_HINT = 10;
 
 		//withdraw, deposit transaction
 		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 20;
@@ -248,9 +251,9 @@ namespace Comons
 
 		public const long UPLOAD_FILE_SIZE_LIMIT = 2 * 1024 * 1024;
 
-        public const int STATUS_ALL_SLIDER_FOR_FILTER = 0;
-        public const int STATUS_ACTIVE_SLIDER_FOR_FILTER = 1;
-        public const int STATUS_UN_ACTIVE_SLIDER_FOR_FILTER = 2;
+		public const int STATUS_ALL_SLIDER_FOR_FILTER = 0;
+		public const int STATUS_ACTIVE_SLIDER_FOR_FILTER = 1;
+		public const int STATUS_UN_ACTIVE_SLIDER_FOR_FILTER = 2;
 
 		//files
 		public const string EXECL_FOLDER_PATH = "Files/Excels/";

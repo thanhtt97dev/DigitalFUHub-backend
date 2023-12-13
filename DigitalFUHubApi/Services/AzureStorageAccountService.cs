@@ -11,26 +11,19 @@ namespace DigitalFUHubApi.Services
 {
 	public class AzureStorageAccountService
 	{
-		private readonly IConfiguration _configuration;
-
-		private readonly string connectionString = string.Empty;
-		private readonly string containerName = string.Empty;
-		public AzureStorageAccountService(IConfiguration configuration)
+		public AzureStorageAccountService()
 		{
-			_configuration = configuration;
-			connectionString = _configuration["Azure:StorageConnectionString"] ?? string.Empty;
-			containerName = _configuration["Azure:StorageContainerName"] ?? string.Empty;
 		}
 
 		public async Task<string> UploadFileToAzureAsync(IFormFile fileUpload, string filename)
 		{
 			try
 			{
-				BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
+				BlobContainerClient container = new BlobContainerClient(Constants.AZURE_STORAGE_CONNECTION_STRING, Constants.AZURE_STORAGE_CONTAINER_NAME);
 				var blobClient = container.GetBlobClient(filename);
 				var blobHttpHeader = new BlobHttpHeaders { ContentType = Util.Instance.GetContentType(filename) };
 				await blobClient.UploadAsync(fileUpload.OpenReadStream(), new BlobUploadOptions { HttpHeaders = blobHttpHeader });
-				return string.Format("{0}/{1}/{2}", Constants.AZURE_ROOT_PATH,containerName,filename);
+				return string.Format("{0}/{1}/{2}", Constants.AZURE_ROOT_PATH, Constants.AZURE_STORAGE_CONTAINER_NAME, filename);
 			}
 			catch (Exception e)
 			{
@@ -39,7 +32,7 @@ namespace DigitalFUHubApi.Services
 		}
 		public async Task<Stream?> GetFileFromAzureAsync(string filename)
 		{
-			BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
+			BlobContainerClient container = new BlobContainerClient(Constants.AZURE_STORAGE_CONNECTION_STRING, Constants.AZURE_STORAGE_CONTAINER_NAME);
 			BlobClient blobClient = container.GetBlobClient(filename);
 			bool isExist = await blobClient.ExistsAsync();
 			if (!isExist)
@@ -51,7 +44,7 @@ namespace DigitalFUHubApi.Services
 		}
 		public async Task<bool> RemoveFileFromAzureAsync(string filename)
 		{
-			BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
+			BlobContainerClient container = new BlobContainerClient(Constants.AZURE_STORAGE_CONNECTION_STRING, Constants.AZURE_STORAGE_CONTAINER_NAME);
 			BlobClient blobClient = container.GetBlobClient(filename);
 			bool isExist = await blobClient.ExistsAsync();
 			if (!isExist)
