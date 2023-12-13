@@ -19,7 +19,7 @@ namespace DigitalFUHubApi.Controllers
 			_shopRepository = shopRepository;
 			_productRepository = productRepository;
 		}
-
+		#region get search hint
 		[HttpGet("SearchHint")]
 		public IActionResult GetSearchHint(string keyword) {
 			if(string.IsNullOrWhiteSpace(keyword))
@@ -30,6 +30,7 @@ namespace DigitalFUHubApi.Controllers
 			List<string> listSearchHint = products.Select(x => x.ProductName).ToList();
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, listSearchHint));
 		}
-		
+		#endregion
+
 	}
 }

@@ -861,16 +861,19 @@ namespace DataAccess.DAOs
 			{
 				string keywordSearch = keyword.Trim().ToLower();
 #pragma warning disable CS8604 // Possible null reference argument.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-				return context.Product.Include(x => x.Tags)
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+				return context.Product.Include(x => x.Tags).Include(x => x.ProductVariants).ThenInclude(x => x.AssetInformations)
+					.Include(x => x.Shop).ThenInclude(x => x.User)
 					.Where(x => x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+					&& x.Shop.User.Status == true && x.Shop.IsActive == true
 					&& (x.ProductName.ToLower().Contains(keywordSearch)
+					&& x.ProductVariants.Any(pv => pv.AssetInformations.Any(ai => ai.IsActive == true))
 					//|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch))
 					))
 					.OrderByDescending(x => x.SoldCount)
 					.Take(Constants.LIMIT_SEARCH_HINT)
 					.ToList();
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
 #pragma warning restore CS8604 // Possible null reference argument.
 			}
 		}
@@ -890,9 +893,9 @@ namespace DataAccess.DAOs
 					.Include(x => x.ProductVariants)
 					.ThenInclude(x => x.AssetInformations)
 					.Where(x => x.Shop.User.Status == true && x.Shop.IsActive == true
-						&& (x.ProductName.ToLower().Contains(keywordSearch)
-							|| x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
+						&& (x.ProductName.ToLower().Contains(keywordSearch) || x.Tags.Any(tag => tag.TagName.ToLower().Contains(keywordSearch)))
 						&& x.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE
+						&& x.ProductVariants.Any(pv => pv.AssetInformations.Any(ai => ai.IsActive == true))
 						&& (categoryId == Constants.ALL_CATEGORY ? true : x.CategoryId == categoryId)
 						&& (rating == Constants.FEEDBACK_TYPE_ALL ? true : (x.NumberFeedback != 0 && x.TotalRatingStar / x.NumberFeedback >= rating))
 						&& (minPrice == null ? true : x.ProductVariants.All(pv => (pv.Price - (pv.Price * pv.Discount / 100)) >= minPrice))
