@@ -67,7 +67,7 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found", false, new()));
 				}
 
-				List<CouponResponseDTO> coupons = _mapper.Map<List<CouponResponseDTO>>(_couponRepository.GetCouponPublic(shopId));
+				List<CouponCartCustomerResponseDTO> coupons = _mapper.Map<List<CouponCartCustomerResponseDTO>>(_couponRepository.GetCouponPublic(shopId));
                 return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, coupons));
 			}
 			catch (Exception ex)
@@ -77,8 +77,32 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get coupon private
+		#region Get coupon detail (customer)
 		[Authorize]
+		[HttpGet("getDetailById/{id}")]
+		public IActionResult GetCouponDetailCustomerById(long id)
+		{
+			try
+			{
+				var coupon = _couponRepository.GetCouponDetailCustomer(id);
+
+				if (coupon == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "coupon not found", false, new()));
+				}
+
+                CouponDetailCustomerResponseDTO couponResponse = _mapper.Map<CouponDetailCustomerResponseDTO>(coupon);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, couponResponse));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+        #endregion
+
+        #region Get coupon private
+        [Authorize]
 		[HttpGet("GetCouponPrivate")]
 		public IActionResult GetCouponPrivate(string couponCode, long shopId)
 		{
@@ -103,7 +127,7 @@ namespace DigitalFUHubApi.Controllers
                     return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "coupon not found", false, new()));
                 }
 
-                CouponResponseDTO couponResponse = _mapper.Map<CouponResponseDTO>(coupon);
+                CouponCartCustomerResponseDTO couponResponse = _mapper.Map<CouponCartCustomerResponseDTO>(coupon);
                 return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, couponResponse));
 
 			}

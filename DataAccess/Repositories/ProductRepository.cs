@@ -72,5 +72,8 @@ namespace DataAccess.Repositories
 
 		public long GetNumberProductsOutOfStock(long userId)
 		=> ProductDAO.Instance.GetNumberProductsOutOfStock(userId);
-	}
+
+        public List<Product> GetProductSpecificOfCoupon(long couponId, string productName)
+                    => ProductDAO.Instance.GetProductSpecificOfCoupon(couponId, productName);
+    }
 }

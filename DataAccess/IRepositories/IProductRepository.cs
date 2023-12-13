@@ -39,5 +39,7 @@ namespace DataAccess.IRepositories
 		List<Product> GetListProductForSearchHint(string keyword);
 		(long totalItems, List<Product> productSearched) GetListProductSearched(string keyword, long categoryId, int rating, long? minPrice, long? maxPrice, long sort, int page);
 		long GetNumberProductsOutOfStock(long v);
-	}
+		List<Product> GetProductSpecificOfCoupon(long couponId, string productName);
+
+    }
 }

@@ -98,7 +98,38 @@ namespace DataAccess.DAOs
 			}
 		}
 
-		internal (long, List<Coupon>) GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate,
+        internal Coupon? GetCouponDetailCustomer(long couponId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                DateTime now = DateTime.Now;
+                var coupon = (from coupons in context.Coupon
+							  join shops in context.Shop
+							  on coupons.ShopId equals shops.UserId
+                              where coupons.CouponId == couponId
+                              select new Coupon
+                              {
+                                  CouponId = coupons.CouponId,
+                                  CouponTypeId = coupons.CouponTypeId,
+                                  CouponCode = coupons.CouponCode,
+                                  CouponName = coupons.CouponName,
+                                  PriceDiscount = coupons.PriceDiscount,
+                                  StartDate = coupons.StartDate,
+                                  EndDate = coupons.EndDate,
+                                  MinTotalOrderValue = coupons.MinTotalOrderValue,
+								  Shop = new Shop
+								  {
+									  UserId = shops.UserId,
+                                      Avatar = shops.Avatar,
+									  ShopName = shops.ShopName,
+                                  }
+                              }).FirstOrDefault();
+
+                return coupon;
+            }
+        }
+
+        internal (long, List<Coupon>) GetListCouponsByShop(long userId, string couponCode, DateTime? startDate, DateTime? endDate,
 			bool? isPublic, long status , int page)
 		{
 			using (DatabaseContext context = new DatabaseContext())
@@ -267,5 +298,22 @@ namespace DataAccess.DAOs
 				}
 			}
 		}
+
+		internal Coupon? GetCouponEntityById (long couponId)
+		{
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                try
+                {
+					Coupon? coupon = context.Coupon.FirstOrDefault(x => x.CouponId == couponId);
+
+					return coupon;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+            }
+        }
 	}
 }
