@@ -202,7 +202,7 @@ namespace DigitalFUHubApi
 							trigger.ForJob(jobKeyHistoryTransactionMbBankJob)
 							.StartNow()
 							.WithSimpleSchedule(schedule => 
-								schedule.WithIntervalInSeconds(60).RepeatForever()
+								schedule.WithIntervalInSeconds(61).RepeatForever()
 								)
 							);
 
@@ -212,7 +212,7 @@ namespace DigitalFUHubApi
 							trigger.ForJob(jobKeyHistoryDepositTransactionMbBankJob)
 							.StartNow()
 							.WithSimpleSchedule(schedule => 
-								schedule.WithIntervalInSeconds(81).RepeatForever()
+								schedule.WithIntervalInSeconds(111).RepeatForever()
 								)
 							);
 
