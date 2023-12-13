@@ -35,10 +35,11 @@ namespace DigitalFUHubApi.Services
 			return qrCode;
 		}
 
-		internal bool ValidateTwoFactorPin(string secretKey, string otp)
+		internal bool ValidateTwoFactorPin(string secretKey, string pin)
 		{
 			var totp = new TwoFactorAuthenticator();
-			return totp.ValidateTwoFactorPIN(secretKey, otp);
+			var currentPin = totp.GetCurrentPIN(secretKey, false);
+			return currentPin == pin;
 		}
 	}
 }

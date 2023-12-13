@@ -34,7 +34,7 @@ namespace DigitalFUHubApi.Jobs
 			}
 
 			// get previous data debit transaction
-			string? directoryPathStoreWithdrawData = Constants.MB_BANK_DIRECTORY_PATH_STORE_DEPOSIT_DATA;
+			string? directoryPathStoreWithdrawData = Constants.MB_BANK_DIRECTORY_PATH_STORE_WITHDRAW_DATA;
 			if (directoryPathStoreWithdrawData == null)
 				return Task.CompletedTask;
 

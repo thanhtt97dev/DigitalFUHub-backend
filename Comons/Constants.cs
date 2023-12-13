@@ -5,6 +5,9 @@ namespace Comons
 	public static class Constants
 	{
 
+		//config hosting
+
+
 		//MB bank config
 		public const string BANK_ID_MB_BANK = "970422";
 		public const int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 3;
