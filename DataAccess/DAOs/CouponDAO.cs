@@ -36,19 +36,29 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
                 DateTime now = DateTime.Now;
-                var coupons = context.Coupon.Where(c => c.ShopId == shopId
-															&& c.IsActive == true
-															&&
-															c.StartDate <= now && now <= c.EndDate
-															&& c.IsPublic == true).ToList();
-
-				foreach (var item in coupons)
-				{
-					if (item.CouponTypeId == Constants.COUPON_TYPE_SPECIFIC_PRODUCTS)
-					{
-						item.CouponProducts = context.CouponProduct.Where(x => x.CouponId == item.CouponId).ToList();
-					}
-				}
+                var coupons = (from coupon in context.Coupon
+                              where
+                              coupon.ShopId == shopId
+                              &&
+                              coupon.IsActive == true
+                              &&
+                              coupon.IsPublic == true
+                              &&
+                              coupon.StartDate <= now && now <= coupon.EndDate
+                              select new Coupon
+                              {
+                                  CouponId = coupon.CouponId,
+                                  CouponTypeId = coupon.CouponTypeId,
+                                  CouponCode = coupon.CouponCode,
+                                  CouponName = coupon.CouponName,
+                                  PriceDiscount = coupon.PriceDiscount,
+                                  Quantity = coupon.Quantity,
+                                  StartDate = coupon.StartDate,
+                                  EndDate = coupon.EndDate,
+                                  MinTotalOrderValue = coupon.MinTotalOrderValue,
+                                  CouponProducts = context.CouponProduct.Where(x => x.CouponId == coupon.CouponId)
+                                  .Select(x => new CouponProduct { ProductId = x.ProductId }).ToList()
+                              }).ToList();
 
 				return coupons;
 			}
@@ -59,14 +69,30 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
                 DateTime now = DateTime.Now;
-                var coupon = context
-								.Coupon
-								.FirstOrDefault(c => c.CouponCode.ToLower().Equals(couponCode.ToLower())
-											&& c.ShopId == shopId
-											&& c.IsActive == true
-											&& c.IsPublic == false
-                                            &&
-                                            c.StartDate <= now && now <= c.EndDate);
+				var coupon = (from coupons in context.Coupon
+							  where coupons.CouponCode.Trim().ToLower().Equals(couponCode.Trim().ToLower())
+							  &&
+							  coupons.ShopId == shopId
+							  &&
+							  coupons.IsActive == true
+							  &&
+							  coupons.IsPublic == false
+							  &&
+							  coupons.StartDate <= now && now <= coupons.EndDate
+							  select new Coupon
+							  {
+                                  CouponId = coupons.CouponId,
+                                  CouponTypeId = coupons.CouponTypeId,
+                                  CouponCode = coupons.CouponCode,
+                                  CouponName = coupons.CouponName,
+                                  PriceDiscount = coupons.PriceDiscount,
+                                  Quantity = coupons.Quantity,
+                                  StartDate = coupons.StartDate,
+                                  EndDate = coupons.EndDate,
+                                  MinTotalOrderValue = coupons.MinTotalOrderValue,
+								  CouponProducts = context.CouponProduct.Where(x => x.CouponId == coupons.CouponId)
+								  .Select(x => new CouponProduct { ProductId = x.ProductId }).ToList()
+                              }).FirstOrDefault();
 
 				return coupon;
 			}
