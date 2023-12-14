@@ -24,6 +24,7 @@ namespace DigitalFUHubApi.Controllers
 	public class ProductsController : ControllerBase
 	{
 		private readonly IProductRepository _productRepository;
+		private readonly IShopRepository _shopRepository;
 		private readonly AzureStorageAccountService _azureStorageAccountService;
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly HubService _hubService;
@@ -31,7 +32,7 @@ namespace DigitalFUHubApi.Controllers
         private readonly ICouponRepository _couponRepository;
         private readonly IMapper _mapper;
 
-		public ProductsController(IProductRepository productRepository, AzureStorageAccountService azureStorageAccountService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper, ICouponRepository couponRepository)
+		public ProductsController(IProductRepository productRepository, IShopRepository shopRepository, AzureStorageAccountService azureStorageAccountService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper, ICouponRepository couponRepository)
 		{
 			_productRepository = productRepository;
 			_azureStorageAccountService = azureStorageAccountService;
@@ -218,6 +219,15 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+				}
 				if (request.Tags == null || request.Tags.Count == 0)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
@@ -344,6 +354,15 @@ namespace DigitalFUHubApi.Controllers
 					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
+				}
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
 				}
 				if (request.Tags == null || request.Tags.Count == 0)
 				{

@@ -50,7 +50,7 @@ namespace DigitalFUHubApi.Comons
 				context.Fail("Unauthorized");
 				return base.TokenValidated(context);
 			}
-			
+
 
 			var accessToken = dbContext.AccessToken.FirstOrDefault(x => x.JwtId == jwtId && x.IsRevoked == false);
 			if (accessToken == null)

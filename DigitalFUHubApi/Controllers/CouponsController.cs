@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure;
+using Azure.Core;
 using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
@@ -166,7 +167,6 @@ namespace DigitalFUHubApi.Controllers
 		#endregion
 
 		#region Get list coupons
-
 		[Authorize("Seller")]
 		[HttpPost("Seller/List")]
 		public IActionResult GetListCouponsSeller(SellerCouponRequestDTO request)
@@ -224,6 +224,15 @@ namespace DigitalFUHubApi.Controllers
 					|| (request.MinTotalOrderValue == 0 && request.PriceDiscount > Constants.MAX_PRICE_DISCOUNT_COUPON))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
+				}
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
 				}
 
 				DateTime startDT = DateTime.Parse(request.StartDate);
@@ -295,6 +304,15 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+				}
 
 				DateTime startDT = DateTime.Parse(request.StartDate);
 				DateTime endDT = DateTime.Parse(request.EndDate);
@@ -350,6 +368,15 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+				}
 
 
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
@@ -376,6 +403,15 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+				}
 				_couponRepository.UpdateCouponFinish(couponId, _jwtTokenService.GetUserIdByAccessToken(User));
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
@@ -401,7 +437,15 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
-
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+				}
 				Coupon? coupon = _couponRepository.GetCoupon(request.CouponId, request.UserId);
 				if (coupon == null)
 				{

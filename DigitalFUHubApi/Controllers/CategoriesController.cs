@@ -3,6 +3,7 @@ using DataAccess.IRepositories;
 using DigitalFUHubApi.Comons;
 using Microsoft.AspNetCore.Mvc;
 using Comons;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -18,6 +19,14 @@ namespace DigitalFUHubApi.Controllers
 		}
 		[HttpGet("GetAll")]
 		public ActionResult<ResponseData> GetAll()
+		{
+			List<Category> categories = _categoryRepository.GetAll();
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", false, categories));
+		}
+
+		[Authorize("Seller")]
+		[HttpGet("Seller/All")]
+		public ActionResult<ResponseData> GetAllForSeller()
 		{
 			List<Category> categories = _categoryRepository.GetAll();
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", false, categories));
