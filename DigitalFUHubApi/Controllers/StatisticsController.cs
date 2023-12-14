@@ -1,6 +1,7 @@
 ﻿using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
+using DataAccess.Repositories;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Services;
 using DTOs.Shop;
@@ -20,6 +21,7 @@ namespace DigitalFUHubApi.Controllers
 	{
 		private readonly IOrderRepository _orderRepository;
 		private readonly IProductRepository _productRepository;
+		private readonly IShopRepository _shopRepository;
 		private readonly IReportProductRepository _reportProductRepository;
 		private readonly IBankRepository _bankRepository;
 		private readonly IUserRepository _userRepository;
@@ -27,6 +29,7 @@ namespace DigitalFUHubApi.Controllers
 
 		public StatisticsController(IOrderRepository orderRepository,
 			IProductRepository productRepository,
+			IShopRepository shopRepository,
 			IBankRepository bankRepository,
 			IReportProductRepository reportProductRepository,
 			IUserRepository userRepository,
@@ -34,6 +37,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			_orderRepository = orderRepository;
 			_productRepository = productRepository;
+			_shopRepository = shopRepository;
 			_bankRepository = bankRepository;
 			_reportProductRepository = reportProductRepository;
 			_userRepository = userRepository;

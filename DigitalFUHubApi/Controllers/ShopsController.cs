@@ -59,6 +59,25 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
+		#region check user has shop
+		[Authorize("Customer,Seller")]
+		[HttpGet("Exist")]
+		public IActionResult CheckExistShop()
+		{
+			Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+			if (shop == null)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not Found", false, new()));
+			}
+			if (!shop.IsActive)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+			}
+			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new())) ;
+
+		}
+		#endregion
+
 		#region get info shop of seller
 		[Authorize("Seller")]
 		[HttpGet("Seller/Get")]
@@ -68,6 +87,10 @@ namespace DigitalFUHubApi.Controllers
 			if (shop == null)
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not Found", false, new()));
+			}
+			if (!shop.IsActive)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
 			}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, shop));
 
@@ -139,6 +162,15 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				Shop? shop = _shopRepository.GetShopById(_jwtTokenService.GetUserIdByAccessToken(User));
+				if (shop == null)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found shop", false, new()));
+				}
+				if (!shop.IsActive)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+				}
 				string[] fileExtension = new string[] { ".jpge", ".png", ".jpg" };
 				if (string.IsNullOrWhiteSpace(request.ShopDescription)
 					|| (request.AvatarFile != null &&
@@ -159,14 +191,14 @@ namespace DigitalFUHubApi.Controllers
 						request.AvatarFile.FileName.Substring(request.AvatarFile.FileName.LastIndexOf(".")));
 					avatarUrl = await _azureStorageAccountService.UploadFileToAzureAsync(request.AvatarFile, filename);
 				}
-				Shop shop = new Shop
+				Shop shopEdit = new Shop
 				{
 					Avatar = avatarUrl,
 					UserId = _jwtTokenService.GetUserIdByAccessToken(User),
 					DateCreate = DateTime.Now,
 					Description = request.ShopDescription
 				};
-				_shopRepository.EditShop(shop);
+				_shopRepository.EditShop(shopEdit);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
 			catch (Exception e)

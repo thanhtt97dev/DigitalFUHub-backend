@@ -201,7 +201,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 				}
-
+				
 				DateTime? fromDate = string.IsNullOrWhiteSpace(request.FromDate) ? null :
 					DateTime.ParseExact(request.FromDate, "M/d/yyyy", CultureInfo.InvariantCulture);
 				DateTime? toDate = string.IsNullOrWhiteSpace(request.ToDate) ? null :

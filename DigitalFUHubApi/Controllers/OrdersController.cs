@@ -496,7 +496,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Unauthorized();
 				}
-
+				
 				var order = _orderRepository.GetOrder(request.OrderId);
 				if (order == null)
 				{

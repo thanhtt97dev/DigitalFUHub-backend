@@ -43,7 +43,6 @@ namespace Comons
 		public const string RESPONSE_CODE_FAILD = "03";
 		public const string RESPONSE_CODE_UN_AUTHORIZE = "04";
 
-
 		public const string RESPONSE_CODE_BANK_WITHDRAW_PAID = "BANK_01";
 		public const string RESPONSE_CODE_BANK_WITHDRAW_UNPAY = "BANK_02";
 		public const string RESPONSE_CODE_BANK_WITHDRAW_REJECT = "BANK_03";
@@ -92,7 +91,7 @@ namespace Comons
 
 		public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
 
-
+		public const string RESPONSE_CODE_SHOP_BANNED = "SHOP_01";
 
 
 		//SignalR
