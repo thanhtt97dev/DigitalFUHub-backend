@@ -14,6 +14,7 @@ namespace DTOs.Coupon
         public long CouponTypeId { get; set; }
         public long PriceDiscount { get; set; }
         public long MinTotalOrderValue { get; set; }
+        public bool AreCouponsAvailable { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public CouponDetailCustomerShopResponseDTO Shop { get; set; } = null!;

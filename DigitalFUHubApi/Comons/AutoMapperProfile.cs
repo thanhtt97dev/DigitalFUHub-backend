@@ -215,6 +215,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.productIds, act => act.MapFrom(src => src.CouponProducts != null ? src.CouponProducts.Select(x => x.ProductId).ToList() : new List<long>()))
 				.ReverseMap();
             CreateMap<Coupon, CouponDetailCustomerResponseDTO>()
+                .ForMember(des => des.AreCouponsAvailable, act => act.MapFrom(src => src.Quantity > 0 ? true : false))
                 .ReverseMap();
             CreateMap<Product, CouponDetailCustomerProductResponseDTO>()
                 .ReverseMap();

@@ -49,12 +49,14 @@ namespace DataAccess.DAOs
                               {
                                   CouponId = coupon.CouponId,
                                   CouponTypeId = coupon.CouponTypeId,
+								  ShopId = coupon.ShopId,
                                   CouponCode = coupon.CouponCode,
                                   CouponName = coupon.CouponName,
                                   PriceDiscount = coupon.PriceDiscount,
                                   Quantity = coupon.Quantity,
                                   StartDate = coupon.StartDate,
                                   EndDate = coupon.EndDate,
+								  IsPublic = coupon.IsPublic,
                                   MinTotalOrderValue = coupon.MinTotalOrderValue,
                                   CouponProducts = context.CouponProduct.Where(x => x.CouponId == coupon.CouponId)
                                   .Select(x => new CouponProduct { ProductId = x.ProductId }).ToList()
@@ -85,10 +87,12 @@ namespace DataAccess.DAOs
                                   CouponTypeId = coupons.CouponTypeId,
                                   CouponCode = coupons.CouponCode,
                                   CouponName = coupons.CouponName,
+                                  ShopId = coupons.ShopId,
                                   PriceDiscount = coupons.PriceDiscount,
                                   Quantity = coupons.Quantity,
                                   StartDate = coupons.StartDate,
                                   EndDate = coupons.EndDate,
+                                  IsPublic = coupons.IsPublic,
                                   MinTotalOrderValue = coupons.MinTotalOrderValue,
 								  CouponProducts = context.CouponProduct.Where(x => x.CouponId == coupons.CouponId)
 								  .Select(x => new CouponProduct { ProductId = x.ProductId }).ToList()
@@ -114,6 +118,7 @@ namespace DataAccess.DAOs
                                   CouponCode = coupons.CouponCode,
                                   CouponName = coupons.CouponName,
                                   PriceDiscount = coupons.PriceDiscount,
+								  Quantity = coupons.Quantity,
                                   StartDate = coupons.StartDate,
                                   EndDate = coupons.EndDate,
                                   MinTotalOrderValue = coupons.MinTotalOrderValue,

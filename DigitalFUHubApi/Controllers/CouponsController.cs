@@ -100,10 +100,10 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Get coupon private
-        [Authorize]
+		#region Get coupon private
+		[Authorize]
 		[HttpGet("GetCouponPrivate")]
 		public IActionResult GetCouponPrivate(string couponCode, long shopId)
 		{
