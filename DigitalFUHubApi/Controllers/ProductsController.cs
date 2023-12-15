@@ -36,6 +36,7 @@ namespace DigitalFUHubApi.Controllers
 		{
 			_productRepository = productRepository;
 			_azureStorageAccountService = azureStorageAccountService;
+			_shopRepository = shopRepository;
 			_jwtTokenService = jwtTokenService;
 			_hubService = hubService;
 			_mailService = mailService;
