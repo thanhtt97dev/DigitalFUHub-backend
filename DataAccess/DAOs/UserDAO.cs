@@ -338,5 +338,17 @@ namespace DataAccess.DAOs
 					.FirstOrDefault(x => x.UserId == id);
 			}
 		}
-	}
+
+        internal string GetAvatarUser(long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+				var avatar = (from user in context.User
+							  where user.UserId == userId
+							  select user.Avatar).FirstOrDefault();
+
+				return avatar != null ? avatar : "";
+            }
+        }
+    }
 }

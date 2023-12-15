@@ -137,6 +137,11 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "product not found!!", false, new()));
 				}
 
+				if (user.UserId == product.ShopId)
+				{
+                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Do not report your own products", false, new()));
+                }
+
 				var reason = reasonReportProductRepository.GetEntityById(request.ReasonReportProductId);
 				if (reason == null)
 				{

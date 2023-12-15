@@ -151,7 +151,7 @@ namespace DigitalFUHubApi.Controllers
                         Content = request.Content,
                         MessageType = Constants.MESSAGE_TYPE_CONVERSATION_TEXT,
                         DateCreate = DateTime.Now,
-                        IsDelete = false
+                        IsDelete = false,
                     };
                 } else {
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Message is not allowed to be null!", false, new()));
@@ -177,6 +177,9 @@ namespace DigitalFUHubApi.Controllers
 
                 // Message response to chat hub
                 MessageConversationResponseDTO messageConversation = mapper.Map<MessageConversationResponseDTO>(newMessage);
+
+				// Set avt of user
+				messageConversation.Avatar = userRepository.GetAvatarUser(newMessage.UserId);
 
                 // Send to signR chat hub
                 if (connections.Count > 0)
