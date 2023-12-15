@@ -239,7 +239,7 @@ namespace DigitalFUHubApi.Controllers
 				OrderProductResponseDTO responseData = new OrderProductResponseDTO
 				{
 					OrderId = order.OrderId,
-					Note = order.Note ?? "",
+					Note = order.HistoryOrderStatus.OrderByDescending(x => x.DateCreate).FirstOrDefault()?.Note??"",
 					OrderDate = order.OrderDate,
 					ShopId = order.ShopId,
 					ShopName = order.Shop.ShopName,
@@ -381,7 +381,7 @@ namespace DigitalFUHubApi.Controllers
 			SellerOrderDetailResponseDTO response = new SellerOrderDetailResponseDTO
 			{
 				OrderId = order.OrderId,
-				Note = order.Note ?? "",
+				Note = order.HistoryOrderStatus.OrderByDescending(x => x.DateCreate).FirstOrDefault()?.Note??"",
 				OrderDate = order.OrderDate,
 				ShopId = order.ShopId,
 				CustomerId = order.User.UserId,
