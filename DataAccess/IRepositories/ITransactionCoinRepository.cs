@@ -11,6 +11,8 @@ namespace DataAccess.IRepositories
 	{
 		List<TransactionCoin> GetDataReportTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId);
 		List<TransactionCoin> GetHistoryTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId, int page);
+		long GetNumberCoinReceiveCurrentMonth();
+		long GetNumberCoinUsedOrdersCurrentMonth();
 		int GetNumberTransactionCoin(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionCoinTypeId);
 	}
 }

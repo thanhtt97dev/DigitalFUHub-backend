@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DataAccess.DAOs
 {
@@ -85,6 +86,24 @@ namespace DataAccess.DAOs
 								.OrderByDescending(x => x.DateCreate)
 								.ToList();
 				return transactions;
+			}
+		}
+
+		internal long GetNumberCoinUsedOrdersCurrentMonth()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.TransactionCoin.Where(x => x.TransactionCoinTypeId == Constants.TRANSACTION_COIN_TYPE_USE)
+					.Sum(x => x.Amount);
+			}
+		}
+
+		internal long GetNumberCoinReceiveCurrentMonth()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.TransactionCoin.Where(x => x.TransactionCoinTypeId == Constants.TRANSACTION_COIN_TYPE_RECEIVE)
+					.Sum(x => x.Amount);
 			}
 		}
 	}

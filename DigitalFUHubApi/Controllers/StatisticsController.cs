@@ -25,9 +25,11 @@ namespace DigitalFUHubApi.Controllers
 		private readonly IReportProductRepository _reportProductRepository;
 		private readonly IBankRepository _bankRepository;
 		private readonly IUserRepository _userRepository;
+		private readonly ITransactionCoinRepository _transactionCoinRepository;
 		private readonly JwtTokenService _jwtTokenService;
 
 		public StatisticsController(IOrderRepository orderRepository,
+			ITransactionCoinRepository transactionCoinRepository,
 			IProductRepository productRepository,
 			IShopRepository shopRepository,
 			IBankRepository bankRepository,
@@ -36,6 +38,7 @@ namespace DigitalFUHubApi.Controllers
 			JwtTokenService jwtTokenService)
 		{
 			_orderRepository = orderRepository;
+			_transactionCoinRepository = transactionCoinRepository;
 			_productRepository = productRepository;
 			_shopRepository = shopRepository;
 			_bankRepository = bankRepository;
@@ -381,12 +384,16 @@ namespace DigitalFUHubApi.Controllers
 			{
 				List<Order> orders = _orderRepository.GetListOrderOfCurrentMonthAllShop();
 				long numberNewUserInCurrentMonth = _userRepository.GetNumberNewUserInCurrentMonth();
+				long totalCoinUsedOrders = _transactionCoinRepository.GetNumberCoinUsedOrdersCurrentMonth();
+				long totalCoinReceive = _transactionCoinRepository.GetNumberCoinReceiveCurrentMonth();
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new
 				{
 					Revenue = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)))),
 					Profit = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
 											- (((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)) * (x?.BusinessFee?.Fee ?? 0) / 100))),
 					TotalOrders = orders.LongCount(),
+					TotalCoinUsedOrders = totalCoinUsedOrders,
+					TotalCoinReceive = totalCoinReceive,
 					NumberNewUserInCurrentMonth = numberNewUserInCurrentMonth,
 				}));
 			}
