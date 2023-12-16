@@ -44,15 +44,20 @@ namespace DataAccess.DAOs
 						UserId = userId,
 					};
 					context.Shop.Add(shop);
+
+					//get fee
+					var shopRegisterFeeDate = context.ShopRegisterFee.Max(x => x.StartDate);
+					var shopRegisterFee = context.ShopRegisterFee.First(x => x.StartDate == shopRegisterFeeDate);
+
 					User user = context.User.First(x => x.UserId == userId);
-					user.AccountBalance = user.AccountBalance - Constants.SELLER_REGISTRATION_FEE;
+					user.AccountBalance = user.AccountBalance - shopRegisterFee.Fee;
 					user.RoleId = Constants.SELLER_ROLE;
 
 					TransactionInternal transactionInternal = new TransactionInternal
 					{
 						UserId = userId,
 						TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_SELLER_REGISTRATION_FEE,
-						PaymentAmount = Constants.SELLER_REGISTRATION_FEE,
+						PaymentAmount = shopRegisterFee.Fee,
 						Note = "regisete fee to become seller",
 						DateCreate = DateTime.Now
 					};

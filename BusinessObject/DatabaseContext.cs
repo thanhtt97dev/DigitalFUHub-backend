@@ -68,10 +68,11 @@ namespace BusinessObject
 		public virtual DbSet<ReasonReportProduct> ReasonReportProduct { get; set; } = null!;
 		public virtual DbSet<ReportProductStatus> ReportProductStatus { get; set; } = null!;
         public virtual DbSet<Slider> Sliders { get; set; } = null!;
+		public virtual DbSet<ShopRegisterFee> ShopRegisterFee { get; set; } = null!;
 
-        #endregion
+		#endregion
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			optionsBuilder.UseSqlServer(connectionString).EnableSensitiveDataLogging(true).LogTo(Console.WriteLine);
 		}
@@ -260,6 +261,11 @@ namespace BusinessObject
 				new Bank(){BankId = 970441, BankName = "Quốc tế (VIB)", BankCode = "VIB", isActivate = true},
 				new Bank(){BankId = 970443, BankName = "Sài Gòn Hà Nội (SHB)", BankCode = "SHB", isActivate = true},
 				new Bank(){BankId = 970449, BankName = "Bưu điện Liên Việt (LPB)", BankCode = "LPB", isActivate = true},
+			});
+
+			modelBuilder.Entity<ShopRegisterFee>().HasData(new ShopRegisterFee[]
+			{
+				new ShopRegisterFee() {ShopRegisterFeeId = 1, Fee = 50000, StartDate = DateTime.Now},
 			});
 
 			modelBuilder.Entity<BusinessFee>().HasData(new BusinessFee[]
