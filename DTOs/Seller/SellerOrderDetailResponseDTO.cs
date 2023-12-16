@@ -43,6 +43,7 @@ namespace DTOs.Seller
 		public long TotalAmount { get; set; }
 		public int FeedbackRate { get; set; }
 		public bool IsFeedback { get; set; }
+		public List<string> AssetInformations { get; set; } = null!;
 	}
 	public class SellerHistoryOrderResponseDTO
 	{
