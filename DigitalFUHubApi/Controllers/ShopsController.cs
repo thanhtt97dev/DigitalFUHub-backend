@@ -343,7 +343,7 @@ namespace DigitalFUHubApi.Controllers
         #region Update shop (admin)
         [HttpPost("admin/update")]
         [Authorize("Admin")]
-        public IActionResult UpdateShop(ShopDetailAdminUpdateStatusRequestDTO request)
+        public async Task<IActionResult> UpdateShop(ShopDetailAdminUpdateStatusRequestDTO request)
         {
             try
             {
@@ -360,6 +360,23 @@ namespace DigitalFUHubApi.Controllers
 				shop.DateBan = DateTime.Now;
 
 				_shopRepository.UpdateShop(shop);
+
+                string html = request.IsActive
+                ?
+				$"<div>" +
+				$"<h3>Xin chào {shop.ShopName},</h3>" +
+				$"<div>Cửa hàng của bạn đã được hoạt động trở lại.</div>" +
+				$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+				$"</div>"
+				:
+				$"<div>" +
+				$"<h3>Xin chào {shop.ShopName},</h3>" +
+				$"<div>Cửa hàng của bạn đã bị đình chỉ vì vi phạm chính sách của chúng tôi.</div>" +
+				$"<div>Lý do bị đình chỉ: <b>{request.Note}</b></div>" +
+				$"<b>Mọi thông tin thắc mắc xin vui lòng liên hệ: digitalfuhub@gmail.com</b>" +
+				$"</div>";
+
+                await _mailService.SendEmailAsync(shop.User.Email, request.IsActive ? "DigitalFUHub: Gỡ đình chỉ cửa hàng" : "DigitalFUHub: Cửa hàng đã bị đình chỉ", html);
 
                 // Ok
                 return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ()));

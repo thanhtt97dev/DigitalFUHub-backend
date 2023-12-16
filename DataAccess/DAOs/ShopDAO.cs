@@ -98,7 +98,7 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.Shop.FirstOrDefault(x => x.UserId == shopId);
+				return context.Shop.Include(_ => _.User).FirstOrDefault(x => x.UserId == shopId);
 			}
 		}
 
