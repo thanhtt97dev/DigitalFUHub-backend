@@ -808,6 +808,8 @@ namespace DataAccess.DAOs
 					.Include(x => x.BusinessFee)
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.Feedback)
+					.Include(x => x.OrderDetails)
+					.ThenInclude(x => x.AssetInformations)
 					.FirstOrDefault(x => x.OrderId == orderId && x.ShopId == userId);
 			}
 		}

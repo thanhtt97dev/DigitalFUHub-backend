@@ -418,6 +418,7 @@ namespace DigitalFUHubApi.Controllers
 					Thumbnail = od.ProductVariant?.Product?.Thumbnail ?? "",
 					TotalAmount = od.TotalAmount,
 					IsFeedback = od.IsFeedback,
+					AssetInformations = od.AssetInformations.Select(x => x.Asset ?? "").ToList(),
 					FeedbackRate = od?.Feedback?.Rate ?? 0
 				}).ToList(),
 			};
