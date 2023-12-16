@@ -34,6 +34,11 @@ namespace DataAccess.DAOs
 				{
 					if (context.Shop.Any(x => x.UserId == userId)) throw new Exception("INVALID");
 					if (context.Shop.Any(x => x.ShopName.ToLower() == shopName.ToLower())) throw new Exception("INVALID");
+
+					//get fee
+					var shopRegisterFeeDate = context.ShopRegisterFee.Max(x => x.StartDate);
+					var shopRegisterFee = context.ShopRegisterFee.First(x => x.StartDate == shopRegisterFeeDate);
+
 					Shop shop = new Shop()
 					{
 						DateCreate = DateTime.Now,
@@ -41,13 +46,10 @@ namespace DataAccess.DAOs
 						Avatar = avatarUrl,
 						IsActive = true,
 						Description = shopDescription,
+						ShopRegisterFeeId = shopRegisterFee.ShopRegisterFeeId,
 						UserId = userId,
 					};
 					context.Shop.Add(shop);
-
-					//get fee
-					var shopRegisterFeeDate = context.ShopRegisterFee.Max(x => x.StartDate);
-					var shopRegisterFee = context.ShopRegisterFee.First(x => x.StartDate == shopRegisterFeeDate);
 
 					User user = context.User.First(x => x.UserId == userId);
 					user.AccountBalance = user.AccountBalance - shopRegisterFee.Fee;
