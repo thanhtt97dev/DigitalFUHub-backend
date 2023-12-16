@@ -11,7 +11,12 @@ namespace BusinessObject
 	{
 
 		public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+
+		//db test
 		//public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Database=digitalfuhub;User ID=digitalfuhub;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
+
+		//db main
+		//public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Initial Catalog=digitalfuhub-main;Persist Security Info=False;User ID=digitalfuhub;Password=A0336687454a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
 		public DatabaseContext() { }
 
@@ -177,8 +182,10 @@ namespace BusinessObject
 				new Category{CategoryId = 1, CategoryName = "Mạng xã hội"},
 				new Category{CategoryId = 2, CategoryName = "Giáo dục"},
 				new Category{CategoryId = 3, CategoryName = "Trò chơi"},
-				new Category{CategoryId = 4, CategoryName = "VPS"},
-				new Category{CategoryId = 5, CategoryName = "Khác"},
+				new Category{CategoryId = 4, CategoryName = "Làm việc"},
+				new Category{CategoryId = 5, CategoryName = "Giải trí"},
+				new Category{CategoryId = 6, CategoryName = "VPS"},
+				new Category{CategoryId = 7, CategoryName = "Khác"},
 			});
 
 			modelBuilder.Entity<TransactionInternalType>().HasData(new TransactionInternalType[]
