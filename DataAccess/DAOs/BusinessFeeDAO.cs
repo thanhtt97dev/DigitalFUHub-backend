@@ -82,5 +82,13 @@ namespace DataAccess.DAOs
 
 			}
 		}
+
+		internal long GetBusinessFeeCurrent()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				return context.BusinessFee.FirstOrDefault(x => x.EndDate == null)?.Fee??0;
+			}
+		}
 	}
 }

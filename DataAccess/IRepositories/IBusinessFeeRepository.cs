@@ -12,5 +12,6 @@ namespace DataAccess.IRepositories
 	{
 		List<BusinessFeeResponseDTO> GetBusinessFee(long businessFeeId, int maxFee, DateTime? fromDate, DateTime? toDate);
 		void AddNewBusinessFee(long fee);
+		long GetBusinessFeeCurrent();
 	}
 }

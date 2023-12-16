@@ -14,6 +14,8 @@ namespace DataAccess.Repositories
 	{
 		public void AddNewBusinessFee(long fee) => BusinessFeeDAO.Instance.AddNewBusinessFee(fee);
 		public List<BusinessFeeResponseDTO> GetBusinessFee(long businessFeeId, int maxFee, DateTime? fromDate, DateTime? toDate) => BusinessFeeDAO.Instance.GetBusinessFee(businessFeeId,maxFee,fromDate,toDate);
-		
+
+		public long GetBusinessFeeCurrent()
+		=> BusinessFeeDAO.Instance.GetBusinessFeeCurrent();
 	}
 }

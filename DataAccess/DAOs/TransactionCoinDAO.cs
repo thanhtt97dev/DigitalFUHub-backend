@@ -93,7 +93,9 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.TransactionCoin.Where(x => x.TransactionCoinTypeId == Constants.TRANSACTION_COIN_TYPE_USE)
+				DateTime now = DateTime.Now;
+				return context.TransactionCoin.Where(x => x.TransactionCoinTypeId == Constants.TRANSACTION_COIN_TYPE_USE
+					&& x.DateCreate.Year == now.Year && x.DateCreate.Month == now.Month)
 					.Sum(x => x.Amount);
 			}
 		}
@@ -102,7 +104,9 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				return context.TransactionCoin.Where(x => x.TransactionCoinTypeId == Constants.TRANSACTION_COIN_TYPE_RECEIVE)
+				DateTime now = DateTime.Now;
+				return context.TransactionCoin.Where(x => x.TransactionCoinTypeId == Constants.TRANSACTION_COIN_TYPE_RECEIVE
+					&& x.DateCreate.Year == now.Year && x.DateCreate.Month == now.Month)
 					.Sum(x => x.Amount);
 			}
 		}
