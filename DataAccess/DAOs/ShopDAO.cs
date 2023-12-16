@@ -3,6 +3,7 @@ using BusinessObject.Entities;
 using Comons;
 using DTOs.MbBank;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.Style;
 
 namespace DataAccess.DAOs
 {
@@ -44,7 +45,20 @@ namespace DataAccess.DAOs
 					};
 					context.Shop.Add(shop);
 					User user = context.User.First(x => x.UserId == userId);
+					user.AccountBalance = user.AccountBalance - Constants.SELLER_REGISTRATION_FEE;
 					user.RoleId = Constants.SELLER_ROLE;
+
+					TransactionInternal transactionInternal = new TransactionInternal
+					{
+						UserId = userId,
+						TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_SELLER_REGISTRATION_FEE,
+						PaymentAmount = Constants.SELLER_REGISTRATION_FEE,
+						Note = "regisete fee to become seller",
+						DateCreate = DateTime.Now
+					};
+
+					context.TransactionInternal.Add(transactionInternal);
+
 					context.SaveChanges();
 				}
 				catch (Exception e)

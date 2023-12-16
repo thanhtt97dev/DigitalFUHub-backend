@@ -110,10 +110,12 @@ namespace Comons
 		public const int CUSTOMER_ROLE = 2;
 		public const int SELLER_ROLE = 3;
 
+		public const int SELLER_REGISTRATION_FEE = 50000;
+
 		//Azure
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
-		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub-testing.cognitiveservices.azure.com";
-		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "01e633a3d5e74d648cc030f7e551fe32";
+		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub.cognitiveservices.azure.com";
+		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "60becab2ecde4f16917874641354099c";
 		public const string AZURE_EXTRACT_TEXT_FROM_IMAGE_API = $"{AZURE_COMPUTER_VISION_ENDPOINT}/computervision/imageanalysis:analyze?api-version=2023-02-01-preview&features=read&language=en";
 		public const string AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=fptu;AccountKey=RQLNtnNQb2tPDiqpZtac1dcMZMpI2AdsS63ZyAzMMar5FVfOsFUulBu27ecGae9LhK7O8unXV3z3+ASt64pCYA==;EndpointSuffix=core.windows.net";
 		public const string AZURE_STORAGE_CONTAINER_NAME = "test";
@@ -153,7 +155,8 @@ namespace Comons
 		public const int TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT = 2;
 		public const int TRANSACTION_INTERNAL_TYPE_RECEIVE_REFUND = 3;
 		public const int TRANSACTION_INTERNAL_TYPE_RECEIVE_PROFIT = 4;
-		public static int[] TRANSACTION_INTERNAL_STATUS_TYPE = new int[] { TRANSACTION_INTERNAL_TYPE_PAYMENT, TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT, TRANSACTION_INTERNAL_TYPE_RECEIVE_REFUND, TRANSACTION_INTERNAL_TYPE_RECEIVE_PROFIT };
+		public const int TRANSACTION_INTERNAL_TYPE_SELLER_REGISTRATION_FEE = 5;
+		public static int[] TRANSACTION_INTERNAL_STATUS_TYPE = new int[] { TRANSACTION_INTERNAL_TYPE_PAYMENT, TRANSACTION_INTERNAL_TYPE_RECEIVE_PAYMENT, TRANSACTION_INTERNAL_TYPE_RECEIVE_REFUND, TRANSACTION_INTERNAL_TYPE_RECEIVE_PROFIT, TRANSACTION_INTERNAL_TYPE_SELLER_REGISTRATION_FEE };
 
 		//Transaction coin Type
 		public const int TRANSACTION_COIN_TYPE_RECEIVE = 1;
