@@ -13,6 +13,7 @@ namespace DataAccess.Repositories
 	public class ShopRegisterFeeRepository : IShopRegisterFeeRepository
 	{
 		public void AddNewShopRegisterFee(long fee) => ShopRegisterFeeDAO.Instance.AddNewShopRegisterFee(fee);
+		public long GetCurrentFee() => ShopRegisterFeeDAO.Instance.GetCurrentFee();
 		public List<ShopRegisterFee> GetFees(long businessFeeId, int maxFee, DateTime? fromDate, DateTime? toDate) => ShopRegisterFeeDAO.Instance.GetFees(businessFeeId, maxFee, fromDate, toDate);
 
 	}

@@ -10,6 +10,7 @@ namespace DataAccess.IRepositories
 	public interface IShopRegisterFeeRepository
 	{
 		void AddNewShopRegisterFee(long fee);
+		long GetCurrentFee();
 		List<ShopRegisterFee> GetFees(long businessFeeId, int maxFee, DateTime? fromDate, DateTime? toDate);
 	}
 }

@@ -80,5 +80,15 @@ namespace DataAccess.DAOs
 
 			}
 		}
+
+		internal long GetCurrentFee()
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var shopRegisterFeeDate = context.ShopRegisterFee.Max(x => x.StartDate);
+				var shopRegisterFee = context.ShopRegisterFee.First(x => x.StartDate == shopRegisterFeeDate);
+				return shopRegisterFee.Fee;
+			}
+		}
 	}
 }

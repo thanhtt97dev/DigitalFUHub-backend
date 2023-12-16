@@ -73,8 +73,20 @@ namespace DigitalFUHubApi.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
 			}
 		}
-		#region Add new business fee
 
-		#endregion
+		[HttpGet("Fee")]
+		public IActionResult GetCurrentFee()
+		{
+			try
+			{
+				var fee = shopRegisterFeeRepository.GetCurrentFee();
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, fee));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+
 	}
 }
