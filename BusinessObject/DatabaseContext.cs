@@ -194,6 +194,7 @@ namespace BusinessObject
 				new TransactionInternalType{TransactionInternalTypeId = 2, Name = "Receive payment"},
 				new TransactionInternalType{TransactionInternalTypeId = 3, Name = "Receive refund"},
 				new TransactionInternalType{TransactionInternalTypeId = 4, Name = "Profit"},
+				new TransactionInternalType{TransactionInternalTypeId = 5, Name = "Seller registration fee"},
 			});
 
 

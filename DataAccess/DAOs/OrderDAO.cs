@@ -572,6 +572,7 @@ namespace DataAccess.DAOs
 						if (totalPayment >= 0)
 						{
 							//Check customer is a seller of another shop and total payment > seller's account balance require
+							/*
 							var shopOfBuyer = context.Shop.FirstOrDefault(x => x.UserId == userId);
 							if (shopOfBuyer != null)
 							{
@@ -581,6 +582,7 @@ namespace DataAccess.DAOs
 									return (Constants.RESPONSE_CODE_ORDER_SELLER_LOCK_TRANSACTION, "Seller lock transaction!", numberQuantityAvailable, orderResult);
 								}
 							}
+							*/
 
 							if (customer.AccountBalance < totalPayment)
 							{
