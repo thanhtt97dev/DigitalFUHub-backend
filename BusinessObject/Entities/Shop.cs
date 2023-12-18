@@ -13,12 +13,15 @@ namespace BusinessObject.Entities
 		[Key]
 		public long UserId { get; set; }
 		public string ShopName { get; set; } = null!;
+		public long ShopRegisterFeeId { get; set; }
 		public string Avatar { get; set; } = string.Empty;
 		public DateTime DateCreate { get; set; }
 		public DateTime DateBan { get; set; }
 		public string Note { get; set; } = string.Empty;
 		public string? Description { get; set; }
 		public bool IsActive { get; set; }
+		[ForeignKey(nameof(ShopRegisterFeeId))]
+		public virtual ShopRegisterFee ShopRegisterFee { get; set; } = null!;
 
 		[ForeignKey(nameof(UserId))]
 		public virtual User User { get; set; } = null!;

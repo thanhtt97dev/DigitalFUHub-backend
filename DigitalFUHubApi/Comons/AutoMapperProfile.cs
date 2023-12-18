@@ -24,6 +24,7 @@ using System.Globalization;
 using DTOs.ReasonReportProduct;
 using DTOs.ReportProduct;
 using DTOs.Slider;
+using DTOs.ShopRegisterFee;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -416,6 +417,10 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.ReasonReportProductViName, act => act.MapFrom(src => src.ReasonReportProduct.ViName))
 				.ForMember(des => des.ReasonReportProductViExplanation, act => act.MapFrom(src => src.ReasonReportProduct.ViExplanation))
 				.ForMember(des => des.ReportProductStatusId, act => act.MapFrom(src => src.ReportProductStatusId))
+				.ReverseMap();
+
+			CreateMap<ShopRegisterFee, ShopRegisterFeeResponseDTO>()
+				.ForMember(des => des.TotalShopUsed, act => act.MapFrom(src => src.Shops.Count()))
 				.ReverseMap();
 		}
 	}

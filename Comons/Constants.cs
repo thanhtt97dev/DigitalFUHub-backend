@@ -110,7 +110,7 @@ namespace Comons
 		public const int CUSTOMER_ROLE = 2;
 		public const int SELLER_ROLE = 3;
 
-		public const int SELLER_REGISTRATION_FEE = 50000;
+		public const int MIN_SELLER_REGISTRATION_FEE = 50000;
 
 		//Azure
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
