@@ -6,7 +6,7 @@ namespace Comons
 	{
 
 		//config hosting
-
+		public const string FRONT_END_ENDPOINT_USER = "http://localhost:3000";
 
 		//MB bank config
 		public const string BANK_ID_MB_BANK = "970422";
@@ -202,7 +202,6 @@ namespace Comons
 		public static int[] FEEDBACK_TYPES = new int[] { FEEDBACK_TYPE_ALL, FEEDBACK_TYPE_1_STAR, FEEDBACK_TYPE_2_STAR, FEEDBACK_TYPE_3_STAR, FEEDBACK_TYPE_4_STAR, FEEDBACK_TYPE_5_STAR, FEEDBACK_TYPE_HAVE_COMMENT, FEEDBACK_TYPE_HAVE_MEDIA };
 
 		//URL front-end
-		public const string FRONT_END_ENDPOINT_USER = "http://localhost:3000";
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 		public const string FRONT_END_SELLER_PRODUCT_URL = "/seller/product/";
 		public const string FRONT_END_SELLER_ORDER_DETAIL_URL = "/seller/order/";
