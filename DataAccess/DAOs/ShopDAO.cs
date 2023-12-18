@@ -52,6 +52,10 @@ namespace DataAccess.DAOs
 					context.Shop.Add(shop);
 
 					User user = context.User.First(x => x.UserId == userId);
+					if(user.AccountBalance - shopRegisterFee.Fee < 0)
+					{
+						throw new ArgumentOutOfRangeException(shopRegisterFee.Fee.ToString());
+					}
 					user.AccountBalance = user.AccountBalance - shopRegisterFee.Fee;
 					user.RoleId = Constants.SELLER_ROLE;
 
@@ -60,13 +64,17 @@ namespace DataAccess.DAOs
 						UserId = userId,
 						TransactionInternalTypeId = Constants.TRANSACTION_INTERNAL_TYPE_SELLER_REGISTRATION_FEE,
 						PaymentAmount = shopRegisterFee.Fee,
-						Note = "regisete fee to become seller",
+						Note = "Register fee to become seller",
 						DateCreate = DateTime.Now
 					};
 
 					context.TransactionInternal.Add(transactionInternal);
 
 					context.SaveChanges();
+				}
+				catch (ArgumentOutOfRangeException e)
+				{
+					throw new Exception(e.Message);
 				}
 				catch (Exception e)
 				{

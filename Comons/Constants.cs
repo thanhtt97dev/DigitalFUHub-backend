@@ -92,6 +92,8 @@ namespace Comons
 		public const string RESPONSE_CODE_NOT_FEEDBACK_AGAIN = "FB_01";
 
 		public const string RESPONSE_CODE_SHOP_BANNED = "SHOP_01";
+		public const string RESPONSE_CODE_BALANCE_NOT_ENOUGH = "SHOP_02";
+
 
 
 		//SignalR

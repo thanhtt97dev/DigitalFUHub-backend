@@ -148,6 +148,10 @@ namespace DigitalFUHubApi.Controllers
 				await _mailService.SendEmailAsync(user.Email, "DigitalFUHub: Đăng ký bán hàng thành công.", html);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new()));
 			}
+			catch (ArgumentOutOfRangeException e)
+			{
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_BALANCE_NOT_ENOUGH, "Balance not enough", false, e.Message));
+			}
 			catch (Exception e)
 			{
 				return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
