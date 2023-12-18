@@ -150,7 +150,7 @@ namespace DigitalFUHubApi.Controllers
 			}
 			catch (ArgumentOutOfRangeException e)
 			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_BALANCE_NOT_ENOUGH, "Balance not enough", false, e.Message));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_BALANCE_NOT_ENOUGH, "Balance not enough", false, e.ParamName));
 			}
 			catch (Exception e)
 			{

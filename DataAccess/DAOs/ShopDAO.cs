@@ -74,7 +74,7 @@ namespace DataAccess.DAOs
 				}
 				catch (ArgumentOutOfRangeException e)
 				{
-					throw new Exception(e.Message);
+					throw new ArgumentOutOfRangeException(e.ParamName);
 				}
 				catch (Exception e)
 				{

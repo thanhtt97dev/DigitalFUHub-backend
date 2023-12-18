@@ -104,6 +104,7 @@ namespace DigitalFUHubApi.Controllers
 						OrderId = x.OrderId,
 						Note = x.Note ?? "",
 						OrderDate = x.OrderDate,
+						DateConfirmed = x.HistoryOrderStatus == null || !x.HistoryOrderStatus.Any(ho => ho.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED) ? null : x.HistoryOrderStatus.First(ho => ho.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED).DateCreate,
 						ShopId = x.ShopId,
 						ShopName = x.Shop.ShopName,
 						ConversationId = x.ConversationId,
@@ -151,6 +152,10 @@ namespace DigitalFUHubApi.Controllers
 					return Unauthorized();
 				}
 				if (!ModelState.IsValid)
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
+				}
+				if(request.StatusId == Constants.ORDER_STATUS_COMPLAINT && string.IsNullOrWhiteSpace(request.Note))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
 				}
@@ -241,6 +246,7 @@ namespace DigitalFUHubApi.Controllers
 					OrderId = order.OrderId,
 					Note = order.HistoryOrderStatus.OrderByDescending(x => x.DateCreate).FirstOrDefault()?.Note??"",
 					OrderDate = order.OrderDate,
+					DateConfirmed = order.HistoryOrderStatus == null || !order.HistoryOrderStatus.Any(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED) ? null : order.HistoryOrderStatus.First(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED).DateCreate,
 					ShopId = order.ShopId,
 					ShopName = order.Shop.ShopName,
 					ConversationId = order.ConversationId ?? 0,
@@ -254,7 +260,7 @@ namespace DigitalFUHubApi.Controllers
 						OrderId = x.OrderId,
 						OrderStatusId = x.OrderStatusId,
 						DateCreate = x.DateCreate,
-						Note = x.Note
+						Note = x.Note.Trim()
 					}).OrderBy(x => x.DateCreate).ToList(),
 					OrderDetails = order.OrderDetails.Select(od => new OrderDetailProductResponseDTO
 					{
@@ -432,7 +438,7 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Seller/Dispute")]
 		public async Task<IActionResult> UpdateDisputeOrder(SellerDisputeOrderRequestDTO request)
 		{
-			if (!ModelState.IsValid)
+			if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.Note))
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid", false, new()));
 			}

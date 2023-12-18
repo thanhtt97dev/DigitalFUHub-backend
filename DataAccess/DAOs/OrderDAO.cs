@@ -1023,6 +1023,7 @@ namespace DataAccess.DAOs
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
+					.Include(x => x.HistoryOrderStatus)
 					.Where(x => x.UserId == userId
 						&& (statusId.Count == 1 && statusId[0] == 0 ? true : statusId.Any(st => st == x.OrderStatusId)))
 					.OrderByDescending(x => x.OrderDate)
@@ -1147,7 +1148,7 @@ namespace DataAccess.DAOs
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
 					.FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId && x.ShopId == shopId);
-					//&& x.OrderStatusId != Constants.ORDER_STATUS_CONFIRMED);
+				//&& x.OrderStatusId != Constants.ORDER_STATUS_CONFIRMED);
 			}
 		}
 
@@ -1182,6 +1183,7 @@ namespace DataAccess.DAOs
 					.Include(x => x.OrderDetails)
 					.ThenInclude(x => x.ProductVariant)
 					.ThenInclude(x => x.Product)
+					.Include(x => x.HistoryOrderStatus)
 					.Where(x => x.ShopId == userId && x.User.Username.ToLower().Contains(username.ToLower())
 							&& (fromDate != null && toDate != null ? x.OrderDate.Date >= fromDate.Value.Date
 							&& x.OrderDate.Date <= toDate.Value.Date : true)

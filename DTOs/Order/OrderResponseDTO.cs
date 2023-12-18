@@ -20,6 +20,7 @@ namespace DTOs.Order
 		public string ShopName { get; set; } = string.Empty;
 		public long? ConversationId { get; set; }
 		public DateTime OrderDate { get; set; }
+		public DateTime? DateConfirmed { get; set; } = null!;
 		public string Note { get; set; } = string.Empty;
 		public long TotalAmount { get; set; }
 		public long TotalCouponDiscount { get; set; }

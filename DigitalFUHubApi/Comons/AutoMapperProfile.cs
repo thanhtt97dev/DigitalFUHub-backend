@@ -52,6 +52,7 @@ namespace DigitalFUHubApi.Comons
 					return "";
 			}
 		}
+
 		public AutoMapperProfile()
 		{
 			CreateMap<User, UserResponeDTO>()
@@ -215,13 +216,13 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Coupon, CouponCartCustomerResponseDTO>()
 				.ForMember(des => des.productIds, act => act.MapFrom(src => src.CouponProducts != null ? src.CouponProducts.Select(x => x.ProductId).ToList() : new List<long>()))
 				.ReverseMap();
-            CreateMap<Coupon, CouponDetailCustomerResponseDTO>()
-                .ForMember(des => des.AreCouponsAvailable, act => act.MapFrom(src => src.Quantity > 0 ? true : false))
-                .ReverseMap();
-            CreateMap<Product, CouponDetailCustomerProductResponseDTO>()
-                .ReverseMap();
-            CreateMap<Shop, CouponDetailCustomerShopResponseDTO>().ReverseMap();
-            CreateMap<Coupon, SellerCouponResponseDTO>()
+			CreateMap<Coupon, CouponDetailCustomerResponseDTO>()
+				.ForMember(des => des.AreCouponsAvailable, act => act.MapFrom(src => src.Quantity > 0 ? true : false))
+				.ReverseMap();
+			CreateMap<Product, CouponDetailCustomerProductResponseDTO>()
+				.ReverseMap();
+			CreateMap<Shop, CouponDetailCustomerShopResponseDTO>().ReverseMap();
+			CreateMap<Coupon, SellerCouponResponseDTO>()
 				.ForMember(des => des.ProductsApplied, act => act.MapFrom(src => src.CouponProducts.Select(x => new Product
 				{
 					ProductId = x.ProductId,
@@ -242,55 +243,55 @@ namespace DigitalFUHubApi.Comons
 			CreateMap<Product, WishListCustomerProductDetailResponseDTO>()
 			.ForMember(des => des.IsProductStock, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.SelectMany(x => x.AssetInformations).Count() > 0 ? true : false : false))
 			.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
-            .ForMember(des => des.IsShopActivate, act => act.MapFrom(src => src.Shop.IsActive))
-            .ForMember(des => des.IsProductActivate, act => act.MapFrom(src => src.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE ? true : false))
-            .ReverseMap();
+			.ForMember(des => des.IsShopActivate, act => act.MapFrom(src => src.Shop.IsActive))
+			.ForMember(des => des.IsProductActivate, act => act.MapFrom(src => src.ProductStatusId == Constants.PRODUCT_STATUS_ACTIVE ? true : false))
+			.ReverseMap();
 
 			CreateMap<ProductVariant, WishListCustomerProductVariantResponseDTO>()
 				.ReverseMap();
 
-            // Shop Detail <Customer>
-            CreateMap<Shop, ShopDetailCustomerResponseDTO>()
+			// Shop Detail <Customer>
+			CreateMap<Shop, ShopDetailCustomerResponseDTO>()
 			.ForMember(des => des.ProductNumber, act => act.MapFrom(src => src.Products.Count))
 			.ForMember(des => des.NumberFeedback, act => act.MapFrom(src => src.Products.Sum(x => x.NumberFeedback)))
 			.ForMember(des => des.TotalRatingStar, act => act.MapFrom(src => src.Products.Sum(x => x.TotalRatingStar)))
 			.ReverseMap();
-            CreateMap<User, ShopDetailCustomerUserResponseDTO>().ReverseMap();
+			CreateMap<User, ShopDetailCustomerUserResponseDTO>().ReverseMap();
 
-            CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
+			CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
 				.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
 				.ReverseMap();
 
 			CreateMap<ProductVariant, ShopDetailCustomerProductVariantDetailResponseDTO>()
 				.ReverseMap();
-            //
+			//
 
-            // Shop Detail <Admin>
-            CreateMap<Shop, ShopDetailAdminResponseDTO>()
-            .ForMember(des => des.TotalNumberProduct, act => act.MapFrom(src => src.Products.Count()))
-            .ForMember(des => des.ShopEmail, act => act.MapFrom(src => src.User.Email))
-            .ForMember(des => des.NumberProductsSold, act => act.MapFrom(src => src.Products.Sum(x => x.SoldCount)))
-            .ForMember(des => des.NumberFeedback, act => act.MapFrom(src => src.Products.Sum(x => x.NumberFeedback)))
-            .ForMember(des => des.TotalRatingStar, act => act.MapFrom(src => src.Products.Sum(x => x.TotalRatingStar)))
-            .ForMember(des => des.NumberOrderConfirmed, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED).Count()))
-            .ForMember(des => des.NumberOrderWaitConfirmation, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION).Count()))
-            .ForMember(des => des.TotalNumberOrder, act => act.MapFrom(src => src.Orders.Count()))
-            .ForMember(des => des.NumberOrderViolated, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_SELLER_VIOLATES).Count()))
-            .ForMember(des => des.Revenue, act => act.MapFrom(src => (src.User.TransactionInternals == null) ? 0 : src.User.TransactionInternals.Sum(x => x.PaymentAmount)))
-            .ReverseMap();
+			// Shop Detail <Admin>
+			CreateMap<Shop, ShopDetailAdminResponseDTO>()
+			.ForMember(des => des.TotalNumberProduct, act => act.MapFrom(src => src.Products.Count()))
+			.ForMember(des => des.ShopEmail, act => act.MapFrom(src => src.User.Email))
+			.ForMember(des => des.NumberProductsSold, act => act.MapFrom(src => src.Products.Sum(x => x.SoldCount)))
+			.ForMember(des => des.NumberFeedback, act => act.MapFrom(src => src.Products.Sum(x => x.NumberFeedback)))
+			.ForMember(des => des.TotalRatingStar, act => act.MapFrom(src => src.Products.Sum(x => x.TotalRatingStar)))
+			.ForMember(des => des.NumberOrderConfirmed, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED).Count()))
+			.ForMember(des => des.NumberOrderWaitConfirmation, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION).Count()))
+			.ForMember(des => des.TotalNumberOrder, act => act.MapFrom(src => src.Orders.Count()))
+			.ForMember(des => des.NumberOrderViolated, act => act.MapFrom(src => src.Orders.Where(x => x.OrderStatusId == Constants.ORDER_STATUS_SELLER_VIOLATES).Count()))
+			.ForMember(des => des.Revenue, act => act.MapFrom(src => (src.User.TransactionInternals == null) ? 0 : src.User.TransactionInternals.Sum(x => x.PaymentAmount)))
+			.ReverseMap();
 
-            CreateMap<User, ShopDetailAdminUserResponseDTO>().ReverseMap();
+			CreateMap<User, ShopDetailAdminUserResponseDTO>().ReverseMap();
 
-            //CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
-            //    .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
-            //    .ReverseMap();
+			//CreateMap<Product, ShopDetailCustomerProductDetailResponseDTO>()
+			//    .ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
+			//    .ReverseMap();
 
-            //CreateMap<ProductVariant, ShopDetailCustomerProductVariantDetailResponseDTO>()
-            //    .ReverseMap();
-            //
+			//CreateMap<ProductVariant, ShopDetailCustomerProductVariantDetailResponseDTO>()
+			//    .ReverseMap();
+			//
 
-            // Home Page <Customer>
-            CreateMap<Product, HomePageCustomerProductDetailResponseDTO>()
+			// Home Page <Customer>
+			CreateMap<Product, HomePageCustomerProductDetailResponseDTO>()
 				.ForMember(des => des.ProductVariant, act => act.MapFrom(src => src.ProductVariants != null ? src.ProductVariants.OrderBy(x => x.Price - (x.Price * x.Discount / 100)).First() : null))
 				.ReverseMap();
 

@@ -94,11 +94,13 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					Order? order = context.Order.Include(x => x.OrderDetails).ThenInclude(x => x.ProductVariant)
+					Order? order = context.Order.Include(x => x.HistoryOrderStatus).Include(x => x.OrderDetails).ThenInclude(x => x.ProductVariant)
 						.FirstOrDefault(x => x.UserId == userId && x.OrderId == orderId
 						&& x.OrderDetails.Any(od => od.OrderDetailId == orderDetailId));
 					if (order == null) throw new Exception("Not found.");
-					if (DateTime.Now.Subtract(order.OrderDate) > TimeSpan.FromDays(Constants.NUMBER_DAYS_CAN_MAKE_FEEDBACK)) throw new Exception("EXCEED TIME TO FEEDBACK.");
+					DateTime? dateOrderConfirmed = order.HistoryOrderStatus == null ? null : order.HistoryOrderStatus.FirstOrDefault(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED)?.DateCreate ?? null;
+					if (dateOrderConfirmed == null) throw new Exception("Orders not confirmed");
+					if (DateTime.Now.Subtract(dateOrderConfirmed.Value) > TimeSpan.FromDays(Constants.NUMBER_DAYS_CAN_MAKE_FEEDBACK)) throw new Exception("EXCEED TIME TO FEEDBACK.");
 
 					User user = context.User.First(x => x.UserId == userId);
 
