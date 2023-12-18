@@ -237,7 +237,7 @@
 					}
 					if (!user.Status)
 					{
-						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Account was banned", false, new()));
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_ACCOUNT_BANNED, "Account was banned", false, new()));
 					}
 					if (!user.IsConfirm)
 					{

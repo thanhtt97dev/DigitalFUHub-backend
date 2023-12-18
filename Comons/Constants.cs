@@ -78,6 +78,7 @@ namespace Comons
 
 		public const string RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM = "RS_01";
 		public const string RESPONSE_CODE_RESET_PASSWORD_SIGNIN_GOOGLE = "RS_02";
+		public const string RESPONSE_CODE_RESET_PASSWORD_ACCOUNT_BANNED = "RS_03";
 
 		public const string RESPONSE_CODE_CONFIRM_PASSWORD_IS_CONFIRMED = "CF_01";
 
