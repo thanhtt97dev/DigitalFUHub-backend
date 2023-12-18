@@ -235,6 +235,10 @@
 					{
 						return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not found", false, new()));
 					}
+					if (!user.Status)
+					{
+						return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Account was banned", false, new()));
+					}
 					if (!user.IsConfirm)
 					{
 						return Ok(new ResponseData(Constants.RESPONSE_CODE_RESET_PASSWORD_NOT_CONFIRM, "Not confirm email", false, new()));
