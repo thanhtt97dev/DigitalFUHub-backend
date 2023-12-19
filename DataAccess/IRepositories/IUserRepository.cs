@@ -34,7 +34,6 @@ namespace DataAccess.IRepositories
 		long GetNumberNewUserInCurrentMonth();
 		User? GetUserInfoById(long id);
 		int GetNumberUserWithCondition(long userId, string email, string fullName, int roleId, int status);
-		string GetAvatarUser(long userId);
 
     }
 }
