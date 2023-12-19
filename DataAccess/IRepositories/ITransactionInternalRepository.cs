@@ -13,5 +13,7 @@ namespace DataAccess.IRepositories
 		List<TransactionInternal> GetDataReportTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId);
 		List<TransactionInternal> GetHistoryTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionTypeId, int page);
 		int GetNumberTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId);
+		int GetNumberTransactionInternalOfUser(long userId, long orderId, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId);
+		List<TransactionInternal> GetHistoryTransactionInternalOfUser(long userId, long orderId, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId, int page);
 	}
 }
