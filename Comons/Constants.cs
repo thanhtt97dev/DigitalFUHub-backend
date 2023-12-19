@@ -107,8 +107,9 @@ namespace Comons
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userOnlineStatusHub";
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS = "ReceiveUserOnlineStatus";
 
-		//User config
-		public const int ADMIN_USER_ID = 1;
+        //User config
+        public const string ADMIN_NAME = "Quản trị viên";
+        public const int ADMIN_USER_ID = 1;
 		public const int ADMIN_ROLE = 1;
 		public const int CUSTOMER_ROLE = 2;
 		public const int SELLER_ROLE = 3;
