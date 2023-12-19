@@ -94,5 +94,43 @@ namespace DataAccess.DAOs
 
 			}
 		}
+
+		internal int GetNumberTransactionInternalOfUser(long userId, long orderId, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transactions = context.TransactionInternal
+								.Include(x => x.User)
+								.Where
+								(x =>
+									x.User.UserId == userId &&
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionInternalTypeId == 0 ? true : x.TransactionInternalTypeId == transactionInternalTypeId)
+								)
+								.Count();
+				return transactions;
+			}
+		}
+
+		internal List<TransactionInternal> GetNumberTransactionInternalOfUser(long userId, long orderId, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId, int page)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transactions = context.TransactionInternal
+								.Include(x => x.User)
+								.Where
+								(x =>
+									x.User.UserId == userId &&
+									((fromDate != null && toDate != null) ? fromDate <= x.DateCreate && toDate >= x.DateCreate : true) &&
+									(orderId == 0 ? true : x.OrderId == orderId) &&
+									(transactionInternalTypeId == 0 ? true : x.TransactionInternalTypeId == transactionInternalTypeId)
+								)
+								.OrderByDescending(x => x.DateCreate)
+								.ToList();
+				return transactions;
+
+			}
+		}
 	}
 }

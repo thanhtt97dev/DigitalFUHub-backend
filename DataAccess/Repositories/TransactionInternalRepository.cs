@@ -15,5 +15,8 @@ namespace DataAccess.Repositories
 		public List<TransactionInternal> GetDataReportTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId) => TransactionInternalDAO.Instance.GetDataReportTransactionInternal(orderId, email, fromDate, toDate, transactionInternalTypeId);
 		public List<TransactionInternal> GetHistoryTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionTypeId, int page) => TransactionInternalDAO.Instance.GetHistoryTransactionInternal(orderId, email, fromDate, toDate, transactionTypeId, page);
 		public int GetNumberTransactionInternal(long orderId, string email, DateTime? fromDate, DateTime? toDate, int transactionTypeId) => TransactionInternalDAO.Instance.GetNumberTransactionInternal(orderId, email, fromDate, toDate, transactionTypeId);
+		public int GetNumberTransactionInternalOfUser(long userId, long orderId, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId) => TransactionInternalDAO.Instance.GetNumberTransactionInternalOfUser(userId, orderId, fromDate, toDate, transactionInternalTypeId);
+
+		public List<TransactionInternal> GetHistoryTransactionInternalOfUser(long userId, long orderId, DateTime? fromDate, DateTime? toDate, int transactionInternalTypeId, int page) => TransactionInternalDAO.Instance.GetNumberTransactionInternalOfUser(userId, orderId, fromDate, toDate, transactionInternalTypeId, page);
 	}
 }
