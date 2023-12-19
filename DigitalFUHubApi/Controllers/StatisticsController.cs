@@ -385,13 +385,15 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
+				long[] lsStatus = { Constants.ORDER_STATUS_CONFIRMED, Constants.ORDER_STATUS_REJECT_COMPLAINT };
 				List<Order> orders = _orderRepository.GetListOrderOfCurrentMonthAllShop();
+				List<Order> ordersCompleted = orders.Where(x => lsStatus.Contains(x.OrderStatusId)).ToList();
 				long numberNewUserInCurrentMonth = _userRepository.GetNumberNewUserInCurrentMonth();
 				long totalCoinUsedOrders = _transactionCoinRepository.GetNumberCoinUsedOrdersCurrentMonth();
 				long totalCoinReceive = _transactionCoinRepository.GetNumberCoinReceiveCurrentMonth();
 				long businessFeeCurrent = _businessRepository.GetBusinessFeeCurrent();
-				long revenueAllShop = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))));
-				long profitAllShop = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
+				long revenueAllShop = ordersCompleted.Count == 0 ? 0 : ordersCompleted.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))));
+				long profitAllShop = ordersCompleted.Count == 0 ? 0 : ordersCompleted.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
 											- (((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)) * (x?.BusinessFee?.Fee ?? 0) / 100)));
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new
 				{
