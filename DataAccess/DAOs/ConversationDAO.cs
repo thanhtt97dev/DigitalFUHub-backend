@@ -268,10 +268,26 @@ namespace DataAccess.DAOs
 		{
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				List<Message> result = context.Messages
-					.Include(_ => _.User)
-					.Where(m => m.ConversationId == conversationId && m.IsDelete == false)
-					.ToList();
+                var result = (from message in context.Messages
+                              join user in context.User on message.UserId equals user.UserId
+                              where message.ConversationId == conversationId && !message.IsDelete
+                              select new Message
+                              {
+                                  UserId = user.UserId,
+                                  MessageId = message.MessageId,
+                                  ConversationId = message.ConversationId,
+                                  Content = message.Content,
+                                  MessageType = message.MessageType,
+                                  DateCreate = message.DateCreate,
+                                  User = new User
+                                  {
+                                      Avatar = user.RoleId == Constants.SELLER_ROLE
+                                               ? (context.Shop.Where(x => x.UserId == message.UserId)
+                                                              .Select(x => x.Avatar)
+                                                              .FirstOrDefault() ?? user.Avatar)
+                                               : user.Avatar
+                                  }
+                              }).ToList();
 
 				return result;
 			}

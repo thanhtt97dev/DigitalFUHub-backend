@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using OfficeOpenXml.Style;
 using System.Text.RegularExpressions;
 
 namespace DigitalFUHubApi.Controllers
@@ -25,6 +26,7 @@ namespace DigitalFUHubApi.Controllers
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly AzureStorageAccountService _azureStorageAccountService;
 		private readonly MailService _mailService;
+		private readonly HubService _hubService;
 
 		private readonly IMapper _mapper;
 
@@ -32,7 +34,8 @@ namespace DigitalFUHubApi.Controllers
 			IUserRepository userRepository, 
 			JwtTokenService jwtTokenService, 
 			AzureStorageAccountService azureStorageAccountService, 
-			MailService mailService, 
+			MailService mailService,
+			HubService hubService,
 			IMapper mapper)
 		{
 			_shopRepository = shopRepository;
@@ -40,6 +43,7 @@ namespace DigitalFUHubApi.Controllers
 			_jwtTokenService = jwtTokenService;
 			_azureStorageAccountService = azureStorageAccountService;
 			_mailService = mailService;
+			_hubService = hubService;
 			_mapper = mapper;
 		}
 
@@ -381,16 +385,24 @@ namespace DigitalFUHubApi.Controllers
 				$"</div>";
 
                 await _mailService.SendEmailAsync(shop.User.Email, request.IsActive ? "DigitalFUHub: Gỡ đình chỉ cửa hàng" : "DigitalFUHub: Cửa hàng đã bị đình chỉ", html);
+				if(request.IsActive) 
+				{
+					await _hubService.SendNotification(shop.UserId, $"Mở khóa cửa hàng", "Cửa hàng của bạn đã hoạt động trở lại!", Constants.FRONT_END_SELLER_DASHBOARD_URL);
+				}
+				else
+				{
+					await _hubService.SendNotification(shop.UserId, $"Khóa cửa hàng", "Cửa hàng của bạn đã bị khóa!", Constants.FRONT_END_SELLER_DASHBOARD_URL);
+				}
+				// Ok
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ()));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
 
-                // Ok
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, new ()));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        #endregion
+		#endregion
 
     }
 }

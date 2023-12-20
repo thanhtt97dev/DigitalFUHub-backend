@@ -59,6 +59,5 @@ namespace DataAccess.Repositories
 		public User? GetUserInfoById(long id)
 		=> UserDAO.Instance.GetUserInfoById(id);
 
-        public string GetAvatarUser(long userId) => UserDAO.Instance.GetAvatarUser(userId);
     }
 }

@@ -34,8 +34,9 @@ namespace DigitalFUHubApi.Controllers
         private readonly IUserRepository userRepository;
         private readonly IUserConversationRepository userConversationRepository;
         private readonly JwtTokenService jwtTokenService;
+        private readonly IShopRepository shopRepository;
 
-        public ConversationsController(IHubContext<ChatHub> hubContext, JwtTokenService jwtTokenService, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, AzureStorageAccountService azureStorageAccountService, IUserRepository userRepository, IUserConversationRepository userConversationRepository)
+        public ConversationsController(IHubContext<ChatHub> hubContext, JwtTokenService jwtTokenService, IConnectionManager connectionManager, IConversationRepository conversationRepository, IMapper mapper, AzureStorageAccountService azureStorageAccountService, IUserRepository userRepository, IUserConversationRepository userConversationRepository, IShopRepository shopRepository)
         {
             this.hubContext = hubContext;
             this.connectionManager = connectionManager;
@@ -45,6 +46,7 @@ namespace DigitalFUHubApi.Controllers
             this.userRepository = userRepository;
             this.userConversationRepository = userConversationRepository;
             this.jwtTokenService = jwtTokenService;
+			this.shopRepository = shopRepository;
         }
 
 		#region Send message
@@ -178,8 +180,25 @@ namespace DigitalFUHubApi.Controllers
                 // Message response to chat hub
                 MessageConversationResponseDTO messageConversation = mapper.Map<MessageConversationResponseDTO>(newMessage);
 
+				// get user
+				var user = userRepository.GetUserById(newMessage.UserId);
+				string avatar = "";
+
+                // Set avt of user
+                if (user != null)
+				{
+					if (user.RoleId == Constants.SELLER_ROLE)
+					{
+						var shop = shopRepository.GetShopById(user.UserId);
+
+                        avatar = shop?.Avatar ?? "";
+                    } else
+					{
+                        avatar = user.Avatar;
+                    }
+				}
 				// Set avt of user
-				messageConversation.Avatar = userRepository.GetAvatarUser(newMessage.UserId);
+				messageConversation.Avatar = avatar;
 
                 // Send to signR chat hub
                 if (connections.Count > 0)
