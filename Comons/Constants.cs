@@ -209,6 +209,7 @@ namespace Comons
 		public const string FRONT_END_HISTORY_ORDER_URL = "/history/order/";
 		public const string FRONT_END_SELLER_PRODUCT_URL = "/seller/product/";
 		public const string FRONT_END_SELLER_ORDER_DETAIL_URL = "/seller/order/";
+		public const string FRONT_END_SELLER_DASHBOARD_URL = "/seller/statistic/";
 		public const string FRONT_END_ADMIN_ORDER_DETAIL_URL = "/admin/order/";
 
 		// Pagination
