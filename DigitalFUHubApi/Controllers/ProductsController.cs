@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -29,8 +30,8 @@ namespace DigitalFUHubApi.Controllers
 		private readonly JwtTokenService _jwtTokenService;
 		private readonly HubService _hubService;
 		private readonly MailService _mailService;
-        private readonly ICouponRepository _couponRepository;
-        private readonly IMapper _mapper;
+		private readonly ICouponRepository _couponRepository;
+		private readonly IMapper _mapper;
 
 		public ProductsController(IProductRepository productRepository, IShopRepository shopRepository, AzureStorageAccountService azureStorageAccountService, JwtTokenService jwtTokenService, HubService hubService, MailService mailService, IMapper mapper, ICouponRepository couponRepository)
 		{
@@ -43,7 +44,7 @@ namespace DigitalFUHubApi.Controllers
 			_mapper = mapper;
 			_couponRepository = couponRepository;
 
-        }
+		}
 
 		#region Get Product Detail
 		[HttpGet("GetById/{productId}")]
@@ -233,7 +234,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid product tags", false, new()));
 				}
-				if(request.ProductDetailImageFiles.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
+				if (request.ProductDetailImageFiles.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
 					|| request.ThumbnailFile.Length > Constants.UPLOAD_FILE_SIZE_LIMIT
 					|| request.AssetInformationFiles.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT))
 				{
@@ -372,7 +373,7 @@ namespace DigitalFUHubApi.Controllers
 				if (
 					request.AssetInformationFilesAddNew.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
 					|| request.AssetInformationFilesUpdate.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
-					|| (request.ProductThumbnailFileUpdate != null 
+					|| (request.ProductThumbnailFileUpdate != null
 						&& request.ProductThumbnailFileUpdate.Length > Constants.UPLOAD_FILE_SIZE_LIMIT)
 					|| request.ProductDetailImagesAddNew.Any(x => x.Length > Constants.UPLOAD_FILE_SIZE_LIMIT))
 				{
@@ -444,6 +445,19 @@ namespace DigitalFUHubApi.Controllers
 				// check if there are product variant update (not include delete)
 				if (request.ProductVariantIdsUpdate.Count > 0)
 				{
+					List<UpdateAssetInformation> assetInformationUpdate = new List<UpdateAssetInformation>();
+					if (request.ProductVariantIdUpdateAssetInformation != null && request.ProductVariantIdUpdateAssetInformation.Count > 0)
+					{
+						for (int i = 0; i < request.ProductVariantIdUpdateAssetInformation.Count; i++)
+						{
+							assetInformationUpdate.Add(new UpdateAssetInformation
+							{
+								ProductVariantId = request.ProductVariantIdUpdateAssetInformation[i],
+								AssetInformations = Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i])
+							});
+						}
+					}
+
 					for (int i = 0; i < request.ProductVariantIdsUpdate.Count; i++)
 					{
 #pragma warning disable CS8601 // Possible null reference assignment.
@@ -454,9 +468,12 @@ namespace DigitalFUHubApi.Controllers
 							ProductId = request.ProductId,
 							ProductVariantId = request.ProductVariantIdsUpdate[i],
 							Discount = request.ProductVariantDiscountsUpdate[i],
-							AssetInformations = request.AssetInformationFilesUpdate != null && request.AssetInformationFilesUpdate.Count > 0
-												&& request.AssetInformationFilesUpdate[i] != null ?
-									Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i]) : null
+							//AssetInformations = request.AssetInformationFilesUpdate != null && request.AssetInformationFilesUpdate.Count() > 0
+							//					&& request.AssetInformationFilesUpdate[i] != null ?
+							//		Util.Instance.ReadDataFileExcelProductVariant(request.AssetInformationFilesUpdate[i]) : null
+							AssetInformations = !assetInformationUpdate.Any(x => x.ProductVariantId == request.ProductVariantIdsUpdate[i]) ? null :
+								assetInformationUpdate.First(x => x.ProductVariantId == request.ProductVariantIdsUpdate[i]).AssetInformations
+
 						});
 #pragma warning restore CS8601 // Possible null reference assignment.
 					}
@@ -725,7 +742,7 @@ namespace DigitalFUHubApi.Controllers
 		[HttpPost("Search")]
 		public IActionResult SearchProduct(SearchProductRequestDTO request)
 		{
-			if(string.IsNullOrWhiteSpace(request.Keyword))
+			if (string.IsNullOrWhiteSpace(request.Keyword))
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid keyword search", false, new()));
 			}
@@ -738,8 +755,8 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid page", false, new()));
 			}
-			(long totalItems, List<Product> products) = _productRepository.GetListProductSearched(request.Keyword, 
-				request.Category, request.Rating ,request.MinPrice, request.MaxPrice, request.Sort, request.Page);
+			(long totalItems, List<Product> products) = _productRepository.GetListProductSearched(request.Keyword,
+				request.Category, request.Rating, request.MinPrice, request.MaxPrice, request.Sort, request.Page);
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new SearchProductResponseDTO
 			{
 				TotalItems = totalItems,
@@ -751,27 +768,27 @@ namespace DigitalFUHubApi.Controllers
 		#region GetProductSpecificOfCoupon
 		[Authorize]
 		[HttpPost("GetProductSpecificOfCoupon")]
-        public IActionResult GetProductSpecificOfCoupon(CouponDetailCustomerProductRequestDTO request)
-        {
-            try
-            {
+		public IActionResult GetProductSpecificOfCoupon(CouponDetailCustomerProductRequestDTO request)
+		{
+			try
+			{
 				var coupon = _couponRepository.GetCouponEntityById(request.CouponId);
 
 				if (coupon == null)
 				{
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Coupon not found", false, new()));
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Coupon not found", false, new()));
+				}
 
 				var productResponse = _mapper.Map<List<CouponDetailCustomerProductResponseDTO>>(_productRepository.GetProductSpecificOfCoupon(request.CouponId, request.ProductName));
 
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, productResponse));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-        #endregion
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "SUCCESS", true, productResponse));
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
+		}
+		#endregion
 
-    }
+	}
 }

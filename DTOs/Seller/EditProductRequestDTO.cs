@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessObject.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,17 @@ namespace DTOs.Seller
 		public List<long> ProductVariantPricesUpdate { get; set; } = new(); 
 		public List<int> ProductVariantDiscountsUpdate { get; set; } = new(); 
 		public List<IFormFile> AssetInformationFilesUpdate { get; set; } = new(); 
+		public List<long> ProductVariantIdUpdateAssetInformation { get; set; } = new();
 		public List<string> ProductVariantNamesAddNew { get; set; } = new(); 
 		public List<long> ProductVariantPricesAddNew { get; set; } = new();
 		public List<int> ProductVariantDiscountsAddNew { get; set; } = new();
 		public List<IFormFile> AssetInformationFilesAddNew { get; set; } = new(); 
 		public List<string> Tags { get; set; } = new(); 
 		public bool IsActiveProduct { get; set; }
+	}
+	public class UpdateAssetInformation
+	{
+		public long ProductVariantId { get; set; }
+		public List<AssetInformation> AssetInformations { get; set; } = new();
 	}
 }
