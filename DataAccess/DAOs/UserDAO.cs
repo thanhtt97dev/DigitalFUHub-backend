@@ -339,5 +339,13 @@ namespace DataAccess.DAOs
 					.FirstOrDefault(x => x.UserId == id);
 			}
 		}
+
+        internal long GetRoleIdUser(long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                return context.User.FirstOrDefault(x => x.UserId == userId)?.RoleId ?? 0;
+            }
+        }
     }
 }

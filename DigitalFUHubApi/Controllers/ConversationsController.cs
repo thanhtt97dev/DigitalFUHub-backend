@@ -180,28 +180,11 @@ namespace DigitalFUHubApi.Controllers
                 // Message response to chat hub
                 MessageConversationResponseDTO messageConversation = mapper.Map<MessageConversationResponseDTO>(newMessage);
 
-				// get user
-				var user = userRepository.GetUserById(newMessage.UserId);
-				string avatar = "";
+				// get role id of user
+				messageConversation.RoleId = userRepository.GetRoleIdUser(request.UserId);
 
-                // Set avt of user
-                if (user != null)
-				{
-					if (user.RoleId == Constants.SELLER_ROLE)
-					{
-						var shop = shopRepository.GetShopById(user.UserId);
-
-                        avatar = shop?.Avatar ?? "";
-                    } else
-					{
-                        avatar = user.Avatar;
-                    }
-				}
-				// Set avt of user
-				messageConversation.Avatar = avatar;
-
-                // Send to signR chat hub
-                if (connections.Count > 0)
+				// Send to signR chat hub
+				if (connections.Count > 0)
                 {
                     foreach (var connectionId in connections)
                     {
