@@ -553,6 +553,7 @@ namespace DataAccess.DAOs
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
 									ProductStatusId = product.ProductStatusId,
+									DateCreate = product.DateCreate,
 									Shop = new Shop
 									{
 										UserId = shop.UserId,
@@ -719,6 +720,7 @@ namespace DataAccess.DAOs
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
 									Note = product.Note,
+									DateCreate = product.DateCreate,	
 									BanDate = product.BanDate,
 									ProductStatusId = product.ProductStatusId,
 									Shop = new Shop
