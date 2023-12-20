@@ -36,7 +36,7 @@ namespace DataAccess.IRepositories
         List<Product> GetProductByUserId(long userId, int page, string productName);
 		List<Product> GetProductForHomePageCustomer(int page, long categoryId);
         List<Product> GetProductsOfSeller(long userId, long productId, string productName, int productCategory, int soldMin, int soldMax, int productStatusId, int page);
-		List<Product> GetListProductForSearchHint(string keyword);
+		List<string> GetListProductNameForSearchHint(string keyword);
 		(long totalItems, List<Product> productSearched) GetListProductSearched(string keyword, long categoryId, int rating, long? minPrice, long? maxPrice, long sort, int page);
 		long GetNumberProductsOutOfStock(long v);
 		List<Product> GetProductSpecificOfCoupon(long couponId, string productName);

@@ -63,8 +63,8 @@ namespace DataAccess.Repositories
 
 		public List<Product> GetProductForHomePageCustomer(int page, long categoryId) => ProductDAO.Instance.GetProductForHomePageCustomer(page, categoryId);
 
-		public List<Product> GetListProductForSearchHint(string keyword)
-		=> ProductDAO.Instance.GetListProductForSearchHint(keyword);
+		public List<string> GetListProductNameForSearchHint(string keyword)
+		=> ProductDAO.Instance.GetListProductNameForSearchHint(keyword);
 
 		public (long totalItems, List<Product> productSearched) GetListProductSearched(string keyword, long categoryId,
 			int rating, long? minPrice, long? maxPrice, long sort, int page)

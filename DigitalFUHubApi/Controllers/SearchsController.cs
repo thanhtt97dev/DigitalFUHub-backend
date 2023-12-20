@@ -4,6 +4,7 @@ using DataAccess.IRepositories;
 using DigitalFUHubApi.Comons;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Validations;
 
 namespace DigitalFUHubApi.Controllers
 {
@@ -26,8 +27,7 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", true, new()));
 			}
-			List<Product> products = _productRepository.GetListProductForSearchHint(keyword);
-			List<string> listSearchHint = products.Select(x => x.ProductName).ToList();
+			List<string> listSearchHint = _productRepository.GetListProductNameForSearchHint(keyword);
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, listSearchHint));
 		}
 		#endregion
