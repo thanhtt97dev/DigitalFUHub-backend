@@ -204,7 +204,8 @@ namespace DataAccess.DAOs
 								(roleId == 0 ? true : x.RoleId == roleId) &&
 								(status == 0 ? true : x.Status == (status == 1))
 								)
-								.Skip((page - 1) * Constants.PAGE_SIZE)
+							   .OrderByDescending(x => x.CreateDate)
+							   .Skip((page - 1) * Constants.PAGE_SIZE)
 							   .Take(Constants.PAGE_SIZE)
 							   .ToList();
 				return users;

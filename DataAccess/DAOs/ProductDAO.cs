@@ -574,6 +574,7 @@ namespace DataAccess.DAOs
 													   .ToList(),
 								}
 							   )
+							   .OrderByDescending(x => x.DateCreate)
 							   .Skip((page - 1) * Constants.PAGE_SIZE)
 							   .Take(Constants.PAGE_SIZE)
 							   .ToList();
@@ -741,6 +742,7 @@ namespace DataAccess.DAOs
 													   .ToList(),
 								}
 							   )
+							   .OrderByDescending(x => x.DateCreate)
 							   .Skip((page - 1) * Constants.PAGE_SIZE)
 							   .Take(Constants.PAGE_SIZE)
 							   .ToList();
