@@ -553,6 +553,7 @@ namespace DataAccess.DAOs
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
 									ProductStatusId = product.ProductStatusId,
+									DateCreate = product.DateCreate,
 									Shop = new Shop
 									{
 										UserId = shop.UserId,
@@ -574,6 +575,7 @@ namespace DataAccess.DAOs
 													   .ToList(),
 								}
 							   )
+							   .OrderByDescending(x => x.DateCreate)
 							   .Skip((page - 1) * Constants.PAGE_SIZE)
 							   .Take(Constants.PAGE_SIZE)
 							   .ToList();
@@ -718,6 +720,7 @@ namespace DataAccess.DAOs
 									LikeCount = product.LikeCount,
 									SoldCount = product.SoldCount,
 									Note = product.Note,
+									DateCreate = product.DateCreate,	
 									BanDate = product.BanDate,
 									ProductStatusId = product.ProductStatusId,
 									Shop = new Shop
@@ -741,6 +744,7 @@ namespace DataAccess.DAOs
 													   .ToList(),
 								}
 							   )
+							   .OrderByDescending(x => x.DateCreate)
 							   .Skip((page - 1) * Constants.PAGE_SIZE)
 							   .Take(Constants.PAGE_SIZE)
 							   .ToList();

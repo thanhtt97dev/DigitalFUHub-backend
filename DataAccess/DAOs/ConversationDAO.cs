@@ -75,7 +75,7 @@ namespace DataAccess.DAOs
 							RoleId = uc.User.RoleId,
 							Fullname = uc.User.RoleId == Constants.SELLER_ROLE ? 
 										(context.Shop.FirstOrDefault(x => x.UserId == uc.User.UserId)?.ShopName ?? uc.User.Fullname) 
-										: (uc.User.RoleId == Constants.ADMIN_ROLE ? Constants.ADMIN_NAME : uc.User.Fullname),
+										: uc.User.Fullname,
 							Avatar = uc.User.RoleId == Constants.SELLER_ROLE ?
                                         (context.Shop.FirstOrDefault(x => x.UserId == uc.User.UserId)?.Avatar ?? uc.User.Avatar) : uc.User.Avatar
                         }).Distinct().ToList()
@@ -281,11 +281,7 @@ namespace DataAccess.DAOs
                                   DateCreate = message.DateCreate,
                                   User = new User
                                   {
-                                      Avatar = user.RoleId == Constants.SELLER_ROLE
-                                               ? (context.Shop.Where(x => x.UserId == message.UserId)
-                                                              .Select(x => x.Avatar)
-                                                              .FirstOrDefault() ?? user.Avatar)
-                                               : user.Avatar
+                                      RoleId = user.RoleId
                                   }
                               }).ToList();
 

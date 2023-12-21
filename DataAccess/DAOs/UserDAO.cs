@@ -204,7 +204,8 @@ namespace DataAccess.DAOs
 								(roleId == 0 ? true : x.RoleId == roleId) &&
 								(status == 0 ? true : x.Status == (status == 1))
 								)
-								.Skip((page - 1) * Constants.PAGE_SIZE)
+							   .OrderByDescending(x => x.CreateDate)
+							   .Skip((page - 1) * Constants.PAGE_SIZE)
 							   .Take(Constants.PAGE_SIZE)
 							   .ToList();
 				return users;
@@ -338,5 +339,13 @@ namespace DataAccess.DAOs
 					.FirstOrDefault(x => x.UserId == id);
 			}
 		}
+
+        internal long GetRoleIdUser(long userId)
+        {
+            using (DatabaseContext context = new DatabaseContext())
+            {
+                return context.User.FirstOrDefault(x => x.UserId == userId)?.RoleId ?? 0;
+            }
+        }
     }
 }

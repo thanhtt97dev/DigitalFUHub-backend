@@ -7,6 +7,7 @@ namespace Comons
 
 		//config hosting
 		public const string FRONT_END_ENDPOINT_USER = "http://localhost:3000";
+		//public const string FRONT_END_ENDPOINT_USER = "https://digitalfuhub.id.vn";
 
 		//MB bank config
 		public const string BANK_ID_MB_BANK = "970422";
