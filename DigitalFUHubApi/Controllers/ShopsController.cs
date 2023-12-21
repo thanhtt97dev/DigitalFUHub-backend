@@ -92,10 +92,10 @@ namespace DigitalFUHubApi.Controllers
 			{
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Not Found", false, new()));
 			}
-			if (!shop.IsActive)
-			{
-				return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
-			}
+			//if (!shop.IsActive)
+			//{
+			//	return Ok(new ResponseData(Constants.RESPONSE_CODE_SHOP_BANNED, "Shop banned", false, new()));
+			//}
 			return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, shop));
 
 		}

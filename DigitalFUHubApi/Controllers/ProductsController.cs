@@ -181,7 +181,7 @@ namespace DigitalFUHubApi.Controllers
 		}
 		#endregion
 
-		#region Get Product Of Seller
+		#region Get Product detail Of Seller
 		[Authorize("Seller")]
 		[HttpGet("Seller/{userId}/{productId}")]
 		public IActionResult GetProductSeller(long userId, long productId)
