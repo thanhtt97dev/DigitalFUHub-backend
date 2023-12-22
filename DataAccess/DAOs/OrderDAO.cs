@@ -344,8 +344,9 @@ namespace DataAccess.DAOs
 						#endregion
 
 						#region Check shop existed
+						var seller = context.User.FirstOrDefault(x => x.UserId == shopProduct.ShopId);
 						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId && x.IsActive);
-						if (shop == null)
+						if (shop == null || seller == null)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!", numberQuantityAvailable, orderResult);
