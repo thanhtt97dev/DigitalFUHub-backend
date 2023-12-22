@@ -37,7 +37,7 @@ namespace DataAccess.DAOs
                 var feedbackBenefits = (from feebackBenefit in context.FeedbackBenefit
                             where (1 == 1) &&
                             (feedbackBenefitId != 0 ? feebackBenefit.FeedbackBenefitId == feedbackBenefitId : true) &&
-                            (fromDate != null && toDate != null) ? fromDate <= feebackBenefit.StartDate && toDate >= feebackBenefit.StartDate : true &&
+                            ((fromDate != null && toDate != null) ? fromDate <= feebackBenefit.StartDate && toDate >= feebackBenefit.StartDate : true) &&
                             feebackBenefit.Coin <= coin
                                         select new FeedbackBenefitAdminResponseDTO
                             {

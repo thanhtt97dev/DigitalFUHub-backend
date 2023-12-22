@@ -37,7 +37,7 @@ namespace DataAccess.DAOs
 				var fees = (from businessFee in context.BusinessFee
 							where (1 == 1) &&
 							(businessFeeId != 0 ? businessFee.BusinessFeeId == businessFeeId : true) &&
-							(fromDate != null && toDate != null) ? fromDate <= businessFee.StartDate && toDate >= businessFee.StartDate : true &&
+							((fromDate != null && toDate != null) ? fromDate <= businessFee.StartDate && toDate >= businessFee.StartDate : true) &&
 							businessFee.Fee <= maxFee
 							select new BusinessFeeResponseDTO 
 							{
