@@ -78,7 +78,7 @@ namespace DataAccess.DAOs
 						if (sellerProfit > 0)
 						{
 							// update seller's balance
-							var seller = context.User.First(x => x.UserId == sellerId && x.Status == true);
+							var seller = context.User.First(x => x.UserId == sellerId);
 							seller.AccountBalance = seller.AccountBalance + sellerProfit;
 
 							// add transaction for refund money to seller
@@ -344,7 +344,7 @@ namespace DataAccess.DAOs
 						#endregion
 
 						#region Check shop existed
-						var seller = context.User.FirstOrDefault(x => x.UserId == shopProduct.ShopId);
+						var seller = context.User.FirstOrDefault(x => x.UserId == shopProduct.ShopId && x.Status == true);
 						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId && x.IsActive);
 						if (shop == null || seller == null)
 						{
