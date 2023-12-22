@@ -344,8 +344,9 @@ namespace DataAccess.DAOs
 						#endregion
 
 						#region Check shop existed
+						var seller = context.User.FirstOrDefault(x => x.UserId == shopProduct.ShopId);
 						var shop = context.Shop.FirstOrDefault(x => x.UserId == shopProduct.ShopId && x.IsActive);
-						if (shop == null)
+						if (shop == null || seller == null)
 						{
 							transaction.Rollback();
 							return (Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not existed!", numberQuantityAvailable, orderResult);
@@ -569,7 +570,7 @@ namespace DataAccess.DAOs
 
 						#region Update data in database
 						//update customer and admin account balance
-						if (totalPayment >= 0)
+						if (totalPayment > 0)
 						{
 							//Check customer is a seller of another shop and total payment > seller's account balance require
 							/*
@@ -595,11 +596,7 @@ namespace DataAccess.DAOs
 								customer.Coin = customer.Coin - totalCoinDiscount;
 							}
 
-							//update admin account balance
-							var admin = context.User.First(x => x.UserId == Constants.ADMIN_USER_ID);
-							admin.AccountBalance += totalPayment == 0 ? totalCoinDiscount : totalPayment;
-
-							context.User.UpdateRange(admin, customer);
+							context.User.UpdateRange(customer);
 							context.SaveChanges();
 						}
 
