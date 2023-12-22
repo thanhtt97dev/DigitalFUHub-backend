@@ -434,8 +434,7 @@ namespace DigitalFUHubApi.Controllers
 				long depositTransactionId;
 				long.TryParse(request.DepositTransactionId, out depositTransactionId);
 
-				// 0 : All, 1: paid, 2: unpay
-				if(request.Status != 0 && request.Status != 1 && request.Status != 2)
+				if(!Constants.DEPOSIT_TRANSACTION_STATUS.Contains(request.Status))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid transaction's status", false, new()));
 				}

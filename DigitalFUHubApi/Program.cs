@@ -238,6 +238,16 @@ namespace DigitalFUHubApi
 								)
 							);
 
+				var jobKeyUpdateStatusRequestDepositMoneyToExpiredJob = new JobKey("UpdateStatusRequestDepositMoneyToExpired");
+				configure.AddJob<UpdateStatusRequestDepositMoneyToExpired>(jobKeyUpdateStatusRequestDepositMoneyToExpiredJob)
+						 .AddTrigger(trigger =>
+							trigger.ForJob(jobKeyUpdateStatusRequestDepositMoneyToExpiredJob)
+							.StartNow()
+							.WithSimpleSchedule(schedule =>
+								schedule.WithIntervalInHours(24).RepeatForever()
+								)
+							);
+
 				configure.UseMicrosoftDependencyInjectionJobFactory();
 			});
 

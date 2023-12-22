@@ -84,7 +84,7 @@ namespace DataAccess.DAOs
 			{
 				transaction.RequestDate = DateTime.Now;
 				transaction.PaidDate = null;
-				transaction.IsPay = false;
+				transaction.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY;
 				transaction.UserId = transaction.UserId;
 				context.DepositTransaction.Add(transaction);
 				context.SaveChanges();
@@ -124,12 +124,12 @@ namespace DataAccess.DAOs
 					{
 						var deposit = context.DepositTransaction
 								.FirstOrDefault(x => item.description.ToLower().Contains(x.Code.ToLower()) &&
-								x.Amount == item.creditAmount);
+								x.Amount == item.creditAmount && x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY);
 						if (deposit != null)
 						{
-							if (deposit.IsPay == true) continue;
+							if (deposit.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED) continue;
 							//update sataus recharge
-							deposit.IsPay = true;
+							deposit.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED;
 							deposit.PaidDate = System.DateTime.Now;
 							//update accout balace user
 							var user = context.User.First(x => x.UserId == deposit.UserId);
@@ -242,7 +242,7 @@ namespace DataAccess.DAOs
 								(!string.IsNullOrEmpty(email)) ? x.User.Email.Contains(email) : true &&
 								(fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true &&
 								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-								(status == 0 ? true : x.IsPay == (status == 1))
+								(status == 0 ? true : x.DepositTransactionStatusId == status)
 							)
 							.Count();
 				return deposits;
@@ -259,7 +259,7 @@ namespace DataAccess.DAOs
 								userId == x.UserId &&
 								((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
 								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-								(status == 0 ? true : x.IsPay == (status == 1))
+								(status == 0 ? true : x.DepositTransactionStatusId == status)
 							)
 							.OrderByDescending(x => x.RequestDate)
 							.Skip((page - 1) * Constants.PAGE_SIZE)
@@ -280,7 +280,7 @@ namespace DataAccess.DAOs
 									(!string.IsNullOrEmpty(email)) ? x.User.Email.Contains(email) : true &&
 									((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
 									(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-									x.IsPay == true
+									x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED
 								)
 							.OrderByDescending(x => x.RequestDate)
 							.Skip((page - 1) * Constants.PAGE_SIZE)
@@ -681,7 +681,7 @@ namespace DataAccess.DAOs
 								(userId == 0 ? true : userId == x.UserId) &&
 								((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
 								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-								(status == 0 ? true : x.IsPay == (status == 1))
+								(status == 0 ? true : x.DepositTransactionStatusId == status)
 							)
 							.OrderByDescending(x => x.RequestDate)
 							.ToList();
@@ -707,7 +707,7 @@ namespace DataAccess.DAOs
 			{
 				return context.DepositTransaction
 							.Include(x => x.User)
-							.Where(x => x.IsPay == true && x.PaidDate != null)
+							.Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED && x.PaidDate != null)
 							.OrderByDescending(x => x.PaidDate)
 							.ToList();
 			}
@@ -719,6 +719,21 @@ namespace DataAccess.DAOs
 			{
 				return context.WithdrawTransaction.LongCount(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING);
 							
+			}
+		}
+
+		internal void UpdateStatusRequestDepositMoneyToExpired(int days)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				DateTime timeAccept = DateTime.Now.AddDays(-days);
+				var deposits = context.DepositTransaction
+									  .Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY && 
+											 x.RequestDate < timeAccept)
+									  .ToList();
+				deposits.ForEach(x => x.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_EXPIRED);
+				context.UpdateRange(deposits);
+				context.SaveChanges();
 			}
 		}
 	}

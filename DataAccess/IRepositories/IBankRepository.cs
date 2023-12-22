@@ -38,5 +38,6 @@ namespace DataAccess.IRepositories
 		List<DepositTransaction> GetListDepositMoney(int month, int year);
 		List<WithdrawTransaction> GetListWithdrawnMoney(int month, int year);
 		long GetNumberRequestWithdrawnMoney();
+		void UpdateStatusRequestDepositMoneyToExpired(int days);
 	}
 }

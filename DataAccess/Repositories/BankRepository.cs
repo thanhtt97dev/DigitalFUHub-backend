@@ -46,5 +46,8 @@ namespace DataAccess.Repositories
 
 		public long GetNumberRequestWithdrawnMoney()
 		=> BankDAO.Instance.GetNumberRequestWithdrawnMoney();
+
+		public void UpdateStatusRequestDepositMoneyToExpired(int days) => BankDAO.Instance.UpdateStatusRequestDepositMoneyToExpired(days);
+
 	}
 }

@@ -108,9 +108,9 @@ namespace Comons
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB = "userOnlineStatusHub";
 		public const string SIGNAL_R_USER_ONLINE_STATUS_HUB_RECEIVE_ONLINE_STATUS = "ReceiveUserOnlineStatus";
 
-        //User config
-        public const string ADMIN_NAME = "Quản trị viên";
-        public const int ADMIN_USER_ID = 1;
+		//User config
+		public const string ADMIN_NAME = "Quản trị viên";
+		public const int ADMIN_USER_ID = 1;
 		public const int ADMIN_ROLE = 1;
 		public const int CUSTOMER_ROLE = 2;
 		public const int SELLER_ROLE = 3;
@@ -226,6 +226,12 @@ namespace Comons
 		public const int LIMIT_SEARCH_HINT = 10;
 
 		//withdraw, deposit transaction
+		public static int[] DEPOSIT_TRANSACTION_STATUS = new int[] { 0, DEPOSIT_TRANSACTION_STATUS_UNPAY, DEPOSIT_TRANSACTION_STATUS_PAIDED, DEPOSIT_TRANSACTION_STATUS_EXPIRED };
+		public const int DEPOSIT_TRANSACTION_STATUS_UNPAY = 1;
+		public const int DEPOSIT_TRANSACTION_STATUS_PAIDED = 2;
+		public const int DEPOSIT_TRANSACTION_STATUS_EXPIRED = 3;
+
+		public const int NUMBER_DAY_DEPOSIT_REQUEST_EXPIRED = 3;
 		public const int NUMBER_WITH_DRAW_REQUEST_CAN_MAKE_A_DAY = 20;
 		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 300000;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;

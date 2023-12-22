@@ -15,6 +15,6 @@ namespace DTOs.Bank
 		public DateTime? PaidDate { get; set; }
 		public string Code { get; set; } = null!;
 		public long Amount { get; set; }
-		public bool IsPay { get; set; }
+		public int DepositTransactionStatusId { get; set; }
 	}
 }
