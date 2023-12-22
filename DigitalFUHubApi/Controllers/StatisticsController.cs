@@ -92,8 +92,7 @@ namespace DigitalFUHubApi.Controllers
 									Date = tb.Key,
 									Revenue = tb.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0)))),
 									Profit = tb.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-										- (((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-											* (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
+										- ((x?.ord?.TotalAmount ?? 0) * (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
 									TotalOrders = (long)tb.Count(x => x.ord != null)
 								};
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new StatisticSalesResponseDTO
@@ -115,8 +114,7 @@ namespace DigitalFUHubApi.Controllers
 								 Date = tb2.Key,
 								 Revenue = tb2.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0)))),
 								 Profit = tb2.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-									- (((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-									* (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
+									- ((x?.ord?.TotalAmount ?? 0) * (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
 								 TotalOrders = (long)tb2.Count(x => x.ord != null)
 							 };
 
@@ -145,7 +143,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					Revenue = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)))),
 					Profit = orders.Count == 0 ? 0 : orders.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
-											- (((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)) * (x?.BusinessFee?.Fee ?? 0) / 100))),
+											- ((x?.TotalAmount ?? 0) * (x?.BusinessFee?.Fee ?? 0) / 100))),
 					TotalOrders = orders.Count
 				}));
 			}
@@ -230,8 +228,7 @@ namespace DigitalFUHubApi.Controllers
 									Date = tb.Key,
 									Revenue = tb.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0)))),
 									Profit = tb.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-										- (((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-										* (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
+										- ((x?.ord?.TotalAmount ?? 0) * (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
 									TotalOrders = (long)tb.Count(x => x.ord != null)
 								};
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new StatisticSalesResponseDTO
@@ -253,8 +250,7 @@ namespace DigitalFUHubApi.Controllers
 								 Date = tb2.Key,
 								 Revenue = tb2.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0)))),
 								 Profit = tb2.Sum(x => x.ord == null ? 0 : (long)(((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-									- (((x?.ord?.TotalAmount ?? 0) - (x?.ord?.TotalCouponDiscount ?? 0))
-									* (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
+									- ((x?.ord?.TotalAmount ?? 0) * (x?.ord?.BusinessFee?.Fee ?? 0) / 100))),
 								 TotalOrders = (long)tb2.Count(x => x.ord != null)
 							 };
 
@@ -394,7 +390,7 @@ namespace DigitalFUHubApi.Controllers
 				long businessFeeCurrent = _businessRepository.GetBusinessFeeCurrent();
 				long revenueAllShop = ordersCompleted.Count == 0 ? 0 : ordersCompleted.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))));
 				long profitAllShop = ordersCompleted.Count == 0 ? 0 : ordersCompleted.Sum(x => (long)(((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0))
-											- (((x?.TotalAmount ?? 0) - (x?.TotalCouponDiscount ?? 0)) * (x?.BusinessFee?.Fee ?? 0) / 100)));
+											- ((x?.TotalAmount ?? 0) * (x?.BusinessFee?.Fee ?? 0) / 100)));
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success", true, new
 				{
 					RevenueAllShop = revenueAllShop,

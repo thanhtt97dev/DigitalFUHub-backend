@@ -71,7 +71,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.CreditAccount, act => act.MapFrom(src => Util.HideCharacters(src.CreditAccount, 5)))
 				.ReverseMap();
 			CreateMap<Message, MessageConversationResponseDTO>()
-                .ForMember(des => des.RoleId, act => act.MapFrom(src => src.User.RoleId))
+				.ForMember(des => des.RoleId, act => act.MapFrom(src => src.User.RoleId))
 				.ReverseMap();
 			CreateMap<WithdrawTransactionBill, WithdrawTransactionBillDTO>().ReverseMap();
 			CreateMap<WithdrawTransaction, HistoryWithdrawDetail>()
@@ -109,7 +109,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.BusinessFee, act => act.MapFrom(src => src.BusinessFee.Fee))
 				.ForMember(des => des.CouponCode, act => act.MapFrom(src => (src.OrderCoupons == null || src.OrderCoupons.Count <= 0) ? "" : src.OrderCoupons.ToArray()[0].Coupon.CouponCode))
 				.ForMember(des => des.IsFeedback, act => act.MapFrom(src => src.OrderDetails.Any(x => x.IsFeedback == true)))
-				.ForMember(des => des.Profit, act => act.MapFrom(src => (src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)))
+				.ForMember(des => des.Profit, act => act.MapFrom(src => (src.TotalAmount - src.TotalCouponDiscount) - (src.TotalAmount * src.BusinessFee.Fee / 100)))
 				.ReverseMap();
 			CreateMap<OrderCoupon, OrderDetailInfoResponseDTO>()
 				.ReverseMap();
@@ -377,7 +377,7 @@ namespace DigitalFUHubApi.Comons
 				.ForMember(des => des.TotalAmount, act => act.MapFrom(src => src.TotalAmount.ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.TotalCouponDiscount, act => act.MapFrom(src => src.TotalCouponDiscount.ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.BusinessFee, act => act.MapFrom(src => src.BusinessFee.Fee))
-				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - ((src.TotalAmount - src.TotalCouponDiscount) * src.BusinessFee.Fee / 100)).ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
+				.ForMember(des => des.Profit, act => act.MapFrom(src => ((src.TotalAmount - src.TotalCouponDiscount) - (src.TotalAmount * src.BusinessFee.Fee / 100)).ToString("#,###0", CultureInfo.GetCultureInfo("vi-VN"))))
 				.ForMember(des => des.OrderStatus, act => act.MapFrom(src => MapOrderStatusToString(src.OrderStatusId)))
 				.ReverseMap();
 			// slider

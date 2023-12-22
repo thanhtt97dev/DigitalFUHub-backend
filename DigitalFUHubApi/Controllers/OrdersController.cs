@@ -67,9 +67,9 @@ namespace DigitalFUHubApi.Controllers
 				if (responseCode == Constants.RESPONSE_CODE_SUCCESS)
 				{
 					await _hubService.SendNotification(
-						orderInfo.ShopId, 
-						$"Đơn hàng mới", 
-						$"Mã đơn hàng #{orderInfo.OrderId}", 
+						orderInfo.ShopId,
+						$"Đơn hàng mới",
+						$"Mã đơn hàng #{orderInfo.OrderId}",
 						Constants.FRONT_END_SELLER_ORDER_DETAIL_URL + orderInfo.OrderId);
 				}
 
@@ -155,7 +155,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
 				}
-				if(request.StatusId == Constants.ORDER_STATUS_COMPLAINT && string.IsNullOrWhiteSpace(request.Note))
+				if (request.StatusId == Constants.ORDER_STATUS_COMPLAINT && string.IsNullOrWhiteSpace(request.Note))
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_FAILD, "Invalid data", false, new()));
 				}
@@ -189,7 +189,7 @@ namespace DigitalFUHubApi.Controllers
 					}
 				}
 
-				if(request.StatusId == Constants.ORDER_STATUS_COMPLAINT)
+				if (request.StatusId == Constants.ORDER_STATUS_COMPLAINT)
 				{
 					await _mailService.SendMailOrderComplain(order);
 					//send notification to seller
@@ -199,9 +199,9 @@ namespace DigitalFUHubApi.Controllers
 					await _hubService.SendNotification(order.ShopId, title, content, link);
 				}
 
-				if(request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
+				if (request.StatusId == Constants.ORDER_STATUS_CONFIRMED)
 				{
-					if(order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION)
+					if (order.OrderStatusId != Constants.ORDER_STATUS_WAIT_CONFIRMATION)
 					{
 						await _mailService.SendMailOrderComfirm(order);
 					}
@@ -244,7 +244,7 @@ namespace DigitalFUHubApi.Controllers
 				OrderProductResponseDTO responseData = new OrderProductResponseDTO
 				{
 					OrderId = order.OrderId,
-					Note = order.HistoryOrderStatus.OrderByDescending(x => x.DateCreate).FirstOrDefault()?.Note??"",
+					Note = order.HistoryOrderStatus.OrderByDescending(x => x.DateCreate).FirstOrDefault()?.Note ?? "",
 					OrderDate = order.OrderDate,
 					DateConfirmed = order.HistoryOrderStatus == null || !order.HistoryOrderStatus.Any(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED) ? null : order.HistoryOrderStatus.First(x => x.OrderStatusId == Constants.ORDER_STATUS_CONFIRMED).DateCreate,
 					ShopId = order.ShopId,
@@ -387,7 +387,7 @@ namespace DigitalFUHubApi.Controllers
 			SellerOrderDetailResponseDTO response = new SellerOrderDetailResponseDTO
 			{
 				OrderId = order.OrderId,
-				Note = order.HistoryOrderStatus.OrderByDescending(x => x.DateCreate).FirstOrDefault()?.Note??"",
+				Note = order.HistoryOrderStatus.OrderByDescending(x => x.DateCreate).FirstOrDefault()?.Note ?? "",
 				OrderDate = order.OrderDate,
 				ShopId = order.ShopId,
 				CustomerId = order.User.UserId,
@@ -401,9 +401,9 @@ namespace DigitalFUHubApi.Controllers
 				CouponCode = order.OrderCoupons.FirstOrDefault()?.Coupon?.CouponCode ?? "",
 				TotalCouponDiscount = order.TotalCouponDiscount,
 				PercentBusinessFee = order.BusinessFee.Fee,
-				BusinessFeePrice = (order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100,
+				BusinessFeePrice = order.TotalAmount * order.BusinessFee.Fee / 100,
 				AmountSellerReceive = (order.TotalAmount - order.TotalCouponDiscount) -
-									((order.TotalAmount - order.TotalCouponDiscount) * order.BusinessFee.Fee / 100),
+									(order.TotalAmount * order.BusinessFee.Fee / 100),
 				HistoryOrderStatus = order.HistoryOrderStatus.Select(x => new SellerHistoryOrderResponseDTO
 				{
 					OrderId = x.OrderId,
@@ -503,7 +503,7 @@ namespace DigitalFUHubApi.Controllers
 				{
 					return Unauthorized();
 				}
-				
+
 				var order = _orderRepository.GetOrder(request.OrderId);
 				if (order == null)
 				{

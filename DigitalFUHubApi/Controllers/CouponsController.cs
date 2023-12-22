@@ -63,13 +63,13 @@ namespace DigitalFUHubApi.Controllers
 			{
 				var shop = _shopRepository.GetShopById(shopId);
 
-                if (shop == null)
+				if (shop == null)
 				{
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found", false, new()));
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found", false, new()));
 				}
 
 				List<CouponCartCustomerResponseDTO> coupons = _mapper.Map<List<CouponCartCustomerResponseDTO>>(_couponRepository.GetCouponPublic(shopId));
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, coupons));
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, coupons));
 			}
 			catch (Exception ex)
 			{
@@ -92,7 +92,7 @@ namespace DigitalFUHubApi.Controllers
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "coupon not found", false, new()));
 				}
 
-                CouponDetailCustomerResponseDTO couponResponse = _mapper.Map<CouponDetailCustomerResponseDTO>(coupon);
+				CouponDetailCustomerResponseDTO couponResponse = _mapper.Map<CouponDetailCustomerResponseDTO>(coupon);
 				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, couponResponse));
 			}
 			catch (Exception ex)
@@ -109,33 +109,33 @@ namespace DigitalFUHubApi.Controllers
 		{
 			try
 			{
-                var shop = _shopRepository.GetShopById(shopId);
+				var shop = _shopRepository.GetShopById(shopId);
 
-                if (shop == null)
-                {
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found", false, new()));
-                }
-
-                if (string.IsNullOrEmpty(couponCode))
+				if (shop == null)
 				{
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param", false, new()));
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "Shop not found", false, new()));
+				}
+
+				if (string.IsNullOrEmpty(couponCode))
+				{
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid param", false, new()));
+				}
 
 				var coupon = _couponRepository.GetCouponPrivate(couponCode, shopId);
 
 				if (coupon == null)
 				{
-                    return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "coupon not found", false, new()));
-                }
+					return Ok(new ResponseData(Constants.RESPONSE_CODE_DATA_NOT_FOUND, "coupon not found", false, new()));
+				}
 
-                CouponCartCustomerResponseDTO couponResponse = _mapper.Map<CouponCartCustomerResponseDTO>(coupon);
-                return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, couponResponse));
+				CouponCartCustomerResponseDTO couponResponse = _mapper.Map<CouponCartCustomerResponseDTO>(coupon);
+				return Ok(new ResponseData(Constants.RESPONSE_CODE_SUCCESS, "Success!", true, couponResponse));
 
 			}
 			catch (Exception ex)
 			{
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+			}
 		}
 		#endregion
 
@@ -220,8 +220,8 @@ namespace DigitalFUHubApi.Controllers
 					|| request.MinTotalOrderValue < Constants.MIN_PRICE_OF_MIN_ORDER_TOTAL_VALUE
 					|| request.MinTotalOrderValue > Constants.MAX_PRICE_OF_MIN_ORDER_TOTAL_VALUE
 					|| request.PriceDiscount < Constants.MIN_PRICE_DISCOUNT_COUPON
-					|| (request.MinTotalOrderValue != 0 && request.PriceDiscount > (request.MinTotalOrderValue * Constants.MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON))
-					|| (request.MinTotalOrderValue == 0 && request.PriceDiscount > Constants.MAX_PRICE_DISCOUNT_COUPON))
+					|| request.PriceDiscount > (request.MinTotalOrderValue * Constants.MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON)
+					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));
 				}
@@ -299,7 +299,7 @@ namespace DigitalFUHubApi.Controllers
 					|| request.MinTotalOrderValue < Constants.MIN_PRICE_OF_MIN_ORDER_TOTAL_VALUE
 					|| request.MinTotalOrderValue > Constants.MAX_PRICE_OF_MIN_ORDER_TOTAL_VALUE
 					|| request.PriceDiscount < Constants.MIN_PRICE_DISCOUNT_COUPON
-					|| (request.MinTotalOrderValue != 0 && request.PriceDiscount > (request.MinTotalOrderValue * Constants.MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON))
+					|| request.PriceDiscount > (request.MinTotalOrderValue * Constants.MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON)
 					)
 				{
 					return Ok(new ResponseData(Constants.RESPONSE_CODE_NOT_ACCEPT, "Invalid data", false, new()));

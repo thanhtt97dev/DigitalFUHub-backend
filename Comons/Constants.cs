@@ -244,7 +244,7 @@ namespace Comons
 		public const long MAX_PRICE_PRODUCT_VARIANT = 100000000;
 
 		public const string REGEX_COUPON_CODE = "^[a-zA-Z0-9]{4,10}$";
-		public const long MIN_PRICE_OF_MIN_ORDER_TOTAL_VALUE = 0;
+		public const long MIN_PRICE_OF_MIN_ORDER_TOTAL_VALUE = 1000;
 		public const long MAX_PRICE_OF_MIN_ORDER_TOTAL_VALUE = 100000000;
 		public const long MIN_PRICE_DISCOUNT_COUPON = 1000;
 		public const float MAX_PERCENTAGE_PRICE_DISCOUNT_COUPON = 0.7f;

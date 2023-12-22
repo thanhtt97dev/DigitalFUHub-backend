@@ -28,11 +28,11 @@ namespace DTOs.Seller
 		public string Username { get; set; } = string.Empty;
 		[Description("Ngày mua hàng")]
 		public string OrderDate { get; set; } = string.Empty;
-		[Description("Tổng số tiền đơn hàng (đồng)")]
+		[Description("Tổng giá trị đơn hàng (đồng)")]
 		public string TotalAmount { get; set; } = string.Empty;
 		[Description("Áp dụng mã giảm giá (đồng)")]
 		public string TotalCouponDiscount { get; set; } = string.Empty;
-		[Description("Phí dịch vụ (%)")]
+		[Description("Phí dịch vụ (%, tính theo tổng giá trị đơn hàng)")]
 		public string BusinessFee { get; set; } = string.Empty;
 		[Description("Lợi nhuận (đồng)")]
 		public string Profit { get; set; } = string.Empty;
