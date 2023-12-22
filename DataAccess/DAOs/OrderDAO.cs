@@ -78,7 +78,7 @@ namespace DataAccess.DAOs
 						if (sellerProfit > 0)
 						{
 							// update seller's balance
-							var seller = context.User.First(x => x.UserId == sellerId);
+							var seller = context.User.First(x => x.UserId == sellerId && x.Status == true);
 							seller.AccountBalance = seller.AccountBalance + sellerProfit;
 
 							// add transaction for refund money to seller
