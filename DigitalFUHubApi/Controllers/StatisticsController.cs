@@ -76,11 +76,8 @@ namespace DigitalFUHubApi.Controllers
 				if (request.Month != 0)
 				{
 					int numberDaysOfMonth = DateTime.DaysInMonth(request.Year, request.Month);
-					List<int> daysOfMonth = new List<int>();
-					for (int i = 1; i <= numberDaysOfMonth; i++)
-					{
-						daysOfMonth.Add(i);
-					}
+					List<int> daysOfMonth = Enumerable.Range(1, numberDaysOfMonth).ToList();
+					
 					var query = from d in daysOfMonth
 								join o in orders
 								on new { day = d, month = request.Month } equals
@@ -102,7 +99,7 @@ namespace DigitalFUHubApi.Controllers
 					}));
 				}
 				// get statisic sales by each month of year
-				List<int> MonthOfYear = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+				List<int> MonthOfYear = Enumerable.Range(1, 12).ToList();
 				var query2 = from d in MonthOfYear
 							 join o in orders
 							 on new { month = d, year = request.Year } equals
@@ -212,11 +209,7 @@ namespace DigitalFUHubApi.Controllers
 				if (request.Month != 0)
 				{
 					int numberDaysOfMonth = DateTime.DaysInMonth(request.Year, request.Month);
-					List<int> daysOfMonth = new List<int>();
-					for (int i = 1; i <= numberDaysOfMonth; i++)
-					{
-						daysOfMonth.Add(i);
-					}
+					List<int> daysOfMonth = Enumerable.Range(1, numberDaysOfMonth).ToList();
 					var query = from d in daysOfMonth
 								join o in orders
 								on new { day = d, month = request.Month } equals
@@ -238,7 +231,7 @@ namespace DigitalFUHubApi.Controllers
 					}));
 				}
 				// get statisic sales by each month of year
-				List<int> MonthOfYear = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+				List<int> MonthOfYear = Enumerable.Range(1, 12).ToList();
 				var query2 = from d in MonthOfYear
 							 join o in orders
 							 on new { month = d, year = request.Year } equals
@@ -289,11 +282,7 @@ namespace DigitalFUHubApi.Controllers
 				if (request.Month != 0)
 				{
 					int numberDaysOfMonth = DateTime.DaysInMonth(request.Year, request.Month);
-					List<int> daysOfMonth = new List<int>();
-					for (int i = 1; i <= numberDaysOfMonth; i++)
-					{
-						daysOfMonth.Add(i);
-					}
+					List<int> daysOfMonth = Enumerable.Range(1, numberDaysOfMonth).ToList();
 					var query = from d in daysOfMonth
 								join ld in listDeposit
 								on new { day = d, month = request.Month } equals
@@ -318,7 +307,7 @@ namespace DigitalFUHubApi.Controllers
 					}));
 				}
 				// get statisic sales by each month of year
-				List<int> MonthOfYear = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+				List<int> MonthOfYear = Enumerable.Range(1, 12).ToList();
 				var query2 = from d in MonthOfYear
 							 join ld in listDeposit
 							 on new { month = d, year = request.Year } equals

@@ -181,7 +181,7 @@ namespace DataAccess.DAOs
 								withdraw.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
 								withdraw.PaidDate = item.transactionDate;
 							}
-							
+
 							// add bill info
 							WithdrawTransactionBill bill = new WithdrawTransactionBill()
 							{
@@ -381,55 +381,6 @@ namespace DataAccess.DAOs
 							 userBank.CreditAccount.Contains(creditAccount) &&
 							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
 							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
-							 (bankId == 0 ? true : bank.BankId == bankId) 
-							 select new WithdrawTransaction
-							 {
-								WithdrawTransactionId = withdraw.WithdrawTransactionId,
-								UserId = withdraw.UserId,
-								User = new User { Email = user.Email},
-								Amount = withdraw.Amount,	
-								Code = withdraw.Code,
-								RequestDate = withdraw.RequestDate,
-								PaidDate = withdraw.PaidDate,
-								UserBank = new UserBank 
-								{
-									CreditAccount = userBank.CreditAccount,
-									CreditAccountName = userBank.CreditAccountName,
-									Bank = new Bank
-									{
-										BankCode = bank.BankCode, 
-										BankName = bank.BankName,
-									}
-								},
-								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
-							 }
-							)
-							.OrderByDescending(x => x.RequestDate)
-							.Skip((page - 1) * Constants.PAGE_SIZE)
-							.Take(Constants.PAGE_SIZE)
-							.ToList();
-			}
-			return withdraws;
-		}
-
-		internal List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var withdraws = (from withdraw in context.WithdrawTransaction
-							 join user in context.User
-								 on withdraw.UserId equals user.UserId
-							 join userBank in context.UserBank
-								 on withdraw.UserBankId equals userBank.UserBankId
-							 join bank in context.Bank
-								 on userBank.BankId equals bank.BankId
-							 where
-							 (1 == 1) &&
-							 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
-							 user.Email.Contains(email) &&
-							 userBank.CreditAccount.Contains(creditAccount) &&
-							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
-							 withdraw.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING &&
 							 (bankId == 0 ? true : bank.BankId == bankId)
 							 select new WithdrawTransaction
 							 {
@@ -453,7 +404,56 @@ namespace DataAccess.DAOs
 								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
 							 }
 							)
-							.ToList();	
+							.OrderByDescending(x => x.RequestDate)
+							.Skip((page - 1) * Constants.PAGE_SIZE)
+							.Take(Constants.PAGE_SIZE)
+							.ToList();
+			}
+			return withdraws;
+		}
+
+		internal List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount)
+		{
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var withdraws = (from withdraw in context.WithdrawTransaction
+								 join user in context.User
+									 on withdraw.UserId equals user.UserId
+								 join userBank in context.UserBank
+									 on withdraw.UserBankId equals userBank.UserBankId
+								 join bank in context.Bank
+									 on userBank.BankId equals bank.BankId
+								 where
+								 (1 == 1) &&
+								 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
+								 user.Email.Contains(email) &&
+								 userBank.CreditAccount.Contains(creditAccount) &&
+								 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+								 withdraw.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING &&
+								 (bankId == 0 ? true : bank.BankId == bankId)
+								 select new WithdrawTransaction
+								 {
+									 WithdrawTransactionId = withdraw.WithdrawTransactionId,
+									 UserId = withdraw.UserId,
+									 User = new User { Email = user.Email },
+									 Amount = withdraw.Amount,
+									 Code = withdraw.Code,
+									 RequestDate = withdraw.RequestDate,
+									 PaidDate = withdraw.PaidDate,
+									 UserBank = new UserBank
+									 {
+										 CreditAccount = userBank.CreditAccount,
+										 CreditAccountName = userBank.CreditAccountName,
+										 Bank = new Bank
+										 {
+											 BankCode = bank.BankCode,
+											 BankName = bank.BankName,
+										 }
+									 },
+									 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+								 }
+							)
+							.ToList();
 				return withdraws;
 			}
 		}
@@ -499,7 +499,7 @@ namespace DataAccess.DAOs
 					context.SaveChanges();
 					transaction.Commit();
 				}
-				catch(Exception) 
+				catch (Exception)
 				{
 					transaction.Rollback();
 				}
@@ -577,12 +577,12 @@ namespace DataAccess.DAOs
 					context.SaveChanges();
 					transaction.Commit();
 				}
-				catch(Exception ex) 
+				catch (Exception ex)
 				{
 					transaction.Rollback();
 					throw new Exception(ex.Message);
 				}
-				
+
 			}
 		}
 
@@ -594,7 +594,7 @@ namespace DataAccess.DAOs
 											.Where(x =>
 											x.UserId == userId &&
 											x.RequestDate > DateTime.Now.Date && x.RequestDate < DateTime.Now)
-											.Select(x => 
+											.Select(x =>
 												new WithdrawTransaction
 												{
 													Amount = x.Amount
@@ -605,7 +605,7 @@ namespace DataAccess.DAOs
 				var totalAmountMaked = result.Sum(x => x.Amount);
 				return (totalRequestMaked, totalAmountMaked);
 			}
-			
+
 		}
 
 		internal int GetNumberDepositTransactionMakedInToday(long userId)
@@ -695,7 +695,8 @@ namespace DataAccess.DAOs
 			{
 				return context.WithdrawTransaction
 							.Include(x => x.User)
-							.Where(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID && x.PaidDate != null)
+							.Where(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID && x.PaidDate != null
+								&& x.PaidDate.Value.Year == year && (month == 0 ? true : x.PaidDate.Value.Month == month))
 							.OrderByDescending(x => x.PaidDate)
 							.ToList();
 			}
@@ -707,7 +708,8 @@ namespace DataAccess.DAOs
 			{
 				return context.DepositTransaction
 							.Include(x => x.User)
-							.Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED && x.PaidDate != null)
+							.Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED && x.PaidDate != null
+								&& x.PaidDate.Value.Year == year && (month == 0 ? true : x.PaidDate.Value.Month == month))
 							.OrderByDescending(x => x.PaidDate)
 							.ToList();
 			}
@@ -718,7 +720,7 @@ namespace DataAccess.DAOs
 			using (DatabaseContext context = new DatabaseContext())
 			{
 				return context.WithdrawTransaction.LongCount(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING);
-							
+
 			}
 		}
 
@@ -728,7 +730,7 @@ namespace DataAccess.DAOs
 			{
 				DateTime timeAccept = DateTime.Now.AddDays(-days);
 				var deposits = context.DepositTransaction
-									  .Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY && 
+									  .Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY &&
 											 x.RequestDate < timeAccept)
 									  .ToList();
 				deposits.ForEach(x => x.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_EXPIRED);
