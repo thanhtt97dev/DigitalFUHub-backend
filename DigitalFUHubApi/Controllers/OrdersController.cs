@@ -60,6 +60,7 @@ namespace DigitalFUHubApi.Controllers
 			try
 			{
 				if (!ModelState.IsValid) return BadRequest();
+				if (request.UserId != _jwtTokenService.GetUserIdByAccessToken(User)) return Unauthorized();
 
 				(string responseCode, string message, int numberQuantityAvailable, Order orderInfo) =
 					_orderRepository.AddOrder(request.UserId, request.ShopProducts, request.IsUseCoin);
