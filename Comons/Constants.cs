@@ -119,8 +119,8 @@ namespace Comons
 
 		//Azure
 		public const string AZURE_ROOT_PATH = "https://fptu.blob.core.windows.net";
-		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhub.cognitiveservices.azure.com";
-		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "60becab2ecde4f16917874641354099c";
+		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://fptu.cognitiveservices.azure.com";
+		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "3c6636c12182498fbad06657f6cdd26e";
 		public const string AZURE_EXTRACT_TEXT_FROM_IMAGE_API = $"{AZURE_COMPUTER_VISION_ENDPOINT}/computervision/imageanalysis:analyze?api-version=2023-02-01-preview&features=read&language=en";
 		public const string AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=fptu;AccountKey=RQLNtnNQb2tPDiqpZtac1dcMZMpI2AdsS63ZyAzMMar5FVfOsFUulBu27ecGae9LhK7O8unXV3z3+ASt64pCYA==;EndpointSuffix=core.windows.net";
 		public const string AZURE_STORAGE_CONTAINER_NAME = "test";
