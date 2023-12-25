@@ -201,12 +201,12 @@
 		#endregion
 
 		#region Verify confirm Email
-		[HttpGet("ConfirmEmail/{token}")]
-		public IActionResult ConfirmEmail(string token)
+		[HttpPost("ConfirmEmail")]
+		public IActionResult ConfirmEmail(UserConfirmEmailRequestDTO request)
 		{
 			try
 			{
-				bool result = _jwtTokenService.ValidateTokenConfirmEmail(token);
+				bool result = _jwtTokenService.ValidateTokenConfirmEmail(request.Token);
 				return Ok(new ResponseData(result ? Constants.RESPONSE_CODE_SUCCESS : Constants.RESPONSE_CODE_FAILD,
 					result ? "Success" : "Invalid", result, new()));
 			}
