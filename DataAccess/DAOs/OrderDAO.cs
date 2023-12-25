@@ -44,7 +44,7 @@ namespace DataAccess.DAOs
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
-							x.OrderDate > timeAccept
+							x.OrderDate < timeAccept
 						)
 						.ToList();
 					if (orders.Count() == 0) return;
@@ -150,7 +150,7 @@ namespace DataAccess.DAOs
 							where 
 							order.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT &&
 							historyOrderStatus.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT &&
-							historyOrderStatus.DateCreate > timeAccept
+							historyOrderStatus.DateCreate < timeAccept
 							select order;
 
 					if (orders.Count() == 0) return;
@@ -335,6 +335,8 @@ namespace DataAccess.DAOs
 					#region Make order
 					foreach (var shopProduct in shopProducts)
 					{
+						if (shopProduct.Products.Count() == 0) continue;
+
 						#region Check ProductVariant existed
 						var productVariantIds = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
 						var productVariants = context.ProductVariant
