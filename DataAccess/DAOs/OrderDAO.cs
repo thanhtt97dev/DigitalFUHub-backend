@@ -335,6 +335,8 @@ namespace DataAccess.DAOs
 					#region Make order
 					foreach (var shopProduct in shopProducts)
 					{
+						if (shopProduct.Products.Count() == 0) continue;
+
 						#region Check ProductVariant existed
 						var productVariantIds = shopProduct.Products.Select(x => x.ProductVariantId).ToList();
 						var productVariants = context.ProductVariant
