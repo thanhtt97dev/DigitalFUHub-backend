@@ -44,7 +44,7 @@ namespace DataAccess.DAOs
 					var orders = context.Order
 						.Where(x =>
 							x.OrderStatusId == Constants.ORDER_STATUS_WAIT_CONFIRMATION &&
-							x.OrderDate < timeAccept
+							x.OrderDate > timeAccept
 						)
 						.ToList();
 					if (orders.Count() == 0) return;
@@ -144,11 +144,16 @@ namespace DataAccess.DAOs
 				try
 				{
 					DateTime timeAccept = DateTime.Now.AddDays(-days);
-					var orders = context.Order
-						.Where(x =>
-							x.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT &&
-							x.OrderDate < timeAccept)
-						.ToList();
+					var orders = from order in context.Order
+							join historyOrderStatus in context.HistoryOrderStatus 
+							on order.OrderId equals historyOrderStatus.OrderId
+							where 
+							order.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT &&
+							historyOrderStatus.OrderStatusId == Constants.ORDER_STATUS_COMPLAINT &&
+							historyOrderStatus.DateCreate > timeAccept
+							select order;
+
+					if (orders.Count() == 0) return;
 
 					foreach (var order in orders)
 					{
@@ -200,8 +205,13 @@ namespace DataAccess.DAOs
 						};
 						context.HistoryOrderStatus.Add(historyOrderStatus);
 					}
-					context.Order.UpdateRange(orders);
-					context.SaveChanges();
+
+					if(orders.Count() > 0)
+					{
+						context.Order.UpdateRange(orders);
+						context.SaveChanges();
+					}
+					
 					transaction.Commit();
 				}
 				catch (Exception ex)
