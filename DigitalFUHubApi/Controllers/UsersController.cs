@@ -252,7 +252,7 @@
 					user.Password = passwordHash;
 					_userRepository.UpdateUser(user);
 					string html = $"<div>" +
-						$"<h3>Xin chào ${user.Fullname},</h3>" +
+						$"<h3>Xin chào {user.Fullname},</h3>" +
 						$"<div>Yêu cầu đặt lại mật khẩu.</div>" +
 						$"<div>Mật khẩu mới của bạn là: <b>{newPassword}</b></div>" +
 						$"<div>Sau khi đăng nhập vào ứng dụng vui lòng đổi lại mật khẩu mới để đảm bảo tài khoản của bạn được an toàn.</div>" +
