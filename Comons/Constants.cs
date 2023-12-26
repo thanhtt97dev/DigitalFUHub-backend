@@ -236,7 +236,7 @@ namespace Comons
 		public const int ACCOUNT_BALANCE_REQUIRED_FOR_SELLER = 300000;
 		public const int MAX_PRICE_CAN_WITHDRAW = 3000000;
 		//public const int MIN_PRICE_CAN_WITHDRAW = 500000;
-		public const int MIN_PRICE_CAN_WITHDRAW = 10000;
+		public const int MIN_PRICE_CAN_WITHDRAW = 50000;
 		public const int NUMBER_DEPOSIT_REQUEST_CAN_MAKE_A_DAY = 100;
 		public const int MAX_PRICE_CAN_DEPOSIT = 10000000;
 		public const int MIN_PRICE_CAN_DEPOSIT = 10000;
