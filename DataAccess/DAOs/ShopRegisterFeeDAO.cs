@@ -58,8 +58,8 @@ namespace DataAccess.DAOs
 				var transaction = context.Database.BeginTransaction();
 				try
 				{
-					var shopRegisterFeeDate = context.ShopRegisterFee.Max(x => x.StartDate);
-					var shopRegisterFeeOld = context.ShopRegisterFee.First(x => x.StartDate == shopRegisterFeeDate);
+					var shopRegisterFeeId = context.ShopRegisterFee.Max(x => x.ShopRegisterFeeId);
+					var shopRegisterFeeOld = context.ShopRegisterFee.First(x => x.ShopRegisterFeeId == shopRegisterFeeId);
 					shopRegisterFeeOld.EndDate = DateTime.Now;
 
 					var ShopRegisterFee = new ShopRegisterFee
