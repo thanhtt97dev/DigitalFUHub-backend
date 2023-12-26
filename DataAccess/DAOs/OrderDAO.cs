@@ -584,33 +584,22 @@ namespace DataAccess.DAOs
 						//update customer and admin account balance
 						if (totalPayment > 0)
 						{
-							//Check customer is a seller of another shop and total payment > seller's account balance require
-							/*
-							var shopOfBuyer = context.Shop.FirstOrDefault(x => x.UserId == userId);
-							if (shopOfBuyer != null)
-							{
-								if (customer.AccountBalance - totalPayment < Constants.ACCOUNT_BALANCE_REQUIRED_FOR_SELLER)
-								{
-									transaction.Rollback();
-									return (Constants.RESPONSE_CODE_ORDER_SELLER_LOCK_TRANSACTION, "Seller lock transaction!", numberQuantityAvailable, orderResult);
-								}
-							}
-							*/
-
 							if (customer.AccountBalance < totalPayment)
 							{
 								transaction.Rollback();
 								return (Constants.RESPONSE_CODE_ORDER_INSUFFICIENT_BALANCE, "Insufficient balance!", numberQuantityAvailable, orderResult);
 							}
 							customer.AccountBalance = customer.AccountBalance - totalPayment;
+						}
+						else if(totalPayment == 0)
+						{
 							if (totalCoinDiscount > 0)
 							{
 								customer.Coin = customer.Coin - totalCoinDiscount;
 							}
-
-							context.User.UpdateRange(customer);
-							context.SaveChanges();
 						}
+						context.User.UpdateRange(customer);
+						context.SaveChanges();
 
 
 
