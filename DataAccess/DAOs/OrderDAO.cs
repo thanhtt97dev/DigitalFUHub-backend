@@ -591,16 +591,12 @@ namespace DataAccess.DAOs
 							}
 							customer.AccountBalance = customer.AccountBalance - totalPayment;
 						}
-						else if(totalPayment == 0)
+						if(isUseCoin && totalCoinDiscount > 0)
 						{
-							if (totalCoinDiscount > 0)
-							{
-								customer.Coin = customer.Coin - totalCoinDiscount;
-							}
+							customer.Coin = customer.Coin - totalCoinDiscount;
 						}
 						context.User.UpdateRange(customer);
 						context.SaveChanges();
-
 
 
 						// update order
