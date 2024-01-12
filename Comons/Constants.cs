@@ -27,7 +27,7 @@ namespace Comons
 
 		public const string MB_BANK_API_GET_CAPTCHA_IMAGE = "https://online.mbbank.com.vn/api/retail-web-internetbankingms/getCaptchaImage";
 		public const string MB_BANK_API_LOGIN = "https://online.mbbank.com.vn/api/retail_web/internetbanking/doLogin";
-		public const string MB_BANK_API_HISTORY_TRANSACTION = "https://online.mbbank.com.vn/api/retail-web-transactionservice/transaction/getTransactionAccountHistory";
+		public const string MB_BANK_API_HISTORY_TRANSACTION = "https://online.mbbank.com.vn/api/retail-transactionms/transactionms/get-account-transaction-history";
 		public const string MB_BANK_API_INQUIRY_ACCOUNT_NAME = "https://online.mbbank.com.vn/api/retail_web/transfer/inquiryAccountName";
 
 		public const string MB_BANK_DIRECTORY_PATH_STORE_ACCOUNT_DATA = "Data/mbBankAccountData.json";
