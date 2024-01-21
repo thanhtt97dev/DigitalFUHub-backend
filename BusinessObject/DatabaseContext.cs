@@ -10,13 +10,9 @@ namespace BusinessObject
 	public class DatabaseContext : DbContext
 	{
 
-		public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+		//public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
 
-		//db test
-		//public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Database=digitalfuhub;User ID=digitalfuhub;Password=A0336687454a;Trusted_Connection=False;Encrypt=True;";
-
-		//db main
-		//public readonly string connectionString = "Server=tcp:digitalfuhub-database-server.database.windows.net,1433;Initial Catalog=digitalfuhub-main;Persist Security Info=False;User ID=digitalfuhub;Password=A0336687454a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+		public readonly string connectionString = "Server=tcp:fptu-server.database.windows.net,1433;Initial Catalog=fptu;Persist Security Info=False;User ID=fptu;Password=A0336687454a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
 		public DatabaseContext() { }
 
