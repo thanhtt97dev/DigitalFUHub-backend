@@ -10,9 +10,9 @@ namespace BusinessObject
 	public class DatabaseContext : DbContext
 	{
 
-		//public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
+		public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
 
-		public readonly string connectionString = "Server=tcp:fptu-server.database.windows.net,1433;Initial Catalog=fptu;Persist Security Info=False;User ID=fptu;Password=A0336687454a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+		//public readonly string connectionString = "Server=tcp:fptu-server.database.windows.net,1433;Initial Catalog=fptu;Persist Security Info=False;User ID=fptu;Password=A0336687454a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
 		public DatabaseContext() { }
 
@@ -219,6 +219,8 @@ namespace BusinessObject
 				new OrderStatus{OrderStatusId = 5, Name = "Dispute"},
 				new OrderStatus{OrderStatusId = 6, Name = "Reject Complaint"},
 				new OrderStatus{OrderStatusId = 7, Name = "Seller violates"},
+				new OrderStatus{OrderStatusId = 8, Name = "In prossess"},
+				new OrderStatus{OrderStatusId = 9, Name = "Failed"},
 			});
 
 			modelBuilder.Entity<WithdrawTransactionStatus>().HasData(new WithdrawTransactionStatus[]

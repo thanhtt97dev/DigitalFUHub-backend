@@ -18,7 +18,7 @@ namespace DigitalFUHubApi.Jobs
 		{
 			//RULE: handle change order's status to "Confirmed" if order status still "wait confirm" in a range times
 			orderRepository.UpdateStatusOrderFromWaitConfirmationToConfirmInPreviousDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STAUTS_CONFIRM_ORDER);
-
+			
 			//RULE: handle change order's status to "seller refunded " if order status still "complaint" in a range times
 			orderRepository.UpdateStatusOrderFromComplaintToSellerRefundedInPreviousDays(Constants.NUMBER_DAYS_AUTO_UPDATE_STATUS_SELLER_REFUNDED_ORDER);
 
