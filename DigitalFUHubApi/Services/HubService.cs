@@ -3,7 +3,7 @@ using BusinessObject.Entities;
 using Comons;
 using DataAccess.IRepositories;
 using DigitalFUHubApi.Hubs;
-using DigitalFUHubApi.Managers;
+using DigitalFUHubApi.Managers.IRepositories;
 using DTOs.Notification;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -12,7 +12,7 @@ using Quartz.Util;
 
 namespace DigitalFUHubApi.Services
 {
-	public class HubService
+    public class HubService
 	{
 
 		private readonly IConnectionManager connectionManager;

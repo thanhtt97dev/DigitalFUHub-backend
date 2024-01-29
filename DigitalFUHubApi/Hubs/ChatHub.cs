@@ -1,12 +1,12 @@
 ﻿using DigitalFUHubApi.Services;
 using Microsoft.AspNetCore.SignalR;
 using Comons;
-using DigitalFUHubApi.Managers;
 using Microsoft.AspNetCore.Authorization;
+using DigitalFUHubApi.Managers.IRepositories;
 
 namespace DigitalFUHubApi.Hubs
 {
-	[Authorize]
+    [Authorize]
     public class ChatHub : Hub
     {
         private readonly HubService hubService;

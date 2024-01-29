@@ -2,7 +2,7 @@
 using Comons;
 using DataAccess.IRepositories;
 using DataAccess.Repositories;
-using DigitalFUHubApi.Managers;
+using DigitalFUHubApi.Managers.IRepositories;
 using DigitalFUHubApi.Services;
 using DTOs.Conversation;
 using DTOs.Notification;
@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace DigitalFUHubApi.Hubs
 {
-	[Authorize]
+    [Authorize]
 	public class UserOnlineStatusHub : Hub
 	{
 		private readonly IConnectionManager connectionManager;

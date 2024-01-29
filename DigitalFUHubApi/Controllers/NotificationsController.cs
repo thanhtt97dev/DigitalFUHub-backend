@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using DigitalFUHubApi.Hubs;
-using DigitalFUHubApi.Managers;
 using DigitalFUHubApi.Comons;
 using BusinessObject.Entities;
 using DTOs.Notification;
@@ -15,6 +14,7 @@ using DTOs.User;
 using System.Collections.Generic;
 using DTOs.Order;
 using DigitalFUHubApi.Services;
+using DigitalFUHubApi.Managers.IRepositories;
 
 namespace DigitalFUHubApi.Controllers
 {

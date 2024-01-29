@@ -2,17 +2,17 @@
 using DataAccess.IRepositories;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using DigitalFUHubApi.Managers;
 using Microsoft.AspNetCore.Authorization;
 using DigitalFUHubApi.Services;
 using DigitalFUHubApi.Comons;
 using DTOs.Notification;
 using Comons;
 using System;
+using DigitalFUHubApi.Managers.IRepositories;
 
 namespace DigitalFUHubApi.Hubs
 {
-	[Authorize]
+    [Authorize]
     public class NotificationHub : Hub
 	{
 

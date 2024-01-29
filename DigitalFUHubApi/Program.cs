@@ -8,15 +8,16 @@ using DataAccess.Repositories;
 using DigitalFUHubApi.Services;
 using DigitalFUHubApi.Comons;
 using DigitalFUHubApi.Hubs;
-using DigitalFUHubApi.Managers;
 using AspNetCoreRateLimit;
 using Quartz;
 using DigitalFUHubApi.Jobs;
 using BusinessObject;
+using DigitalFUHubApi.Managers.Repositories;
+using DigitalFUHubApi.Managers.IRepositories;
 
 namespace DigitalFUHubApi
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -130,7 +131,8 @@ namespace DigitalFUHubApi
 			builder.Services.AddSingleton<IShopRegisterFeeRepository, ShopRegisterFeeRepository>();
 
 			builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
-			
+			builder.Services.AddSingleton<IFinanceTransactionManager, FinanceTransactionManager>();
+
 			builder.Services.AddSingleton<JwtTokenService>();
 			builder.Services.AddSingleton<HubService>();
 			builder.Services.AddSingleton<TwoFactorAuthenticationService>();
