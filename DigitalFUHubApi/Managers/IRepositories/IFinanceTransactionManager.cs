@@ -4,10 +4,12 @@ namespace DigitalFUHubApi.Managers.IRepositories
 {
     public interface IFinanceTransactionManager
     {
-        void Enqueue(FinanceTransaction transaction);
+		void Enqueues(List<FinanceTransaction> transaction);
+		void Enqueue(FinanceTransaction transaction);
         FinanceTransaction? Dequeue();
         FinanceTransaction? Peek();
         void Clear();
         int Count();
-    }
+        Queue<FinanceTransaction> GetQueuesAndClearItemGeted();
+	}
 }

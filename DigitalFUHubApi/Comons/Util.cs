@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DigitalFUHubApi.Comons
 {
@@ -84,6 +85,15 @@ namespace DigitalFUHubApi.Comons
 		public static void WriteFile(string fileName, object data)
 		{
 			string fullPath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+			var options = new JsonSerializerOptions { WriteIndented = true };
+			string json = JsonSerializer.Serialize(data, options);
+			File.WriteAllText(fullPath, json);
+		}
+		#endregion
+
+		#region Write file
+		public static void WriteFileFullPath(string fullPath, object data)
+		{
 			var options = new JsonSerializerOptions { WriteIndented = true };
 			string json = JsonSerializer.Serialize(data, options);
 			File.WriteAllText(fullPath, json);
@@ -276,7 +286,28 @@ namespace DigitalFUHubApi.Comons
 
             return isValidUrl;
         }
-        #endregion
+		#endregion
 
-    }
+		#region Write log
+		public static void WirteToLogFile(string message)
+		{
+			var currentDate = DateTime.Now.ToString("yyyyMMdd");
+			var currentTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+			var folderName = "Log";
+			var folderLog = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+			if(!Directory.Exists(folderLog)) 
+			{
+				Directory.CreateDirectory(folderLog);
+			}
+			var folderLogToday = Path.Combine(Directory.GetCurrentDirectory(), currentDate);
+			if (!Directory.Exists(folderLogToday))
+			{
+				Directory.CreateDirectory(folderLogToday);
+			}
+			var data = $"[{currentTime}] \r --- {message} \r\r\r";
+
+			WriteFileFullPath(folderLogToday, data);
+		}
+		#endregion
+	}
 }

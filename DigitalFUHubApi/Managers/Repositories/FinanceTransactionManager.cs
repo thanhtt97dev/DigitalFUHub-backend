@@ -3,7 +3,7 @@ using DigitalFUHubApi.Managers.IRepositories;
 
 namespace DigitalFUHubApi.Managers.Repositories
 {
-    public class FinanceTransactionManager : IFinanceTransactionManager
+	public class FinanceTransactionManager : IFinanceTransactionManager
     {
         public static Queue<FinanceTransaction> data = new Queue<FinanceTransaction>();
 
@@ -27,6 +27,31 @@ namespace DigitalFUHubApi.Managers.Repositories
 		{
 			if (transaction == null) return;
 			data.Enqueue(transaction);
+		}
+
+		public void Enqueues(List<FinanceTransaction> transactions)
+		{
+			foreach (var item in transactions)
+			{
+				Enqueue(item);
+			}
+		}
+
+		public Queue<FinanceTransaction> GetQueuesAndClearItemsGeted()
+		{
+			//copy
+			Queue<FinanceTransaction> copy = data;
+			// compare data and copy what is same -> Dequeue
+			int countItemRemved = 0;
+			int countCopy = copy.Count;	
+			while (countItemRemved < countCopy) 
+			{
+				if (copy.Contains(data.Peek())){
+					data.Dequeue();
+					countItemRemved++;
+				}
+			}
+			return copy;	
 		}
 
 		public FinanceTransaction? Peek()

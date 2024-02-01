@@ -1,4 +1,4 @@
-﻿using static Comons.Enum;
+﻿using static Comons.Constants;
 
 namespace DigitalFUHubApi.Comons
 {

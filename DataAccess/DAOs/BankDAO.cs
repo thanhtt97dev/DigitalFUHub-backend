@@ -127,6 +127,7 @@ namespace DataAccess.DAOs
 								x.Amount == item.creditAmount && x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY);
 						if (deposit != null)
 						{
+							/*
 							if (deposit.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED) continue;
 							//update sataus recharge
 							deposit.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED;
@@ -134,6 +135,8 @@ namespace DataAccess.DAOs
 							//update accout balace user
 							var user = context.User.First(x => x.UserId == deposit.UserId);
 							user.AccountBalance = user.AccountBalance + item.creditAmount;
+							*/
+							
 						}
 					}
 					context.SaveChanges();
@@ -144,6 +147,38 @@ namespace DataAccess.DAOs
 					transaction.Rollback();
 					throw new Exception(ex.Message);
 				}
+			}
+		}
+		#endregion
+
+		#region Get Credit Transactions
+		public List<DepositTransaction> GetCreditTransactions(List<TransactionHistory> transactionHistoryCreditList)
+		{
+			List<DepositTransaction> deposits = new List<DepositTransaction>();
+			using (DatabaseContext context = new DatabaseContext())
+			{
+				var transaction = context.Database.BeginTransaction();
+				try
+				{
+					foreach (var item in transactionHistoryCreditList)
+					{
+						var deposit = context.DepositTransaction
+								.FirstOrDefault(x => item.description.ToLower().Contains(x.Code.ToLower()) &&
+								x.Amount == item.creditAmount && x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY);
+						if (deposit != null)
+						{
+							deposits.Add(deposit);
+						}
+					}
+					context.SaveChanges();
+					transaction.Commit();
+				}
+				catch (Exception ex)
+				{
+					transaction.Rollback();
+					throw new Exception(ex.Message);
+				}
+				return deposits;
 			}
 		}
 		#endregion

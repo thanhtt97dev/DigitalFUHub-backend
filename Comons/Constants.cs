@@ -296,6 +296,13 @@ namespace Comons
 
 		public const string CAPTCHA_IMAGE_FILE_NAME = "captcha.png";
 
+		public enum FinanceTransactionType
+		{
+			Order = 1,
+			Deposit = 2,
+			Withdraw = 3,
+			RegisterSeller = 4,
+		}
 	}
 
 }

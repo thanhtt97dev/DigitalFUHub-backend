@@ -7,11 +7,19 @@ using DataAccess.DAOs;
 using DigitalFUHubApi.Services;
 using DTOs.MbBank;
 using Comons;
+using BusinessObject.Entities;
 
 namespace DigitalFUHubApi.Jobs
 {
     public class HistoryDepositTransactionMbBankJob : IJob
 	{
+		private readonly FinanceTransactionService financeTransactionService;
+
+		public HistoryDepositTransactionMbBankJob(FinanceTransactionService financeTransactionService)
+		{
+			this.financeTransactionService = financeTransactionService;
+		}
+
 		public Task Execute(IJobExecutionContext context)
 		{
 			//get folder name history transaction data
@@ -59,7 +67,10 @@ namespace DigitalFUHubApi.Jobs
 			// Save new data into file
 			Util.WriteFile(directoryPathStoreDepositData, transactionHistoryCreditList);
 			//Update DB
-			BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
+			//BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
+			List<DepositTransaction> depositTransactions = BankDAO.Instance.GetCreditTransactions(transactionHistoryCreditList);
+
+			financeTransactionService.AddDepositTransactions(depositTransactions);
 
 			return Task.CompletedTask;
 		}
