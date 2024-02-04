@@ -5,6 +5,8 @@ using DTOs.MbBank;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
@@ -127,7 +129,6 @@ namespace DataAccess.DAOs
 								x.Amount == item.creditAmount && x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY);
 						if (deposit != null)
 						{
-							/*
 							if (deposit.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED) continue;
 							//update sataus recharge
 							deposit.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED;
@@ -135,8 +136,6 @@ namespace DataAccess.DAOs
 							//update accout balace user
 							var user = context.User.First(x => x.UserId == deposit.UserId);
 							user.AccountBalance = user.AccountBalance + item.creditAmount;
-							*/
-							
 						}
 					}
 					context.SaveChanges();
@@ -151,8 +150,8 @@ namespace DataAccess.DAOs
 		}
 		#endregion
 
-		#region Get Credit Transactions
-		public List<DepositTransaction> GetCreditTransactions(List<TransactionHistory> transactionHistoryCreditList)
+		#region Get Credit Transactions Un Pay
+		public List<DepositTransaction> GetCreditTransactionsUnPay(List<TransactionHistory> transactionHistoryCreditList)
 		{
 			List<DepositTransaction> deposits = new List<DepositTransaction>();
 			using (DatabaseContext context = new DatabaseContext())
@@ -167,6 +166,7 @@ namespace DataAccess.DAOs
 								x.Amount == item.creditAmount && x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY);
 						if (deposit != null)
 						{
+							if (deposit.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED) continue;
 							deposits.Add(deposit);
 						}
 					}
@@ -183,595 +183,633 @@ namespace DataAccess.DAOs
 		}
 		#endregion
 
-		#region Checking debit transactions
-		/// <summary>
-		///	 This function this use for adding bill's info when transaction has been withdrawn
-		/// </summary>
-		/// <param name="transactionHistoryDebitList"></param>
-		/// <exception cref="Exception"></exception>
-		public void CheckingDebitTransactions(List<TransactionHistory> transactionHistoryDebitList)
+		#region Update Deposit transaction paid
+		public void UpdateDepositTransactionPaid(DepositTransaction? depositTransaction)
 		{
+			if (depositTransaction == null) return;
 			using (DatabaseContext context = new DatabaseContext())
 			{
-				var transaction = context.Database.BeginTransaction();
+				var dbTransaction = context.Database.BeginTransaction();
 				try
 				{
-					foreach (var item in transactionHistoryDebitList)
-					{
-						var withdraw = context.WithdrawTransaction
-								.FirstOrDefault(x => item.description.ToLower().Contains(x.Code.ToLower()) &&
-								x.Amount == item.debitAmount);
+					var deposit = context.DepositTransaction.FirstOrDefault(x => x.DepositTransactionId == depositTransaction.DepositTransactionId);
+					if (deposit == null) return;
+					if (deposit.DepositTransactionStatusId != Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY) return;
 
-						if (withdraw != null)
-						{
-							//get withdraw transaction bill
-							var withdrawTransactionBill = context.WithdrawTransactionBill
-								.FirstOrDefault(x => x.WithdrawTransactionId == withdraw.WithdrawTransactionId);
+					// update deposit
+					deposit.PaidDate = DateTime.Now;
+					deposit.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED;
+					context.DepositTransaction.Update(deposit);
 
-							if (withdrawTransactionBill != null) continue;
+					// update user's account balance
+					var user = context.User.FirstOrDefault(x => x.UserId == deposit.UserId);
+					if (user == null) return;
+					user.AccountBalance += deposit.Amount;
+					context.User.Update(user);
 
-							if (withdraw.WithdrawTransactionStatusId != Constants.WITHDRAW_TRANSACTION_PAID)
-							{
-								// set status is paid
-								withdraw.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
-								withdraw.PaidDate = item.transactionDate;
-							}
-
-							// add bill info
-							WithdrawTransactionBill bill = new WithdrawTransactionBill()
-							{
-								WithdrawTransactionId = withdraw.WithdrawTransactionId,
-								PostingDate = item.postingDate,
-								TransactionDate = item.transactionDate,
-								AccountNo = item.accountNo,
-								CreditAmount = item.creditAmount,
-								DebitAmount = item.debitAmount,
-								Currency = item.currency,
-								Description = item.description,
-								AvailableBalance = item.availableBalance,
-								BeneficiaryAccount = item.beneficiaryAccount,
-								RefNo = item.refNo,
-								BenAccountNo = item.benAccountNo,
-								BenAccountName = item.benAccountName,
-								BankName = item.bankName,
-								DueDate = item.dueDate,
-								DocId = item.docId,
-								TransactionType = item.transactionType,
-							};
-							context.WithdrawTransactionBill.Add(bill);
-						}
-					}
 					context.SaveChanges();
-					transaction.Commit();
+					dbTransaction.Commit();
 				}
 				catch (Exception ex)
 				{
-					transaction.Rollback();
+					dbTransaction.Rollback();
 					throw new Exception(ex.Message);
 				}
 			}
 		}
-		#endregion
 
-		internal void UpdateUserBankStatus(UserBank userBankUpdate)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var userBank = context.UserBank.FirstOrDefault(x => x.UserBankId == userBankUpdate.UserBankId);
-				if (userBank == null) throw new Exception("User's bank account not existed!");
-				userBank.UpdateAt = DateTime.Now;
-				userBank.isActivate = false;
-				context.SaveChanges();
-			}
-		}
+	}
+	#endregion
 
-		internal int GetNumberDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status)
+	#region Checking debit transactions
+	/// <summary>
+	///	 This function this use for adding bill's info when transaction has been withdrawn
+	/// </summary>
+	/// <param name="transactionHistoryDebitList"></param>
+	/// <exception cref="Exception"></exception>
+	public void CheckingDebitTransactions(List<TransactionHistory> transactionHistoryDebitList)
+	{
+		using (DatabaseContext context = new DatabaseContext())
 		{
-			using (DatabaseContext context = new DatabaseContext())
+			var transaction = context.Database.BeginTransaction();
+			try
 			{
-				var deposits = context.DepositTransaction
-							.Include(x => x.User)
-							.Where
-							(x =>
-								(userId != 0) ? userId == x.UserId : true &&
-								(!string.IsNullOrEmpty(email)) ? x.User.Email.Contains(email) : true &&
-								(fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true &&
-								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-								(status == 0 ? true : x.DepositTransactionStatusId == status)
-							)
-							.Count();
-				return deposits;
-			}
-		}
-
-		internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var deposits = context.DepositTransaction
-							.Where
-							(x =>
-								userId == x.UserId &&
-								((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
-								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-								(status == 0 ? true : x.DepositTransactionStatusId == status)
-							)
-							.OrderByDescending(x => x.RequestDate)
-							.Skip((page - 1) * Constants.PAGE_SIZE)
-							.Take(Constants.PAGE_SIZE)
-							.ToList();
-				return deposits;
-			}
-		}
-
-		internal List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int page)
-		{
-			List<DepositTransaction> deposits = new List<DepositTransaction>();
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				deposits = context.DepositTransaction
-							.Include(x => x.User)
-							.Where(x =>
-									(!string.IsNullOrEmpty(email)) ? x.User.Email.Contains(email) : true &&
-									((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
-									(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-									x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED
-								)
-							.OrderByDescending(x => x.RequestDate)
-							.Skip((page - 1) * Constants.PAGE_SIZE)
-							.Take(Constants.PAGE_SIZE)
-							.ToList();
-			}
-			return deposits;
-		}
-
-		internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
-		{
-			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				withdraws = (from withdraw in context.WithdrawTransaction
-							 join user in context.User
-								 on withdraw.UserId equals user.UserId
-							 join userBank in context.UserBank
-								 on withdraw.UserBankId equals userBank.UserBankId
-							 join bank in context.Bank
-								 on userBank.BankId equals bank.BankId
-							 where
-							 withdraw.UserId == userId &&
-							 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
-							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
-							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status)
-							 select new WithdrawTransaction
-							 {
-								 WithdrawTransactionId = withdraw.WithdrawTransactionId,
-								 UserId = withdraw.UserId,
-								 User = new User { Email = user.Email },
-								 Amount = withdraw.Amount,
-								 Code = withdraw.Code,
-								 RequestDate = withdraw.RequestDate,
-								 PaidDate = withdraw.PaidDate,
-								 UserBank = new UserBank
-								 {
-									 CreditAccount = userBank.CreditAccount,
-									 CreditAccountName = userBank.CreditAccountName,
-									 Bank = new Bank
-									 {
-										 BankCode = bank.BankCode,
-										 BankName = bank.BankName,
-									 }
-								 },
-								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
-							 }
-							)
-							.OrderByDescending(x => x.RequestDate)
-							.Skip((page - 1) * Constants.PAGE_SIZE)
-							.Take(Constants.PAGE_SIZE)
-							.ToList();
-			}
-			return withdraws;
-		}
-
-		internal int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var withdraws = (from withdraw in context.WithdrawTransaction
-								 join user in context.User
-									 on withdraw.UserId equals user.UserId
-								 join userBank in context.UserBank
-									 on withdraw.UserBankId equals userBank.UserBankId
-								 join bank in context.Bank
-									 on userBank.BankId equals bank.BankId
-								 where
-								 (userId == 0 ? true : withdraw.UserId == userId) &&
-								 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
-								 user.Email.Contains(email) &&
-								 userBank.CreditAccount.Contains(creditAccount) &&
-								 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
-								 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
-								 (bankId == 0 ? true : bank.BankId == bankId)
-								 select new { }
-								).Count();
-				return withdraws;
-			}
-		}
-
-		internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status, int page)
-		{
-			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				withdraws = (from withdraw in context.WithdrawTransaction
-							 join user in context.User
-								 on withdraw.UserId equals user.UserId
-							 join userBank in context.UserBank
-								 on withdraw.UserBankId equals userBank.UserBankId
-							 join bank in context.Bank
-								 on userBank.BankId equals bank.BankId
-							 where
-							 (1 == 1) &&
-							 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
-							 user.Email.Contains(email) &&
-							 userBank.CreditAccount.Contains(creditAccount) &&
-							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
-							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
-							 (bankId == 0 ? true : bank.BankId == bankId)
-							 select new WithdrawTransaction
-							 {
-								 WithdrawTransactionId = withdraw.WithdrawTransactionId,
-								 UserId = withdraw.UserId,
-								 User = new User { Email = user.Email },
-								 Amount = withdraw.Amount,
-								 Code = withdraw.Code,
-								 RequestDate = withdraw.RequestDate,
-								 PaidDate = withdraw.PaidDate,
-								 UserBank = new UserBank
-								 {
-									 CreditAccount = userBank.CreditAccount,
-									 CreditAccountName = userBank.CreditAccountName,
-									 Bank = new Bank
-									 {
-										 BankCode = bank.BankCode,
-										 BankName = bank.BankName,
-									 }
-								 },
-								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
-							 }
-							)
-							.OrderByDescending(x => x.RequestDate)
-							.Skip((page - 1) * Constants.PAGE_SIZE)
-							.Take(Constants.PAGE_SIZE)
-							.ToList();
-			}
-			return withdraws;
-		}
-
-		internal List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var withdraws = (from withdraw in context.WithdrawTransaction
-								 join user in context.User
-									 on withdraw.UserId equals user.UserId
-								 join userBank in context.UserBank
-									 on withdraw.UserBankId equals userBank.UserBankId
-								 join bank in context.Bank
-									 on userBank.BankId equals bank.BankId
-								 where
-								 (1 == 1) &&
-								 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
-								 user.Email.Contains(email) &&
-								 userBank.CreditAccount.Contains(creditAccount) &&
-								 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
-								 withdraw.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING &&
-								 (bankId == 0 ? true : bank.BankId == bankId)
-								 select new WithdrawTransaction
-								 {
-									 WithdrawTransactionId = withdraw.WithdrawTransactionId,
-									 UserId = withdraw.UserId,
-									 User = new User { Email = user.Email },
-									 Amount = withdraw.Amount,
-									 Code = withdraw.Code,
-									 RequestDate = withdraw.RequestDate,
-									 PaidDate = withdraw.PaidDate,
-									 UserBank = new UserBank
-									 {
-										 CreditAccount = userBank.CreditAccount,
-										 CreditAccountName = userBank.CreditAccountName,
-										 Bank = new Bank
-										 {
-											 BankCode = bank.BankCode,
-											 BankName = bank.BankName,
-										 }
-									 },
-									 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
-								 }
-							)
-							.ToList();
-				return withdraws;
-			}
-		}
-
-		internal WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var transaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
-				return transaction;
-			}
-		}
-
-		internal WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var bill = context.WithdrawTransactionBill.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
-				return bill;
-			}
-		}
-
-		internal void UpdateWithdrawTransactionCancel(int id)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var transaction = context.Database.BeginTransaction();
-				try
+				foreach (var item in transactionHistoryDebitList)
 				{
-					var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == id);
-					if (withDrawTransaction == null) throw new Exception();
-					if (withDrawTransaction.WithdrawTransactionStatusId != Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
+					var withdraw = context.WithdrawTransaction
+							.FirstOrDefault(x => item.description.ToLower().Contains(x.Code.ToLower()) &&
+							x.Amount == item.debitAmount);
+
+					if (withdraw != null)
 					{
-						throw new Exception();
-					}
-					withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_CANCEL;
-					context.WithdrawTransaction.Update(withDrawTransaction);
-					context.SaveChanges();
+						//get withdraw transaction bill
+						var withdrawTransactionBill = context.WithdrawTransactionBill
+							.FirstOrDefault(x => x.WithdrawTransactionId == withdraw.WithdrawTransactionId);
 
-					var customer = context.User.First(x => x.UserId == withDrawTransaction.UserId);
-					customer.AccountBalance += withDrawTransaction.Amount;
-					context.User.Update(customer);
-					context.SaveChanges();
-					transaction.Commit();
-				}
-				catch (Exception)
-				{
-					transaction.Rollback();
-				}
-			}
-		}
+						if (withdrawTransactionBill != null) continue;
 
-		internal void UpdateWithdrawTransaction(long transactionId)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
-				if (withDrawTransaction == null) throw new Exception();
-				withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
-				withDrawTransaction.PaidDate = DateTime.Now;
-				context.SaveChanges();
-			}
-		}
-
-		internal string UpdateListWithdrawTransactionPaid(List<long> transactionIds)
-		{
-			string RESPONSE_CODE_SUCCESS = "00";
-			string RESPONSE_CODE_FAILD = "03";
-			string RESPONSE_CODE_DATA_NOT_FOUND = "02";
-			string RESPONSE_CODE_BANK_WITHDRAW_PAID = "BANK_01";
-
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var transaction = context.Database.BeginTransaction();
-				try
-				{
-					foreach (var transactionId in transactionIds)
-					{
-						var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
-						if (withDrawTransaction == null)
+						if (withdraw.WithdrawTransactionStatusId != Constants.WITHDRAW_TRANSACTION_PAID)
 						{
-							transaction.Rollback();
-							return RESPONSE_CODE_DATA_NOT_FOUND;
+							// set status is paid
+							withdraw.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
+							withdraw.PaidDate = item.transactionDate;
 						}
-						if (withDrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID)
+
+						// add bill info
+						WithdrawTransactionBill bill = new WithdrawTransactionBill()
 						{
-							transaction.Rollback();
-							return RESPONSE_CODE_BANK_WITHDRAW_PAID;
-						}
-						withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
-						withDrawTransaction.PaidDate = DateTime.Now;
+							WithdrawTransactionId = withdraw.WithdrawTransactionId,
+							PostingDate = item.postingDate,
+							TransactionDate = item.transactionDate,
+							AccountNo = item.accountNo,
+							CreditAmount = item.creditAmount,
+							DebitAmount = item.debitAmount,
+							Currency = item.currency,
+							Description = item.description,
+							AvailableBalance = item.availableBalance,
+							BeneficiaryAccount = item.beneficiaryAccount,
+							RefNo = item.refNo,
+							BenAccountNo = item.benAccountNo,
+							BenAccountName = item.benAccountName,
+							BankName = item.bankName,
+							DueDate = item.dueDate,
+							DocId = item.docId,
+							TransactionType = item.transactionType,
+						};
+						context.WithdrawTransactionBill.Add(bill);
 					}
-					transaction.Commit();
-					context.SaveChanges();
-					return RESPONSE_CODE_SUCCESS;
 				}
-				catch (Exception)
-				{
-					transaction.Rollback();
-					return RESPONSE_CODE_FAILD;
-				}
-			}
-
-		}
-		internal void RejectWithdrawTransaction(long withdrawTransactionId, string? note)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var transaction = context.Database.BeginTransaction();
-				try
-				{
-					//update withdraw transation status
-					var withdrawTransaction = context.WithdrawTransaction.First(x => x.WithdrawTransactionId == withdrawTransactionId);
-					withdrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_REJECT;
-					withdrawTransaction.Note = note;
-					context.SaveChanges();
-
-					// refund money to customer
-					var customer = context.User.First(x => x.UserId == withdrawTransaction.UserId);
-					customer.AccountBalance = customer.AccountBalance + withdrawTransaction.Amount;
-					context.SaveChanges();
-					transaction.Commit();
-				}
-				catch (Exception ex)
-				{
-					transaction.Rollback();
-					throw new Exception(ex.Message);
-				}
-
-			}
-		}
-
-		internal (int, long) GetDataWithdrawTransactionMakedToday(long userId)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var result = context.WithdrawTransaction
-											.Where(x =>
-											x.UserId == userId &&
-											x.RequestDate > DateTime.Now.Date && x.RequestDate < DateTime.Now)
-											.Select(x =>
-												new WithdrawTransaction
-												{
-													Amount = x.Amount
-												}
-											)
-											.ToList();
-				var totalRequestMaked = result.Count();
-				var totalAmountMaked = result.Sum(x => x.Amount);
-				return (totalRequestMaked, totalAmountMaked);
-			}
-
-		}
-
-		internal int GetNumberDepositTransactionMakedInToday(long userId)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var result = context.DepositTransaction
-											.Where(x =>
-											x.UserId == userId &&
-											x.RequestDate > DateTime.Now.Date && x.RequestDate < DateTime.Now)
-											.Select(x => new { })
-											.Count();
-				return result;
-			}
-		}
-
-		internal List<WithdrawTransaction> GetWithdrawTransactionReport(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status)
-		{
-			List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				withdraws = (from withdraw in context.WithdrawTransaction
-							 join user in context.User
-								 on withdraw.UserId equals user.UserId
-							 join userBank in context.UserBank
-								 on withdraw.UserBankId equals userBank.UserBankId
-							 join bank in context.Bank
-								 on userBank.BankId equals bank.BankId
-							 where
-							 (1 == 1) &&
-							 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
-							 user.Email.Contains(email) &&
-							 userBank.CreditAccount.Contains(creditAccount) &&
-							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
-							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
-							 (bankId == 0 ? true : bank.BankId == bankId)
-							 select new WithdrawTransaction
-							 {
-								 WithdrawTransactionId = withdraw.WithdrawTransactionId,
-								 UserId = withdraw.UserId,
-								 User = new User { Email = user.Email },
-								 Amount = withdraw.Amount,
-								 Code = withdraw.Code,
-								 RequestDate = withdraw.RequestDate,
-								 PaidDate = withdraw.PaidDate,
-								 UserBank = new UserBank
-								 {
-									 CreditAccount = userBank.CreditAccount,
-									 CreditAccountName = userBank.CreditAccountName,
-									 Bank = new Bank
-									 {
-										 BankCode = bank.BankCode,
-										 BankName = bank.BankName,
-									 }
-								 },
-								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
-							 }
-							)
-							.OrderByDescending(x => x.RequestDate)
-							.ToList();
-			}
-			return withdraws;
-		}
-
-		internal List<DepositTransaction> GetDataReportDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				var deposits = context.DepositTransaction
-							.Include(x => x.User)
-							.Where
-							(x =>
-								(userId == 0 ? true : userId == x.UserId) &&
-								((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
-								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
-								(status == 0 ? true : x.DepositTransactionStatusId == status)
-							)
-							.OrderByDescending(x => x.RequestDate)
-							.ToList();
-				return deposits;
-			}
-		}
-
-		internal List<WithdrawTransaction> GetListWithdrawnMoney(int month, int year)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				return context.WithdrawTransaction
-							.Include(x => x.User)
-							.Where(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID && x.PaidDate != null
-								&& x.PaidDate.Value.Year == year && (month == 0 ? true : x.PaidDate.Value.Month == month))
-							.OrderByDescending(x => x.PaidDate)
-							.ToList();
-			}
-		}
-
-		internal List<DepositTransaction> GetListDepositMoney(int month, int year)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				return context.DepositTransaction
-							.Include(x => x.User)
-							.Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED && x.PaidDate != null
-								&& x.PaidDate.Value.Year == year && (month == 0 ? true : x.PaidDate.Value.Month == month))
-							.OrderByDescending(x => x.PaidDate)
-							.ToList();
-			}
-		}
-
-		internal long GetNumberRequestWithdrawnMoney()
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				return context.WithdrawTransaction.LongCount(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING);
-
-			}
-		}
-
-		internal void UpdateStatusRequestDepositMoneyToExpired(int days)
-		{
-			using (DatabaseContext context = new DatabaseContext())
-			{
-				DateTime timeAccept = DateTime.Now.AddDays(-days);
-				var deposits = context.DepositTransaction
-									  .Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY &&
-											 x.RequestDate < timeAccept)
-									  .ToList();
-				deposits.ForEach(x => x.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_EXPIRED);
-				context.UpdateRange(deposits);
 				context.SaveChanges();
+				transaction.Commit();
+			}
+			catch (Exception ex)
+			{
+				transaction.Rollback();
+				throw new Exception(ex.Message);
 			}
 		}
 	}
+	#endregion
+
+	internal void UpdateUserBankStatus(UserBank userBankUpdate)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var userBank = context.UserBank.FirstOrDefault(x => x.UserBankId == userBankUpdate.UserBankId);
+			if (userBank == null) throw new Exception("User's bank account not existed!");
+			userBank.UpdateAt = DateTime.Now;
+			userBank.isActivate = false;
+			context.SaveChanges();
+		}
+	}
+
+	internal int GetNumberDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var deposits = context.DepositTransaction
+						.Include(x => x.User)
+						.Where
+						(x =>
+							(userId != 0) ? userId == x.UserId : true &&
+							(!string.IsNullOrEmpty(email)) ? x.User.Email.Contains(email) : true &&
+							(fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true &&
+							(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+							(status == 0 ? true : x.DepositTransactionStatusId == status)
+						)
+						.Count();
+			return deposits;
+		}
+	}
+
+	internal List<DepositTransaction> GetDepositTransaction(int userId, long depositTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var deposits = context.DepositTransaction
+						.Where
+						(x =>
+							userId == x.UserId &&
+							((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
+							(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+							(status == 0 ? true : x.DepositTransactionStatusId == status)
+						)
+						.OrderByDescending(x => x.RequestDate)
+						.Skip((page - 1) * Constants.PAGE_SIZE)
+						.Take(Constants.PAGE_SIZE)
+						.ToList();
+			return deposits;
+		}
+	}
+
+	internal List<DepositTransaction> GetDepositTransactionSucess(long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int page)
+	{
+		List<DepositTransaction> deposits = new List<DepositTransaction>();
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			deposits = context.DepositTransaction
+						.Include(x => x.User)
+						.Where(x =>
+								(!string.IsNullOrEmpty(email)) ? x.User.Email.Contains(email) : true &&
+								((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
+								(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+								x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED
+							)
+						.OrderByDescending(x => x.RequestDate)
+						.Skip((page - 1) * Constants.PAGE_SIZE)
+						.Take(Constants.PAGE_SIZE)
+						.ToList();
+		}
+		return deposits;
+	}
+
+	internal List<WithdrawTransaction> GetWithdrawTransaction(int userId, long withdrawTransactionId, DateTime? fromDate, DateTime? toDate, int status, int page)
+	{
+		List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			withdraws = (from withdraw in context.WithdrawTransaction
+						 join user in context.User
+							 on withdraw.UserId equals user.UserId
+						 join userBank in context.UserBank
+							 on withdraw.UserBankId equals userBank.UserBankId
+						 join bank in context.Bank
+							 on userBank.BankId equals bank.BankId
+						 where
+						 withdraw.UserId == userId &&
+						 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
+						 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+						 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status)
+						 select new WithdrawTransaction
+						 {
+							 WithdrawTransactionId = withdraw.WithdrawTransactionId,
+							 UserId = withdraw.UserId,
+							 User = new User { Email = user.Email },
+							 Amount = withdraw.Amount,
+							 Code = withdraw.Code,
+							 RequestDate = withdraw.RequestDate,
+							 PaidDate = withdraw.PaidDate,
+							 UserBank = new UserBank
+							 {
+								 CreditAccount = userBank.CreditAccount,
+								 CreditAccountName = userBank.CreditAccountName,
+								 Bank = new Bank
+								 {
+									 BankCode = bank.BankCode,
+									 BankName = bank.BankName,
+								 }
+							 },
+							 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+						 }
+						)
+						.OrderByDescending(x => x.RequestDate)
+						.Skip((page - 1) * Constants.PAGE_SIZE)
+						.Take(Constants.PAGE_SIZE)
+						.ToList();
+		}
+		return withdraws;
+	}
+
+	internal int GetNumberWithdrawTransactionWithCondition(int userId, long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var withdraws = (from withdraw in context.WithdrawTransaction
+							 join user in context.User
+								 on withdraw.UserId equals user.UserId
+							 join userBank in context.UserBank
+								 on withdraw.UserBankId equals userBank.UserBankId
+							 join bank in context.Bank
+								 on userBank.BankId equals bank.BankId
+							 where
+							 (userId == 0 ? true : withdraw.UserId == userId) &&
+							 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
+							 user.Email.Contains(email) &&
+							 userBank.CreditAccount.Contains(creditAccount) &&
+							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+							 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
+							 (bankId == 0 ? true : bank.BankId == bankId)
+							 select new { }
+							).Count();
+			return withdraws;
+		}
+	}
+
+	internal List<WithdrawTransaction> GetAllWithdrawTransaction(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status, int page)
+	{
+		List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			withdraws = (from withdraw in context.WithdrawTransaction
+						 join user in context.User
+							 on withdraw.UserId equals user.UserId
+						 join userBank in context.UserBank
+							 on withdraw.UserBankId equals userBank.UserBankId
+						 join bank in context.Bank
+							 on userBank.BankId equals bank.BankId
+						 where
+						 (1 == 1) &&
+						 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
+						 user.Email.Contains(email) &&
+						 userBank.CreditAccount.Contains(creditAccount) &&
+						 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+						 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
+						 (bankId == 0 ? true : bank.BankId == bankId)
+						 select new WithdrawTransaction
+						 {
+							 WithdrawTransactionId = withdraw.WithdrawTransactionId,
+							 UserId = withdraw.UserId,
+							 User = new User { Email = user.Email },
+							 Amount = withdraw.Amount,
+							 Code = withdraw.Code,
+							 RequestDate = withdraw.RequestDate,
+							 PaidDate = withdraw.PaidDate,
+							 UserBank = new UserBank
+							 {
+								 CreditAccount = userBank.CreditAccount,
+								 CreditAccountName = userBank.CreditAccountName,
+								 Bank = new Bank
+								 {
+									 BankCode = bank.BankCode,
+									 BankName = bank.BankName,
+								 }
+							 },
+							 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+						 }
+						)
+						.OrderByDescending(x => x.RequestDate)
+						.Skip((page - 1) * Constants.PAGE_SIZE)
+						.Take(Constants.PAGE_SIZE)
+						.ToList();
+		}
+		return withdraws;
+	}
+
+	internal List<WithdrawTransaction> GetAllWithdrawTransactionUnPay(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var withdraws = (from withdraw in context.WithdrawTransaction
+							 join user in context.User
+								 on withdraw.UserId equals user.UserId
+							 join userBank in context.UserBank
+								 on withdraw.UserBankId equals userBank.UserBankId
+							 join bank in context.Bank
+								 on userBank.BankId equals bank.BankId
+							 where
+							 (1 == 1) &&
+							 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
+							 user.Email.Contains(email) &&
+							 userBank.CreditAccount.Contains(creditAccount) &&
+							 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+							 withdraw.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING &&
+							 (bankId == 0 ? true : bank.BankId == bankId)
+							 select new WithdrawTransaction
+							 {
+								 WithdrawTransactionId = withdraw.WithdrawTransactionId,
+								 UserId = withdraw.UserId,
+								 User = new User { Email = user.Email },
+								 Amount = withdraw.Amount,
+								 Code = withdraw.Code,
+								 RequestDate = withdraw.RequestDate,
+								 PaidDate = withdraw.PaidDate,
+								 UserBank = new UserBank
+								 {
+									 CreditAccount = userBank.CreditAccount,
+									 CreditAccountName = userBank.CreditAccountName,
+									 Bank = new Bank
+									 {
+										 BankCode = bank.BankCode,
+										 BankName = bank.BankName,
+									 }
+								 },
+								 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+							 }
+						)
+						.ToList();
+			return withdraws;
+		}
+	}
+
+	internal WithdrawTransaction? GetWithdrawTransaction(long withdrawTransactionId)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var transaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
+			return transaction;
+		}
+	}
+
+	internal WithdrawTransactionBill? GetWithdrawTransactionBill(long withdrawTransactionId)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var bill = context.WithdrawTransactionBill.FirstOrDefault(x => x.WithdrawTransactionId == withdrawTransactionId);
+			return bill;
+		}
+	}
+
+	internal void UpdateWithdrawTransactionCancel(int id)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var transaction = context.Database.BeginTransaction();
+			try
+			{
+				var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == id);
+				if (withDrawTransaction == null) throw new Exception();
+				if (withDrawTransaction.WithdrawTransactionStatusId != Constants.WITHDRAW_TRANSACTION_IN_PROCESSING)
+				{
+					throw new Exception();
+				}
+				withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_CANCEL;
+				context.WithdrawTransaction.Update(withDrawTransaction);
+				context.SaveChanges();
+
+				var customer = context.User.First(x => x.UserId == withDrawTransaction.UserId);
+				customer.AccountBalance += withDrawTransaction.Amount;
+				context.User.Update(customer);
+				context.SaveChanges();
+				transaction.Commit();
+			}
+			catch (Exception)
+			{
+				transaction.Rollback();
+			}
+		}
+	}
+
+	internal void UpdateWithdrawTransaction(long transactionId)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
+			if (withDrawTransaction == null) throw new Exception();
+			withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
+			withDrawTransaction.PaidDate = DateTime.Now;
+			context.SaveChanges();
+		}
+	}
+
+	internal string UpdateListWithdrawTransactionPaid(List<long> transactionIds)
+	{
+		string RESPONSE_CODE_SUCCESS = "00";
+		string RESPONSE_CODE_FAILD = "03";
+		string RESPONSE_CODE_DATA_NOT_FOUND = "02";
+		string RESPONSE_CODE_BANK_WITHDRAW_PAID = "BANK_01";
+
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var transaction = context.Database.BeginTransaction();
+			try
+			{
+				foreach (var transactionId in transactionIds)
+				{
+					var withDrawTransaction = context.WithdrawTransaction.FirstOrDefault(x => x.WithdrawTransactionId == transactionId);
+					if (withDrawTransaction == null)
+					{
+						transaction.Rollback();
+						return RESPONSE_CODE_DATA_NOT_FOUND;
+					}
+					if (withDrawTransaction.WithdrawTransactionStatusId == Constants.WITHDRAW_TRANSACTION_PAID)
+					{
+						transaction.Rollback();
+						return RESPONSE_CODE_BANK_WITHDRAW_PAID;
+					}
+					withDrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_PAID;
+					withDrawTransaction.PaidDate = DateTime.Now;
+				}
+				transaction.Commit();
+				context.SaveChanges();
+				return RESPONSE_CODE_SUCCESS;
+			}
+			catch (Exception)
+			{
+				transaction.Rollback();
+				return RESPONSE_CODE_FAILD;
+			}
+		}
+
+	}
+	internal void RejectWithdrawTransaction(long withdrawTransactionId, string? note)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var transaction = context.Database.BeginTransaction();
+			try
+			{
+				//update withdraw transation status
+				var withdrawTransaction = context.WithdrawTransaction.First(x => x.WithdrawTransactionId == withdrawTransactionId);
+				withdrawTransaction.WithdrawTransactionStatusId = Constants.WITHDRAW_TRANSACTION_REJECT;
+				withdrawTransaction.Note = note;
+				context.SaveChanges();
+
+				// refund money to customer
+				var customer = context.User.First(x => x.UserId == withdrawTransaction.UserId);
+				customer.AccountBalance = customer.AccountBalance + withdrawTransaction.Amount;
+				context.SaveChanges();
+				transaction.Commit();
+			}
+			catch (Exception ex)
+			{
+				transaction.Rollback();
+				throw new Exception(ex.Message);
+			}
+
+		}
+	}
+
+	internal (int, long) GetDataWithdrawTransactionMakedToday(long userId)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var result = context.WithdrawTransaction
+										.Where(x =>
+										x.UserId == userId &&
+										x.RequestDate > DateTime.Now.Date && x.RequestDate < DateTime.Now)
+										.Select(x =>
+											new WithdrawTransaction
+											{
+												Amount = x.Amount
+											}
+										)
+										.ToList();
+			var totalRequestMaked = result.Count();
+			var totalAmountMaked = result.Sum(x => x.Amount);
+			return (totalRequestMaked, totalAmountMaked);
+		}
+
+	}
+
+	internal int GetNumberDepositTransactionMakedInToday(long userId)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var result = context.DepositTransaction
+										.Where(x =>
+										x.UserId == userId &&
+										x.RequestDate > DateTime.Now.Date && x.RequestDate < DateTime.Now)
+										.Select(x => new { })
+										.Count();
+			return result;
+		}
+	}
+
+	internal List<WithdrawTransaction> GetWithdrawTransactionReport(long withdrawTransactionId, string email, DateTime? fromDate, DateTime? toDate, long bankId, string creditAccount, int status)
+	{
+		List<WithdrawTransaction> withdraws = new List<WithdrawTransaction>();
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			withdraws = (from withdraw in context.WithdrawTransaction
+						 join user in context.User
+							 on withdraw.UserId equals user.UserId
+						 join userBank in context.UserBank
+							 on withdraw.UserBankId equals userBank.UserBankId
+						 join bank in context.Bank
+							 on userBank.BankId equals bank.BankId
+						 where
+						 (1 == 1) &&
+						 ((fromDate != null && toDate != null) ? fromDate <= withdraw.RequestDate && toDate >= withdraw.RequestDate : true) &&
+						 user.Email.Contains(email) &&
+						 userBank.CreditAccount.Contains(creditAccount) &&
+						 (withdrawTransactionId == 0 ? true : withdraw.WithdrawTransactionId == withdrawTransactionId) &&
+						 (status == 0 ? true : withdraw.WithdrawTransactionStatusId == status) &&
+						 (bankId == 0 ? true : bank.BankId == bankId)
+						 select new WithdrawTransaction
+						 {
+							 WithdrawTransactionId = withdraw.WithdrawTransactionId,
+							 UserId = withdraw.UserId,
+							 User = new User { Email = user.Email },
+							 Amount = withdraw.Amount,
+							 Code = withdraw.Code,
+							 RequestDate = withdraw.RequestDate,
+							 PaidDate = withdraw.PaidDate,
+							 UserBank = new UserBank
+							 {
+								 CreditAccount = userBank.CreditAccount,
+								 CreditAccountName = userBank.CreditAccountName,
+								 Bank = new Bank
+								 {
+									 BankCode = bank.BankCode,
+									 BankName = bank.BankName,
+								 }
+							 },
+							 WithdrawTransactionStatusId = withdraw.WithdrawTransactionStatusId,
+						 }
+						)
+						.OrderByDescending(x => x.RequestDate)
+						.ToList();
+		}
+		return withdraws;
+	}
+
+	internal List<DepositTransaction> GetDataReportDepositTransaction(int userId, long depositTransactionId, string? email, DateTime? fromDate, DateTime? toDate, int status)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			var deposits = context.DepositTransaction
+						.Include(x => x.User)
+						.Where
+						(x =>
+							(userId == 0 ? true : userId == x.UserId) &&
+							((fromDate != null && toDate != null) ? fromDate <= x.RequestDate && toDate >= x.RequestDate : true) &&
+							(depositTransactionId == 0 ? true : x.DepositTransactionId == depositTransactionId) &&
+							(status == 0 ? true : x.DepositTransactionStatusId == status)
+						)
+						.OrderByDescending(x => x.RequestDate)
+						.ToList();
+			return deposits;
+		}
+	}
+
+	internal List<WithdrawTransaction> GetListWithdrawnMoney(int month, int year)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			return context.WithdrawTransaction
+						.Include(x => x.User)
+						.Where(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_PAID && x.PaidDate != null
+							&& x.PaidDate.Value.Year == year && (month == 0 ? true : x.PaidDate.Value.Month == month))
+						.OrderByDescending(x => x.PaidDate)
+						.ToList();
+		}
+	}
+
+	internal List<DepositTransaction> GetListDepositMoney(int month, int year)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			return context.DepositTransaction
+						.Include(x => x.User)
+						.Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_PAIDED && x.PaidDate != null
+							&& x.PaidDate.Value.Year == year && (month == 0 ? true : x.PaidDate.Value.Month == month))
+						.OrderByDescending(x => x.PaidDate)
+						.ToList();
+		}
+	}
+
+	internal long GetNumberRequestWithdrawnMoney()
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			return context.WithdrawTransaction.LongCount(x => x.WithdrawTransactionId == Constants.WITHDRAW_TRANSACTION_IN_PROCESSING);
+
+		}
+	}
+
+	internal void UpdateStatusRequestDepositMoneyToExpired(int days)
+	{
+		using (DatabaseContext context = new DatabaseContext())
+		{
+			DateTime timeAccept = DateTime.Now.AddDays(-days);
+			var deposits = context.DepositTransaction
+								  .Where(x => x.DepositTransactionStatusId == Constants.DEPOSIT_TRANSACTION_STATUS_UNPAY &&
+										 x.RequestDate < timeAccept)
+								  .ToList();
+			deposits.ForEach(x => x.DepositTransactionStatusId = Constants.DEPOSIT_TRANSACTION_STATUS_EXPIRED);
+			context.UpdateRange(deposits);
+			context.SaveChanges();
+		}
+	}
+}
 }

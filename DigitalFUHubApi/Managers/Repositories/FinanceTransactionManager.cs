@@ -37,7 +37,7 @@ namespace DigitalFUHubApi.Managers.Repositories
 			}
 		}
 
-		public Queue<FinanceTransaction> GetQueuesAndClearItemsGeted()
+		public Queue<FinanceTransaction> GetData()
 		{
 			//copy
 			Queue<FinanceTransaction> copy = data;

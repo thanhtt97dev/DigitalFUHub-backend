@@ -9,21 +9,16 @@ namespace DigitalFUHubApi.Jobs
 {
 	public class FinanceTransactionJob : IJob
 	{
-		private Queue<FinanceTransaction> data = new Queue<FinanceTransaction>();
 		private readonly FinanceTransactionService financeTransactionService;
 
-		public FinanceTransactionJob(Queue<FinanceTransaction> data, FinanceTransactionService financeTransactionService)
+		public FinanceTransactionJob(FinanceTransactionService financeTransactionService)
 		{
-			this.data = data;
 			this.financeTransactionService = financeTransactionService;
 		}
 
 		public Task Execute(IJobExecutionContext context)
 		{
-			if(data.Count == 0) return Task.CompletedTask;
-
 			financeTransactionService.HandleFinanceTransactions();
-
 			return Task.CompletedTask;
 		}
 	}

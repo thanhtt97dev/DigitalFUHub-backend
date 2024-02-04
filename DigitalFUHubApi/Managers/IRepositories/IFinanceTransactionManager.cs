@@ -10,6 +10,6 @@ namespace DigitalFUHubApi.Managers.IRepositories
         FinanceTransaction? Peek();
         void Clear();
         int Count();
-        Queue<FinanceTransaction> GetQueuesAndClearItemGeted();
+        Queue<FinanceTransaction> GetData();
 	}
 }
