@@ -12,7 +12,7 @@ namespace BusinessObject
 
 		public readonly string connectionString = "server=localhost; database=DigitalFuHub; uid=sa; pwd=sa;MultipleActiveResultSets=true";
 
-		//public readonly string connectionString = "Server=tcp:fptu-server.database.windows.net,1433;Initial Catalog=fptu;Persist Security Info=False;User ID=fptu;Password=A0336687454a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+		//public readonly string connectionString = "Server=tcp:digitalfuhub-server.database.windows.net,1433;Initial Catalog=digitalfuhub;Persist Security Info=False;User ID=digitalfuhub;Password=A0336687454a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
 		public DatabaseContext() { }
 

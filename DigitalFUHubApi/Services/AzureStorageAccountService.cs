@@ -23,7 +23,7 @@ namespace DigitalFUHubApi.Services
 				var blobClient = container.GetBlobClient(filename);
 				var blobHttpHeader = new BlobHttpHeaders { ContentType = Util.Instance.GetContentType(filename) };
 				await blobClient.UploadAsync(fileUpload.OpenReadStream(), new BlobUploadOptions { HttpHeaders = blobHttpHeader });
-				return string.Format("{0}/{1}/{2}", Constants.AZURE_ROOT_PATH, Constants.AZURE_STORAGE_CONTAINER_NAME, filename);
+				return string.Format("{0}/{1}/{2}", Constants.AZURE_STORAGE_CONNECTION_ROOT_PATH, Constants.AZURE_STORAGE_CONTAINER_NAME, filename);
 			}
 			catch (Exception e)
 			{
