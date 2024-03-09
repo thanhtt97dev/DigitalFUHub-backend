@@ -19,7 +19,13 @@ namespace DigitalFUHubApi.Services
 {
 	public class OpticalCharacterRecognitionService
 	{
-		public OpticalCharacterRecognitionService() { }
+		private IConfiguration Configuration;
+
+		public OpticalCharacterRecognitionService(IConfiguration configuration)
+		{
+			Configuration = configuration;
+		}
+
 
 		#region Clarify image
 		public void ClarifyImage(string base64)
@@ -137,9 +143,10 @@ namespace DigitalFUHubApi.Services
 		{
 			var imageStream = new MemoryStream(bytes);
 
-			ApiKeyServiceClientCredentials visionCredentials = new(Constants.AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY);
+			ApiKeyServiceClientCredentials visionCredentials =
+				new(Configuration[Constants.AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY]);
 			ComputerVisionClient client = new ComputerVisionClient(visionCredentials);
-			client.Endpoint = Constants.AZURE_COMPUTER_VISION_ENDPOINT;
+			client.Endpoint = Configuration[Constants.AZURE_COMPUTER_VISION_ENDPOINT];
 
 			ReadOperationResult results;
 

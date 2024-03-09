@@ -118,12 +118,12 @@ namespace Comons
 		public const int MIN_SELLER_REGISTRATION_FEE = 10000;
 
 		//Azure
-		public const string AZURE_COMPUTER_VISION_ENDPOINT = "https://digitalfuhubs.cognitiveservices.azure.com";
-		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = "8ab501ac9b9848949cd0d541c42fd99a";
-		public const string AZURE_EXTRACT_TEXT_FROM_IMAGE_API = $"{AZURE_COMPUTER_VISION_ENDPOINT}/computervision/imageanalysis:analyze?api-version=2023-02-01-preview&features=read&language=en";
-		public const string AZURE_STORAGE_CONNECTION_ROOT_PATH = "https://digitalfuhubs.blob.core.windows.net";
-		public const string AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=digitalfuhubs;AccountKey=iNt80tVSJotWojA+kSRqtamqvQveGsOSaJN6cZrn5OLdE5gzE2z7U2rQlZqNBPzQxhT99paD1S67+AStVLWsoQ==;EndpointSuffix=core.windows.net";
-		public const string AZURE_STORAGE_CONTAINER_NAME = "digitalfuhub";
+		private const string AZURE = "Azure";
+		public const string AZURE_COMPUTER_VISION_ENDPOINT = $"{AZURE}:ComputerVisonEndpoint";
+		public const string AZURE_COMPUTER_VISION_SUBSCRIPTION_KEY = $"{AZURE}:ComputerVisonSubcriptionKey";
+		public const string AZURE_STORAGE_END_POINT = $"{AZURE}:StorageEndPoint";
+		public const string AZURE_STORAGE_CONNECTION_STRING = $"{AZURE}:StorageConnectionString";
+		public const string AZURE_STORAGE_CONTAINER_NAME = $"{AZURE}:StorageContainerName";
 
 		// Product Status
 		public const int PRODUCT_STATUS_ALL = 0;
