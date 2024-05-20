@@ -15,15 +15,17 @@ namespace DTOs.MbBank
 		public int debitAmount { get; set; }
 		public string? currency { get; set; }
 		public string description { get; set; } = null!;
+		public string? addDescription { get; set; }
 		public int availableBalance { get; set; }
 		public string? beneficiaryAccount { get; set; }
 		public string refNo { get; set; } = null!;
 		public string? benAccountName { get; set; }
 		public string? bankName { get; set; }
-		public string benAccountNo { get; set; } = string.Empty;
+		public string? benAccountNo { get; set; }
 		public DateTime? dueDate { get; set; }
 		public string? docId { get; set; }
 		public string? transactionType { get; set; }
-
+		public string? pos { get; set; }
+		public string? tracingType { get; set; }
 	}
 }

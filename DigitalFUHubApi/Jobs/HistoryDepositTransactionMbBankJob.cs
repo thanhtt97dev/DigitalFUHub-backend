@@ -13,16 +13,9 @@ namespace DigitalFUHubApi.Jobs
 {
     public class HistoryDepositTransactionMbBankJob : IJob
 	{
-		private readonly FinanceTransactionService financeTransactionService;
-
-		public HistoryDepositTransactionMbBankJob(FinanceTransactionService financeTransactionService)
-		{
-			this.financeTransactionService = financeTransactionService;
-		}
-
 		public Task Execute(IJobExecutionContext context)
 		{
-			return Task.CompletedTask;
+			//return Task.CompletedTask;
 			//get folder name history transaction data
 			string? directoryPathStoreData = Constants.MB_BANK_DIRECTORY_PATH_STORE_TRANSACTION_DATA;
 			if (directoryPathStoreData == null)
@@ -71,7 +64,6 @@ namespace DigitalFUHubApi.Jobs
 			//BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
 
 			List<DepositTransaction> depositTransactions = BankDAO.Instance.GetCreditTransactionsUnPay(transactionHistoryCreditList);
-			financeTransactionService.AddDepositTransactions(depositTransactions);
 
 			return Task.CompletedTask;
 		}

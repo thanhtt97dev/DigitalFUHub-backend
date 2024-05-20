@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "postingDate": "2024-05-20T22:32:00",
+    "transactionDate": "2024-05-20T22:32:00",
+    "accountNo": "0336687454",
+    "creditAmount": 10000,
+    "debitAmount": 0,
+    "currency": "VND",
+    "description": "CUSTOMER GGWFGHNFBO6FU FT24142717353883   Ma  giao dich  Trace643303 Trace 64330",
+    "addDescription": "GGWFGHNFBO6FU FT24142717353883   Ma  giao dich  Trace643303 Trace 64330 ",
+    "availableBalance": 10000,
+    "beneficiaryAccount": "",
+    "refNo": "FT24141394720642\\BNK",
+    "benAccountName": "",
+    "bankName": "",
+    "benAccountNo": "",
+    "dueDate": null,
+    "docId": "",
+    "transactionType": "ACSM",
+    "pos": "00001006580822585102",
+    "tracingType": ""
+  }
+]

@@ -14,6 +14,10 @@ namespace Comons
 		public const int NUMBER_DAYS_CAN_UPDATE_BANK_ACCOUNT = 3;
 		public const string BANK_TRANSACTION_CODE_KEY = "FU";
 
+		public const string MB_BANK_REQUEST_HEADER_AUTHORIZATION = "Authorization";
+		public const string MB_BANK_REQUEST_HEADER_REF_NO = "Refno";
+		public const string MB_BANK_REQUEST_HEADER_DEVICE_ID = "Deviceid";
+
 		public const string MB_BANK_RESPONE_CODE_SUCCESS = "00";
 		public const string MB_BANK_RESPONE_CODE_SESSION_INVALID = "GW200";
 		public const string MB_BANK_RESPONE_CODE_SAME_URI_IN_SAME_TIME = "GW485";

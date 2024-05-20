@@ -18,7 +18,7 @@ namespace DigitalFUHubApi.Services
 		{
 			client = new HttpClient();
 			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			client.DefaultRequestHeaders.Add("Authorization", "Basic " + Constants.MB_BANK_BASIC_AUTH_BASE64);
+			client.DefaultRequestHeaders.Add(Constants.MB_BANK_REQUEST_HEADER_AUTHORIZATION, "Basic " + Constants.MB_BANK_BASIC_AUTH_BASE64);
 		}
 
 		#region Get Mb Bank account info
@@ -37,8 +37,14 @@ namespace DigitalFUHubApi.Services
 		#region Get History Transaction
 		public async Task<MbBankResponeHistoryTransactionDataDTO?> GetHistoryTransaction()
 		{
+			
+
 			MbBankAccount? mbBankAccount = GetMbBankAccount();
 			if (mbBankAccount == null) return null;
+
+			//setting request header
+			client.DefaultRequestHeaders.Add(Constants.MB_BANK_REQUEST_HEADER_REF_NO, mbBankAccount.RefNo);
+			client.DefaultRequestHeaders.Add(Constants.MB_BANK_REQUEST_HEADER_DEVICE_ID, mbBankAccount.DeviceIdCommon);
 
 			MbBankRequestBodyHistoryTransactionDTO mbBank = new MbBankRequestBodyHistoryTransactionDTO()
 			{
@@ -61,6 +67,10 @@ namespace DigitalFUHubApi.Services
 			options.Converters.Add(new JsonSerializerIntConverter());
 
 			var data = JsonSerializer.Deserialize<MbBankResponeHistoryTransactionDataDTO>(respone, options);
+
+			//remove setting request header
+			client.DefaultRequestHeaders.Remove(Constants.MB_BANK_REQUEST_HEADER_REF_NO);
+			client.DefaultRequestHeaders.Remove(Constants.MB_BANK_REQUEST_HEADER_DEVICE_ID);
 
 			return data;
 		}
