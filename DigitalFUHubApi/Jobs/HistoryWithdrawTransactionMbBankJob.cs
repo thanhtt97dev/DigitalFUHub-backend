@@ -12,6 +12,7 @@ namespace DigitalFUHubApi.Jobs
 	{
 		public Task Execute(IJobExecutionContext context)
 		{
+			return Task.CompletedTask;
 			//get folder name history transaction data
 			string? directoryPathStoreData = Constants.MB_BANK_DIRECTORY_PATH_STORE_TRANSACTION_DATA;
 			if (directoryPathStoreData == null)

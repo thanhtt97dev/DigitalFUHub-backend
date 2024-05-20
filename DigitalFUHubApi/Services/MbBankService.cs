@@ -156,6 +156,7 @@ namespace DigitalFUHubApi.Services
 			{
 				captcha = captcha,
 				deviceIdCommon = mbBankAccount.DeviceIdCommon,
+				ibAuthen2faString = mbBankAccount.IbAuthen2faString,
 				password = mbBankAccount.Password,
 				refNo = mbBankAccount.RefNo,
 				sessionId = null,

@@ -32,6 +32,7 @@ namespace DigitalFUHubApi.Services
 			};
 
 			MailMessage mailMessage = new MailMessage(from: mail, to: email);
+			mailMessage.To.Add(subject);
 			mailMessage.Subject = subject;
 			mailMessage.Body = message;
 			mailMessage.IsBodyHtml = true;

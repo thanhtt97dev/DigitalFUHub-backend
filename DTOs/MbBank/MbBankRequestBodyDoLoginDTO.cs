@@ -10,6 +10,7 @@ namespace DTOs.MbBank
 	{
 		public string? captcha { get; set; }
 		public string? deviceIdCommon { get; set; }
+		public string? ibAuthen2faString { get; set; }
 		public string? password { get; set; }
 		public string? refNo { get; set; }
 		public string? sessionId { get; set; }

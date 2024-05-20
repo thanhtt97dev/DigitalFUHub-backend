@@ -20,7 +20,7 @@ namespace DigitalFUHubApi.Jobs
 
 		public async Task Execute(IJobExecutionContext context)
 		{
-			return;
+			//return;
 			string base64CaptchaImage = string.Empty;
 			string sessionId = string.Empty;
 
