@@ -61,9 +61,9 @@ namespace DigitalFUHubApi.Jobs
 			// Save new data into file
 			Util.WriteFile(directoryPathStoreDepositData, transactionHistoryCreditList);
 			//Update DB
-			//BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
+			BankDAO.Instance.CheckingCreditTransactions(transactionHistoryCreditList);
 
-			List<DepositTransaction> depositTransactions = BankDAO.Instance.GetCreditTransactionsUnPay(transactionHistoryCreditList);
+			//List<DepositTransaction> depositTransactions = BankDAO.Instance.GetCreditTransactionsUnPay(transactionHistoryCreditList);
 
 			return Task.CompletedTask;
 		}
